@@ -10,10 +10,10 @@
        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <import resource="classpath:/dss_applicationContext_soap.xml"/>
-	<import resource="classpath:/dss_applicationContext_rest.xml"/>
-	<import resource="classpath:/dss_validation_applicationContext_rest.xml"/>
-	<import resource="classpath:/dss_validation_applicationContext_soap.xml"/>
+    <import resource="classpath:spring/dss_signature_applicationContext_soap.xml"/>
+	<import resource="classpath:spring/dss_signature_applicationContext_rest.xml"/>
+	<import resource="classpath:spring/dss_validation_applicationContext_rest.xml"/>
+	<import resource="classpath:spring/dss_validation_applicationContext_soap.xml"/>
     
     <context:annotation-config />
 	<context:component-scan base-package="eu.europa.esig.dss" />

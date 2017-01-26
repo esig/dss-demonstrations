@@ -58,6 +58,6 @@
 		<property name="dataLoader" ref="dataLoader" />
 	</bean>
 
-    <import resource="classpath:/service-definitions.xml" />
+    <import resource="classpath:spring/service-definitions.xml" />
         
 </beans>    
