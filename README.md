@@ -1,6 +1,6 @@
-## DSS : Digital Signature Service
+## Demonstrations for DSS : Digital Signature Service
 
-This is the official repository for project DSS : https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eSignature. 
+This is the demonstration repository for project DSS : https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eSignature. 
 
 # Issue Tracker
 

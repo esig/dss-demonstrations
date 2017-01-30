@@ -6,7 +6,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>4.8-SNAPSHOT</version>
+	<version>5.0.RC1</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
