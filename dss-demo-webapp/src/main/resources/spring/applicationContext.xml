@@ -76,7 +76,7 @@
 	<bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="tslValidationJobDetail" />
 		<property name="startDelay" value="5000" />
-		<property name="repeatInterval" value="300000" /> <!-- 5min -->
+		<property name="repeatInterval" value="${tl.refresh.interval}" />
 	</bean>
 
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">

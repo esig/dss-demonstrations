@@ -3,7 +3,7 @@
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
-<h2>NexU</h2>
+<h2><spring:message code="label.signADocument" /></h2>
 <form:form method="post" modelAttribute="signatureDocumentForm" cssClass="form-horizontal" enctype="multipart/form-data">
 
     <input type="hidden" id="isSign" value="true" />

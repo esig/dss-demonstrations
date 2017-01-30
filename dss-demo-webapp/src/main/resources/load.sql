@@ -1,8 +1,3 @@
-
-INSERT INTO PREFERENCES (PREF_KEY , PREF_VALUE) values ( 'preference.url.jar', 'http://localhost:8080/jar/signature-applet-r5.jar');
-INSERT INTO PREFERENCES (PREF_KEY , PREF_VALUE) values ( 'preference.url.service', 'http://localhost:8080/services/SignatureService?wsdl');
-INSERT INTO PREFERENCES (PREF_KEY , PREF_VALUE) values ( 'preference.default.policy.url', null);
-
 INSERT INTO PROXY_PREFERENCES (PROXY_KEY , PROXY_VALUE) values ( 'proxy.http.host', '127.0.0.1');
 INSERT INTO PROXY_PREFERENCES (PROXY_KEY , PROXY_VALUE) values ( 'proxy.http.port', '8008');
 INSERT INTO PROXY_PREFERENCES (PROXY_KEY , PROXY_VALUE) values ( 'proxy.http.user', '');

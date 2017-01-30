@@ -21,18 +21,12 @@
 package eu.europa.esig.dss.web.dao;
 
 import eu.europa.esig.dss.web.model.Preference;
-import eu.europa.esig.dss.web.model.PreferenceKey;
 
 /**
  * 
- * TODO
- * 
- *
- *
- * 
- *
+ * DAO interface for Preferences
  *
  */
-public interface PreferencesDao extends GenericDao<Preference, PreferenceKey> {
+public interface PreferencesDao extends GenericDao<Preference, String> {
 
 }

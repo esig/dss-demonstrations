@@ -28,18 +28,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyKey;
 import eu.europa.esig.dss.client.http.proxy.ProxyPreference;
 import eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager;
-import eu.europa.esig.dss.web.model.PreferenceForm;
+import eu.europa.esig.dss.web.model.Preference;
 
 /**
- * Controller for proxi edition
+ * Controller for proxy edition
  */
 @Controller
-@RequestMapping(value = "/admin/proxy")
+@RequestMapping(value = "/admin")
 public class ProxyEditController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProxyEditController.class);
@@ -48,22 +48,14 @@ public class ProxyEditController {
 	private ProxyPreferenceManager proxyPreferenceManager;
 
 	/**
-	 * @param webRequest
-	 *            The web request
-	 * @return a proxy form bean
+	 * @param model
+	 *            The model attributes
+	 * @return a view name
 	 */
-	@ModelAttribute("preferenceForm")
-	public final PreferenceForm setupForm(final WebRequest webRequest) {
-
-		final String requestKey = webRequest.getParameter("key");
-		final PreferenceForm form = new PreferenceForm();
-		final ProxyKey proxyKey = ProxyKey.fromKey(requestKey);
-		final ProxyPreference preference = proxyPreferenceManager.get(proxyKey);
-
-		form.setKey(preference.getProxyKey().getKeyName());
-		form.setValue(preference.getValue());
-
-		return form;
+	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.GET)
+	public String showProxy(final Model model) {
+		model.addAttribute("preferences", proxyPreferenceManager.list());
+		return "admin-proxy-list";
 	}
 
 	/**
@@ -71,8 +63,17 @@ public class ProxyEditController {
 	 *            The view model
 	 * @return a view name
 	 */
-	@RequestMapping(value = "/edit", method = RequestMethod.GET)
-	public String showForm(final Model model) {
+	@RequestMapping(value = "/proxy/edit", method = RequestMethod.GET)
+	public String showForm(@RequestParam(name = "key") String requestKey, final Model model) {
+
+		final ProxyKey proxyKey = ProxyKey.fromKey(requestKey);
+		final ProxyPreference preference = proxyPreferenceManager.get(proxyKey);
+
+		final Preference form = new Preference();
+		form.setKey(preference.getProxyKey().getKeyName());
+		form.setValue(preference.getValue());
+
+		model.addAttribute("preferenceForm", form);
 		return "admin-proxy-edit";
 	}
 
@@ -81,8 +82,8 @@ public class ProxyEditController {
 	 *            The proxy form bean
 	 * @return a view name
 	 */
-	@RequestMapping(value = "/edit", method = RequestMethod.POST)
-	public String updatePreferences(@ModelAttribute("preferenceForm") final PreferenceForm form) {
+	@RequestMapping(value = "/proxy/edit", method = RequestMethod.POST)
+	public String updatePreferences(@ModelAttribute("preferenceForm") final Preference form) {
 		final String proxyKeyString = form.getKey();
 		final String proxyValueString = form.getValue();
 		proxyPreferenceManager.update(proxyKeyString, proxyValueString);

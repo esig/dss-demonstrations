@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Required;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyDaoException;
 import eu.europa.esig.dss.web.model.Preference;
-import eu.europa.esig.dss.web.model.PreferenceKey;
 
 public class PreferencesJdbcDao implements PreferencesDao {
 
@@ -42,13 +41,13 @@ public class PreferencesJdbcDao implements PreferencesDao {
 	/**
 	 * Set the datasource
 	 *
-	 * @param dataSource The datasource
+	 * @param dataSource
+	 *            The datasource
 	 */
 	@Required
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -56,7 +55,7 @@ public class PreferencesJdbcDao implements PreferencesDao {
 	 * @see eu.europa.esig.dss.web.dao.GenericDao#get(java.lang.Object)
 	 */
 	@Override
-	public Preference get(PreferenceKey id) {
+	public Preference get(String id) {
 		final String query = "select * from PREFERENCES where PREF_KEY = ?";
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -65,7 +64,7 @@ public class PreferencesJdbcDao implements PreferencesDao {
 
 			connection = dataSource.getConnection();
 			preparedStatement = connection.prepareStatement(query);
-			preparedStatement.setString(1, id.toString());
+			preparedStatement.setString(1, id);
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
 
@@ -138,7 +137,6 @@ public class PreferencesJdbcDao implements PreferencesDao {
 		}
 		return prefs;
 	}
-
 
 	/*
 	 * (non-Javadoc)

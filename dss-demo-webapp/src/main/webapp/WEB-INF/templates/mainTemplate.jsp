@@ -39,7 +39,7 @@
                         <li><a href="<spring:url value="/home"/>"><spring:message code="application.title" /></a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="<spring:url value="/admin/general"/>"><spring:message code="label.administration" /></a></li>
+                        <li><a href="<spring:url value="/admin/" />"><spring:message code="label.administration" /></a></li>
                     </ul>
                 </div>
             </div>

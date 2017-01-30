@@ -24,34 +24,29 @@ import java.util.List;
 
 /**
  * 
- * TODO
+ * Generic DAO
  * 
- *
- *
- * 
- *
- *
  * @param <T>
  * @param <ID>
  */
 public interface GenericDao<T, ID> {
 
-    /**
-     * 
-     * @param id
-     */
-    T get(ID id);
+	/**
+	 * 
+	 * @param id
+	 */
+	T get(ID id);
 
-    /**
-     * 
-     * @return
-     */
-    List<T> getAll();
+	/**
+	 * 
+	 * @return
+	 */
+	List<T> getAll();
 
-    /**
-     * 
-     * @param entity
-     */
-    void update(T entity);
+	/**
+	 * 
+	 * @param entity
+	 */
+	void update(T entity);
 
 }

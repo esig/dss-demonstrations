@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.MimeType;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
@@ -56,6 +59,9 @@ public class ValidationController {
 
 	@Autowired
 	private FOPService fopService;
+
+	@Autowired
+	private Resource defaultPolicy;
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -97,8 +103,18 @@ public class ValidationController {
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
+		} else if (defaultPolicy != null) {
+			InputStream dpis = null;
+			try {
+				dpis = defaultPolicy.getInputStream();
+				reports = documentValidator.validateDocument(dpis);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			} finally {
+				Utils.closeQuietly(dpis);
+			}
 		} else {
-			reports = documentValidator.validateDocument();
+			logger.error("Not correctly initialized");
 		}
 
 		// reports.print();

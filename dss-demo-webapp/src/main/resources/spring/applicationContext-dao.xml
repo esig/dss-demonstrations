@@ -11,7 +11,7 @@
 
 	<!--Property file implementation of proxy preferences-->
 	<!-- Uncomment if you want to use the proxy properties file (comment proxy DAO)-->
-	<!--<bean id="proxyFile" class="eu.europa.esig.dss.web.dao.ProxyFileDao">-->
+	<!--<bean id="proxyFile" class="eu.europa.esig.dss.client.http.proxy.ProxyFileDao">-->
 	<!--<constructor-arg value="/proxy.properties"/>-->
 	<!--</bean>-->
 

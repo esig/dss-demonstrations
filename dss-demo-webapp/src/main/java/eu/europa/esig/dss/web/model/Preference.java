@@ -21,52 +21,48 @@
 package eu.europa.esig.dss.web.model;
 
 /**
+ * Preference model
  * 
- * TODO
- * 
- *
- *
- * 
- *
- *
  */
 public class Preference {
 
-    /**
-     * The preferences key.
-     */
-    private String key;
-    /**
-     * The preferences value.
-     */
-    private String value;
+	/**
+	 * The preferences key.
+	 */
+	private String key;
+	/**
+	 * The preferences value.
+	 */
+	private String value;
 
-    /**
-     * @return the key
-     */
-    public String getKey() {
-        return key;
-    }
+	/**
+	 * @return the key
+	 */
+	public String getKey() {
+		return key;
+	}
 
-    /**
-     * @return the value
-     */
-    public String getValue() {
-        return value;
-    }
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
+	}
 
-    /**
-     * @param key the key to set
-     */
-    public void setKey(String key) {
-        this.key = key;
-    }
+	/**
+	 * @param key
+	 *            the key to set
+	 */
+	public void setKey(String key) {
+		this.key = key;
+	}
 
-    /**
-     * @param value the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
 
 }

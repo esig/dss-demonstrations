@@ -81,5 +81,9 @@
 		<property name="crlSource" ref="crlSource" />
 		<property name="dataLoader" ref="dataLoader" />
 	</bean>
+	
+	<bean id="defaultPolicy" class="org.springframework.core.io.ClassPathResource">
+	    <constructor-arg value="${default.validation.policy}"/> 
+	</bean>
 
 </beans>
