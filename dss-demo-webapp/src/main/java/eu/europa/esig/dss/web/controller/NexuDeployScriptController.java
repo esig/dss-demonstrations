@@ -22,8 +22,11 @@ public class NexuDeployScriptController {
 	@Value("${baseUrl}")
 	private String baseUrl;
 
+	@Value("${nexuVersion}")
+	private String nexuVersion;
+
 	@Value("${nexuUrl}")
-	private String nexuUrl = "http://localhost:9876/";
+	private String nexuUrl;
 
 	private Template template;
 
@@ -45,6 +48,7 @@ public class NexuDeployScriptController {
 		Map<String, String> model = new HashMap<String, String>();
 
 		model.put("baseUrl", baseUrl);
+		model.put("nexuVersion", nexuVersion);
 		model.put("nexuUrl", nexuUrl);
 
 		template.process(model, outWriter);

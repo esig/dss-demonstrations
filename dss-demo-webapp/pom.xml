@@ -79,7 +79,7 @@
 			                <overwrite>true</overwrite>
 			                <resources>
 			                    <resource>
-			                        <directory>../dss-cookbook/target/generated-docs</directory>
+			                        <directory>../../dss/dss-cookbook/target/generated-docs</directory>
 			                        <includes>
 			                            <include>**/*</include>
 			                            <include>*</include>

@@ -14,7 +14,7 @@
 	<strong id="errorText">Oops... an error occurred </strong><span id="errorcontent"></span>
 </div>
 
-<script src="scripts/nexu.js" type="text/javascript"></script>
+<script src="${nexuUrl}/nexu.js" type="text/javascript"></script>
 
 <script type="text/javascript" defer>
 
@@ -80,6 +80,7 @@
 	function error(error) {
 		$('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
 		$("#errorcontent").html(error.responseText);
+		console.log(error);
 	    $("#error").show();
 	    $("#success").hide();
 	}

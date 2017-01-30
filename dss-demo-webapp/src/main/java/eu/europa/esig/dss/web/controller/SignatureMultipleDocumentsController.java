@@ -11,6 +11,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,6 +55,9 @@ public class SignatureMultipleDocumentsController {
 	private static final String SIGNATURE_PARAMETERS = "signature-multiple-documents-parameters";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 
+	@Value("${nexuUrl}")
+	private String nexuUrl;
+
 	@Autowired
 	private SigningService signingService;
 
@@ -85,6 +89,7 @@ public class SignatureMultipleDocumentsController {
 		model.addAttribute("signatureMultipleDocumentsForm", signatureMultipleDocumentsForm);
 		model.addAttribute("digestAlgorithm", signatureMultipleDocumentsForm.getDigestAlgorithm());
 		model.addAttribute("rootUrl", "sign-multiple-documents");
+		model.addAttribute("nexuUrl", nexuUrl);
 		return SIGNATURE_PROCESS;
 	}
 
