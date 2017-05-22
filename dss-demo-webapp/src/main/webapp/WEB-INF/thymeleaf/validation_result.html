@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head th:replace="template :: header"></head>
+	<body>
+		
+		<nav th:replace="template :: navigation"></nav>
+	
+		<div class="container">
+			<div class="row">
+                <div class="col-md-3">
+        			<div th:replace="template :: menu"></div>
+                </div>
+				<div class="col-md-9">
+				
+					<ul class="nav nav-tabs nav-justified hidden-print" id="tabsResult" style="margin-top: 25px;">
+					    <li role="presentation" class="active"><a href="#simple-report" th:text="#{label.simple.report}"></a></li>
+					    <li role="presentation"><a href="#detailed-report" th:text="#{label.detailed.report}"></a></li>
+					    <li role="presentation"><a href="#diagnostic-tree" th:text="#{label.diagnostic.tree}"></a></li>
+					</ul>
+					
+					<div class="tab-content" style="margin-top: 10px">
+					
+					    <div role="tabpanel" class="tab-pane fade in active" id="simple-report">
+					        <div class="btn-group pull-right hidden-print" role="toolbar" style="margin : 4px;">
+					            <button type="button" class="btn btn-default" onclick="window.print();">
+					                <span class="glyphicon glyphicon-print"></span> Print
+					            </button>
+					            <a class="btn btn-default" th:href="@{/validation/download-simple-report}" role="button">
+					                <span class="glyphicon glyphicon-save-file"></span> Download as PDF
+					            </a>
+					        </div>
+					
+					    	<div th:utext="${simpleReport}"></div>
+					    </div>
+					    <div role="tabpanel" class="tab-pane fade" id="detailed-report">
+					        <div class="btn-group pull-right hidden-print" role="toolbar" style="margin : 4px;">
+					            <button type="button" class="btn btn-default" onclick="window.print();">
+					                <span class="glyphicon glyphicon-print"></span> Print
+					            </button>
+					            <a class="btn btn-default" th:href="@{/validation/download-detailed-report}" role="button">
+					                <span class="glyphicon glyphicon-save-file"></span> Download as PDF
+					            </a>
+					        </div>
+					    
+					    	<div th:utext="${detailedReport}"></div>
+					    </div>
+					    <div role="tabpanel" class="tab-pane fade" id="diagnostic-tree">
+							<pre class="prettyprint lang-xml" th:text="${diagnosticTree}"></pre>
+					    </div>
+					</div>
+				
+					<script type="text/javascript">
+					    $('#tabsResult a').click(function(e) {
+					        e.preventDefault()
+					        $(this).tab('show')
+					    });
+					    
+					    $('[data-toggle="tooltip"]').tooltip();
+					</script>
+				</div>
+			</div>
+			<footer th:replace="template :: footer"></footer>
+		</div>
+	</body>
+</html>
