@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head th:replace="template :: header"></head>
+	<body>
+		
+		<nav th:replace="template :: navigation"></nav>
+	
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+
+					<div class="alert alert-danger" role="alert">
+						<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 
+						<span class="sr-only">Error:</span> The	credentials provided are invalid.
+	
+						<p>
+							Please see <a href="https://joinup.ec.europa.eu/software/sd-dss/wiki/change-credentials-administration"	class="alert-link">/wiki/change-credentials-administration</a>
+							for information about how to change the password.
+						</p>
+					</div>
+	
+				</div>
+			</div>
+		</div>
+	</body>
+</html>	

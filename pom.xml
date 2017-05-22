@@ -362,6 +362,17 @@
 				<artifactId>hsqldb</artifactId>
 				<version>1.8.0.10</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.thymeleaf</groupId>
+				<artifactId>thymeleaf</artifactId>
+				<version>3.0.6.RELEASE</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.thymeleaf</groupId>
+			    <artifactId>thymeleaf-spring4</artifactId>
+			    <version>3.0.6.RELEASE</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.apache.tiles</groupId>
