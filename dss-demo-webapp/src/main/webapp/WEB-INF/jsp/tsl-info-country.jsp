@@ -121,11 +121,11 @@
 		                                        <dl class="dl-horizontal">
 		                                            <dt>Name :</dt>
 		                                            <dd><c:out value="${service.name}"/></dd>
-		                                            <dt>Type :</dt>
-		                                            <dd><a href="<c:out value="${service.type}" />"><c:out value="${service.type}" /></a></dd>
 		                                            
 		                                   			<c:forEach var="serviceStatus" items="${service.statusAndInformationExtensions.list}">
 		                                   				<br />
+			                                            <dt>Type :</dt>
+			                                            <dd><a href="<c:out value="${serviceStatus.type}" />"><c:out value="${serviceStatus.type}" /></a></dd>
 			                                            <dt>Status :</dt>
 			                                            <dd><a href="<c:out value="${serviceStatus.status}" />"><c:out value="${serviceStatus.status}"/></a></dd>
 			                                            <dt>Start date :</dt>
