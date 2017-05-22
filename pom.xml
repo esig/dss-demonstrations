@@ -6,7 +6,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.0</version>
+	<version>5.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -47,12 +47,12 @@
 		<project.source.version>1.8</project.source.version>
 		<project.encoding>UTF-8</project.encoding>
 
-		<dss.framework.version>5.0</dss.framework.version>
+		<dss.framework.version>5.1-SNAPSHOT</dss.framework.version>
 
-		<slf4j.version>1.7.22</slf4j.version>
-		<logback-classic.version>1.1.9</logback-classic.version>
+		<slf4j.version>1.7.25</slf4j.version>
+		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.1.9</cxf.version>
+		<cxf.version>3.1.11</cxf.version>
 		<spring.version>4.2.8.RELEASE</spring.version>
 		<tiles.version>3.0.7</tiles.version>
 		<jackson-jaxrs-json-provider.version>2.5.4</jackson-jaxrs-json-provider.version>
