@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.DigestAlgorithm;
@@ -64,6 +65,7 @@ public class SignatureController {
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(SignatureForm.class, new EnumPropertyEditor(SignatureForm.class));
+		binder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
 		binder.registerCustomEditor(SignaturePackaging.class, new EnumPropertyEditor(SignaturePackaging.class));
 		binder.registerCustomEditor(SignatureLevel.class, new EnumPropertyEditor(SignatureLevel.class));
 		binder.registerCustomEditor(DigestAlgorithm.class, new EnumPropertyEditor(DigestAlgorithm.class));
@@ -146,9 +148,14 @@ public class SignatureController {
 		return null;
 	}
 
+	@ModelAttribute("asicContainerTypes")
+	public ASiCContainerType[] getASiCContainerTypes() {
+		return ASiCContainerType.values();
+	}
+
 	@ModelAttribute("signatureForms")
 	public SignatureForm[] getSignatureForms() {
-		return SignatureForm.values();
+		return new SignatureForm[] { SignatureForm.CAdES, SignatureForm.PAdES, SignatureForm.XAdES };
 	}
 
 	@ModelAttribute("signaturePackagings")

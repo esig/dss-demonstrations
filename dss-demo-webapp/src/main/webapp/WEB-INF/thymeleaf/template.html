@@ -61,7 +61,6 @@
             <div class="list-group hidden-print">
                 <a th:href="@{/extension}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/extension' ? 'active' : ''}" th:text="#{label.extend}">Extension</a>
                 <a th:href="@{/validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/validation' ? 'active' : ''}" th:text="#{label.validate}">Validation</a>
-                <a th:href="@{/validation-policy}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/validation-policy' ? 'active' : ''}" th:text="#{label.validation-policy}">Validation policy</a>
                 <a th:href="@{/tsl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tsl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
             </div>
         </div>

@@ -12,7 +12,7 @@
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
 
-var nexuVersion = ${nexuVersion};
+var nexuVersion = "${nexuVersion}";
 
 $.get("${nexuUrl}/nexu-info", function(data) {
 	// something responded

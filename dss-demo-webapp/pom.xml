@@ -125,10 +125,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.thymeleaf</groupId>
-			<artifactId>thymeleaf</artifactId>
-		</dependency>
-		<dependency>
 		    <groupId>org.thymeleaf</groupId>
 		    <artifactId>thymeleaf-spring4</artifactId>
 		</dependency>
@@ -226,16 +222,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tiles</groupId>
-			<artifactId>tiles-jsp</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
@@ -300,12 +286,6 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>4.3.1.Final</version>
 		</dependency>
-		
-		<dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.2.3</version>
-        </dependency>
 		
 		<dependency>
 			<groupId>junit</groupId>

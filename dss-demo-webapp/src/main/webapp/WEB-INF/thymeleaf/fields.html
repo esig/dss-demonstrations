@@ -140,21 +140,4 @@
     </div>
 </div>
 
-
-<div class="form-group" th:fragment="field-operation">
-    <label for="operation" class="col-sm-2 control-label" th:text="#{label.operation}"></label>
-    <div class="col-sm-5">
-    	<label class="radio-inline"> 
-	    	<input type="radio" th:field="*{operation}" th:value="ASN1CONVERT" /> ASN1 display
-	    </label>
-	    <label class="radio-inline">
-	    	<input type="radio" th:field="*{operation}" th:value="DIGEST" /> Digest
-	    </label>
-    </div>
-    <div class="col-xs-4">
-    	<p th:if="${#fields.hasErrors('operation')}" th:errors="*{operation}" class="text-danger">Error</p>
-    </div>
-</div>
-
-
 </html>

@@ -31,10 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
 	/**
 	 *
-	 * @param model The model attributes
+	 * @param model
+	 *            The model attributes
 	 * @return The view name.
 	 */
-	@RequestMapping(value = "/home")
+	@RequestMapping(value = { "/", "/home" })
 	public final String showHome(final Model model) {
 		return "home";
 	}

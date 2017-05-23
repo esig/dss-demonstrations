@@ -51,7 +51,7 @@
 		<property name="trustedListsCertificateSource" ref="trustedListSource" />
 	</bean>
 	
-    <bean id="dssKeyStore" class="eu.europa.esig.dss.web.DSSKeyStoreFactoryBean">
+    <bean id="ojContentKeyStore" class="eu.europa.esig.dss.web.DSSKeyStoreFactoryBean">
 	    <property name="keyStoreType" value="${dss.keystore.type}" />
 	    <property name="keyStoreFilename" value="${dss.keystore.filename}" />
 	    <property name="keyStorePassword" value="${dss.keystore.password}" />
@@ -61,9 +61,10 @@
 		<property name="dataLoader" ref="dataLoader" />
 		<property name="repository" ref="tslRepository" />
 		<property name="lotlUrl" value="https://ec.europa.eu/information_society/policy/esignature/trusted-list/tl-mp.xml" />
+		<property name="lotlRootSchemeInfoUri" value="https://ec.europa.eu/information_society/policy/esignature/trusted-list/tl.html" />
 		<property name="lotlCode" value="EU" />
 		<property name="ojUrl" value="${dss.oj.url}" />
-		<property name="dssKeyStore" ref="dssKeyStore" />
+		<property name="ojContentKeyStore" ref="ojContentKeyStore" />
 		<property name="checkLOTLSignature" value="true" />
 		<property name="checkTSLSignatures" value="true" />
 	</bean>
