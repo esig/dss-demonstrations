@@ -42,12 +42,12 @@
    
    <div th:fragment="menu">
    
-        <div th:if="${#httpServletRequest.getRequestURI().startsWith('/admin')}" class="list-group hidden-print">
+        <div th:if="${#httpServletRequest.getRequestURI().contains('/admin/')}" class="list-group hidden-print">
             <a th:href="@{/admin/proxy}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/proxy' ? 'active' : ''}" th:text="#{label.proxy}">Proxy</a>
             <a th:href="@{/admin/certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/certificates' ? 'active' : ''}" th:text="#{label.certificates}">Certificates</a>
         </div>
 
-        <div th:if="${! #httpServletRequest.getRequestURI().startsWith('/admin')}" class="panel panel-default">
+        <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
             <div class="panel-heading">e-Signature</div>
             <div class="list-group hidden-print">
                 <a th:href="@{/sign-a-document}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-document' ? 'active' : ''}" th:text="#{label.signADocument}">Sign a document</a>
@@ -56,7 +56,7 @@
                 <a th:href="@{/signature-rest}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-rest' ? 'active' : ''}" th:text="#{label.rest.soap.services}">REST/SOAP WebServices</a>
             </div>
         </div>
-        <div th:if="${! #httpServletRequest.getRequestURI().startsWith('/admin')}" class="panel panel-default">
+        <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
             <div class="panel-heading">Server side</div>
             <div class="list-group hidden-print">
                 <a th:href="@{/extension}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/extension' ? 'active' : ''}" th:text="#{label.extend}">Extension</a>
