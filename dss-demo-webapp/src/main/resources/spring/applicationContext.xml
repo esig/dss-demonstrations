@@ -51,10 +51,11 @@
 		<property name="trustedListsCertificateSource" ref="trustedListSource" />
 	</bean>
 	
-    <bean id="ojContentKeyStore" class="eu.europa.esig.dss.web.DSSKeyStoreFactoryBean">
-	    <property name="keyStoreType" value="${dss.keystore.type}" />
-	    <property name="keyStoreFilename" value="${dss.keystore.filename}" />
-	    <property name="keyStorePassword" value="${dss.keystore.password}" />
+	
+    <bean id="ojContentKeyStore" class="eu.europa.esig.dss.x509.KeyStoreCertificateSource">
+    	<constructor-arg name="ksType" value="${dss.keystore.type}" />
+    	<constructor-arg name="ksStream" value="${dss.keystore.filename}" />
+    	<constructor-arg name="ksPassword" value="${dss.keystore.password}" />
 	</bean>
 
 	<bean id="tslValidationJob" class="eu.europa.esig.dss.tsl.service.TSLValidationJob" init-method="initRepository">

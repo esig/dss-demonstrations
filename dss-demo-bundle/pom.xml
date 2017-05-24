@@ -15,6 +15,11 @@
 
 	<artifactId>dss-demo-bundle</artifactId>
 	<packaging>pom</packaging>
+	
+	<properties>
+		<tomcat.version>8.0.44</tomcat.version>
+		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -29,9 +34,9 @@
 			<type>zip</type>
 		</dependency>
 		<dependency>
-			<groupId>org.apache</groupId>
-			<artifactId>tomcat</artifactId>
-			<version>8.0.21</version>
+		    <groupId>org.apache.tomcat</groupId>
+		    <artifactId>tomcat</artifactId>
+		    <version>${tomcat.version}</version>
 			<type>zip</type>
 		</dependency>
 		<dependency>
