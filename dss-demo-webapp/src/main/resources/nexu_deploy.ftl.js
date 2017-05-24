@@ -21,10 +21,12 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		// load nexu script 
 		console.log("Loading script...");
 		loadScript();
+	    $("#nexu_ready_alert").slideDown();
+	    $("#submit-button").prop('disabled', false);
 	} else {
 		// need update
-		$(".nexu-sign-button").html("Update NexU");
-		$(".nexu-sign-button").on("click", function() {
+		$("#submit-button").html("Update NexU");
+		$("#submit-button").on("click", function() {
 			console.log("Update NexU");
 			return false;
 		});
@@ -38,6 +40,9 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		window.location = "${baseUrl}";
 		return false;
 	});
+	
+    $("#warning-text").html("NexU not detected or not started ! ");
+    $("#nexu_missing_alert").slideDown();
 });
 
 function loadScript() {

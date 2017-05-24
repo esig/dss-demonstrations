@@ -28,6 +28,8 @@
 						<div th:replace="fields::field-signature-level"></div>
 						
 						<div th:replace="fields::field-digest-algo"></div>
+						
+						<div th:replace="fields::field-sign-expired"></div>
 					
 						<div id="nexu_missing_alert" style="display:none;" class="alert alert-warning col-lg-8"><span id="warning-text"></span> You can download the <a th:href="@{/downloads/nexu.jar}">open source version of NexU</a> (<a href="http://nowina.lu/news/nexu/">more info</a>)</div>
 							
@@ -35,7 +37,7 @@
 					
 					    <div class="form-group">
 					        <div class="col-sm-offset-2 col-sm-10">
-					            <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}"></button>
+					            <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}" disabled="disabled"></button>
 					            <button type="reset" class="btn" th:text="#{label.clear}"></button>
 					        </div>
 					    </div>   

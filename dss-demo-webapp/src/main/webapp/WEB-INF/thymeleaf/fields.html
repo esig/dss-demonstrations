@@ -128,15 +128,10 @@
     </div>
 </div>
 
-<div class="form-group" id="digest-algo-block" th:fragment="field-digest-algo-tools">
-    <label for="digestAlgorithm" class="col-sm-2 control-label" th:text="#{label.digest.algorithm}"></label>
-    <div class="col-sm-5">
-	    <label class="radio-inline" th:each="algo : ${digestAlgos}"> 
-		    <input type="radio" th:field="*{digestAlgorithm}"  th:value="${algo}" th:text="${algo}" />
-	    </label>
-    </div>
-    <div class="col-xs-4">
-    	<p th:if="${#fields.hasErrors('digestAlgorithmValid')}" th:errors="*{digestAlgorithmValid}" class="text-danger">Error</p>
+<div class="form-group" id="sign-expired-block" th:fragment="field-sign-expired">
+    <label for="signWithExpiredCertificate" class="col-sm-2 control-label" th:text="#{label.allow.expired.certificate}"></label>
+    <div class="col-sm-4">
+    	<input type="checkbox" name="signWithExpiredCertificate" />
     </div>
 </div>
 
