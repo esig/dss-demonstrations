@@ -1,9 +1,8 @@
 package eu.europa.esig.dss.web.service;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -149,7 +148,7 @@ public class SigningService {
 
 		List<String> base64CertificateChain = form.getBase64CertificateChain();
 		if (Utils.isCollectionNotEmpty(base64CertificateChain)) {
-			Set<CertificateToken> certificateChain = new HashSet<CertificateToken>();
+			List<CertificateToken> certificateChain = new LinkedList<CertificateToken>();
 			for (String base64Certificate : base64CertificateChain) {
 				certificateChain.add(DSSUtils.loadCertificateFromBase64EncodedString(base64Certificate));
 			}
