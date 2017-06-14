@@ -1,13 +1,3 @@
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.http.host', '127.0.0.1');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.http.port', '8008');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.http.user', '');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.http.password', '');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.http.enabled', 'false');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.http.exclude', '');
-
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.https.host', '127.0.0.1');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.https.port', '8008');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.https.user', '');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.https.password', '');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.https.enabled', 'false');
-INSERT INTO PREFERENCE (KEY , VALUE) values ( 'proxy.https.exclude', '');
+INSERT INTO PROXY_PROPS(ID, ENABLED, PORT, HOST) values ('1', true, 8008, '127.0.0.1');
+INSERT INTO PROXY_PROPS(ID, ENABLED, PORT, HOST) values ('2', false, 8008, '127.0.0.1');
+INSERT INTO PROXY_CONFIG(ID, HTTPPROPS_ID, HTTPSPROPS_ID) values('1' , '1', '2');

@@ -7,8 +7,13 @@
 
 	<import resource="classpath:spring/applicationContext-repository.xml"/>
 
-	<bean id="proxyPreferenceManager" class="eu.europa.esig.dss.web.dao.ProxyPreferencesDao" />
 
+	<bean id="proxyPreferenceDao" class="eu.europa.esig.dss.web.dao.ProxyConfigDbDao" />
+
+	<bean id="proxyPreferenceManager" class="eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager">
+		<property name="proxyPreferenceDao" ref="proxyPreferenceDao" />
+	</bean>
+	
 	<bean id="dataLoader" class="eu.europa.esig.dss.client.http.commons.CommonsDataLoader">
 		<property name="proxyPreferenceManager" ref="proxyPreferenceManager"/>
 	</bean>

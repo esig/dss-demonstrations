@@ -28,11 +28,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import eu.europa.esig.dss.client.http.proxy.ProxyPreference;
+import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager;
-import eu.europa.esig.dss.web.model.Preference;
 
 /**
  * Controller for proxy edition
@@ -53,26 +51,8 @@ public class ProxyEditController {
 	 */
 	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.GET)
 	public String showProxy(final Model model) {
-		model.addAttribute("preferences", proxyPreferenceManager.getAll());
+		model.addAttribute("proxyConfig", proxyPreferenceManager.getProxyConfig());
 		return "admin-proxy-list";
-	}
-
-	/**
-	 * @param model
-	 *            The view model
-	 * @return a view name
-	 */
-	@RequestMapping(value = "/proxy/edit", method = RequestMethod.GET)
-	public String showForm(@RequestParam(name = "key") String requestKey, final Model model) {
-
-		final ProxyPreference preference = proxyPreferenceManager.get(requestKey);
-
-		final Preference form = new Preference();
-		form.setKey(preference.getKey());
-		form.setValue(preference.getValue());
-
-		model.addAttribute("preferenceForm", form);
-		return "admin-proxy-edit";
 	}
 
 	/**
@@ -80,12 +60,9 @@ public class ProxyEditController {
 	 *            The proxy form bean
 	 * @return a view name
 	 */
-	@RequestMapping(value = "/proxy/edit", method = RequestMethod.POST)
-	public String updatePreferences(@ModelAttribute("preferenceForm") final Preference form) {
-		final String proxyKeyString = form.getKey();
-		final String proxyValueString = form.getValue();
-		proxyPreferenceManager.update(proxyKeyString, proxyValueString);
-		logger.trace(">>> Proxy preference updated: " + proxyKeyString + "(" + proxyValueString + ")/" + proxyPreferenceManager);
+	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.POST)
+	public String updatePreferences(@ModelAttribute("proxyConfig") final ProxyConfig proxyConfig) {
+		proxyPreferenceManager.update(proxyConfig);
 		return "redirect:/admin/proxy";
 	}
 }

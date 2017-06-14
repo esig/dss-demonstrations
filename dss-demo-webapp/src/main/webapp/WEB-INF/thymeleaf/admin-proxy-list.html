@@ -12,20 +12,71 @@
                 </div>
 				<div class="col-md-9">
 					<h2 th:text="#{label.preferences}"></h2>
-					<table class="table">
-					    <thead>
-					        <tr>
-					            <th th:text="#{label.key}"></th>
-					            <th th:text="#{label.value}"></th>
-					        </tr>
-					    </thead>
-					    <tbody>
-				            <tr th:each="preference : ${preferences}">
-				                <td><a th:href="@{/admin/proxy/edit(key=${preference.key})}" th:text="${preference.key}"></a></td>
-				                <td><a th:href="@{/admin/proxy/edit(key=${preference.key})}" th:text="${preference.value}"></a></td>
-				            </tr>
-					    </tbody>
-					</table>
+					<form method="post" th:object="${proxyConfig}">
+						<table class="table table-striped">
+						    <thead>
+						        <tr>
+						            <th th:text="#{label.key}"></th>
+						            <th th:text="#{label.value}"></th>
+						        </tr>
+						    </thead>
+						    <tbody>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.host}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpProps.host}" name="httpProps.host" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.port}"></td>
+					                <td class="col-md-3"><input th:type="number" th:value="${proxyConfig.httpProps.port}" name="httpProps.port" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.user}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpProps.user}" name="httpProps.user" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.password}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpProps.password}" name="httpProps.password" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.enabled}"></td>
+					                <td class="col-md-3"><input type="checkbox" th:checked="${proxyConfig.httpProps.enabled}" name="httpProps.enabled" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.exclude}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpProps.excludedHost}" name="httpProps.excludedHost" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.host}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpsProps.host}" name="httpsProps.host" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.port}"></td>
+					                <td class="col-md-3"><input th:type="number" th:value="${proxyConfig.httpsProps.port}" name="httpsProps.port" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.user}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpsProps.user}" name="httpsProps.user" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.password}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpsProps.password}" name="httpsProps.password" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.enabled}"></td>
+					                <td class="col-md-3"><input type="checkbox" th:checked="${proxyConfig.httpsProps.enabled}" name="httpsProps.enabled" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.exclude}"></td>
+					                <td class="col-md-3"><input th:value="${proxyConfig.httpsProps.excludedHost}" name="httpsProps.excludedHost" class="form-control" /></td>
+					            </tr>
+						    </tbody>
+						</table>
+						<div class="form-group">
+					        <div class="col-sm-offset-11">
+					            <button type="submit" class="btn btn-primary" th:text="#{label.update}"></button>
+					        </div>
+					    </div>   
+					</form>
 				</div>
 			</div>
 			<footer th:replace="template :: footer"></footer>

@@ -22,8 +22,8 @@ package eu.europa.esig.dss.web.model.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import eu.europa.esig.dss.web.model.Preference;
+import eu.europa.esig.dss.web.model.db.DBProxyConfig;
 
-public interface PreferenceRepository extends CrudRepository<Preference, String> {
+public interface ProxyConfigRepository extends CrudRepository<DBProxyConfig, String> {
 
 }
