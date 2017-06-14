@@ -21,8 +21,8 @@
 					    </thead>
 					    <tbody>
 				            <tr th:each="preference : ${preferences}">
-				                <td><a th:href="@{/admin/proxy/edit(key=${preference.proxyKey.keyName})}" th:text="${preference.proxyKey.keyName}"></a></td>
-				                <td><a th:href="@{/admin/proxy/edit(key=${preference.proxyKey.keyName})}" th:text="${preference.value}"></a></td>
+				                <td><a th:href="@{/admin/proxy/edit(key=${preference.key})}" th:text="${preference.key}"></a></td>
+				                <td><a th:href="@{/admin/proxy/edit(key=${preference.key})}" th:text="${preference.value}"></a></td>
 				            </tr>
 					    </tbody>
 					</table>

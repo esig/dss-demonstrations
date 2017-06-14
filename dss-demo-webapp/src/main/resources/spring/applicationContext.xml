@@ -2,12 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:spring/dss_signature_applicationContext_soap.xml"/>
@@ -43,10 +41,23 @@
         <property name="password" value="${datasource.password}"/>
     </bean>
     
-    <jdbc:initialize-database data-source="dataSource">
-        <jdbc:script location="classpath:structure.sql"/>
-        <jdbc:script location="classpath:load.sql"/>
-    </jdbc:initialize-database>
+    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	  	<property name="dataSource" ref="dataSource"/>
+	  	<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+	  	<property name="packagesToScan" value="eu.europa.esig.dss.web.model"/>
+	  	<property name="jpaProperties">
+			<props>
+	            <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+	            <prop key="hibernate.hbm2ddl.import_files">load.sql</prop>
+		  	</props>
+	  	</property>
+	</bean>
+	  
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
     
     <!-- TSL Loader -->
 	<bean id="tslRepository" class="eu.europa.esig.dss.tsl.service.TSLRepository">

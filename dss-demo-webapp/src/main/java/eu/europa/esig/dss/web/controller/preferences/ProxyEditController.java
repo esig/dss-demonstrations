@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import eu.europa.esig.dss.client.http.proxy.ProxyKey;
 import eu.europa.esig.dss.client.http.proxy.ProxyPreference;
 import eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager;
 import eu.europa.esig.dss.web.model.Preference;
@@ -54,7 +53,7 @@ public class ProxyEditController {
 	 */
 	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.GET)
 	public String showProxy(final Model model) {
-		model.addAttribute("preferences", proxyPreferenceManager.list());
+		model.addAttribute("preferences", proxyPreferenceManager.getAll());
 		return "admin-proxy-list";
 	}
 
@@ -66,11 +65,10 @@ public class ProxyEditController {
 	@RequestMapping(value = "/proxy/edit", method = RequestMethod.GET)
 	public String showForm(@RequestParam(name = "key") String requestKey, final Model model) {
 
-		final ProxyKey proxyKey = ProxyKey.fromKey(requestKey);
-		final ProxyPreference preference = proxyPreferenceManager.get(proxyKey);
+		final ProxyPreference preference = proxyPreferenceManager.get(requestKey);
 
 		final Preference form = new Preference();
-		form.setKey(preference.getProxyKey().getKeyName());
+		form.setKey(preference.getKey());
 		form.setValue(preference.getValue());
 
 		model.addAttribute("preferenceForm", form);

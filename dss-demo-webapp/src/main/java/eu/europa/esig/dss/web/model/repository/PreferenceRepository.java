@@ -18,15 +18,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package eu.europa.esig.dss.web.dao;
+package eu.europa.esig.dss.web.model.repository;
+
+import org.springframework.data.repository.CrudRepository;
 
 import eu.europa.esig.dss.web.model.Preference;
 
-/**
- * 
- * DAO interface for Preferences
- *
- */
-public interface PreferencesDao extends GenericDao<Preference, String> {
+public interface PreferenceRepository extends CrudRepository<Preference, String> {
 
 }

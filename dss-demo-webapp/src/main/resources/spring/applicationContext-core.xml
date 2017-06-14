@@ -5,12 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<import resource="classpath:spring/applicationContext-dao.xml"/>
+	<import resource="classpath:spring/applicationContext-repository.xml"/>
 
-	<bean id="proxyPreferenceManager" class="eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager">
-		<property name="proxyDao" ref="proxyDao"/>
-		<!--<property name="proxyDao" ref="proxyFile"/>-->
-	</bean>
+	<bean id="proxyPreferenceManager" class="eu.europa.esig.dss.web.dao.ProxyPreferencesDao" />
 
 	<bean id="dataLoader" class="eu.europa.esig.dss.client.http.commons.CommonsDataLoader">
 		<property name="proxyPreferenceManager" ref="proxyPreferenceManager"/>

@@ -14,11 +14,11 @@
 					<h2 th:text="#{label.preferences}"></h2>
 					
 					<form method="post" th:object="${preferenceForm}" action="edit" class="form-horizontal">
-					    <input type="hidden" name="key" />
+					    <input type="hidden" name="key" th:value="${preferenceForm.key}" />
 					    <div class="form-group">
-					        <label for="value" class="col-sm-3 control-label" th:text="#{preferenceForm.key}"></label>
+					        <label for="value" class="col-sm-3 control-label" th:text="${preferenceForm.key}"></label>
 					        <div class="col-sm-6">
-					            <input name="value" class="form-control" />
+					            <input th:value="${preferenceForm.value}" name="value" class="form-control" />
 					        </div>
 					    </div>
 					    <div class="form-group">
