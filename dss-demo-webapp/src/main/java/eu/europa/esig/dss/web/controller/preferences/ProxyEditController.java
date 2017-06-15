@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.http.proxy.ProxyManager;
+import eu.europa.esig.dss.web.model.ProxyConfigForm;
 
 /**
  * Controller for proxy edition
@@ -51,7 +52,10 @@ public class ProxyEditController {
 	 */
 	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.GET)
 	public String showProxy(final Model model) {
-		model.addAttribute("proxyConfig", proxyPreferenceManager.getProxyConfig());
+		ProxyConfig proxyConfig = proxyPreferenceManager.getProxyConfig();
+		ProxyConfigForm form = new ProxyConfigForm();
+		form.fillForm(proxyConfig);
+		model.addAttribute("proxyConfigForm", form);
 		return "admin-proxy-list";
 	}
 
@@ -61,8 +65,8 @@ public class ProxyEditController {
 	 * @return a view name
 	 */
 	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.POST)
-	public String updatePreferences(@ModelAttribute("proxyConfig") final ProxyConfig proxyConfig) {
-		proxyPreferenceManager.update(proxyConfig);
+	public String updatePreferences(@ModelAttribute("proxyConfigForm") final ProxyConfigForm proxyConfigForm) {
+		proxyPreferenceManager.update(proxyConfigForm.getProxyConfig());
 		return "redirect:/admin/proxy";
 	}
 }
