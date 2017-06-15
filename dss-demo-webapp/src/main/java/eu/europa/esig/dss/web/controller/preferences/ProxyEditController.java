@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
-import eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager;
+import eu.europa.esig.dss.client.http.proxy.ProxyManager;
 
 /**
  * Controller for proxy edition
@@ -42,7 +42,7 @@ public class ProxyEditController {
 	private static final Logger logger = LoggerFactory.getLogger(ProxyEditController.class);
 
 	@Autowired
-	private ProxyPreferenceManager proxyPreferenceManager;
+	private ProxyManager proxyPreferenceManager;
 
 	/**
 	 * @param model

@@ -18,19 +18,19 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package eu.europa.esig.dss.web.dao;
+package eu.europa.esig.dss.web.business;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
-import eu.europa.esig.dss.client.http.proxy.ProxyPreferenceDao;
+import eu.europa.esig.dss.client.http.proxy.ProxyConfigManager;
 import eu.europa.esig.dss.client.http.proxy.ProxyProps;
 import eu.europa.esig.dss.web.model.db.DBProxyConfig;
 import eu.europa.esig.dss.web.model.repository.ProxyConfigRepository;
 
-public class ProxyConfigDbDao implements ProxyPreferenceDao {
+public class ProxyConfigDbManager implements ProxyConfigManager {
 
 	@Autowired
 	private ProxyConfigRepository proxyPreferencesRepository;

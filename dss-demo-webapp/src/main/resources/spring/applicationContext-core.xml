@@ -8,10 +8,10 @@
 	<import resource="classpath:spring/applicationContext-repository.xml"/>
 
 
-	<bean id="proxyPreferenceDao" class="eu.europa.esig.dss.web.dao.ProxyConfigDbDao" />
+	<bean id="proxyConfigManager" class="eu.europa.esig.dss.web.business.ProxyConfigDbManager" />
 
-	<bean id="proxyPreferenceManager" class="eu.europa.esig.dss.client.http.proxy.ProxyPreferenceManager">
-		<property name="proxyPreferenceDao" ref="proxyPreferenceDao" />
+	<bean id="proxyManager" class="eu.europa.esig.dss.client.http.proxy.ProxyManager">
+		<property name="proxyConfigManager" ref="proxyConfigManager" />
 	</bean>
 	
 	<bean id="dataLoader" class="eu.europa.esig.dss.client.http.commons.CommonsDataLoader">
