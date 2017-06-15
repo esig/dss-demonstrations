@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxbProxyConfig>
+	<httpProps>
+		<enabled>false</enabled>
+		<host>127.0.0.1</host>
+		<port>8008</port>
+	</httpProps>
+	<httpsProps>
+		<enabled>false</enabled>
+		<host>127.0.0.1</host>
+		<port>8008</port>
+	</httpsProps>
+</jaxbProxyConfig>
