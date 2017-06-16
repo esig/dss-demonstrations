@@ -9,6 +9,7 @@
 
 
 	<bean id="proxyConfigManager" class="eu.europa.esig.dss.web.business.ProxyConfigDbManager" />
+<!-- 	<bean id="proxyConfigManager" class="eu.europa.esig.dss.web.business.ProxyConfigFileManager" /> -->
 
 	<bean id="proxyPreferenceManager" class="eu.europa.esig.dss.client.http.proxy.ProxyManager">
 		<property name="proxyConfigManager" ref="proxyConfigManager" />

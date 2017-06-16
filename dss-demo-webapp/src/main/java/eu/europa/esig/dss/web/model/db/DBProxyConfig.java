@@ -3,7 +3,6 @@ package eu.europa.esig.dss.web.model.db;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity(name="PROXY_CONFIG")
 public class DBProxyConfig {

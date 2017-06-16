@@ -125,43 +125,4 @@ public class ProxyConfigForm {
 		this.httpsPort = httpsPort;
 	}
 	
-	public void fillForm(ProxyConfig proxyConfig) {
-		httpEnabled = proxyConfig.getHttpProps().isEnabled();
-		httpExcludedHost = proxyConfig.getHttpProps().getExcludedHost();
-		httpHost = proxyConfig.getHttpProps().getHost();
-		httpPassword = proxyConfig.getHttpProps().getPassword();
-		httpPort = proxyConfig.getHttpProps().getPort();
-		httpUser = proxyConfig.getHttpProps().getUser();
-		
-		httpsEnabled = proxyConfig.getHttpsProps().isEnabled();
-		httpsExcludedHost = proxyConfig.getHttpsProps().getExcludedHost();
-		httpsHost = proxyConfig.getHttpsProps().getHost();
-		httpsPassword = proxyConfig.getHttpsProps().getPassword();
-		httpsPort = proxyConfig.getHttpsProps().getPort();
-		httpsUser = proxyConfig.getHttpsProps().getUser();
-	}
-	
-	public ProxyConfig getProxyConfig() {
-		ProxyConfig proxyConfig = new ProxyConfig();
-		
-		ProxyProps httpProps = new ProxyProps();
-		httpProps.setEnabled(httpEnabled);
-		httpProps.setExcludedHost(httpExcludedHost);
-		httpProps.setHost(httpHost);
-		httpProps.setPassword(httpPassword);
-		httpProps.setPort(httpPort);
-		httpProps.setUser(httpUser);
-		proxyConfig.setHttpProps(httpProps);
-		
-		ProxyProps httpsProps = new ProxyProps();
-		httpsProps.setEnabled(httpsEnabled);
-		httpsProps.setExcludedHost(httpsExcludedHost);
-		httpsProps.setHost(httpsHost);
-		httpsProps.setPassword(httpsPassword);
-		httpsProps.setPort(httpsPort);
-		httpsProps.setUser(httpsUser);
-		proxyConfig.setHttpsProps(httpsProps);
-		
-		return proxyConfig;
-	}
 }

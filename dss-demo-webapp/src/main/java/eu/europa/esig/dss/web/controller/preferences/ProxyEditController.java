@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.http.proxy.ProxyManager;
 import eu.europa.esig.dss.web.model.ProxyConfigForm;
+import eu.europa.esig.dss.web.service.FormService;
 
 /**
  * Controller for proxy edition
@@ -45,6 +46,9 @@ public class ProxyEditController {
 	@Autowired
 	private ProxyManager proxyPreferenceManager;
 
+	@Autowired
+	private FormService formService;
+	
 	/**
 	 * @param model
 	 *            The model attributes
@@ -53,9 +57,7 @@ public class ProxyEditController {
 	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.GET)
 	public String showProxy(final Model model) {
 		ProxyConfig proxyConfig = proxyPreferenceManager.getProxyConfig();
-		ProxyConfigForm form = new ProxyConfigForm();
-		form.fillForm(proxyConfig);
-		model.addAttribute("proxyConfigForm", form);
+		model.addAttribute("proxyConfigForm", formService.getForm(proxyConfig));
 		return "admin-proxy-list";
 	}
 
@@ -66,7 +68,7 @@ public class ProxyEditController {
 	 */
 	@RequestMapping(value = { "", "/", "/proxy" }, method = RequestMethod.POST)
 	public String updatePreferences(@ModelAttribute("proxyConfigForm") final ProxyConfigForm proxyConfigForm) {
-		proxyPreferenceManager.update(proxyConfigForm.getProxyConfig());
+		proxyPreferenceManager.update(formService.getProxyConfig(proxyConfigForm));
 		return "redirect:/admin/proxy";
 	}
 }
