@@ -20,9 +20,9 @@
  */
 package eu.europa.esig.dss.web.business;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.http.proxy.ProxyConfigManager;
@@ -31,13 +31,16 @@ import eu.europa.esig.dss.web.model.db.DBProxyConfig;
 import eu.europa.esig.dss.web.model.repository.ProxyConfigRepository;
 
 public class ProxyConfigDbManager implements ProxyConfigManager {
+	
+	@Value("${proxy.config.db.id}")
+	private String configDbId;
 
 	@Autowired
 	private ProxyConfigRepository proxyPreferencesRepository;
 
 	@Override
 	public ProxyConfig get() {
-		DBProxyConfig dbProxyConfig = proxyPreferencesRepository.findAll().iterator().next();
+		DBProxyConfig dbProxyConfig = proxyPreferencesRepository.findOne(configDbId);
 		if(dbProxyConfig != null) {
 			ProxyConfig proxyConfig = new ProxyConfig();
 			
@@ -68,7 +71,7 @@ public class ProxyConfigDbManager implements ProxyConfigManager {
 	@Override
 	@Transactional
 	public void update(ProxyConfig proxyConfig) {
-		DBProxyConfig dbProxyConfig = proxyPreferencesRepository.findAll().iterator().next();
+		DBProxyConfig dbProxyConfig = proxyPreferencesRepository.findOne(configDbId);
 		if(dbProxyConfig != null && proxyConfig != null) {
 			dbProxyConfig.getHttpProps().setEnabled(proxyConfig.getHttpProps().isEnabled());
 			dbProxyConfig.getHttpProps().setExcludedHost(proxyConfig.getHttpProps().getExcludedHost());
@@ -83,7 +86,6 @@ public class ProxyConfigDbManager implements ProxyConfigManager {
 			dbProxyConfig.getHttpsProps().setPassword(proxyConfig.getHttpsProps().getPassword());
 			dbProxyConfig.getHttpsProps().setPort(proxyConfig.getHttpsProps().getPort());
 			dbProxyConfig.getHttpsProps().setUser(proxyConfig.getHttpsProps().getUser());
-			proxyPreferencesRepository.save(dbProxyConfig);
 		}
 	}
 

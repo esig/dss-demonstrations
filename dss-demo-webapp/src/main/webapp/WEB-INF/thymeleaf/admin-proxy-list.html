@@ -38,12 +38,12 @@
 					                <td class="col-md-3"><input th:value="${proxyConfigForm.httpPassword}" name="httpPassword" class="form-control" /></td>
 					            </tr>
 					            <tr>
-					                <td class="col-md-3" th:text="#{proxy.http.enabled}"></td>
-					                <td class="col-md-3"><input type="checkbox" th:checked="${proxyConfigForm.httpEnabled}" name="httpEnabled" class="form-control" /></td>
-					            </tr>
-					            <tr>
 					                <td class="col-md-3" th:text="#{proxy.http.exclude}"></td>
 					                <td class="col-md-3"><input th:value="${proxyConfigForm.httpExcludedHost}" name="httpExcludedHost" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.http.enabled}"></td>
+					                <td class="col-md-3"><input th:type="checkbox" th:checked="${proxyConfigForm.httpEnabled}" name="httpEnabled" class="checkbox" /></td>
 					            </tr>
 					            <tr>
 					                <td class="col-md-3" th:text="#{proxy.https.host}"></td>
@@ -62,12 +62,12 @@
 					                <td class="col-md-3"><input th:value="${proxyConfigForm.httpsPassword}" name="httpsPassword" class="form-control" /></td>
 					            </tr>
 					            <tr>
-					                <td class="col-md-3" th:text="#{proxy.https.enabled}"></td>
-					                <td class="col-md-3"><input type="checkbox" th:checked="${proxyConfigForm.httpsEnabled}" name="httpsEnabled" class="form-control" /></td>
-					            </tr>
-					            <tr>
 					                <td class="col-md-3" th:text="#{proxy.https.exclude}"></td>
 					                <td class="col-md-3"><input th:value="${proxyConfigForm.httpsExcludedHost}" name="httpsExcludedHost" class="form-control" /></td>
+					            </tr>
+					            <tr>
+					                <td class="col-md-3" th:text="#{proxy.https.enabled}"></td>
+					                <td class="col-md-3"><input type="checkbox" th:checked="${proxyConfigForm.httpsEnabled}" name="httpsEnabled" class="checkbox" /></td>
 					            </tr>
 						    </tbody>
 						</table>
