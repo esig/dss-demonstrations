@@ -25,8 +25,7 @@
 	</bean>
 
 	<bean id="fileCacheDataLoader" class="eu.europa.esig.dss.client.http.commons.FileCacheDataLoader">
-		<property name="proxyPreferenceManager" ref="proxyPreferenceManager"/>
-		<!-- Per default uses "java.io.tmpdir" property -->
+		<property name="dataLoader" ref="dataLoader" />
 		<!--<property name="fileCacheDirectory" value="/temp"/>-->
 	</bean>
 
