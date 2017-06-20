@@ -72,6 +72,7 @@
 		<module>dss-standalone-app-package</module>
 		<module>dss-demo-webapp</module>
 		<module>dss-demo-bundle</module>
+		<module>dss-rest-doc-generation</module>
 	</modules>
 
 	<build>
@@ -235,6 +236,26 @@
 			
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-model</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-spi</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-token</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-reports</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-service</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
@@ -271,11 +292,6 @@
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-server-signing-rest</artifactId>
-				<version>${dss.framework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-token</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
