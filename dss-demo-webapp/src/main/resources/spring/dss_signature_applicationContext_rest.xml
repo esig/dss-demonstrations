@@ -9,8 +9,6 @@
     <import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	
-	<import resource="classpath:spring/service-definitions.xml" />
-	
     <!-- REST SIGNATURE SERVICE -->
     <bean id="restSignatureService" class="eu.europa.esig.dss.signature.RestDocumentSignatureServiceImpl">
     	<property name="service" ref="remoteSignatureService" />

@@ -9,8 +9,6 @@
     <import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	
-	<import resource="classpath:spring/server-signing-definitions.xml" />
-	
     <!-- REST SERVER SIGNING SERVICE -->
     <bean id="restServerSigningService" class="eu.europa.esig.dss.token.RestSignatureTokenConnectionImpl">
     	<property name="token" ref="serverToken" />

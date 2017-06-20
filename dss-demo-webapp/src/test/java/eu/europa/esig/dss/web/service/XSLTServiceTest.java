@@ -17,12 +17,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import eu.europa.esig.dss.jaxb.detailedreport.DetailedReport;
 import eu.europa.esig.dss.jaxb.simplereport.SimpleReport;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.config.DSSBeanFactory;
+import eu.europa.esig.dss.web.config.PersistenceConfig;
+import eu.europa.esig.dss.web.config.SpringConfig;
 
-@ContextConfiguration("/spring/applicationContext.xml")
+@WebAppConfiguration
+@ContextConfiguration(classes = { SpringConfig.class, PersistenceConfig.class, DSSBeanFactory.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class XSLTServiceTest {
 

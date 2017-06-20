@@ -1,8 +1,5 @@
 package eu.europa.esig.dss.web.model;
 
-import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
-import eu.europa.esig.dss.client.http.proxy.ProxyProps;
-
 public class ProxyConfigForm {
 
 	private boolean httpEnabled;

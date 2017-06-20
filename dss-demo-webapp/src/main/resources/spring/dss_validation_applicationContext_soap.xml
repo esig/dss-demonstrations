@@ -9,8 +9,6 @@
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     
-    <import resource="classpath:spring/service-definitions.xml" />
-	
     <!-- SOAP VALIDATION SERVICE -->
     <bean id="soapValidationService" class="eu.europa.esig.dss.validation.SoapDocumentValidationServiceImpl">
     	<property name="validationService" ref="remoteValidationService" />
