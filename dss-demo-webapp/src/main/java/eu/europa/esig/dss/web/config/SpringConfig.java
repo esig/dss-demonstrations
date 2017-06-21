@@ -77,4 +77,5 @@ public class SpringConfig {
 		schedulerFactoryBean.setTriggers(simpleTrigger.getObject());
 		return schedulerFactoryBean;
 	}
+	
 }

@@ -4,7 +4,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.web.multipart.MultipartResolver;
@@ -20,7 +19,6 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 @EnableWebMvc
 @EnableSpringDataWebSupport
 @ComponentScan(basePackages = {"eu.europa.esig.dss.web.controller", "eu.europa.esig.dss.web.controller.preferences"})
-@ImportResource({ "classpath:META-INF/cxf/cxf.xml", "classpath:META-INF/cxf/cxf-servlet.xml" })
 public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Override

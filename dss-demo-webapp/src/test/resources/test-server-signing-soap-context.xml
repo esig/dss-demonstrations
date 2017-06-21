@@ -5,7 +5,7 @@
        	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
-	<jaxws:client id="remoteToken" address="http://localhost:8765/services/soap/ServerSigningService?wsdl" serviceClass="eu.europa.esig.dss.token.SoapSignatureTokenConnection">
+	<jaxws:client id="remoteToken" address="http://localhost:8080/services/soap/ServerSigningService?wsdl" serviceClass="eu.europa.esig.dss.token.SoapSignatureTokenConnection">
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
 		</jaxws:properties>

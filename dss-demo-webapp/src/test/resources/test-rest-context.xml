@@ -7,7 +7,7 @@
 
 	<jaxrs-client:client 
 		id="restClient" 
-		address="http://localhost:8765/services/rest/signature/one-document" 
+		address="http://localhost:8080/services/rest/signature/one-document" 
 		serviceClass="eu.europa.esig.dss.signature.RestDocumentSignatureService">
 		
 		<jaxrs-client:providers>
@@ -18,7 +18,7 @@
 	
 	<jaxrs-client:client 
 		id="restMultiDocumentsClient" 
-		address="http://localhost:8765/services/rest/signature/multiple-documents" 
+		address="http://localhost:8080/services/rest/signature/multiple-documents" 
 		serviceClass="eu.europa.esig.dss.signature.RestMultipleDocumentSignatureService">
 		
 		<jaxrs-client:providers>

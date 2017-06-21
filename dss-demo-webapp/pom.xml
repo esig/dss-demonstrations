@@ -93,6 +93,7 @@
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
 	            <configuration>
 	                <path>/</path>
 	            </configuration>
@@ -101,6 +102,12 @@
 				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -134,6 +141,15 @@
 	        <groupId>org.springframework.data</groupId>
 	        <artifactId>spring-data-jpa</artifactId>
 	    </dependency>
+	    
+		<dependency>
+	        <groupId>org.springframework.security</groupId>
+	        <artifactId>spring-security-web</artifactId>
+	    </dependency>
+	    <dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
 	    
 	    <dependency>
 		    <groupId>org.hibernate</groupId>

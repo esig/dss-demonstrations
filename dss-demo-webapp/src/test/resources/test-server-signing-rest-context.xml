@@ -7,7 +7,7 @@
 
 	<jaxrs-client:client 
 		id="remoteToken" 
-		address="http://localhost:8765/services/rest/server-signing" 
+		address="http://localhost:8080/services/rest/server-signing" 
 		serviceClass="eu.europa.esig.dss.token.RestSignatureTokenConnection">
 		
 		<jaxrs-client:providers>
