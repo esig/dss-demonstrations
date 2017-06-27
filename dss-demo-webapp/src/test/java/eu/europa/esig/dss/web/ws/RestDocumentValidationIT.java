@@ -6,15 +6,16 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
@@ -24,14 +25,18 @@ import eu.europa.esig.dss.validation.policy.rules.Indication;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.validation.reports.dto.DataToValidateDTO;
 import eu.europa.esig.dss.validation.reports.dto.ReportsDTO;
+import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.jaxb.policy.ConstraintsParameters;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/test-validation-rest-context.xml")
-public class RestDocumentValidationIT {
+public class RestDocumentValidationIT extends AbstractIT {
 
-	@Autowired
 	private RestDocumentValidationService validationService;
+
+	@Before
+	public void init() {
+		validationService = JAXRSClientFactory.create(getBaseCxf() + CXFConfig.REST_VALIDATION, RestDocumentValidationService.class,
+				Arrays.asList(new JacksonJsonProvider()));
+	}
 
 	@Test
 	public void testWithNoPolicyAndNoOriginalFile() throws Exception {

@@ -43,7 +43,6 @@
    <div th:fragment="menu">
    
         <div th:if="${#httpServletRequest.getRequestURI().contains('/admin/')}" class="list-group hidden-print">
-            <a th:href="@{/admin/proxy}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/proxy' ? 'active' : ''}" th:text="#{label.proxy}">Proxy</a>
             <a th:href="@{/admin/certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/certificates' ? 'active' : ''}" th:text="#{label.certificates}">Certificates</a>
         </div>
 

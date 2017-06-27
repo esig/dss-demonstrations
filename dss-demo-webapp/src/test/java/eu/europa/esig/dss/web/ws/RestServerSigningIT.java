@@ -1,23 +1,21 @@
 package eu.europa.esig.dss.web.ws;
 
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import java.util.Arrays;
+
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import eu.europa.esig.dss.token.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.token.RestSignatureTokenConnection;
+import eu.europa.esig.dss.web.config.CXFConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/test-server-signing-rest-context.xml")
 public class RestServerSigningIT extends AbstractServerSigning {
-
-	@Autowired
-	private RestSignatureTokenConnection remoteToken;
 
 	@Override
 	RemoteSignatureTokenConnection getRemoteToken() {
-		return remoteToken;
+		return JAXRSClientFactory.create(getBaseCxf() + CXFConfig.REST_SERVER_SIGNING, RestSignatureTokenConnection.class,
+				Arrays.asList(new JacksonJsonProvider()));
 	}
 
 }

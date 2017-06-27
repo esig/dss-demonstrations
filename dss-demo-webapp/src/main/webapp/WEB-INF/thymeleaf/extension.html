@@ -19,6 +19,8 @@
 							<div th:replace="fields::field-signed-file"></div>
 							
 							<div th:replace="fields::field-original-file"></div>
+							
+							<div th:replace="fields::field-container-type-form"></div>
 						    
 							<div th:replace="fields::field-signature-form"></div>
 						    
@@ -35,7 +37,7 @@
 				</div>
 			</div>
 			<footer th:replace="template :: footer"></footer>
-			<script type="text/javascript"  th:src="@{/js/jsSignatureLevel.js}"></script>
+			<script type="text/javascript"  th:src="@{/scripts/jsSignatureLevel.js}"></script>
 		</div>
 	</body>
 </html>

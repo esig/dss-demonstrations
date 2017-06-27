@@ -22,7 +22,7 @@ import eu.europa.esig.dss.x509.CertificateToken;
 
 @Controller
 @SessionAttributes(value = "certificateForm")
-@RequestMapping(value = "/admin/certificates")
+@RequestMapping(value = { "/admin/", "/admin/certificates" })
 public class CertificateController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CertificateController.class);

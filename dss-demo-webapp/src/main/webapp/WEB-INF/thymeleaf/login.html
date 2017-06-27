@@ -9,17 +9,17 @@
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2">
 				
-					<form action="j_security_check" method="post" id="login-form" role="form" class="form-horizontal">
+					<form th:action="@{/login}" method="post" id="login-form" role="form" class="form-horizontal">
 					    <div class="form-group">
-					        <label for="j_username" class="col-sm-2 control-label">Name</label> 
+					        <label for="username" class="col-sm-2 control-label">Name</label> 
 					        <div class="col-sm-6">
-					            <input type="text" id="j_username" required name="j_username" class="form-control" />
+					            <input type="text" id="username" required name="username" class="form-control" />
 					        </div>
 					    </div>
 					    <div class="form-group">
-					        <label for="j_password" class="col-sm-2 control-label">Password</label>
+					        <label for="password" class="col-sm-2 control-label">Password</label>
 					        <div class="col-sm-6">
-					            <input type="password" id="j_password" name="j_password" class="form-control" />
+					            <input type="password" id="password" name="password" class="form-control" />
 					        </div>
 					    </div>
 					    <div class="form-group">
