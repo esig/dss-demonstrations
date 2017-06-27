@@ -47,8 +47,8 @@ public class CXFConfig {
 
 	public static final String SOAP_SIGNATURE_ONE_DOCUMENT = "/soap/signature/one-document";
 	public static final String SOAP_SIGNATURE_MULTIPLE_DOCUMENTS = "/soap/signature/multiple-documents";
-	public static final String SOAP_VALIDATION = "/soap/ValidationService";
-	public static final String SOAP_SERVER_SIGNING = "/soap/ServerSigningService";
+	public static final String SOAP_VALIDATION = "/soap/validation";
+	public static final String SOAP_SERVER_SIGNING = "/soap/server-signing";
 
 	public static final String REST_SIGNATURE_ONE_DOCUMENT = "/rest/signature/one-document";
 	public static final String REST_SIGNATURE_MULTIPLE_DOCUMENTS = "/rest/signature/multiple-documents";
