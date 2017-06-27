@@ -18,7 +18,7 @@ import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.utils.Utils;
 
-public abstract class AbstractServerSigning {
+public abstract class AbstractServerSigning extends AbstractIT {
 
 	abstract RemoteSignatureTokenConnection getRemoteToken();
 

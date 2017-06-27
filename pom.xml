@@ -199,7 +199,7 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.tomcat.maven</groupId>
-					<artifactId>tomcat6-maven-plugin</artifactId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
 					<version>2.2</version>
 				</plugin>
 			</plugins>
@@ -345,18 +345,6 @@
 			</dependency>
 			
 			<dependency>
-		        <groupId>org.springframework.data</groupId>
-		        <artifactId>spring-data-jpa</artifactId>
-		        <version>1.11.4.RELEASE</version>
-		    </dependency>
-		    
-		    <dependency>
-			    <groupId>org.hibernate</groupId>
-			    <artifactId>hibernate-core</artifactId>
-			    <version>5.2.10.Final</version>
-			</dependency>
-
-			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-rt-frontend-jaxws</artifactId>
 				<version>${cxf.version}</version>
@@ -384,11 +372,6 @@
 				<version>${jackson-jaxrs-json-provider.version}</version>
 			</dependency>	
 
-			<dependency>
-				<groupId>org.quartz-scheduler</groupId>
-				<artifactId>quartz</artifactId>
-				<version>2.2.1</version>
-			</dependency>
 			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
@@ -459,7 +442,7 @@
 		<repository>
 		  <id>cefdigital</id>
 		  <name>CEF Digital</name>
-		  <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
+		  <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss/</url>
 		</repository>
 	</repositories>
 
@@ -518,9 +501,6 @@
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
 						<version>1.4.5</version>
-						<configuration>
-							<failBuildOnCVSS>6</failBuildOnCVSS>
-						</configuration>
 						<executions>
 							<execution>
 								<goals>

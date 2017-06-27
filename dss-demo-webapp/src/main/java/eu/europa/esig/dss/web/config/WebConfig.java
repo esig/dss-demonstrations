@@ -2,10 +2,8 @@ package eu.europa.esig.dss.web.config;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -17,7 +15,6 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"eu.europa.esig.dss.web.controller"})
 public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -30,7 +27,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/downloads/**").addResourceLocations("/downloads/");
 		registry.addResourceHandler("/doc/**").addResourceLocations("/doc/");
 	}
-	
+
 	@Bean
 	public MultipartResolver multipartResolver() {
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
@@ -38,7 +35,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		multipartResolver.setMaxUploadSize(52428800);
 		return multipartResolver;
 	}
-	
+
 	@Bean
 	public SpringResourceTemplateResolver templateResolver() {
 		SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
@@ -47,14 +44,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		templateResolver.setTemplateMode("HTML");
 		return templateResolver;
 	}
-	
+
 	@Bean
 	public SpringTemplateEngine templateEngine(SpringResourceTemplateResolver templateResolver) {
 		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 		templateEngine.setTemplateResolver(templateResolver);
 		return templateEngine;
 	}
-	
+
 	@Bean
 	public ThymeleafViewResolver viewResolver(SpringTemplateEngine templateEngine) {
 		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
@@ -62,12 +59,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		viewResolver.setCharacterEncoding("UTF-8");
 		return viewResolver;
 	}
-	
+
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasenames("classpath:i18n/application");
 		return messageSource;
 	}
-	
+
 }

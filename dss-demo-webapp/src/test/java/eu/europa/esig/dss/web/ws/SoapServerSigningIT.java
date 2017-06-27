@@ -1,23 +1,27 @@
 package eu.europa.esig.dss.web.ws;
 
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import eu.europa.esig.dss.token.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.token.SoapSignatureTokenConnection;
+import eu.europa.esig.dss.web.config.CXFConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/test-server-signing-soap-context.xml")
 public class SoapServerSigningIT extends AbstractServerSigning {
-
-	@Autowired
-	private SoapSignatureTokenConnection remoteToken;
 
 	@Override
 	RemoteSignatureTokenConnection getRemoteToken() {
-		return remoteToken;
+		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapSignatureTokenConnection.class);
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put("mtom-enabled", Boolean.TRUE);
+		factory.setProperties(props);
+
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SERVER_SIGNING);
+		return (SoapSignatureTokenConnection) factory.create();
 	}
 
 }

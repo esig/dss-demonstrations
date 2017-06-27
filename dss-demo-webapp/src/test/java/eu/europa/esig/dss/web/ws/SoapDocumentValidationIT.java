@@ -6,15 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
@@ -24,14 +24,25 @@ import eu.europa.esig.dss.validation.WSReportsDTO;
 import eu.europa.esig.dss.validation.policy.rules.Indication;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.validation.reports.dto.DataToValidateDTO;
+import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.jaxb.policy.ConstraintsParameters;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/test-validation-soap-context.xml")
-public class SoapDocumentValidationIT {
+public class SoapDocumentValidationIT extends AbstractIT {
 
-	@Autowired
 	private SoapDocumentValidationService validationService;
+
+	@Before
+	public void init() {
+		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapDocumentValidationService.class);
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put("mtom-enabled", Boolean.TRUE);
+		factory.setProperties(props);
+
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_VALIDATION);
+		validationService = (SoapDocumentValidationService) factory.create();
+	}
 
 	@Test
 	public void testWithNoPolicyAndNoOriginalFile() throws Exception {

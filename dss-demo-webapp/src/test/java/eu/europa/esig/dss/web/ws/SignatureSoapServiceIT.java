@@ -4,13 +4,13 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.DigestAlgorithm;
@@ -36,16 +36,31 @@ import eu.europa.esig.dss.test.TestUtils;
 import eu.europa.esig.dss.test.gen.CertificateService;
 import eu.europa.esig.dss.test.mock.MockPrivateKeyEntry;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.config.CXFConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/test-soap-context.xml")
-public class SignatureSoapServiceIT {
+public class SignatureSoapServiceIT extends AbstractIT {
 
-	@Autowired
 	private SoapDocumentSignatureService soapClient;
-
-	@Autowired
 	private SoapMultipleDocumentsSignatureService soapMultiDocsClient;
+
+	@Before
+	public void init() {
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put("mtom-enabled", Boolean.TRUE);
+
+		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapDocumentSignatureService.class);
+		factory.setProperties(props);
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_ONE_DOCUMENT);
+		soapClient = (SoapDocumentSignatureService) factory.create();
+
+		JaxWsProxyFactoryBean factory2 = new JaxWsProxyFactoryBean();
+		factory2.setServiceClass(SoapMultipleDocumentsSignatureService.class);
+		factory2.setProperties(props);
+		factory2.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
+		soapMultiDocsClient = (SoapMultipleDocumentsSignatureService) factory2.create();
+	}
 
 	@Test
 	public void testSigningAndExtension() throws Exception {

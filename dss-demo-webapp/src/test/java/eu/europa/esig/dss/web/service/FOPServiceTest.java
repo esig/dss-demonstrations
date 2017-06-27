@@ -19,12 +19,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import eu.europa.esig.dss.jaxb.detailedreport.DetailedReport;
 import eu.europa.esig.dss.jaxb.simplereport.SimpleReport;
-import eu.europa.esig.dss.web.config.DSSBeanFactory;
-import eu.europa.esig.dss.web.config.PersistenceConfig;
-import eu.europa.esig.dss.web.config.SpringConfig;
+import eu.europa.esig.dss.web.config.DSSBeanConfig;
 
 @WebAppConfiguration
-@ContextConfiguration(classes = { SpringConfig.class, PersistenceConfig.class, DSSBeanFactory.class })
+@ContextConfiguration(classes = { DSSBeanConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FOPServiceTest {
 
