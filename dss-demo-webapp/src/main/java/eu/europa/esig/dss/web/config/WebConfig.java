@@ -17,8 +17,7 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 
 @Configuration
 @EnableWebMvc
-@EnableSpringDataWebSupport
-@ComponentScan(basePackages = {"eu.europa.esig.dss.web.controller", "eu.europa.esig.dss.web.controller.preferences"})
+@ComponentScan(basePackages = {"eu.europa.esig.dss.web.controller"})
 public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -67,7 +66,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.setBasenames("classpath:i18n/application", "classpath:i18n/policy");
+		messageSource.setBasenames("classpath:i18n/application");
 		return messageSource;
 	}
 	

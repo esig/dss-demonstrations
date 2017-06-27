@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 public class OverrideConfig {
 
 	@Configuration
-	@Import({PersistenceConfig.class, SpringConfig.class, WebConfig.class, WebSecurityConfig.class, DSSBeanFactory.class })
+	@Import({PersistenceConfig.class, SpringConfig.class, WebSecurityConfig.class, DSSBeanFactory.class })
 	static class InnerConfiguration {
 
 	}
