@@ -440,7 +440,7 @@
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-test</artifactId>
 				<scope>test</scope>
-				<version>${project.version}</version>
+				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
