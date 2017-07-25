@@ -1,12 +1,14 @@
 package eu.europa.esig.dss.web.config;
 
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.http.proxy.ProxyProperties;
 
-public class ProxyConfigFactoryBean implements FactoryBean<ProxyConfig> {
+@Configuration
+public class ProxyConfiguration {
 
 	@Value("${proxy.http.enabled}")
 	private boolean httpEnabled;
@@ -34,8 +36,8 @@ public class ProxyConfigFactoryBean implements FactoryBean<ProxyConfig> {
 	@Value("${proxy.https.exclude}")
 	private String httpsExcludedHosts;
 
-	@Override
-	public ProxyConfig getObject() throws Exception {
+	@Bean
+	public ProxyConfig proxyConfig() {
 		if (!httpEnabled && !httpsEnabled) {
 			return null;
 		}
@@ -59,16 +61,6 @@ public class ProxyConfigFactoryBean implements FactoryBean<ProxyConfig> {
 			config.setHttpsProperties(httpsProperties);
 		}
 		return config;
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return ProxyConfig.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 }
