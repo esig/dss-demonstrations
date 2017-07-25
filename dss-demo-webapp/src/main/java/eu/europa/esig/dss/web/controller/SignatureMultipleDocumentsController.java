@@ -58,6 +58,9 @@ public class SignatureMultipleDocumentsController {
 	@Value("${nexuUrl}")
 	private String nexuUrl;
 
+	@Value("${baseUrl}")
+	private String downloadNexuUrl;
+
 	@Autowired
 	private SigningService signingService;
 
@@ -74,6 +77,7 @@ public class SignatureMultipleDocumentsController {
 	public String showSignatureParameters(Model model, HttpServletRequest request) {
 		SignatureMultipleDocumentsForm signatureMultipleDocumentsForm = new SignatureMultipleDocumentsForm();
 		model.addAttribute("signatureMultipleDocumentsForm", signatureMultipleDocumentsForm);
+		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
 		return SIGNATURE_PARAMETERS;
 	}
 
