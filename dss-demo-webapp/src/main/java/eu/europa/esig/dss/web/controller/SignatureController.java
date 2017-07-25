@@ -59,6 +59,9 @@ public class SignatureController {
 	@Value("${nexuUrl}")
 	private String nexuUrl;
 
+	@Value("${baseUrl}")
+	private String downloadNexuUrl;
+
 	@Autowired
 	private SigningService signingService;
 
@@ -76,6 +79,7 @@ public class SignatureController {
 	public String showSignatureParameters(Model model, HttpServletRequest request) {
 		SignatureDocumentForm signatureDocumentForm = new SignatureDocumentForm();
 		model.addAttribute("signatureDocumentForm", signatureDocumentForm);
+		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
 		return SIGNATURE_PARAMETERS;
 	}
 

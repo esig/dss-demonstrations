@@ -31,7 +31,7 @@
 						
 						<div th:replace="fields::field-sign-expired"></div>
 					
-						<div id="nexu_missing_alert" style="display:none;" class="alert alert-warning col-lg-8"><span id="warning-text"></span> You can download the <a th:href="@{/downloads/nexu.jar}">open source version of NexU</a> (<a href="http://nowina.lu/news/nexu/">more info</a>)</div>
+						<div id="nexu_missing_alert" style="display:none;" class="alert alert-warning col-lg-8"><span id="warning-text"></span> You can download the <a th:href="${downloadNexuUrl}">open source version of NexU</a> (<a href="http://nowina.lu/news/nexu/">more info</a>)</div>
 							
 						<div id="nexu_ready_alert" style="display:none;" class="alert alert-info col-lg-8">NexU ready. Please plug card reader, insert ID card and click on button below.</div>
 					
