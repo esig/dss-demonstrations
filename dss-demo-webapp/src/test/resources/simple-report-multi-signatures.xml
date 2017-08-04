@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimpleReport xmlns="http://dss.esig.europa.eu/validation/simple-report">
+    <Policy>
+        <PolicyName>QES AdESQC TL based</PolicyName>
+        <PolicyDescription>Validate electronic signatures and indicates whether they are Advanced electronic Signatures (AdES), AdES supported by a Qualified Certificate (AdES/QC) or a
+		Qualified electronic Signature (QES). All certificates and their related chains supporting the signatures are validated against the EU Member State Trusted Lists (this includes
+		signer's certificate and certificates used to validate certificate validity status services - CRLs, OCSP, and time-stamps).
+	</PolicyDescription>
+    </Policy>
+    <ValidationTime>2017-08-04T05:39:29</ValidationTime>
+    <DocumentName>more_then_one_signature.xml</DocumentName>
+    <ValidSignaturesCount>2</ValidSignaturesCount>
+    <SignaturesCount>4</SignaturesCount>
+    <Signature Id="Signature-86c36a4a-5882-4984-848a-5febacfed192" SignatureFormat="XAdES-BASELINE-B">
+        <SigningTime>2017-04-27T10:25:52</SigningTime>
+        <SignedBy>PZ3</SignedBy>
+        <CertificateChain>
+            <Certificate>
+                <id>EAD587EB5F0C2793681D964A296BA4CB97B56651AD18813A44C06C4C59BF383D</id>
+                <qualifiedName>PZ3</qualifiedName>
+            </Certificate>
+        </CertificateChain>
+        <SignatureLevel description="Not applicable">N/A</SignatureLevel>
+        <Indication>INDETERMINATE</Indication>
+        <SubIndication>NO_CERTIFICATE_CHAIN_FOUND</SubIndication>
+        <Errors>The certificate chain for signature is not trusted, there is no trusted anchor.</Errors>
+        <Errors>The certificate path is not trusted!</Errors>
+        <SignatureScope name="Full XML File" scope="XmlRootSignatureScope">The full XML file with transformations: XPath filtering.</SignatureScope>
+    </Signature>
+    <Signature Id="Signature-52abf6c0-67ec-40d4-b73d-08ab4f6691d0" SignatureFormat="XAdES-BASELINE-B">
+        <SigningTime>2016-10-10T12:13:46</SigningTime>
+        <SignedBy>PZ3</SignedBy>
+        <CertificateChain>
+            <Certificate>
+                <id>EAD587EB5F0C2793681D964A296BA4CB97B56651AD18813A44C06C4C59BF383D</id>
+                <qualifiedName>PZ3</qualifiedName>
+            </Certificate>
+        </CertificateChain>
+        <SignatureLevel description="Not applicable">N/A</SignatureLevel>
+        <Indication>INDETERMINATE</Indication>
+        <SubIndication>NO_CERTIFICATE_CHAIN_FOUND</SubIndication>
+        <Errors>The certificate chain for signature is not trusted, there is no trusted anchor.</Errors>
+        <Errors>The certificate path is not trusted!</Errors>
+        <SignatureScope name="Full XML File" scope="XmlRootSignatureScope">The full XML file with transformations: XPath filtering.</SignatureScope>
+    </Signature>
+    <Signature Id="ID-8b009720-f82c-11e6-ae9c-0050569a5ac0" SignatureFormat="XAdES-BASELINE-B">
+        <SigningTime>2017-02-21T12:11:37</SigningTime>
+        <SignedBy>mikala</SignedBy>
+        <CertificateChain>
+            <Certificate>
+                <id>D30FA7D4FA90904884DDEED35B989DA84D82D742580E2625D56625C07C572FF8</id>
+                <qualifiedName>mikala</qualifiedName>
+            </Certificate>
+            <Certificate>
+                <id>08DA906198FCD5C6A242B2A6BFFF0B5A445655D76BBC65BFCBDD13186C2C6A86</id>
+                <qualifiedName>PWPW - kwalifikowany CA</qualifiedName>
+            </Certificate>
+        </CertificateChain>
+        <SignatureLevel description="Qualified Electronic Signature">QESig</SignatureLevel>
+        <Indication>TOTAL_PASSED</Indication>
+        <Warnings>Revocation info access is not present!</Warnings>
+        <Warnings>Authority info access is not present!</Warnings>
+        <Infos>A pseudonym is used</Infos>
+        <SignatureScope name="Full XML File" scope="XmlRootSignatureScope">The full XML file with transformations: XPath filtering.</SignatureScope>
+    </Signature>
+    <Signature Id="ID-e5b77ba0-1b6a-11e7-a15a-0050569a0676" SignatureFormat="XAdES-BASELINE-B">
+        <SigningTime>2017-04-07T08:19:49</SigningTime>
+        <SignedBy>mikala</SignedBy>
+        <CertificateChain>
+            <Certificate>
+                <id>D30FA7D4FA90904884DDEED35B989DA84D82D742580E2625D56625C07C572FF8</id>
+                <qualifiedName>mikala</qualifiedName>
+            </Certificate>
+            <Certificate>
+                <id>08DA906198FCD5C6A242B2A6BFFF0B5A445655D76BBC65BFCBDD13186C2C6A86</id>
+                <qualifiedName>PWPW - kwalifikowany CA</qualifiedName>
+            </Certificate>
+        </CertificateChain>
+        <SignatureLevel description="Qualified Electronic Signature">QESig</SignatureLevel>
+        <Indication>TOTAL_PASSED</Indication>
+        <Warnings>Revocation info access is not present!</Warnings>
+        <Warnings>Authority info access is not present!</Warnings>
+        <Infos>A pseudonym is used</Infos>
+        <SignatureScope name="Full XML File" scope="XmlRootSignatureScope">The full XML file with transformations: XPath filtering.</SignatureScope>
+    </Signature>
+</SimpleReport>

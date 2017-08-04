@@ -52,7 +52,24 @@ public class XSLTServiceTest {
 	}
 
 	@Test
-	public void generateDetailedReportFiveSignatures() throws Exception {
+	public void generateSimpleReportMulti() throws Exception {
+		JAXBContext context = JAXBContext.newInstance(SimpleReport.class.getPackage().getName());
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		Marshaller marshaller = context.createMarshaller();
+
+		SimpleReport simpleReport = (SimpleReport) unmarshaller.unmarshal(new File("src/test/resources/simple-report-multi-signatures.xml"));
+		assertNotNull(simpleReport);
+
+		StringWriter writer = new StringWriter();
+		marshaller.marshal(simpleReport, writer);
+
+		String htmlSimpleReport = service.generateSimpleReport(writer.toString());
+		assertTrue(Utils.isStringNotEmpty(htmlSimpleReport));
+		logger.debug("Simple report html : " + htmlSimpleReport);
+	}
+
+	@Test
+	public void generateDetailedReport() throws Exception {
 		JAXBContext context = JAXBContext.newInstance(DetailedReport.class.getPackage().getName());
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Marshaller marshaller = context.createMarshaller();
@@ -66,7 +83,23 @@ public class XSLTServiceTest {
 		String htmlDetailedReport = service.generateDetailedReport(writer.toString());
 		assertTrue(Utils.isStringNotEmpty(htmlDetailedReport));
 		logger.debug("Detailed report html : " + htmlDetailedReport);
+	}
 
+	@Test
+	public void generateDetailedReportMultiSignatures() throws Exception {
+		JAXBContext context = JAXBContext.newInstance(DetailedReport.class.getPackage().getName());
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		Marshaller marshaller = context.createMarshaller();
+
+		DetailedReport detailedReport = (DetailedReport) unmarshaller.unmarshal(new File("src/test/resources/detailed-report-multi-signatures.xml"));
+		assertNotNull(detailedReport);
+
+		StringWriter writer = new StringWriter();
+		marshaller.marshal(detailedReport, writer);
+
+		String htmlDetailedReport = service.generateDetailedReport(writer.toString());
+		assertTrue(Utils.isStringNotEmpty(htmlDetailedReport));
+		logger.debug("Detailed report html : " + htmlDetailedReport);
 	}
 
 }
