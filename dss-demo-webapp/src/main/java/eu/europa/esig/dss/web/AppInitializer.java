@@ -26,7 +26,10 @@ public class AppInitializer implements WebApplicationInitializer {
 		servletContext.addListener(new ContextLoaderListener(context));
 		servletContext.addFilter("characterEncodingFilter", new CharacterEncodingFilter("UTF-8"));
 
-		ServletRegistration.Dynamic dispatcher = servletContext.addServlet("Dispatcher", new DispatcherServlet(context));
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
+		dispatcherServlet.setThrowExceptionIfNoHandlerFound(true);
+
+		ServletRegistration.Dynamic dispatcher = servletContext.addServlet("Dispatcher", dispatcherServlet);
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/*");
 

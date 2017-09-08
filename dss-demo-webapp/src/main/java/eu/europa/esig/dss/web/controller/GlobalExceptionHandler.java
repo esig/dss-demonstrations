@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,6 +28,15 @@ public class GlobalExceptionHandler {
 
 		logger.error("Unhandle exception occured : " + e.getMessage(), e);
 
+		return getMAV(req, e);
+	}
+
+	@ExceptionHandler(NoHandlerFoundException.class)
+	public ModelAndView handle(HttpServletRequest req, Exception e) {
+		return getMAV(req, e);
+	}
+
+	private ModelAndView getMAV(HttpServletRequest req, Exception e) {
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("exception", e);
 		mav.addObject("url", req.getRequestURL());
