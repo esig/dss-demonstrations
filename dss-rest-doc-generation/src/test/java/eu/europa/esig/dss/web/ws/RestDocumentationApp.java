@@ -23,6 +23,7 @@ import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.BLevelParameters;
+import eu.europa.esig.dss.DataToValidateDTO;
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.RemoteCertificate;
@@ -40,7 +41,6 @@ import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.signature.SignOneDocumentDTO;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
-import eu.europa.esig.dss.validation.reports.dto.DataToValidateDTO;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;

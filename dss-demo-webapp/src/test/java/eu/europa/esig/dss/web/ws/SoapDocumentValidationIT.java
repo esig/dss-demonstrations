@@ -3,19 +3,15 @@ package eu.europa.esig.dss.web.ws;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.europa.esig.dss.DataToValidateDTO;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.utils.Utils;
@@ -23,9 +19,7 @@ import eu.europa.esig.dss.validation.SoapDocumentValidationService;
 import eu.europa.esig.dss.validation.WSReportsDTO;
 import eu.europa.esig.dss.validation.policy.rules.Indication;
 import eu.europa.esig.dss.validation.reports.Reports;
-import eu.europa.esig.dss.validation.reports.dto.DataToValidateDTO;
 import eu.europa.esig.dss.web.config.CXFConfig;
-import eu.europa.esig.jaxb.policy.ConstraintsParameters;
 
 public class SoapDocumentValidationIT extends AbstractIT {
 
@@ -47,9 +41,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	@Test
 	public void testWithNoPolicyAndNoOriginalFile() throws Exception {
 
-		FileDocument fileDoc = new FileDocument(new File("src/test/resources/XAdESLTA.xml"));
-		RemoteDocument signedFile = new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName(),
-				fileDoc.getAbsolutePath());
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, null, null);
 
@@ -69,13 +61,9 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 	@Test
 	public void testWithNoPolicyAndOriginalFile() throws Exception {
-		FileDocument fileDoc = new FileDocument(new File("src/test/resources/xades-detached.xml"));
-		RemoteDocument signedFile = new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName(),
-				fileDoc.getAbsolutePath());
 
-		FileDocument fileDoc2 = new FileDocument(new File("src/test/resources/sample.xml"));
-		RemoteDocument originalFile = new RemoteDocument(Utils.toByteArray(fileDoc2.openStream()), fileDoc2.getMimeType(), fileDoc2.getName(),
-				fileDoc2.getAbsolutePath());
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+		RemoteDocument originalFile = toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, originalFile, null);
 
@@ -94,18 +82,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 	@Test
 	public void testWithPolicyAndOriginalFile() throws Exception {
-		FileDocument fileDoc = new FileDocument(new File("src/test/resources/xades-detached.xml"));
-		RemoteDocument signedFile = new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName(),
-				fileDoc.getAbsolutePath());
 
-		FileDocument fileDoc2 = new FileDocument(new File("src/test/resources/sample.xml"));
-		RemoteDocument originalFile = new RemoteDocument(Utils.toByteArray(fileDoc2.openStream()), fileDoc2.getMimeType(), fileDoc2.getName(),
-				fileDoc2.getAbsolutePath());
-
-		JAXBContext context = JAXBContext.newInstance(ConstraintsParameters.class.getPackage().getName());
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		InputStream stream = new FileInputStream("src/test/resources/constraint.xml");
-		ConstraintsParameters policy = (ConstraintsParameters) unmarshaller.unmarshal(stream);
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+		RemoteDocument originalFile = toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
+		RemoteDocument policy = toRemoteDocument(new FileDocument("src/test/resources/constraint.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, originalFile, policy);
 
@@ -124,14 +104,8 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 	@Test
 	public void testWithPolicyAndNoOriginalFile() throws Exception {
-		FileDocument fileDoc = new FileDocument(new File("src/test/resources/xades-detached.xml"));
-		RemoteDocument signedFile = new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName(),
-				fileDoc.getAbsolutePath());
-
-		JAXBContext context = JAXBContext.newInstance(ConstraintsParameters.class.getPackage().getName());
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		InputStream stream = new FileInputStream("src/test/resources/constraint.xml");
-		ConstraintsParameters policy = (ConstraintsParameters) unmarshaller.unmarshal(stream);
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+		RemoteDocument policy = toRemoteDocument(new FileDocument("src/test/resources/constraint.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, null, policy);
 
@@ -146,6 +120,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
 		assertNotNull(reports);
+	}
+
+	private RemoteDocument toRemoteDocument(FileDocument fileDoc) throws IOException {
+		return new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName(), fileDoc.getAbsolutePath());
 	}
 
 }
