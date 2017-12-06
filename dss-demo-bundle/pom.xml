@@ -16,7 +16,7 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<tomcat.version>8.5.20</tomcat.version>
+		<tomcat.version>8.5.24</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
