@@ -52,6 +52,12 @@
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-service</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
