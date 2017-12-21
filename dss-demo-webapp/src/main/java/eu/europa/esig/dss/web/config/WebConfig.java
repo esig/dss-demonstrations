@@ -26,6 +26,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/jar/**").addResourceLocations("/jar/");
 		registry.addResourceHandler("/downloads/**").addResourceLocations("/downloads/");
 		registry.addResourceHandler("/doc/**").addResourceLocations("/doc/");
+		registry.addResourceHandler("/apidocs/**").addResourceLocations("/apidocs/");
 	}
 
 	@Bean
