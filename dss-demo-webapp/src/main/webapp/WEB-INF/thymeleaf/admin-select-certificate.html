@@ -54,15 +54,8 @@
 					    </div>
 					    <div class="panel-body">
 					        <form method="post" th:object="${certificateForm}" class="form-horizontal" enctype="multipart/form-data">
-					            <div class="form-group">
-					                <label for="certificateFile" class="col-sm-3 control-label" th:text="#{label.certificate.file}"></label>
-					                <div class="col-sm-3">
-					                	<input type="file" name="certificateFile" />
-					                </div>
-					                <div class="col-xs-3 col-md-offset-1">
-    									<p th:if="${#fields.hasErrors('certificateFile')}" th:errors="*{certificateFile}" class="text-danger">Error</p>
-					                </div>
-					            </div>
+					          
+					          	<div th:replace="fields::field-certificate-file"></div>
 					            
 					            <div class="form-group">
 					            	<label for="addToKeystore" class="col-sm-3 control-label" th:text=#{label.add.to.keystore}></label>

@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.MimeType;
-import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
@@ -104,14 +103,10 @@ public class ValidationController {
 				logger.error(e.getMessage(), e);
 			}
 		} else if (defaultPolicy != null) {
-			InputStream dpis = null;
-			try {
-				dpis = defaultPolicy.getInputStream();
-				reports = documentValidator.validateDocument(dpis);
+			try (InputStream is = defaultPolicy.getInputStream()) {
+				reports = documentValidator.validateDocument(is);
 			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				Utils.closeQuietly(dpis);
+				logger.error("Unable to parse policy : " + e.getMessage(), e);
 			}
 		} else {
 			logger.error("Not correctly initialized");
