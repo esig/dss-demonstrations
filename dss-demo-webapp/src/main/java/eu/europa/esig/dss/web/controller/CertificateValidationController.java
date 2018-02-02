@@ -1,10 +1,13 @@
 package eu.europa.esig.dss.web.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,19 +16,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DSSUtils;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import eu.europa.esig.dss.web.service.XSLTService;
+import eu.europa.esig.dss.x509.CertificateSource;
+import eu.europa.esig.dss.x509.CertificateToken;
+import eu.europa.esig.dss.x509.CommonCertificateSource;
 
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml" })
 @RequestMapping(value = "/certificate-validation")
 public class CertificateValidationController {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CertificateValidationController.class);
 
 	private static final String VALIDATION_TILE = "certificate_validation";
 	private static final String VALIDATION_RESULT_TILE = "validation_result";
@@ -49,14 +59,26 @@ public class CertificateValidationController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("certValidationForm") @Valid CertificateValidationForm certValidationForm, BindingResult result, Model model)
-			throws DSSException, IOException {
+	public String validate(@ModelAttribute("certValidationForm") @Valid CertificateValidationForm certValidationForm, BindingResult result, Model model) {
 		if (result.hasErrors()) {
 			return VALIDATION_TILE;
 		}
 
-		CertificateValidator certificateValidator = CertificateValidator
-				.fromCertificate(DSSUtils.loadCertificate(certValidationForm.getCertificateFile().getBytes()));
+		CertificateToken certificate = getCertificate(certValidationForm.getCertificateFile());
+
+		List<MultipartFile> certificateChainFiles = certValidationForm.getCertificateChainFiles();
+		if (Utils.isCollectionNotEmpty(certificateChainFiles)) {
+			CertificateSource adjunctCertSource = new CommonCertificateSource();
+			for (MultipartFile file : certificateChainFiles) {
+				CertificateToken certificateChainItem = getCertificate(file);
+				if (certificateChainItem != null) {
+					adjunctCertSource.addCertificate(certificateChainItem);
+				}
+			}
+			certificateVerifier.setAdjunctCertSource(adjunctCertSource);
+		}
+
+		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(certificateVerifier);
 
 		Reports reports = certificateValidator.validate();
@@ -67,13 +89,23 @@ public class CertificateValidationController {
 		// model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
 		// model.addAttribute("simpleReport", xsltService.generateSimpleReport(xmlSimpleReport));
 		//
-		// String xmlDetailedReport = reports.getXmlDetailedReport();
-		// model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
-		// model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
+		String xmlDetailedReport = reports.getXmlDetailedReport();
+		model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
+		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
 
 		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
 
 		return VALIDATION_RESULT_TILE;
+	}
+
+	private CertificateToken getCertificate(MultipartFile file) {
+		try {
+			return DSSUtils.loadCertificate(file.getBytes());
+		} catch (DSSException | IOException e) {
+			LOG.warn("Cannot convert file to X509 Certificate", e);
+			return null;
+		}
+
 	}
 
 	// @RequestMapping(value = "/download-simple-report")

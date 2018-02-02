@@ -145,4 +145,14 @@
 	</div>
 </div>
 
+<div class="form-group" th:fragment="field-certificate-chain-files">
+	<label for="certificateChainFiles" class="col-sm-3 control-label" th:text="#{label.certificate.chain.files}"></label>
+	<div class="col-sm-3">
+		<input type="file" name="certificateChainFiles" multiple="multiple" />
+	</div>
+	<div class="col-xs-3 col-md-offset-1">
+		<p th:if="${#fields.hasErrors('certificateChainFiles')}" th:errors="*{certificateChainFiles}" class="text-danger">Error</p>
+	</div>
+</div>
+
 </html>
