@@ -1,117 +1,136 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-	<head th:replace="template :: header"></head>
-	<body>
-		
-		<nav th:replace="template :: navigation"></nav>
-	
-		<div class="container">
-			<div class="row">
-                <div class="col-md-3">
-        			<div th:replace="template :: menu"></div>
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Signature</li>
+                            <li class="active">NexU process</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2>NexU signature process</h2>
+
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped active" style="width: 0%" id="bar">
+                                        <span id="bar-text"></span>
+                                    </div>
+                                </div>
+                                <div id="error" style="display: none" class="alert alert-danger" role="danger">
+                                    <strong id="errorText">Oops... an error occurred </strong><span id="errorcontent"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-				<div class="col-md-9">
-					<h2>NexU signature process</h2>
-     
-					<div class="progress">
-						<div class="progress-bar progress-bar-striped active" style="width:0%" id="bar">
-							<span id="bar-text"></span>
-							</div>
-					</div>
-					<div id="error" style="display:none" class="alert alert-danger" role="danger">
-						<strong id="errorText">Oops... an error occurred </strong><span id="errorcontent"></span>
-					</div>
-					
-				</div>
-			</div>
-			<footer th:replace="template :: footer"></footer>
-		</div>
-	
-	<script type="text/javascript" th:src="@{${nexuUrl}+'/nexu.js'}"></script>
-	<script type="text/javascript" th:inline="javascript">
-	/*<![CDATA[*/
-		
-			var tokenId;
-			var keyId;
-			
-			window.onload = function() {
-				getCertificates();
-			};
-			
-			function getCertificates() {
-				updateProgressBar("Loading certificates...", "10%");
-			    nexu_get_certificates(getDataToSign, error);
-			}
-			
-			function getDataToSign(certificateData) {
-				if(certificateData.response == null) {
-					$('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
-					$('#bar-text').html("Error");
-					document.getElementById("errorcontent").innerHTML = "error while reading the Smart Card";
-					$("#error").show();
-				} else {
-					updateProgressBar("Computing the digest...", "25%");
-				    var signingCertificate = certificateData.response.certificate;
-				    var certificateChain = certificateData.response.certificateChain;
-				    var encryptionAlgorithm = certificateData.response.encryptionAlgorithm;
-				    tokenId = certificateData.response.tokenId.id;
-				    keyId = certificateData.response.keyId;
-				    var toSend = { signingCertificate: signingCertificate, certificateChain: certificateChain, encryptionAlgorithm: encryptionAlgorithm };
-				    callUrl(/*[[${rootUrl+'/get-data-to-sign'}]]*/, "POST",  JSON.stringify(toSend), sign, error);
-				}
-			}
-			
-			function sign(dataToSignResponse) {
-				if (dataToSignResponse == null) {
-					$('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
-					$('#bar-text').html("Error");
-					$("#errorcontent").text("unable to compute the data to sign (see server logs)");
-					$("#error").show();
-				} else {
-					updateProgressBar("Signing the digest...", "50%");
-					var digestAlgo = /*[[${digestAlgorithm.name}]]*/;
-					nexu_sign_with_token_infos(tokenId, keyId, dataToSignResponse.dataToSign, digestAlgo, signDocument, error);
-				}
-			}
-			
-			function signDocument(signatureData) {
-				updateProgressBar("Signing the document...", "75%");
-				var signatureValue = signatureData.response.signatureValue;
-				var toSend = {signatureValue:signatureValue};
-			    callUrl(/*[[${rootUrl}+'/sign-document']]*/, "POST", JSON.stringify(toSend), downloadSignedDocument, error);
-			}
-			
-			function downloadSignedDocument(signDocumentResponse) {
-				var url = signDocumentResponse.urlToDownload;
-				url = /*[[${rootUrl+'/download'}]]*/;
-				window.open(url, "_self");
-				updateProgressBar("Done !", "100%");
-				$('#bar').removeClass('progress-bar-striped active');
-				$('#bar').addClass('progress-bar-success');
-			}
-			
-			function error(error) {
-				$('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
-				if (error!= null && error.responseJSON !=null) {
-					var jsonResp = error.responseJSON;
-					if (jsonResp.errorMessage != null){
-						$("#errorcontent").html(jsonResp.errorMessage);
-					}
-					else if (jsonResp.error != null){
-						$("#errorcontent").html(jsonResp.error);
-					}
-				}
-			    $("#error").show();
-			    $("#success").hide();
-			}
-			
-			function updateProgressBar(action, percent) {
-				$('#bar-text').html(action);
-				$('#bar').width(percent);
-			}
+            </div>
+        </div>
 
-			/*]]>*/
-		</script> 
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
 
-	</body>
+    <script type="text/javascript" th:src="@{${nexuUrl}+'/nexu.js'}"></script>
+    <script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+        
+            var tokenId;
+            var keyId;
+            
+            window.onload = function() {
+                getCertificates();
+            };
+            
+            function getCertificates() {
+                updateProgressBar("Loading certificates...", "10%");
+                nexu_get_certificates(getDataToSign, error);
+            }
+            
+            function getDataToSign(certificateData) {
+                if(certificateData.response == null) {
+                    $('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
+                    $('#bar-text').html("Error");
+                    document.getElementById("errorcontent").innerHTML = "error while reading the Smart Card";
+                    $("#error").show();
+                } else {
+                    updateProgressBar("Computing the digest...", "25%");
+                    var signingCertificate = certificateData.response.certificate;
+                    var certificateChain = certificateData.response.certificateChain;
+                    var encryptionAlgorithm = certificateData.response.encryptionAlgorithm;
+                    tokenId = certificateData.response.tokenId.id;
+                    keyId = certificateData.response.keyId;
+                    var toSend = { signingCertificate: signingCertificate, certificateChain: certificateChain, encryptionAlgorithm: encryptionAlgorithm };
+                    callUrl(/*[[${rootUrl+'/get-data-to-sign'}]]*/, "POST",  JSON.stringify(toSend), sign, error);
+                }
+            }
+            
+            function sign(dataToSignResponse) {
+                if (dataToSignResponse == null) {
+                    $('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
+                    $('#bar-text').html("Error");
+                    $("#errorcontent").text("unable to compute the data to sign (see server logs)");
+                    $("#error").show();
+                } else {
+                    updateProgressBar("Signing the digest...", "50%");
+                    var digestAlgo = /*[[${digestAlgorithm.name}]]*/;
+                    nexu_sign_with_token_infos(tokenId, keyId, dataToSignResponse.dataToSign, digestAlgo, signDocument, error);
+                }
+            }
+            
+            function signDocument(signatureData) {
+                updateProgressBar("Signing the document...", "75%");
+                var signatureValue = signatureData.response.signatureValue;
+                var toSend = {signatureValue:signatureValue};
+                callUrl(/*[[${rootUrl}+'/sign-document']]*/, "POST", JSON.stringify(toSend), downloadSignedDocument, error);
+            }
+            
+            function downloadSignedDocument(signDocumentResponse) {
+                var url = signDocumentResponse.urlToDownload;
+                url = /*[[${rootUrl+'/download'}]]*/;
+                window.open(url, "_self");
+                updateProgressBar("Done !", "100%");
+                $('#bar').removeClass('progress-bar-striped active');
+                $('#bar').addClass('progress-bar-success');
+            }
+            
+            function error(error) {
+                $('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
+                if (error!= null && error.responseJSON !=null) {
+                    var jsonResp = error.responseJSON;
+                    if (jsonResp.errorMessage != null){
+                        $("#errorcontent").html(jsonResp.errorMessage);
+                    }
+                    else if (jsonResp.error != null){
+                        $("#errorcontent").html(jsonResp.error);
+                    }
+                }
+                $("#error").show();
+                $("#success").hide();
+            }
+            
+            function updateProgressBar(action, percent) {
+                $('#bar-text').html(action);
+                $('#bar').width(percent);
+            }
+
+            /*]]>*/
+        </script>
+
+</body>
 </html>

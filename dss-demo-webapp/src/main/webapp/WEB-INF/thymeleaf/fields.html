@@ -118,7 +118,7 @@
 
 <div class="form-group" th:fragment="field-digest-algo">
     <label for="digestAlgorithm" class="col-sm-2 control-label" th:text="#{label.digest.algorithm}"></label>
-    <div class="col-sm-5">
+    <div class="col-sm-6">
 	    <label class="radio-inline" th:each="algo : ${digestAlgos}"> 
 		    <input type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:text="${algo}" />
 	    </label>

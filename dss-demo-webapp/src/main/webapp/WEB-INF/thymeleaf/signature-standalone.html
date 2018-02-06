@@ -1,45 +1,67 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-	<head th:replace="template :: header"></head>
-	<body>
-		
-		<nav th:replace="template :: navigation"></nav>
-	
-		<div class="container">
-			<div class="row">
-                <div class="col-md-3">
-        			<div th:replace="template :: menu"></div>
-                </div>
-				<div class="col-md-9">
-				
-					<h2>Standalone application</h2>
-					
-					<p>
-					    Download the standalone application (<a th:href="@{/downloads/dss-app.zip}" title="e-signature standalone">zip</a>) or (<a th:href="@{/downloads/dss-app.tar.gz}" title="e-signature standalone">tar.gz</a>)
-					</p>
-					
-					<div class="panel panel-default">
-					  <div class="panel-heading" data-toggle="collapse" data-target="#info">
-					    <h3 class="panel-title">More info...</h3>
-					  </div>
-					  <div class="panel-body collapse in" id="info">
-					    <p>This demo is a standalone application which uses JavaFX (Java 8).</p>
-					    <p>The application connects directly to the CA's infrastructure to retrieve information such as CRL, OCSP, certificates from AIA ...</p>
-					    <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, ASiC). This application doesn't requires a DSS server. </p>
-					    <div class="col-xs-12 col-md-12">
-					        <a th:href="@{/images/standalone-application.png}" class="thumbnail">
-					            <img th:src="@{/images/standalone-application.png}" alt="Standalone application" class="img-rounded" />
-					        </a>
-					    </div>
-					  </div>
-					</div>
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
 
-				</div>
-			</div>
-			<footer th:replace="template :: footer"></footer>
-			<script type="text/javascript">
-			    $('.collapse').collapse();
-			</script>
-		</div>
-	</body>
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Signature</li>
+                            <li class="active">Standalone</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2>Standalone application</h2>
+
+                                <p>
+                                    Download the standalone application (
+                                    <a th:href="@{/downloads/dss-app.zip}" title="e-signature standalone">zip</a>
+                                    ) or (
+                                    <a th:href="@{/downloads/dss-app.tar.gz}" title="e-signature standalone">tar.gz</a>
+                                    )
+                                </p>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" data-toggle="collapse" data-target="#info">
+                                        <h3 class="panel-title">More info...</h3>
+                                    </div>
+                                    <div class="panel-body collapse in" id="info">
+                                        <p>This demo is a standalone application which uses JavaFX (Java 8).</p>
+                                        <p>The application connects directly to the CA's infrastructure to retrieve information such as CRL, OCSP, certificates from AIA ...</p>
+                                        <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, ASiC). This application doesn't requires a DSS server.</p>
+                                        <div class="col-xs-12 col-md-12">
+                                            <a th:href="@{/images/standalone-application.png}" class="thumbnail">
+                                                <img th:src="@{/images/standalone-application.png}" alt="Standalone application" class="img-rounded" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
+    <script type="text/javascript">
+					$('.collapse').collapse();
+				</script>
+</body>
 </html>

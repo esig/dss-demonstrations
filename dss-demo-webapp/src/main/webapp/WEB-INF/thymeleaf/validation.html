@@ -1,65 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-	<head th:replace="template :: header"></head>
-	<body>
-		
-		<nav th:replace="template :: navigation"></nav>
-	
-		<div class="container">
-			<div class="row">
-                <div class="col-md-3">
-        			<div th:replace="template :: menu"></div>
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Signature validation</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2 th:text="#{label.validate}"></h2>
+
+                                <form method="post" class="form-horizontal" enctype="multipart/form-data" th:action="@{/validation}" th:object="${validationForm}">
+
+                                    <div th:replace="fields::field-signed-file"></div>
+
+                                    <div th:replace="fields::field-original-file"></div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" th:text="#{label.validation.level}"></label>
+                                        <div class="col-sm-7">
+                                            <select th:field="*{validationLevel}" class="form-control input-sm">
+                                                <option th:each="level : ${validationLevels}" th:value="${level}" th:text="#{${'label.validation.level.'+level}}" />
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-7">
+                                            <input type="radio" th:field="*{defaultPolicy}" value="true" th:text="#{label.validation.default.policy.file}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-4">
+                                            <input type="radio" th:field="*{defaultPolicy}" value="false" th:text="#{label.validation.custom.policy.file}" /> :
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <input type="file" name="policyFile" id="policyFile" disabled="disabled" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
+                                            <button type="reset" class="btn" th:text="#{label.clear}"></button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
-				<div class="col-md-9">
-					<h2 th:text="#{label.validate}"></h2>
-					
-					<form method="post" class="form-horizontal" enctype="multipart/form-data" th:action="@{/validation}" th:object="${validationForm}">
-					
-					   	<div th:replace="fields::field-signed-file"></div>
-											
-						<div th:replace="fields::field-original-file"></div>
-					
-						<div class="form-group">
-						    <label class="col-sm-2 control-label" th:text="#{label.validation.level}"></label>
-						    <div class="col-sm-7">
-						        <select th:field="*{validationLevel}" class="form-control input-sm">
-						        	<option th:each="level : ${validationLevels}" th:value="${level}" th:text="#{${'label.validation.level.'+level}}" /> 
-						        </select>
-						    </div>
-						</div>
-						
-					    <div class="form-group">
-					        <div class="col-sm-offset-2 col-sm-7">
-					        	<input type="radio" th:field="*{defaultPolicy}" value="true" th:text="#{label.validation.default.policy.file}" />
-					        </div>
-					    </div>
-					
-					    <div class="form-group">
-					        <div class="col-sm-offset-2 col-sm-4">
-					            <input type="radio" th:field="*{defaultPolicy}" value="false" th:text="#{label.validation.custom.policy.file}" /> :
-					        </div>
-					
-					        <div class="col-sm-6">
-					        	<input type="file" name="policyFile" id="policyFile" disabled="disabled" /> 
-					        </div>
-					    </div>
+            </div>
+        </div>
 
-					    <div class="form-group">
-					        <div class="col-sm-offset-2 col-sm-10">
-					            <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
-					            <button type="reset" class="btn" th:text="#{label.clear}"></button>
-					        </div>
-					    </div>   
-					</form>
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
 
-				</div>
-			</div>
-			<footer th:replace="template :: footer"></footer>
-			<script type="text/javascript">
-			    $('input[name="defaultPolicy"]:radio').change(function() {
-			        $('#policyFile').attr("disabled", this.value == 'true');
-			    });
-			</script>
-		</div>
-	</body>
+    <script type="text/javascript">
+					$('input[name="defaultPolicy"]:radio').change(
+							function() {
+								$('#policyFile').attr("disabled",
+										this.value == 'true');
+							});
+				</script>
+</body>
 </html>

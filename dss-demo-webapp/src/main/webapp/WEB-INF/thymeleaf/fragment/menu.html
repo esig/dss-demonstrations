@@ -1,0 +1,50 @@
+<div th:fragment="menu" class="col-md-3 dss-menu">
+
+    <div th:if="${#httpServletRequest.getRequestURI().contains('/admin/')}" class="list-group hidden-print">
+        <a th:href="@{/admin/certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/certificates' ? 'active' : ''}" th:text="#{label.certificates}">Certificates</a>
+    </div>
+
+    <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
+        <div class="panel-heading">e-Signature</div>
+        <div class="list-group hidden-print">
+            <a th:href="@{/sign-a-document}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-document' ? 'active' : ''}" th:text="#{label.signADocument}">Sign
+                a document</a>
+            <a th:href="@{/sign-multiple-documents}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-multiple-documents' ? 'active' : ''}"
+                th:text="#{label.signMultiDocuments}"
+            >Sign multi documents</a>
+            <a th:href="@{/signature-standalone}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-standalone' ? 'active' : ''}"
+                th:text="#{label.standalone.application}"
+            >Standalone application</a>
+            <a th:href="@{/signature-rest}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-rest' ? 'active' : ''}" th:text="#{label.rest.soap.services}">REST/SOAP
+                WebServices</a>
+        </div>
+    </div>
+    <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
+        <div class="panel-heading">Server side</div>
+        <div class="list-group hidden-print">
+            <a th:href="@{/extension}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/extension' ? 'active' : ''}" th:text="#{label.extend}">Extension</a>
+            <a th:href="@{/validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/validation' ? 'active' : ''}" th:text="#{label.validate}">Validation</a>
+            <a th:href="@{/tsl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tsl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Documentation</div>
+        <div class="list-group hidden-print">
+            <a th:href="@{/doc/dss-documentation.html}" target="_blank" class="list-group-item">HTML</a>
+            <a th:href="@{/doc/dss-documentation.pdf}" target="_blank" class="list-group-item">PDF</a>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Useful links</div>
+        <div class="list-group hidden-print">
+            <a href="https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eSignature" class="list-group-item" target="_blank">CEF Digital</a>
+            <a href="https://github.com/esig/" class="list-group-item" title="GitHub - Source code" target="_blank">GitHub source code</a>
+            <a href="https://ec.europa.eu/cefdigital/code/projects/ESIG/" class="list-group-item" title="Bitbucket - Source code" target="_blank">Bitbucket source code</a>
+            <a href="https://ec.europa.eu/cefdigital/tracker/projects/DSS/issues" class="list-group-item" title="Jira - Issue tracker" target="_blank">Report a bug</a>
+            <a href="https://esig-dss.atlassian.net/projects/DSS" class="list-group-item" title="Jira - old" target="_blank">Old Jira</a>
+            <a href="https://webgate.ec.europa.eu/tl-browser/#/" class="list-group-item" th:text="#{label.tlbrowser.tl.eu}" target="_blank">TL Browser</a>
+        </div>
+    </div>
+</div>

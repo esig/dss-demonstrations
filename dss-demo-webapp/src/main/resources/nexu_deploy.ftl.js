@@ -16,7 +16,7 @@ var nexuVersion = "${nexuVersion}";
 
 $.get("${nexuUrl}/nexu-info", function(data) {
 	// something responded
-	if(data.version == nexuVersion) {
+	if(data.version.startsWith(nexuVersion)) {
 		// valid version
 		// load nexu script 
 		console.log("Loading script...");

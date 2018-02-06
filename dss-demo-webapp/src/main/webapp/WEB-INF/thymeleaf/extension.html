@@ -1,43 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-	<head th:replace="template :: header"></head>
-	<body>
-		
-		<nav th:replace="template :: navigation"></nav>
-	
-		<div class="container">
-			<div class="row">
-                <div class="col-md-3">
-        			<div th:replace="template :: menu"></div>
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Extend a signature</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2 th:text="#{label.extend}"></h2>
+                                <form method="post" class="form-horizontal" th:action="@{/extension}" th:object="${extensionForm}" enctype="multipart/form-data">
+
+                                    <input type="hidden" id="isSign" value="false" />
+
+                                    <div th:replace="fields::field-signed-file"></div>
+
+                                    <div th:replace="fields::field-original-file"></div>
+
+                                    <div th:replace="fields::field-container-type-form"></div>
+
+                                    <div th:replace="fields::field-signature-form"></div>
+
+                                    <div th:replace="fields::field-signature-level"></div>
+
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
+                                            <button type="reset" class="btn" th:text="#{label.clear}"></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-				<div class="col-md-9">
-					<h2 th:text="#{label.extend}"></h2>
-						<form method="post" class="form-horizontal"  th:action="@{/extension}" th:object="${extensionForm}" enctype="multipart/form-data">
-						    
-						    <input type="hidden" id="isSign" value="false" />
-						
-							<div th:replace="fields::field-signed-file"></div>
-							
-							<div th:replace="fields::field-original-file"></div>
-							
-							<div th:replace="fields::field-container-type-form"></div>
-						    
-							<div th:replace="fields::field-signature-form"></div>
-						    
-							<div th:replace="fields::field-signature-level"></div>
-						    
-						    <div class="form-group">
-						        <div class="col-sm-offset-2 col-sm-10">
-						            <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
-						            <button type="reset" class="btn" th:text="#{label.clear}"></button>
-						        </div>
-						    </div>   
-	
-						</form>
-				</div>
-			</div>
-			<footer th:replace="template :: footer"></footer>
-			<script type="text/javascript"  th:src="@{/scripts/jsSignatureLevel.js}"></script>
-		</div>
-	</body>
+            </div>
+        </div>
+
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
+    <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+</body>
 </html>

@@ -1,31 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-	<head th:replace="template :: header"></head>
-	<body>
-		
-		<nav th:replace="template :: navigation"></nav>
-	
-		<div class="container">
-			<div class="row">
-                <div class="col-md-3">
-        			<div th:replace="template :: menu"></div>
-                </div>
-				<div class="col-md-9">
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
 
-					<h2>REST/SOAP WebServices</h2>
-					
-					<p>DSS offers some <a th:href="@{/services/}" title="eSignature REST/SOAP WebServices">REST and SOAP WebServices</a> which allows to execute the following operations : </p>
-					<ul>
-					    <li>Compute the digest to be signed (getDataToSign) ;</li>
-					    <li>Incorporate the signature value in the final file (signDocument) ;</li>
-					    <li>Extend an existing signature;</li>
-					    <li>Validate a signature.</li>
-					</ul>
-					
-					<p>These services hide the signature complexity (CAdES, PAdES, XAdES, ASiC) and made integration easier.</p>
-				</div>
-			</div>
-			<footer th:replace="template :: footer"></footer>
-		</div>
-	</body>
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Signature</li>
+                            <li class="active">Rest</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2>REST/SOAP WebServices</h2>
+
+                                <p>
+                                    DSS offers some
+                                    <a th:href="@{/services/}" title="eSignature REST/SOAP WebServices">REST and SOAP WebServices</a>
+                                    which allows to execute the following operations :
+                                </p>
+                                <ul>
+                                    <li>Compute the digest to be signed (getDataToSign) ;</li>
+                                    <li>Incorporate the signature value in the final file (signDocument) ;</li>
+                                    <li>Extend an existing signature;</li>
+                                    <li>Validate a signature.</li>
+                                </ul>
+
+                                <p>These services hide the signature complexity (CAdES, PAdES, XAdES, ASiC) and made integration easier.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
+</body>
 </html>
