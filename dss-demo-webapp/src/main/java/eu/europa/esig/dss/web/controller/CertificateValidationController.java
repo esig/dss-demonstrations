@@ -23,7 +23,7 @@ import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.reports.Reports;
+import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import eu.europa.esig.dss.web.service.XSLTService;
 import eu.europa.esig.dss.x509.CertificateSource;
@@ -81,14 +81,14 @@ public class CertificateValidationController {
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(certificateVerifier);
 
-		Reports reports = certificateValidator.validate();
+		CertificateReports reports = certificateValidator.validate();
 
-		// reports.print();
+		reports.print();
 
-		// String xmlSimpleReport = reports.getXmlSimpleReport();
-		// model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
-		// model.addAttribute("simpleReport", xsltService.generateSimpleReport(xmlSimpleReport));
-		//
+		String xmlSimpleReport = reports.getXmlSimpleReport();
+		model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
+		model.addAttribute("simpleReport", xsltService.generateSimpleCertificateReport(xmlSimpleReport));
+
 		String xmlDetailedReport = reports.getXmlDetailedReport();
 		model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
 		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));

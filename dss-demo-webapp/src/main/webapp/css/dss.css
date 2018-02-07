@@ -19,3 +19,13 @@
     max-width: none;
     white-space: nowrap;
 }
+
+.flag {
+  display: block;
+  width: 64px;
+}
+
+.flag_LU {
+  background: url(../images/flags/lu.svg);
+  background-size: 640px 480px;
+}
