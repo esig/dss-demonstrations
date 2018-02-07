@@ -141,7 +141,7 @@ body {
 }
 
 .row-header {
-	border-bottom: 1.667em solid #004494;
+	border-bottom: 1.667em solid #5986bd;
 	padding-top: 1.667em;
 	padding-bottom: 10px;
 }
@@ -168,7 +168,7 @@ header a span {
 .header-highlight {
 	padding-bottom: 1.667em;
 	color: #FFF;
-	background: #004494;
+	background: #5986bd;
 }
 
 .header-highlight .title {
@@ -221,7 +221,7 @@ footer li a, footer li a:hover {
 	padding-bottom: 1em;
 	text-align: right;
 	color: #FFF;
-	background: #004494;
+	background: #5986bd;
 }
 
 .footer-note a {
@@ -273,12 +273,12 @@ footer li a, footer li a:hover {
 .panel-default>.panel-heading, .panel-primary>.panel-heading {
 	color: white;
 	background-image: inherit;
-	background-color: #004494;
-	border-color: #004981;
+	background-color: #5986bd;
+	border-color: #5986bd;
 }
 
 .panel-default {
-	border-color: #004981;
+	border-color: #5986bd;
 }
 
 .dss-menu>.panel {
