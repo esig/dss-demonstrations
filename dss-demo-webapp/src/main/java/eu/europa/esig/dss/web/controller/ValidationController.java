@@ -160,4 +160,9 @@ public class ValidationController {
 		return new ValidationLevel[] { ValidationLevel.BASIC_SIGNATURES, ValidationLevel.LONG_TERM_DATA, ValidationLevel.ARCHIVAL_DATA };
 	}
 
+	@ModelAttribute("displayDownloadPdf")
+	public boolean isDisplayDownloadPdf() {
+		return false;
+	}
+
 }

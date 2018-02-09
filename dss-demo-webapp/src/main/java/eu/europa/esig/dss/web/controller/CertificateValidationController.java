@@ -100,46 +100,18 @@ public class CertificateValidationController {
 
 	private CertificateToken getCertificate(MultipartFile file) {
 		try {
-			return DSSUtils.loadCertificate(file.getBytes());
+			if (file != null && !file.isEmpty()) {
+				return DSSUtils.loadCertificate(file.getBytes());
+			}
 		} catch (DSSException | IOException e) {
 			LOG.warn("Cannot convert file to X509 Certificate", e);
-			return null;
 		}
-
+		return null;
 	}
 
-	// @RequestMapping(value = "/download-simple-report")
-	// public void downloadSimpleReport(HttpSession session, HttpServletResponse response) {
-	// try {
-	// String simpleReport = (String) session.getAttribute(SIMPLE_REPORT_ATTRIBUTE);
-	//
-	// response.setContentType(MimeType.PDF.getMimeTypeString());
-	// response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
-	//
-	// fopService.generateSimpleReport(simpleReport, response.getOutputStream());
-	// } catch (Exception e) {
-	// logger.error("An error occured while generating pdf for simple report : " + e.getMessage(), e);
-	// }
-	// }
-	//
-	// @RequestMapping(value = "/download-detailed-report")
-	// public void downloadDetailedReport(HttpSession session, HttpServletResponse response) {
-	// try {
-	// String detailedReport = (String) session.getAttribute(DETAILED_REPORT_ATTRIBUTE);
-	//
-	// response.setContentType(MimeType.PDF.getMimeTypeString());
-	// response.setHeader("Content-Disposition", "attachment; filename=DSS-Detailed-report.pdf");
-	//
-	// fopService.generateDetailedReport(detailedReport, response.getOutputStream());
-	// } catch (Exception e) {
-	// logger.error("An error occured while generating pdf for detailed report : " + e.getMessage(), e);
-	// }
-	// }
-	//
-	// @ModelAttribute("validationLevels")
-	// public ValidationLevel[] getValidationLevels() {
-	// return new ValidationLevel[] { ValidationLevel.BASIC_SIGNATURES, ValidationLevel.LONG_TERM_DATA,
-	// ValidationLevel.ARCHIVAL_DATA };
-	// }
+	@ModelAttribute("displayDownloadPdf")
+	public boolean isDisplayDownloadPdf() {
+		return false;
+	}
 
 }

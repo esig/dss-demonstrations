@@ -20,16 +20,23 @@
     white-space: nowrap;
 }
 
+.dss-arrow {
+	margin : 0 10px;
+}
+
 .small_flag {
   display: block;
   width: 32px;
   height : 24px;
+  float: left;
+  border: 1px solid #ececec;
 }
 
 .flag {
   display: block;
   width: 64px;
   height : 48px;
+  border: 1px solid #ececec;
 }
 
 .flag_AT {
