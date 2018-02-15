@@ -91,13 +91,15 @@ public class CertificateValidationController {
 			certificateVerifier.setAdjunctCertSource(adjunctCertSource);
 		}
 
+		LOG.info("Start certificate validation");
+
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(certificateVerifier);
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
 
 		CertificateReports reports = certificateValidator.validate();
 
-		reports.print();
+		// reports.print();
 
 		String xmlSimpleReport = reports.getXmlSimpleReport();
 		model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
@@ -108,6 +110,8 @@ public class CertificateValidationController {
 		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
 
 		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
+
+		LOG.info("End certificate validation");
 
 		return VALIDATION_RESULT_TILE;
 	}
