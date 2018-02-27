@@ -43,13 +43,13 @@
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>
 			<artifactId>spring-restdocs-restassured</artifactId>
-			<version>1.2.2.RELEASE</version>
+			<version>1.2.3.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>3.0.3</version>
+			<version>3.0.7</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

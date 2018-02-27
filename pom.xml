@@ -46,14 +46,19 @@
 		<project.source.version>1.8</project.source.version>
 		<project.encoding>UTF-8</project.encoding>
 
+		<!-- We suppose that we have : -->
+		<!-- 	/root-folder/ -->
+		<!-- 	/root-folder/dss/... -->
+		<!-- 	/root-folder/dss-demos/... -->
 		<dss.framework.version>5.3-SNAPSHOT</dss.framework.version>
+		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
 		<cxf.version>3.1.14</cxf.version>
-		<spring.version>4.3.9.RELEASE</spring.version>
-		<spring-security.version>4.2.3.RELEASE</spring-security.version>
+		<spring.version>4.3.12.RELEASE</spring.version>
+		<spring-security.version>4.2.4.RELEASE</spring-security.version>
 		<jackson-jaxrs-json-provider.version>2.8.8</jackson-jaxrs-json-provider.version>
 		<nexu.version>1.10.5</nexu.version>
 

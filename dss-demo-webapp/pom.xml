@@ -78,7 +78,7 @@
 			                <overwrite>true</overwrite>
 			                <resources>
 			                    <resource>
-			                        <directory>../../dss/dss-cookbook/target/generated-docs</directory>
+			                        <directory>${dss.framework.root.directory}/dss-cookbook/target/generated-docs</directory>
 			                        <includes>
 			                            <include>**/*</include>
 			                            <include>*</include>
@@ -98,7 +98,7 @@
 			                <overwrite>true</overwrite>
 			                <resources>
 			                    <resource>
-			                        <directory>../../dss/target/site/apidocs</directory>
+			                        <directory>${dss.framework.root.directory}/target/site/apidocs</directory>
 			                        <includes>
 			                            <include>**/*</include>
 			                            <include>*</include>
