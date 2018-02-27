@@ -1,4 +1,4 @@
-<div th:fragment="menu" class="col-md-3 dss-menu">
+<div th:fragment="menu" class="col-md-3 dss-menu" xmlns:th="http://www.thymeleaf.org">
 
     <div th:if="${#httpServletRequest.getRequestURI().contains('/admin/')}" class="list-group hidden-print">
         <a th:href="@{/admin/certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/certificates' ? 'active' : ''}" th:text="#{label.certificates}">Certificates</a>
@@ -34,6 +34,7 @@
         <div class="list-group hidden-print">
             <a th:href="@{/doc/dss-documentation.html}" target="_blank" class="list-group-item">HTML</a>
             <a th:href="@{/doc/dss-documentation.pdf}" target="_blank" class="list-group-item">PDF</a>
+            <a th:href="@{/apidocs/index.html}" target="_blank" class="list-group-item">Javadoc</a>
         </div>
     </div>
 
