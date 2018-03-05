@@ -30,6 +30,7 @@ import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.signature.DocumentSignatureService;
 import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.TimestampToken;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.AbstractSignatureForm;
 import eu.europa.esig.dss.web.model.ExtensionForm;
@@ -117,6 +118,20 @@ public class SigningService {
 		return toBeSigned;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public TimestampToken getContentTimestamp(SignatureDocumentForm form) {
+		logger.info("Start getContentTimestamp with one document");
+
+		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm());
+		AbstractSignatureParameters parameters = fillParameters(form);
+		DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
+
+		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocument, parameters);
+
+		logger.info("End getContentTimestamp with one document");
+		return contentTimestamp;
+	}
+
 	private AbstractSignatureParameters fillParameters(SignatureMultipleDocumentsForm form) {
 		AbstractSignatureParameters finalParameters = getASiCSignatureParameters(form.getContainerType(), form.getSignatureForm());
 
@@ -141,6 +156,10 @@ public class SigningService {
 		parameters.bLevel().setSigningDate(form.getSigningDate());
 
 		parameters.setSignWithExpiredCertificate(form.isSignWithExpiredCertificate());
+
+		if (form.getContentTimestamp() != null) {
+			parameters.setContentTimestamps(Arrays.asList(form.getContentTimestamp()));
+		}
 
 		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(form.getBase64Certificate());
 		parameters.setSigningCertificate(signingCertificate);

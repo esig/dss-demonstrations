@@ -33,7 +33,10 @@ public final class WebAppUtils {
 	public static List<DSSDocument> toDSSDocuments(List<MultipartFile> documentsToSign) {
 		List<DSSDocument> dssDocuments = new ArrayList<DSSDocument>();
 		for (MultipartFile multipartFile : documentsToSign) {
-			dssDocuments.add(toDSSDocument(multipartFile));
+			DSSDocument dssDocument = toDSSDocument(multipartFile);
+			if (dssDocument != null) {
+				dssDocuments.add(dssDocument);
+			}
 		}
 		return dssDocuments;
 	}

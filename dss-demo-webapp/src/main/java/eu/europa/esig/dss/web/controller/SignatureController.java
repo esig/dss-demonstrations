@@ -107,6 +107,11 @@ public class SignatureController {
 		signatureDocumentForm.setBase64CertificateChain(params.getCertificateChain());
 		signatureDocumentForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
 		signatureDocumentForm.setSigningDate(new Date());
+
+		if (signatureDocumentForm.isAddContentTimestamp()) {
+			signatureDocumentForm.setContentTimestamp(signingService.getContentTimestamp(signatureDocumentForm));
+		}
+
 		model.addAttribute("signatureDocumentForm", signatureDocumentForm);
 
 		ToBeSigned dataToSign = signingService.getDataToSign(signatureDocumentForm);

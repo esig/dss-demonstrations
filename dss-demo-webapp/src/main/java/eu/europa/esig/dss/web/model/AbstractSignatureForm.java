@@ -9,6 +9,7 @@ import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.EncryptionAlgorithm;
 import eu.europa.esig.dss.SignatureForm;
 import eu.europa.esig.dss.SignatureLevel;
+import eu.europa.esig.dss.validation.TimestampToken;
 
 public abstract class AbstractSignatureForm {
 
@@ -18,6 +19,8 @@ public abstract class AbstractSignatureForm {
 	private Date signingDate;
 
 	private boolean signWithExpiredCertificate;
+
+	private boolean addContentTimestamp;
 
 	@NotNull(message = "{error.signature.form.mandatory}")
 	private SignatureForm signatureForm;
@@ -35,6 +38,8 @@ public abstract class AbstractSignatureForm {
 	private EncryptionAlgorithm encryptionAlgorithm;
 
 	private String base64SignatureValue;
+
+	private TimestampToken contentTimestamp;
 
 	public boolean isNexuDetected() {
 		return nexuDetected;
@@ -58,6 +63,14 @@ public abstract class AbstractSignatureForm {
 
 	public void setSignWithExpiredCertificate(boolean signWithExpiredCertificate) {
 		this.signWithExpiredCertificate = signWithExpiredCertificate;
+	}
+
+	public boolean isAddContentTimestamp() {
+		return addContentTimestamp;
+	}
+
+	public void setAddContentTimestamp(boolean addContentTimestamp) {
+		this.addContentTimestamp = addContentTimestamp;
 	}
 
 	public SignatureForm getSignatureForm() {
@@ -114,6 +127,14 @@ public abstract class AbstractSignatureForm {
 
 	public void setBase64SignatureValue(String base64SignatureValue) {
 		this.base64SignatureValue = base64SignatureValue;
+	}
+
+	public TimestampToken getContentTimestamp() {
+		return contentTimestamp;
+	}
+
+	public void setContentTimestamp(TimestampToken contentTimestamp) {
+		this.contentTimestamp = contentTimestamp;
 	}
 
 }
