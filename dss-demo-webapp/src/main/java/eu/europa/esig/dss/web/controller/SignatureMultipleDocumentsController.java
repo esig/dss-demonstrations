@@ -37,6 +37,7 @@ import eu.europa.esig.dss.SignatureForm;
 import eu.europa.esig.dss.SignatureLevel;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
@@ -105,6 +106,12 @@ public class SignatureMultipleDocumentsController {
 		signatureMultipleDocumentsForm.setBase64CertificateChain(params.getCertificateChain());
 		signatureMultipleDocumentsForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
 		signatureMultipleDocumentsForm.setSigningDate(new Date());
+
+		if (signatureMultipleDocumentsForm.isAddContentTimestamp()) {
+			signatureMultipleDocumentsForm
+					.setContentTimestamp(WebAppUtils.fromTimestampToken(signingService.getContentTimestamp(signatureMultipleDocumentsForm)));
+		}
+
 		model.addAttribute("signatureMultipleDocumentsForm", signatureMultipleDocumentsForm);
 
 		ToBeSigned dataToSign = signingService.getDataToSign(signatureMultipleDocumentsForm);
