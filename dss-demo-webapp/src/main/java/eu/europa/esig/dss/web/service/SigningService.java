@@ -132,6 +132,19 @@ public class SigningService {
 		return contentTimestamp;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public TimestampToken getContentTimestamp(SignatureMultipleDocumentsForm form) {
+		logger.info("Start getContentTimestamp with multiple documents");
+
+		MultipleDocumentsSignatureService service = getASiCSignatureService(form.getSignatureForm());
+		AbstractSignatureParameters parameters = fillParameters(form);
+
+		TimestampToken contentTimestamp = service.getContentTimestamp(WebAppUtils.toDSSDocuments(form.getDocumentsToSign()), parameters);
+
+		logger.info("End getContentTimestamp with  multiple documents");
+		return contentTimestamp;
+	}
+
 	private AbstractSignatureParameters fillParameters(SignatureMultipleDocumentsForm form) {
 		AbstractSignatureParameters finalParameters = getASiCSignatureParameters(form.getContainerType(), form.getSignatureForm());
 
@@ -158,7 +171,7 @@ public class SigningService {
 		parameters.setSignWithExpiredCertificate(form.isSignWithExpiredCertificate());
 
 		if (form.getContentTimestamp() != null) {
-			parameters.setContentTimestamps(Arrays.asList(form.getContentTimestamp()));
+			parameters.setContentTimestamps(Arrays.asList(WebAppUtils.toTimestampToken(form.getContentTimestamp())));
 		}
 
 		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(form.getBase64Certificate());

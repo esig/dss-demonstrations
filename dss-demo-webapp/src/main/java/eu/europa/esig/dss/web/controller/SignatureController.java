@@ -38,6 +38,7 @@ import eu.europa.esig.dss.SignatureLevel;
 import eu.europa.esig.dss.SignaturePackaging;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
@@ -109,7 +110,7 @@ public class SignatureController {
 		signatureDocumentForm.setSigningDate(new Date());
 
 		if (signatureDocumentForm.isAddContentTimestamp()) {
-			signatureDocumentForm.setContentTimestamp(signingService.getContentTimestamp(signatureDocumentForm));
+			signatureDocumentForm.setContentTimestamp(WebAppUtils.fromTimestampToken(signingService.getContentTimestamp(signatureDocumentForm)));
 		}
 
 		model.addAttribute("signatureDocumentForm", signatureDocumentForm);

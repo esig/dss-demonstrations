@@ -9,7 +9,6 @@ import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.EncryptionAlgorithm;
 import eu.europa.esig.dss.SignatureForm;
 import eu.europa.esig.dss.SignatureLevel;
-import eu.europa.esig.dss.validation.TimestampToken;
 
 public abstract class AbstractSignatureForm {
 
@@ -39,7 +38,7 @@ public abstract class AbstractSignatureForm {
 
 	private String base64SignatureValue;
 
-	private TimestampToken contentTimestamp;
+	private TimestampDTO contentTimestamp;
 
 	public boolean isNexuDetected() {
 		return nexuDetected;
@@ -129,11 +128,11 @@ public abstract class AbstractSignatureForm {
 		this.base64SignatureValue = base64SignatureValue;
 	}
 
-	public TimestampToken getContentTimestamp() {
+	public TimestampDTO getContentTimestamp() {
 		return contentTimestamp;
 	}
 
-	public void setContentTimestamp(TimestampToken contentTimestamp) {
+	public void setContentTimestamp(TimestampDTO contentTimestamp) {
 		this.contentTimestamp = contentTimestamp;
 	}
 
