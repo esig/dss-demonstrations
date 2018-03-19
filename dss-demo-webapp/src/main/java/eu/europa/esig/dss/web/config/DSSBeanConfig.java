@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.config;
 
 import java.io.IOException;
+import java.security.KeyStore.PasswordProtection;
 
 import javax.sql.DataSource;
 
@@ -234,7 +235,7 @@ public class DSSBeanConfig {
 	@Bean
 	public KeyStoreSignatureTokenConnection remoteToken() throws IOException {
 		return new KeyStoreSignatureTokenConnection(new ClassPathResource(serverSigningKeystoreFilename).getFile(), serverSigningKeystoreType,
-				serverSigningKeystorePassword);
+				new PasswordProtection(serverSigningKeystorePassword.toCharArray()));
 	}
 
 	@Bean

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +63,7 @@ public class RestDocumentationApp {
 	public void setUp() throws IOException {
 		this.documentationFilter = document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
 		this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(this.restDocumentation)).addFilter(this.documentationFilter).build();
-		this.token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"), "password");
+		this.token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"), new PasswordProtection("password".toCharArray()));
 	}
 
 	@Test
