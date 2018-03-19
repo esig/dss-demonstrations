@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.europa.esig.dss.ASiCContainerType;
+import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.InMemoryDocument;
@@ -75,8 +77,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 		FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
-		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName(),
-				fileToSign.getAbsolutePath());
+		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName());
 		ToBeSigned dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
 		assertNotNull(dataToSign);
 
@@ -98,6 +99,43 @@ public class SignatureSoapServiceIT extends AbstractIT {
 	}
 
 	@Test
+	public void testSigningAndExtensionDigestDocument() throws Exception {
+		CertificateService certificateService = new CertificateService();
+
+		MockPrivateKeyEntry entry = certificateService.generateCertificateChain(SignatureAlgorithm.RSA_SHA256);
+
+		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+		parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_B);
+		parameters.setSigningCertificate(new RemoteCertificate(entry.getCertificate().getCertificate().getEncoded()));
+		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
+		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+		FileDocument fileToSign = new FileDocument(new File("src/test/resources/dss-test.properties"));
+		RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileToSign), DigestAlgorithm.SHA256,
+				fileToSign.getMimeType(), fileToSign.getName());
+
+		ToBeSigned dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+		assertNotNull(dataToSign);
+
+		SignatureValue signatureValue = TestUtils.sign(SignatureAlgorithm.RSA_SHA256, entry, dataToSign);
+		SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, signatureValue);
+		RemoteDocument signedDocument = soapClient.signDocument(signDocument);
+
+		assertNotNull(signedDocument);
+
+		parameters = new RemoteSignatureParameters();
+		parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_T);
+		parameters.setDetachedContents(Arrays.asList(toSignDocument));
+
+		RemoteDocument extendedDocument = soapClient.extendDocument(new ExtendDocumentDTO(signedDocument, parameters));
+
+		assertNotNull(extendedDocument);
+
+		InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
+		iMD.save("target/test-digest.xml");
+	}
+
+	@Test
 	public void testSigningAndExtensionMultiDocuments() throws Exception {
 		CertificateService certificateService = new CertificateService();
 
@@ -110,8 +148,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 		FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
-		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName(),
-				fileToSign.getAbsolutePath());
+		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName());
 		RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), MimeType.BINARY, "test.bin");
 		List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
 		toSignDocuments.add(toSignDocument);

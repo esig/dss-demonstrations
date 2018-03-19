@@ -51,8 +51,7 @@ public class SigningTask extends Task<DSSDocument> {
 		DSSPrivateKeyEntry signer = getSigner(keys);
 
 		FileDocument fileToSign = new FileDocument(model.getFileToSign());
-		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName(),
-				fileToSign.getAbsolutePath());
+		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName());
 		RemoteSignatureParameters parameters = buildParameters(signer);
 
 		ToBeSigned toBeSigned = getDataToSign(toSignDocument, parameters);

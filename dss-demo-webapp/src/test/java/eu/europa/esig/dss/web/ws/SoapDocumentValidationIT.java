@@ -11,7 +11,9 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.DataToValidateDTO;
+import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.utils.Utils;
@@ -81,6 +83,30 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
+	public void testWithNoPolicyAndDigestOriginalFile() throws Exception {
+
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+
+		FileDocument fileDocument = new FileDocument("src/test/resources/sample.xml");
+		RemoteDocument originalFile = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileDocument), fileDocument.getMimeType(),
+				fileDocument.getName());
+
+		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, originalFile, null);
+
+		WSReportsDTO result = validationService.validateSignature(toValidate);
+
+		assertNotNull(result.getDiagnosticData());
+		assertNotNull(result.getDetailedReport());
+		assertNotNull(result.getSimpleReport());
+
+		assertEquals(1, result.getSimpleReport().getSignature().size());
+		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		assertNotNull(reports);
+	}
+
+	@Test
 	public void testWithPolicyAndOriginalFile() throws Exception {
 
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
@@ -123,7 +149,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	private RemoteDocument toRemoteDocument(FileDocument fileDoc) throws IOException {
-		return new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName(), fileDoc.getAbsolutePath());
+		return new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName());
 	}
 
 }
