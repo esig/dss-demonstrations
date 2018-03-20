@@ -56,10 +56,10 @@
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.1.14</cxf.version>
+		<cxf.version>3.1.15</cxf.version>
 		<spring.version>4.3.12.RELEASE</spring.version>
 		<spring-security.version>4.2.4.RELEASE</spring-security.version>
-		<jackson-jaxrs-json-provider.version>2.8.8</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.9.4</jackson-jaxrs-json-provider.version>
 		<nexu.version>1.10.5</nexu.version>
 
 		<junit.version>4.12</junit.version>
