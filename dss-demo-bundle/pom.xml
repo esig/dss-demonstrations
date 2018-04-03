@@ -27,10 +27,11 @@
 			<type>war</type>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>jre-win32</artifactId>
-			<version>8.0.45</version>
-			<type>zip</type>
+			<groupId>com.oracle.java</groupId>
+			<artifactId>jre</artifactId>
+			<version>1.8.0_131</version>
+			<classifier>win64</classifier>
+			<type>tgz</type>
 		</dependency>
 		<dependency>
 		    <groupId>org.apache.tomcat</groupId>
@@ -79,5 +80,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>alfresco</id>
+			<url>https://artifacts.alfresco.com/nexus/content/repositories/public</url>
+		</repository>
+	</repositories>
 
 </project>

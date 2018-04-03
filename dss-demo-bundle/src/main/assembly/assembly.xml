@@ -27,9 +27,8 @@
 		<dependencySet>
 			<unpack>true</unpack>
 			<includes>
-				<include>com.oracle:jre-win32:zip</include>
+				<include>com.oracle.java:jre:tgz:win64</include>
 			</includes>
-			<outputDirectory>java</outputDirectory>
 			<fileMode>0644</fileMode>
 		</dependencySet>
 		<dependencySet>
