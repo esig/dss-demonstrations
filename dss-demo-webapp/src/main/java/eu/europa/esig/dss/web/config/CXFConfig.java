@@ -8,6 +8,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.RemoteSignatureParameters;
+import eu.europa.esig.dss.signature.DateAdapter;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.signature.RemoteMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.signature.RestDocumentSignatureService;
@@ -123,6 +125,7 @@ public class CXFConfig {
 	public Endpoint createSoapSignatureEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(bus, soapDocumentSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_ONE_DOCUMENT);
+		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
 		return endpoint;
 	}
@@ -131,6 +134,7 @@ public class CXFConfig {
 	public Endpoint createSoapMultipleDocumentsSignatureEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(bus, soapMultipleDocumentsSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
+		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
 		return endpoint;
 	}
@@ -149,6 +153,12 @@ public class CXFConfig {
 		endpoint.publish(SOAP_SERVER_SIGNING);
 		enableMTOM(endpoint);
 		return endpoint;
+	}
+
+	private void addXmlAdapterDate(EndpointImpl endpoint) {
+		JAXBDataBinding jaxbDataBinding = new JAXBDataBinding();
+		jaxbDataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
+		endpoint.setDataBinding(jaxbDataBinding);
 	}
 
 	private void enableMTOM(EndpointImpl endpoint) {

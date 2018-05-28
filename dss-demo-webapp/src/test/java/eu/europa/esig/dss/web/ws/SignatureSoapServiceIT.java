@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.signature.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.signature.DataToSignOneDocumentDTO;
+import eu.europa.esig.dss.signature.DateAdapter;
 import eu.europa.esig.dss.signature.ExtendDocumentDTO;
 import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.signature.SignOneDocumentDTO;
@@ -48,18 +50,23 @@ public class SignatureSoapServiceIT extends AbstractIT {
 	@Before
 	public void init() {
 
+		JAXBDataBinding dataBinding = new JAXBDataBinding();
+		dataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
+
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put("mtom-enabled", Boolean.TRUE);
 
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(SoapDocumentSignatureService.class);
 		factory.setProperties(props);
+		factory.setDataBinding(dataBinding);
 		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_ONE_DOCUMENT);
 		soapClient = (SoapDocumentSignatureService) factory.create();
 
 		JaxWsProxyFactoryBean factory2 = new JaxWsProxyFactoryBean();
 		factory2.setServiceClass(SoapMultipleDocumentsSignatureService.class);
 		factory2.setProperties(props);
+		factory.setDataBinding(dataBinding);
 		factory2.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
 		soapMultiDocsClient = (SoapMultipleDocumentsSignatureService) factory2.create();
 	}
