@@ -1,8 +1,11 @@
 package eu.europa.esig.dss.web;
 
+import java.util.Collections;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import javax.servlet.SessionTrackingMode;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFServlet;
@@ -43,6 +46,9 @@ public class AppInitializer implements WebApplicationInitializer {
 				"/*");
 
 		servletContext.getSessionCookieConfig().setSecure(cookieSecure);
+
+		// avoid urls with jsessionid param
+		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
 	}
 
 	private AnnotationConfigWebApplicationContext getContext() {
