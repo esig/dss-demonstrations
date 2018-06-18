@@ -1,7 +1,6 @@
 package eu.europa.esig.dss.web;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -49,10 +48,7 @@ public class AppInitializer implements WebApplicationInitializer {
 		servletContext.getSessionCookieConfig().setSecure(cookieSecure);
 
 		// avoid urls with jsessionid param
-		Set<SessionTrackingMode> supportedTrackingModes = new HashSet<SessionTrackingMode>();
-		supportedTrackingModes.add(SessionTrackingMode.COOKIE);
-		supportedTrackingModes.add(SessionTrackingMode.SSL);
-		servletContext.setSessionTrackingModes(supportedTrackingModes);
+		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
 	}
 
 	private AnnotationConfigWebApplicationContext getContext() {
