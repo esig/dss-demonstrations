@@ -56,10 +56,12 @@
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.1.15</cxf.version>
+		<cxf.version>3.1.16</cxf.version>
 		<spring.version>4.3.17.RELEASE</spring.version>
 		<spring-security.version>4.2.6.RELEASE</spring-security.version>
-		<jackson-jaxrs-json-provider.version>2.9.5</jackson-jaxrs-json-provider.version>
+		<thymeleaf-spring4.version>3.0.9.RELEASE</thymeleaf-spring4.version>
+		<jackson-jaxrs-json-provider.version>2.9.6</jackson-jaxrs-json-provider.version>
+		<hsqldb.version>2.4.1</hsqldb.version>
 		<nexu.version>1.10.5</nexu.version>
 
 		<junit.version>4.12</junit.version>
@@ -406,13 +408,13 @@
 			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
-				<version>1.8.0.10</version>
+				<version>${hsqldb.version}</version>
 			</dependency>
 			
 			<dependency>
 			    <groupId>org.thymeleaf</groupId>
 			    <artifactId>thymeleaf-spring4</artifactId>
-			    <version>3.0.9.RELEASE</version>
+			    <version>${thymeleaf-spring4.version}</version>
 			</dependency>
 
 			<!-- Logger -->
@@ -531,7 +533,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>1.4.5</version>
+						<version>3.2.1</version>
 						<executions>
 							<execution>
 								<goals>
