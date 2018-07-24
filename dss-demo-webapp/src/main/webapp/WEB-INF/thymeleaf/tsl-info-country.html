@@ -108,11 +108,9 @@
                                                         <div class="panel-body collapse in" th:id="'countryServices' + ${country} + ${sp.index}">
                                                             <th:block th:each="service,ser : ${serviceProvider.services}">
                                                                 <dl class="dl-horizontal">
-                                                                    <dt>Name :</dt>
-                                                                    <dd th:text="${service.name}"></dd>
-
-                                                                    <th:block th:each="serviceStatus : ${service.statusAndInformationExtensions.list}">
-                                                                        <br />
+                                                                    <th:block th:each="serviceStatus, i : ${service.statusAndInformationExtensions.list}">
+	                                                                    <dt>Name :</dt>
+	                                                                    <dd th:text="${serviceStatus.name}"></dd>
                                                                         <dt>Type :</dt>
                                                                         <dd>
                                                                             <a th:href="${serviceStatus.type}" th:text="${serviceStatus.type}"></a>
@@ -125,6 +123,8 @@
                                                                         <dd th:text="${#dates.format(serviceStatus.startDate, 'dd/MM/yyyy HH:mm:ss')}"></dd>
                                                                         <dt th:if="${serviceStatus.endDate != null}">End date :</dt>
                                                                         <dd th:text="${serviceStatus.endDate != null} ? ${#dates.format(serviceStatus.endDate, 'dd/MM/yyyy HH:mm:ss')} : ''"></dd>
+                                                                        
+                                                                        <br th:if="${!i.last}" />
                                                                     </th:block>
                                                                 </dl>
 
