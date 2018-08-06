@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import eu.europa.esig.dss.web.exception.BadRequestException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -35,6 +37,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public ModelAndView handle(HttpServletRequest req, Exception e) {
 		return getMAV(req, e, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(BadRequestException.class)
+	public ModelAndView badRequest(HttpServletRequest req, Exception e) {
+		return getMAV(req, e, HttpStatus.BAD_REQUEST);
 	}
 
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status) {

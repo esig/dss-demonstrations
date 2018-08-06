@@ -30,6 +30,7 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
+import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import eu.europa.esig.dss.web.service.XSLTService;
 import eu.europa.esig.dss.x509.CertificateSource;
@@ -123,6 +124,7 @@ public class CertificateValidationController {
 			}
 		} catch (DSSException | IOException e) {
 			LOG.warn("Cannot convert file to X509 Certificate", e);
+			throw new BadRequestException("Unsupported certificate format for file '" + file.getOriginalFilename() + "'");
 		}
 		return null;
 	}
