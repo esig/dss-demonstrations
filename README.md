@@ -24,6 +24,10 @@ https://ec.europa.eu/cefdigital/artifact/#welcome
 
 The release is deployed on https://ec.europa.eu/cefdigital/DSS/webapp-demo
 
+# JavaDoc
+
+The JavaDoc is available on https://ec.europa.eu/cefdigital/DSS/webapp-demo/apidocs/index.html
+
 # Ready-to-use bundles
 
 Bundles which contain the above demonstration can be downloaded from the [Maven repository](https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss/eu/europa/ec/joinup/sd-dss/dss-demo-bundle/).
