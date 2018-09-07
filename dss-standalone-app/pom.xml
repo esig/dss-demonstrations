@@ -59,6 +59,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- Choose your PAdES implementation -->
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-pades-pdfbox</artifactId>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
+<!-- 			<artifactId>dss-pades-openpdf</artifactId> -->
+<!-- 		</dependency> -->
+
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-token</artifactId>
