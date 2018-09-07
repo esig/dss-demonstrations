@@ -55,7 +55,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getTimestamps().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_PASSED);
+		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
 		assertNotNull(reports);

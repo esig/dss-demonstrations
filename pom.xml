@@ -56,7 +56,7 @@
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.1.16</cxf.version>
+		<cxf.version>3.2.6</cxf.version>
 		<spring.version>4.3.18.RELEASE</spring.version>
 		<spring-security.version>4.2.7.RELEASE</spring-security.version>
 		<thymeleaf-spring4.version>3.0.9.RELEASE</thymeleaf-spring4.version>
@@ -397,6 +397,11 @@
 			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-rt-transports-http</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-features-logging</artifactId>
 				<version>${cxf.version}</version>
 			</dependency>
 			<dependency>
