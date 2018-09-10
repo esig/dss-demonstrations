@@ -35,6 +35,7 @@ public class DataController {
 				packagings.add(SignaturePackaging.ENVELOPED);
 				packagings.add(SignaturePackaging.ENVELOPING);
 				packagings.add(SignaturePackaging.DETACHED);
+				packagings.add(SignaturePackaging.INTERNALLY_DETACHED);
 				break;
 			default:
 				break;
