@@ -1,12 +1,5 @@
 package eu.europa.esig.dss.standalone;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -17,10 +10,16 @@ import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.standalone.controller.SignatureController;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 public class DSSApplication extends Application {
 
-	private static Logger logger = LoggerFactory.getLogger(DSSApplication.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DSSApplication.class);
 
 	private RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> signatureService;
 
@@ -54,7 +53,7 @@ public class DSSApplication extends Application {
 			controller.setStage(stage);
 			controller.setSignatureService(signatureService);
 		} catch (Exception e) {
-			logger.error("Unable to init layout : " + e.getMessage(), e);
+			LOG.error("Unable to init layout : " + e.getMessage(), e);
 		}
 	}
 

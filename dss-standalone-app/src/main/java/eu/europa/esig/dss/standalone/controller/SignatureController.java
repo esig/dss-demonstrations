@@ -7,17 +7,14 @@ import java.util.ResourceBundle;
 
 import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.DSSDocument;
-import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.SignatureForm;
 import eu.europa.esig.dss.SignatureLevel;
-import eu.europa.esig.dss.SignaturePackaging;
 import eu.europa.esig.dss.SignatureTokenType;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
-import eu.europa.esig.dss.standalone.fx.TypedToggleGroup;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.standalone.task.SigningTask;
 import eu.europa.esig.dss.utils.Utils;
@@ -40,6 +37,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -51,13 +50,19 @@ public class SignatureController implements Initializable {
 	private Button fileSelectButton;
 
 	@FXML
-	private TypedToggleGroup<ASiCContainerType> toggleAsicContainerType;
+	private RadioButton asicsRadio;
 
 	@FXML
-	private TypedToggleGroup<SignatureForm> toogleSigFormat;
+	private RadioButton asiceRadio;
 
 	@FXML
-	private TypedToggleGroup<SignaturePackaging> toggleSigPackaging;
+	private ToggleGroup toggleAsicContainerType;
+
+	@FXML
+	private ToggleGroup toogleSigFormat;
+
+	@FXML
+	private ToggleGroup toggleSigPackaging;
 
 	@FXML
 	private RadioButton cadesRadio;
@@ -90,10 +95,10 @@ public class SignatureController implements Initializable {
 	private Label warningLabel;
 
 	@FXML
-	private TypedToggleGroup<DigestAlgorithm> toggleDigestAlgo;
+	private ToggleGroup toggleDigestAlgo;
 
 	@FXML
-	private TypedToggleGroup<SignatureTokenType> toggleSigToken;
+	private ToggleGroup toggleSigToken;
 
 	@FXML
 	private HBox hPkcsFile;
@@ -159,32 +164,42 @@ public class SignatureController implements Initializable {
 		});
 		fileSelectButton.textProperty().bindBidirectional(model.fileToSignProperty(), new FileToStringConverter());
 
-		// Enables / disables options with selected signature form
-		toogleSigFormat.getSelectedValueProperty().addListener(new ChangeListener<SignatureForm>() {
+		asicsRadio.setUserData(ASiCContainerType.ASiC_S);
+		asiceRadio.setUserData(ASiCContainerType.ASiC_E);
+		toggleAsicContainerType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
-			public void changed(ObservableValue<? extends SignatureForm> observable, SignatureForm oldValue, SignatureForm newValue) {
-				updateSignatureForm(newValue);
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				if (toogleSigFormat.getSelectedToggle() != null) {
+					ASiCContainerType newContainerType = (ASiCContainerType) toggleAsicContainerType.getUserData();
+					updateSignatureFormForASiC(newContainerType);
+				}
 			}
 		});
 
-		toggleAsicContainerType.getSelectedValueProperty().addListener(new ChangeListener<ASiCContainerType>() {
-
+		cadesRadio.setUserData(SignatureForm.CAdES);
+		xadesRadio.setUserData(SignatureForm.XAdES);
+		padesRadio.setUserData(SignatureForm.PAdES);
+		toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
-			public void changed(ObservableValue<? extends ASiCContainerType> observable, ASiCContainerType oldValue, ASiCContainerType newValue) {
-				updateSignatureFormForASiC(newValue);
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				if (toogleSigFormat.getSelectedToggle() != null) {
+					SignatureForm newSigForm = (SignatureForm) toogleSigFormat.getUserData();
+					updateSignatureForm(newSigForm);
+				}
 			}
 		});
+
 
 		// Binds values with model
-		toggleAsicContainerType.getSelectedValueProperty().bindBidirectional(model.asicContainerTypeProperty());
-		toggleSigPackaging.getSelectedValueProperty().bindBidirectional(model.signaturePackagingProperty());
-		toggleDigestAlgo.getSelectedValueProperty().bindBidirectional(model.digestAlgorithmProperty());
+//		toggleAsicContainerType.selectedToggleProperty().bindBidirectional(model.asicContainerTypeProperty());
+//		toggleSigPackaging.selectedToggleProperty().bindBidirectional(model.signaturePackagingProperty());
+//		toggleDigestAlgo.selectedToggleProperty().bindBidirectional(model.digestAlgorithmProperty());
 		comboLevel.valueProperty().bindBidirectional(model.signatureLevelProperty());
-		toggleSigToken.getSelectedValueProperty().bindBidirectional(model.tokenTypeProperty());
+//		toggleSigToken.selectedToggleProperty().bindBidirectional(model.tokenTypeProperty());
 
-		toggleSigToken.getSelectedValueProperty().addListener(new ChangeListener<SignatureTokenType>() {
+		toggleSigToken.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
-			public void changed(ObservableValue<? extends SignatureTokenType> observable, SignatureTokenType oldValue, SignatureTokenType newValue) {
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				model.setPkcsFile(null);
 				model.setPassword(null);
 			}
@@ -370,5 +385,6 @@ public class SignatureController implements Initializable {
 			}
 		}
 	}
+
 
 }
