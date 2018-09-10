@@ -81,6 +81,9 @@ public class SignatureController implements Initializable {
 	private RadioButton detachedRadio;
 
 	@FXML
+	private RadioButton internallyDetachedRadio;
+
+	@FXML
 	private ComboBox<SignatureLevel> comboLevel;
 
 	@FXML
@@ -313,6 +316,7 @@ public class SignatureController implements Initializable {
 				envelopingRadio.setDisable(false);
 				envelopedRadio.setDisable(false);
 				detachedRadio.setDisable(false);
+				internallyDetachedRadio.setDisable(false);
 
 				comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T, SignatureLevel.XAdES_BASELINE_LT,
 						SignatureLevel.XAdES_BASELINE_LTA);
@@ -338,10 +342,12 @@ public class SignatureController implements Initializable {
 		envelopingRadio.setDisable(true);
 		envelopedRadio.setDisable(true);
 		detachedRadio.setDisable(true);
+		internallyDetachedRadio.setDisable(true);
 
 		envelopingRadio.setSelected(false);
 		envelopedRadio.setSelected(false);
 		detachedRadio.setSelected(false);
+		internallyDetachedRadio.setSelected(false);
 	}
 
 	private void save(DSSDocument signedDocument) {

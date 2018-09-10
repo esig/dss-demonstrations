@@ -89,6 +89,11 @@
 						<SignaturePackaging fx:value="DETACHED"/>
 					</userData>
 				</RadioButton>
+				<RadioButton mnemonicParsing="false" text="Internally detached" fx:id="internallyDetachedRadio" disable="true"  toggleGroup="$toggleSigPackaging">
+					<userData>
+						<SignaturePackaging fx:value="INTERNALLY_DETACHED"/>
+					</userData>
+				</RadioButton>
 			</children>
 		</HBox>
 		<HBox fx:id="hSignatureLevel" styleClass="hbox-style">
