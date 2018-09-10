@@ -176,7 +176,6 @@ public class SigningService {
 
 		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(form.getBase64Certificate());
 		parameters.setSigningCertificate(signingCertificate);
-		parameters.setEncryptionAlgorithm(signingCertificate.getEncryptionAlgorithm());
 
 		List<String> base64CertificateChain = form.getBase64CertificateChain();
 		if (Utils.isCollectionNotEmpty(base64CertificateChain)) {
