@@ -1,107 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.51" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
 	<padding>
 		<Insets bottom="20" left="20" right="20" top="20" />
 	</padding>
 	<children>
 		<HBox styleClass="hbox-style">
 			<children>
-				<Label text="File to sign" styleClass="label-style" />
-				<Button mnemonicParsing="false" text="Select file..." fx:id="fileSelectButton" />
+				<Label styleClass="label-style" text="File to sign" />
+				<Button fx:id="fileSelectButton" mnemonicParsing="false" text="Select file..." />
 			</children>
 		</HBox>
 		
 		<HBox styleClass="hbox-style">
 			<children>
-				<Label text="Container Type" styleClass="label-style" />
+				<Label styleClass="label-style" text="Container Type" />
 				<fx:define>
-				  <ToggleGroup fx:id="toggleAsicContainerType"/>  
+				  <ToggleGroup fx:id="toggleAsicContainerType" />  
 				</fx:define>
-				<RadioButton mnemonicParsing="false" text="None" toggleGroup="$toggleAsicContainerType" />
-				<RadioButton mnemonicParsing="false" text="ASiC-S" fx:id="asicsRadio" toggleGroup="$toggleAsicContainerType" />
-				<RadioButton mnemonicParsing="false" text="ASiC-E" fx:id="asiceRadio" toggleGroup="$toggleAsicContainerType" />
+				<RadioButton mnemonicParsing="false" text="None">
+               <toggleGroup>
+                  <ToggleGroup fx:id="toggleAsicContainerType" />
+               </toggleGroup></RadioButton>
+				<RadioButton fx:id="asicsRadio" mnemonicParsing="false" text="ASiC-S" toggleGroup="$toggleAsicContainerType" />
+				<RadioButton fx:id="asiceRadio" mnemonicParsing="false" text="ASiC-E" toggleGroup="$toggleAsicContainerType" />
 			</children>
 		</HBox>
 		
 		<HBox styleClass="hbox-style">
 			<children>
-				<Label text="Signature format" styleClass="label-style" />
+				<Label styleClass="label-style" text="Signature format" />
 				<fx:define>
-				  <ToggleGroup fx:id="toogleSigFormat"/>  
+				  <ToggleGroup fx:id="toogleSigFormat" />  
 				</fx:define>
-				<RadioButton mnemonicParsing="false" text="CAdES" fx:id="cadesRadio" toggleGroup="$toogleSigFormat" />
-				<RadioButton mnemonicParsing="false" text="PAdES" fx:id="padesRadio" toggleGroup="$toogleSigFormat" />
-				<RadioButton mnemonicParsing="false" text="XAdES" fx:id="xadesRadio" toggleGroup="$toogleSigFormat" />
+				<RadioButton fx:id="cadesRadio" mnemonicParsing="false" text="CAdES">
+               <toggleGroup>
+                  <ToggleGroup fx:id="toogleSigFormat" />
+               </toggleGroup></RadioButton>
+				<RadioButton fx:id="padesRadio" mnemonicParsing="false" text="PAdES" toggleGroup="$toogleSigFormat" />
+				<RadioButton mnemonicParsing="false" text="XAdES" toggleGroup="$toogleSigFormat" fx:id="xadesRadio" />
 			</children>
 		</HBox>
+		
 		<HBox fx:id="hSignaturePackaging" styleClass="hbox-style">
 			<children>
-				<Label text="Packaging" styleClass="label-style" />
+				<Label styleClass="label-style" text="Packaging" />
 				<fx:define>
-				  <ToggleGroup fx:id="toggleSigPackaging"/>  
+				  <ToggleGroup fx:id="toggleSigPackaging" />  
 				</fx:define>
-				<RadioButton mnemonicParsing="false" text="Enveloped" fx:id="envelopedRadio" disable="true" toggleGroup="$toggleSigPackaging" />
-				<RadioButton mnemonicParsing="false" text="Enveloping" fx:id="envelopingRadio" disable="true" toggleGroup="$toggleSigPackaging" />
-				<RadioButton mnemonicParsing="false" text="Detached" fx:id="detachedRadio" disable="true"  toggleGroup="$toggleSigPackaging" />
-				<RadioButton mnemonicParsing="false" text="Internally detached" fx:id="internallyDetachedRadio" disable="true"  toggleGroup="$toggleSigPackaging" />
+				<RadioButton fx:id="envelopedRadio" disable="true" mnemonicParsing="false" text="Enveloped">
+               <toggleGroup>
+                  <ToggleGroup fx:id="toggleSigPackaging" />
+               </toggleGroup></RadioButton>
+				<RadioButton fx:id="envelopingRadio" disable="true" mnemonicParsing="false" text="Enveloping" toggleGroup="$toggleSigPackaging" />
+				<RadioButton fx:id="detachedRadio" disable="true" mnemonicParsing="false" text="Detached" toggleGroup="$toggleSigPackaging" />
+				<RadioButton fx:id="internallyDetachedRadio" disable="true" mnemonicParsing="false" text="Internally detached" toggleGroup="$toggleSigPackaging" />
 			</children>
 		</HBox>
+		
 		<HBox styleClass="hbox-style">
 			<children>
-				<Label text="Level" styleClass="label-style" />
-				<ComboBox prefWidth="200.0" disable="true" fx:id="comboLevel" />
+				<Label styleClass="label-style" text="Level" />
+				<ComboBox fx:id="comboLevel" disable="true" prefWidth="200.0" />
 			</children>
 		</HBox>
+		
+		<HBox fx:id="hBoxDigestAlgos" styleClass="hbox-style">
+			<children>
+				<Label styleClass="label-style" text="Digest algorithm" />
+				<fx:define>
+				  <ToggleGroup fx:id="toggleDigestAlgo" />  
+				</fx:define>
+			</children>
+		</HBox>
+		
 		<HBox styleClass="hbox-style">
 			<children>
-				<Label text="Digest algorithm" styleClass="label-style" />
+				<Label styleClass="label-style" text="Signature token API" />
 				<fx:define>
-				  <ToggleGroup fx:id="toggleDigestAlgo"/>  
+				  <ToggleGroup fx:id="toggleSigToken" />  
 				</fx:define>
-				<RadioButton mnemonicParsing="false" text="SHA-1" toggleGroup="$toggleDigestAlgo" />
-				<RadioButton mnemonicParsing="false" text="SHA-224" toggleGroup="$toggleDigestAlgo" />
-				<RadioButton mnemonicParsing="false" text="SHA-256" toggleGroup="$toggleDigestAlgo" />
-				<RadioButton mnemonicParsing="false" text="SHA-384" toggleGroup="$toggleDigestAlgo" />
-				<RadioButton mnemonicParsing="false" text="SHA-512" toggleGroup="$toggleDigestAlgo" />
+				<RadioButton fx:id="pkcs11Radio" mnemonicParsing="false" text="PKCS #11">
+               <toggleGroup>
+                  <ToggleGroup fx:id="toggleSigToken" />
+               </toggleGroup></RadioButton>
+				<RadioButton fx:id="pkcs12Radio" mnemonicParsing="false" text="PKCS #12" toggleGroup="$toggleSigToken" />
+				<RadioButton fx:id="mscapiRadio" mnemonicParsing="false" text="MS CAPI" toggleGroup="$toggleSigToken" />
 			</children>
 		</HBox>
-		<HBox styleClass="hbox-style">
-			<children>
-				<Label text="Signature token API" styleClass="label-style" />
-				<fx:define>
-				  <ToggleGroup fx:id="toggleSigToken"/>  
-				</fx:define>
-				<RadioButton mnemonicParsing="false" text="PKCS #11" toggleGroup="$toggleSigToken" />
-				<RadioButton mnemonicParsing="false" text="PKCS #12" toggleGroup="$toggleSigToken" />
-				<RadioButton mnemonicParsing="false" text="MS CAPI" toggleGroup="$toggleSigToken" />
-			</children>
-		</HBox>
+		
 		<HBox fx:id="hPkcsFile" styleClass="hbox-style" visible="false">
 			<children>
-				<Label text="PKCS #11 library" styleClass="label-style" fx:id="labelPkcs11File" />
-				<Label text="Keystore file" styleClass="label-style" fx:id="labelPkcs12File" />
-				<Button mnemonicParsing="false" text="Select file..." fx:id="pkcsFileButton" />
+				<Label fx:id="labelPkcs11File" styleClass="label-style" text="PKCS #11 library" />
+				<Label fx:id="labelPkcs12File" styleClass="label-style" text="Keystore file" />
+				<Button fx:id="pkcsFileButton" mnemonicParsing="false" text="Select file..." />
 			</children>
 		</HBox>
+		
 		<HBox fx:id="hPkcsPassword" styleClass="hbox-style" visible="false">
 			<children>
-				<Label text="Password" styleClass="label-style" />
+				<Label styleClass="label-style" text="Password" />
       			<PasswordField fx:id="pkcsPassword" />
 			</children>
 		</HBox>
+		
 		<HBox styleClass="hbox-style">
 			<children>
-				<Label text="" styleClass="label-style" />
-				<Button mnemonicParsing="false" text="Sign" fx:id="signButton" />
+				<Label styleClass="label-style" text="" />
+				<Button fx:id="signButton" mnemonicParsing="false" text="Sign" />
 				<ProgressIndicator fx:id="progressSign" disable="true" progress="0" />
 			</children>
 		</HBox>
-		<Label fx:id="warningLabel" styleClass="warningLabel" text="This application doesn't load the trusted lists and trusted certificates. &#10;If you sign without the complete certificate chain, some data can be missed."/>	
+		
+		<Label fx:id="warningLabel" styleClass="warningLabel" text="This application doesn't load the trusted lists and trusted certificates. &#10;If you sign without the complete certificate chain, some data can be missed." />	
 	</children>
 </VBox>
