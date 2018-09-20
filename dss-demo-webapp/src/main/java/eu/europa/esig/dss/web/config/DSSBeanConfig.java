@@ -7,12 +7,10 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 
 import eu.europa.esig.dss.asic.signature.ASiCWithCAdESService;
@@ -45,8 +43,8 @@ import eu.europa.esig.dss.x509.tsp.TSPSource;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 
 @Configuration
-@PropertySource("classpath:dss.properties")
-@ComponentScan(basePackages = { "eu.europa.esig.dss" })
+@ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
+@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class, SchedulingConfig.class })
 public class DSSBeanConfig {
 
 	@Value("${default.validation.policy}")
@@ -158,13 +156,17 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public CertificateVerifier certificateVerifier() throws Exception {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setTrustedCertSource(trustedListSource());
 		certificateVerifier.setCrlSource(cachedCRLSource());
 		certificateVerifier.setOcspSource(ocspSource());
 		certificateVerifier.setDataLoader(dataLoader());
+
+		// Default configs
+		certificateVerifier.setExceptionOnMissingRevocationData(true);
+		certificateVerifier.setCheckRevocationForUntrustedChains(false);
+
 		return certificateVerifier;
 	}
 
