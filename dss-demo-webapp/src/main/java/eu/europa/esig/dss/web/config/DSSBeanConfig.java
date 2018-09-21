@@ -22,10 +22,8 @@ import eu.europa.esig.dss.client.http.DataLoader;
 import eu.europa.esig.dss.client.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.client.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.client.http.commons.OCSPDataLoader;
-import eu.europa.esig.dss.client.http.commons.TimestampDataLoader;
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.ocsp.OnlineOCSPSource;
-import eu.europa.esig.dss.client.tsp.OnlineTSPSource;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.signature.RemoteMultipleDocumentsSignatureServiceImpl;
@@ -44,7 +42,8 @@ import eu.europa.esig.dss.xades.signature.XAdESService;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class, SchedulingConfig.class })
+@Import({ PropertiesConfig.class, TSPConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
+		SchedulingConfig.class })
 public class DSSBeanConfig {
 
 	@Value("${default.validation.policy}")
@@ -71,9 +70,6 @@ public class DSSBeanConfig {
 	@Value("${oj.content.keystore.password}")
 	private String ksPassword;
 
-	@Value("${dss.tsa.url}")
-	private String tsaUrl;
-
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
 
@@ -82,6 +78,9 @@ public class DSSBeanConfig {
 
 	@Value("${dss.server.signing.keystore.password}")
 	private String serverSigningKeystorePassword;
+
+	@Autowired
+	private TSPSource tspSource;
 
 	@Autowired
 	private DataSource dataSource;
@@ -95,13 +94,6 @@ public class DSSBeanConfig {
 		CommonsDataLoader dataLoader = new CommonsDataLoader();
 		dataLoader.setProxyConfig(proxyConfig);
 		return dataLoader;
-	}
-
-	@Bean
-	public TimestampDataLoader timestampDataLoader() {
-		TimestampDataLoader timestampDataLoader = new TimestampDataLoader();
-		timestampDataLoader.setProxyConfig(proxyConfig);
-		return timestampDataLoader;
 	}
 
 	@Bean
@@ -148,14 +140,6 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public TSPSource tspSource() {
-		OnlineTSPSource onlineTSPSource = new OnlineTSPSource();
-		onlineTSPSource.setDataLoader(timestampDataLoader());
-		onlineTSPSource.setTspServer(tsaUrl);
-		return onlineTSPSource;
-	}
-
-	@Bean
 	public CertificateVerifier certificateVerifier() throws Exception {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setTrustedCertSource(trustedListSource());
@@ -178,35 +162,35 @@ public class DSSBeanConfig {
 	@Bean
 	public CAdESService cadesService() throws Exception {
 		CAdESService service = new CAdESService(certificateVerifier());
-		service.setTspSource(tspSource());
+		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
 	public XAdESService xadesService() throws Exception {
 		XAdESService service = new XAdESService(certificateVerifier());
-		service.setTspSource(tspSource());
+		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
 	public PAdESService padesService() throws Exception {
 		PAdESService service = new PAdESService(certificateVerifier());
-		service.setTspSource(tspSource());
+		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
 	public ASiCWithCAdESService asicWithCadesService() throws Exception {
 		ASiCWithCAdESService service = new ASiCWithCAdESService(certificateVerifier());
-		service.setTspSource(tspSource());
+		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
 	public ASiCWithXAdESService asicWithXadesService() throws Exception {
 		ASiCWithXAdESService service = new ASiCWithXAdESService(certificateVerifier());
-		service.setTspSource(tspSource());
+		service.setTspSource(tspSource);
 		return service;
 	}
 
