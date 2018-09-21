@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,11 +49,35 @@ public class SignatureRestServiceIT extends AbstractIT {
 
 	@Before
 	public void init() {
-		restClient = JAXRSClientFactory.create(getBaseCxf() + CXFConfig.REST_SIGNATURE_ONE_DOCUMENT, RestDocumentSignatureService.class,
-				Arrays.asList(new JacksonJsonProvider()));
+		JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 
-		restMultiDocsClient = JAXRSClientFactory.create(getBaseCxf() + CXFConfig.REST_SIGNATURE_MULTIPLE_DOCUMENTS, RestMultipleDocumentSignatureService.class,
-				Arrays.asList(new JacksonJsonProvider()));
+		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_ONE_DOCUMENT);
+		factory.setServiceClass(RestDocumentSignatureService.class);
+		factory.setProviders(Arrays.asList(new JacksonJsonProvider()));
+
+		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		restClient = factory.create(RestDocumentSignatureService.class);
+
+		factory = new JAXRSClientFactoryBean();
+
+		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_MULTIPLE_DOCUMENTS);
+		factory.setServiceClass(RestMultipleDocumentSignatureService.class);
+		factory.setProviders(Arrays.asList(new JacksonJsonProvider()));
+
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		restMultiDocsClient = factory.create(RestMultipleDocumentSignatureService.class);
 	}
 
 	@Test

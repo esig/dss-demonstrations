@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
@@ -61,14 +63,35 @@ public class SignatureSoapServiceIT extends AbstractIT {
 		factory.setProperties(props);
 		factory.setDataBinding(dataBinding);
 		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_ONE_DOCUMENT);
-		soapClient = (SoapDocumentSignatureService) factory.create();
 
-		JaxWsProxyFactoryBean factory2 = new JaxWsProxyFactoryBean();
-		factory2.setServiceClass(SoapMultipleDocumentsSignatureService.class);
-		factory2.setProperties(props);
+		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		soapClient = factory.create(SoapDocumentSignatureService.class);
+
+		dataBinding = new JAXBDataBinding();
+		dataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
+
+		factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapMultipleDocumentsSignatureService.class);
+		factory.setProperties(props);
 		factory.setDataBinding(dataBinding);
-		factory2.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
-		soapMultiDocsClient = (SoapMultipleDocumentsSignatureService) factory2.create();
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
+
+		loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		soapMultiDocsClient = factory.create(SoapMultipleDocumentsSignatureService.class);
 	}
 
 	@Test

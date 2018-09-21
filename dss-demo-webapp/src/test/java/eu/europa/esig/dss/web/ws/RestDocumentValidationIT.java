@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,8 +32,21 @@ public class RestDocumentValidationIT extends AbstractIT {
 
 	@Before
 	public void init() {
-		validationService = JAXRSClientFactory.create(getBaseCxf() + CXFConfig.REST_VALIDATION, RestDocumentValidationService.class,
-				Arrays.asList(new JacksonJsonProvider()));
+		JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
+
+		factory.setAddress(getBaseCxf() + CXFConfig.REST_VALIDATION);
+		factory.setServiceClass(RestDocumentValidationService.class);
+		factory.setProviders(Arrays.asList(new JacksonJsonProvider()));
+
+		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		validationService = factory.create(RestDocumentValidationService.class);
 	}
 
 	@Test

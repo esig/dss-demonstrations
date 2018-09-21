@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +39,16 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		factory.setProperties(props);
 
 		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_VALIDATION);
-		validationService = (SoapDocumentValidationService) factory.create();
+
+		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		validationService = factory.create(SoapDocumentValidationService.class);
 	}
 
 	@Test
