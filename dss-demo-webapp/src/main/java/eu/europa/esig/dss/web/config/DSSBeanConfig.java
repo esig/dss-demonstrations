@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
 import eu.europa.esig.dss.asic.signature.ASiCWithCAdESService;
@@ -42,8 +43,9 @@ import eu.europa.esig.dss.xades.signature.XAdESService;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, TSPConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
+@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
 		SchedulingConfig.class })
+@ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {
 
 	@Value("${default.validation.policy}")
