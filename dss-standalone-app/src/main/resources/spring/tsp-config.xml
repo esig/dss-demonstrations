@@ -10,7 +10,11 @@
 	</bean>
 
 	<bean id="tsa-token" class="eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection">
-		<constructor-arg name="ksFile" type="java.io.File" value="classpath:self-signed-tsa.p12" />
+		<constructor-arg name="ksBytes">
+	        <bean class="org.springframework.util.FileCopyUtils" factory-method="copyToByteArray">
+	            <constructor-arg value="classpath:self-signed-tsa.p12" type="java.io.InputStream" />
+	        </bean>     
+	    </constructor-arg>
 		<constructor-arg name="ksType" value="PKCS12" />
 		<constructor-arg name="ksPassword" ref="passwordProtection" />
 	</bean>

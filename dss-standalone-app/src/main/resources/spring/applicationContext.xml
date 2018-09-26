@@ -7,6 +7,8 @@
 
     <context:annotation-config /> 
     <context:component-scan base-package="eu.europa.esig.dss"/>
+    
+    <import resource="classpath:spring/tsp-config.xml" />
 		
 	<bean id="dataLoader" class="eu.europa.esig.dss.client.http.commons.CommonsDataLoader">
 	</bean>
@@ -22,11 +24,6 @@
 		<property name="dataLoader" ref="ocspDataLoader"/>
 	</bean>
 
-	<bean id="tspSource" class="eu.europa.esig.dss.client.tsp.OnlineTSPSource">
-		<property name="tspServer" value="http://tsa.belgium.be/connect"/>
-		<property name="dataLoader" ref="dataLoader"/>
-	</bean>
-	
 	<bean id="cadesService" class="eu.europa.esig.dss.cades.signature.CAdESService">
 		<constructor-arg ref="certificateVerifier" />
 		<property name="tspSource" ref="tspSource" />
