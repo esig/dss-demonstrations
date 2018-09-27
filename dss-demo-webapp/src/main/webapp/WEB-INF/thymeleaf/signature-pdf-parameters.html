@@ -36,8 +36,6 @@
 							  		
 							     	<p th:if="${#fields.hasErrors('documentToSign')}" th:errors="*{documentToSign}" class="text-danger">Error</p>
 							     	
-									<button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.sign}" disabled="disabled"></button>
-
                                     <div class="form-group">
 	   									<div id="nexu_missing_alert" style="display: none;" class="alert alert-warning">
 		                                    <span id="warning-text"></span> You can download the
@@ -48,6 +46,9 @@
 		                                <div id="nexu_ready_alert" style="display: none;" class="alert alert-info">NexU ready. Please plug card reader, insert ID card and click on button
 		                                    below.</div>
                                    </div>
+
+									<button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.sign}" disabled="disabled"></button>
+
                                 </form>
                                 
                                 <script type="text/javascript">
