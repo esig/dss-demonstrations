@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -155,6 +156,48 @@ public class RestDocumentValidationIT extends AbstractIT {
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
 		assertNotNull(reports);
+	}
+
+	@Test
+	public void testGetOriginals() throws Exception {
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+
+		DataToValidateDTO toValidate = new DataToValidateDTO();
+		toValidate.setSignatureId("id-0d11cae494b17e19234c619a9db45a97");
+		toValidate.setSignedDocument(signedFile);
+		List<RemoteDocument> result = validationService.getOriginalDocuments(toValidate);
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		RemoteDocument document = result.get(0);
+		assertNotNull(document);
+		assertNotNull(document.getBytes());
+	}
+
+	@Test
+	public void testGetOriginalsWithoutId() throws Exception {
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+
+		DataToValidateDTO toValidate = new DataToValidateDTO();
+		toValidate.setSignedDocument(signedFile);
+		List<RemoteDocument> result = validationService.getOriginalDocuments(toValidate);
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		RemoteDocument document = result.get(0);
+		assertNotNull(document);
+		assertNotNull(document.getBytes());
+	}
+
+	@Test
+	public void testGetOriginalsWithWrongId() throws Exception {
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+
+		DataToValidateDTO toValidate = new DataToValidateDTO();
+		toValidate.setSignatureId("id-wrong");
+		toValidate.setSignedDocument(signedFile);
+		List<RemoteDocument> result = validationService.getOriginalDocuments(toValidate);
+		// Difference with SOAP
+		assertNotNull(result);
+		assertEquals(0, result.size());
 	}
 
 	private RemoteDocument toRemoteDocument(FileDocument fileDoc) throws IOException {

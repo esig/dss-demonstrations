@@ -360,6 +360,25 @@ public class RestDocumentationApp {
 
 	}
 
+	@Test
+	public void getOriginalDocuments() throws IOException {
+
+		DataToValidateDTO dataToValidateDTO = new DataToValidateDTO();
+
+		File signature = new File("src/test/resources/hello-signed-xades.xml");
+		RemoteDocument signedDoc = new RemoteDocument();
+		signedDoc.setBytes(toByteArray(signature));
+		signedDoc.setMimeType(MimeType.XML);
+		signedDoc.setName(signature.getName());
+		dataToValidateDTO.setSignedDocument(signedDoc);
+
+		dataToValidateDTO.setSignedDocument(signedDoc);
+
+		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/validation/getOriginalDocuments").then().assertThat().statusCode(equalTo(200));
+
+	}
+
 	private byte[] toByteArray(File file) throws IOException {
 		return Files.readAllBytes(file.toPath());
 	}

@@ -2,9 +2,11 @@ package eu.europa.esig.dss.web.ws;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -157,6 +159,47 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
 		assertNotNull(reports);
+	}
+
+	@Test
+	public void testGetOriginals() throws Exception {
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+
+		DataToValidateDTO toValidate = new DataToValidateDTO();
+		toValidate.setSignatureId("id-0d11cae494b17e19234c619a9db45a97");
+		toValidate.setSignedDocument(signedFile);
+		List<RemoteDocument> result = validationService.getOriginalDocuments(toValidate);
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		RemoteDocument document = result.get(0);
+		assertNotNull(document);
+		assertNotNull(document.getBytes());
+	}
+
+	@Test
+	public void testGetOriginalsWithoutId() throws Exception {
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+
+		DataToValidateDTO toValidate = new DataToValidateDTO();
+		toValidate.setSignedDocument(signedFile);
+		List<RemoteDocument> result = validationService.getOriginalDocuments(toValidate);
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		RemoteDocument document = result.get(0);
+		assertNotNull(document);
+		assertNotNull(document.getBytes());
+	}
+
+	@Test
+	public void testGetOriginalsWithWrongId() throws Exception {
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+
+		DataToValidateDTO toValidate = new DataToValidateDTO();
+		toValidate.setSignatureId("id-wrong");
+		toValidate.setSignedDocument(signedFile);
+		List<RemoteDocument> result = validationService.getOriginalDocuments(toValidate);
+		// Difference with REST
+		assertNull(result);
 	}
 
 	private RemoteDocument toRemoteDocument(FileDocument fileDoc) throws IOException {
