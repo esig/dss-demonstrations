@@ -9,6 +9,8 @@
         <div class="list-group hidden-print">
             <a th:href="@{/sign-a-document}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-document' ? 'active' : ''}" th:text="#{label.signADocument}">Sign
                 a document</a>
+			<a th:href="@{/sign-a-pdf}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-pdf' ? 'active' : ''}" th:text="#{label.signAPDF}">Sign
+                a PDF</a>
             <a th:href="@{/sign-multiple-documents}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-multiple-documents' ? 'active' : ''}"
                 th:text="#{label.signMultiDocuments}"
             >Sign multi documents</a>

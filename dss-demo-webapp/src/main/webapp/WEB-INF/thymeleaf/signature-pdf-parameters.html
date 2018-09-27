@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Signature</li>
+                            <li class="active" th:text="#{label.signAPDF}">Sign a PDF</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2 th:text="#{label.signAPDF}"></h2>
+
+                                <form method="post" class="form-horizontal" id="sign-pdf-form" enctype="multipart/form-data" th:action="@{/sign-a-pdf}" th:object="${signaturePdfForm}">
+
+                                    <input type="hidden" id="isSign" value="true" />
+									
+							    	<input type="file" name="documentToSign" id="documentToSign" accept="application/pdf" />
+							  		<p id="filename">Drag a PDF document here or click in this area.</p>
+							  		
+							     	<p th:if="${#fields.hasErrors('documentToSign')}" th:errors="*{documentToSign}" class="text-danger">Error</p>
+							     	
+									<button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.sign}" disabled="disabled"></button>
+
+                                    <div class="form-group">
+	   									<div id="nexu_missing_alert" style="display: none;" class="alert alert-warning">
+		                                    <span id="warning-text"></span> You can download the
+		                                    <a th:href="${downloadNexuUrl}">open source version of NexU</a>
+		                                    (<a href="http://nowina.lu/news/nexu/">more info</a>)
+		                                </div>
+	
+		                                <div id="nexu_ready_alert" style="display: none;" class="alert alert-info">NexU ready. Please plug card reader, insert ID card and click on button
+		                                    below.</div>
+                                   </div>
+                                </form>
+                                
+                                <script type="text/javascript">
+                                	  $('form input').change(function () {
+                                		  if (this.files.length == 1) {
+	                               			  let file = this.files[0]; 
+                                			 $('#filename').text(file.name);
+                                		  } else {
+                                			 $('#filename').text('Drag a PDF document here or click in this area.');
+                                		  }
+                                	  });
+                                </script>
+
+                                <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+                                <script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
+</body>
+</html>
