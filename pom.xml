@@ -60,7 +60,7 @@
 		<spring.version>4.3.19.RELEASE</spring.version>
 		<spring-security.version>4.2.8.RELEASE</spring-security.version>
 		<thymeleaf-spring4.version>3.0.9.RELEASE</thymeleaf-spring4.version>
-		<jackson-jaxrs-json-provider.version>2.9.6</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.9.7</jackson-jaxrs-json-provider.version>
 		<hsqldb.version>2.4.1</hsqldb.version>
 		<nexu.version>1.10.5</nexu.version>
 
