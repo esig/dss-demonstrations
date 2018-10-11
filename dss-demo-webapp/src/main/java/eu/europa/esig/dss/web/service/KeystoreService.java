@@ -3,12 +3,11 @@ package eu.europa.esig.dss.web.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.model.CertificateDTO;
 import eu.europa.esig.dss.x509.CertificateToken;
 import eu.europa.esig.dss.x509.KeyStoreCertificateSource;
@@ -42,8 +41,8 @@ public class KeystoreService {
 
 		dto.setSha256Hex(getPrintableHex(digestSHA256));
 		dto.setSha1Hex(getPrintableHex(digestSHA1));
-		dto.setSha256Base64(DatatypeConverter.printBase64Binary(digestSHA256));
-		dto.setSha1Base64(DatatypeConverter.printBase64Binary(digestSHA1));
+		dto.setSha256Base64(Utils.toBase64(digestSHA256));
+		dto.setSha1Base64(Utils.toBase64(digestSHA1));
 
 		return dto;
 	}
@@ -55,7 +54,7 @@ public class KeystoreService {
 	 * @return
 	 */
 	private String getPrintableHex(byte[] digest) {
-		String hexString = DatatypeConverter.printHexBinary(digest);
+		String hexString = Utils.toHex(digest);
 		return hexString.replaceAll("..", "$0 ");
 	}
 

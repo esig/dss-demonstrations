@@ -1,5 +1,7 @@
 package eu.europa.esig.dss.web.model;
 
+import java.util.List;
+
 import javax.validation.constraints.AssertTrue;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +12,7 @@ public class ValidationForm {
 
 	private MultipartFile signedFile;
 
-	private MultipartFile originalFile;
+	private List<MultipartFile> originalFiles;
 
 	private ValidationLevel validationLevel;
 
@@ -26,12 +28,12 @@ public class ValidationForm {
 		this.signedFile = signedFile;
 	}
 
-	public MultipartFile getOriginalFile() {
-		return originalFile;
+	public List<MultipartFile> getOriginalFiles() {
+		return originalFiles;
 	}
 
-	public void setOriginalFile(MultipartFile originalFile) {
-		this.originalFile = originalFile;
+	public void setOriginalFiles(List<MultipartFile> originalFiles) {
+		this.originalFiles = originalFiles;
 	}
 
 	public ValidationLevel getValidationLevel() {

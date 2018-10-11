@@ -1,5 +1,7 @@
 package eu.europa.esig.dss.web.model;
 
+import java.util.List;
+
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
@@ -13,7 +15,7 @@ public class ExtensionForm {
 
 	private MultipartFile signedFile;
 
-	private MultipartFile originalFile;
+	private List<MultipartFile> originalFiles;
 
 	private ASiCContainerType containerType;
 
@@ -31,12 +33,12 @@ public class ExtensionForm {
 		this.signedFile = signedFile;
 	}
 
-	public MultipartFile getOriginalFile() {
-		return originalFile;
+	public List<MultipartFile> getOriginalFiles() {
+		return originalFiles;
 	}
 
-	public void setOriginalFile(MultipartFile originalFile) {
-		this.originalFile = originalFile;
+	public void setOriginalFiles(List<MultipartFile> originalFiles) {
+		this.originalFiles = originalFiles;
 	}
 
 	public ASiCContainerType getContainerType() {

@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,18 +65,18 @@ public class SigningService {
 		SignatureForm signatureForm = extensionForm.getSignatureForm();
 
 		DSSDocument signedDocument = WebAppUtils.toDSSDocument(extensionForm.getSignedFile());
-		DSSDocument originalDocument = WebAppUtils.toDSSDocument(extensionForm.getOriginalFile());
+		List<DSSDocument> originalDocuments = WebAppUtils.toDSSDocuments(extensionForm.getOriginalFiles());
 
 		DocumentSignatureService service = getSignatureService(containerType, signatureForm);
 
 		AbstractSignatureParameters parameters = getSignatureParameters(containerType, signatureForm);
 		parameters.setSignatureLevel(extensionForm.getSignatureLevel());
 
-		if (originalDocument != null) {
-			parameters.setDetachedContents(Arrays.asList(originalDocument));
+		if (Utils.isCollectionNotEmpty(originalDocuments)) {
+			parameters.setDetachedContents(originalDocuments);
 		}
 
-		DSSDocument extendedDoc = service.extendDocument(signedDocument, parameters);
+		DSSDocument extendedDoc = (DSSDocument) service.extendDocument(signedDocument, parameters);
 		return extendedDoc;
 	}
 
@@ -198,8 +196,8 @@ public class SigningService {
 		try {
 			DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
 			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
-			signedDocument = service.signDocument(toSignDocument, parameters, signatureValue);
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			signedDocument = (DSSDocument) service.signDocument(toSignDocument, parameters, signatureValue);
 		} catch (Exception e) {
 			logger.error("Unable to execute signDocument : " + e.getMessage(), e);
 		}
@@ -218,8 +216,8 @@ public class SigningService {
 		try {
 			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
 			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
-			signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			signedDocument = (DSSDocument) service.signDocument(toSignDocuments, parameters, signatureValue);
 		} catch (Exception e) {
 			logger.error("Unable to execute signDocument : " + e.getMessage(), e);
 		}
