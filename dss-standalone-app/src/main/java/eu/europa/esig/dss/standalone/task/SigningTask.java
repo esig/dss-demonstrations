@@ -11,6 +11,7 @@ import eu.europa.esig.dss.BLevelParameters;
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteCertificate;
+import eu.europa.esig.dss.RemoteConverter;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.SignatureValue;
@@ -51,7 +52,7 @@ public class SigningTask extends Task<DSSDocument> {
 		DSSPrivateKeyEntry signer = getSigner(keys);
 
 		FileDocument fileToSign = new FileDocument(model.getFileToSign());
-		RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName());
+		RemoteDocument toSignDocument = RemoteConverter.toRemoteDocument(fileToSign);
 		RemoteSignatureParameters parameters = buildParameters(signer);
 
 		ToBeSigned toBeSigned = getDataToSign(toSignDocument, parameters);
@@ -112,7 +113,7 @@ public class SigningTask extends Task<DSSDocument> {
 		updateProgress(75, 100);
 		DSSDocument signDocument = null;
 		try {
-			signDocument = service.signDocument(toSignDocument, parameters, signatureValue);
+			signDocument = RemoteConverter.toDSSDocument(service.signDocument(toSignDocument, parameters, signatureValue));
 		} catch (Exception e) {
 			throwException("Unable to sign the document", e);
 		}
