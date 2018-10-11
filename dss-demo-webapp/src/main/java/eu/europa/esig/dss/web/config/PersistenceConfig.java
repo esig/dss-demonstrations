@@ -2,11 +2,12 @@ package eu.europa.esig.dss.web.config;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableTransactionManagement
@@ -26,11 +27,13 @@ public class PersistenceConfig {
 
 	@Bean
 	public DataSource datasource() {
-		BasicDataSource ds = new BasicDataSource();
-		ds.setPassword(password);
-		ds.setUsername(username);
-		ds.setUrl(dataSourceUrl);
+		HikariDataSource ds = new HikariDataSource();
+		ds.setPoolName("DSS-Hikari-Pool");
+		ds.setJdbcUrl(dataSourceUrl);
 		ds.setDriverClassName(dataSourceDriverClassName);
+		ds.setUsername(username);
+		ds.setPassword(password);
+		ds.setAutoCommit(false);
 		return ds;
 	}
 
