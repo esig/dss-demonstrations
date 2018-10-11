@@ -372,6 +372,8 @@ public class RestDocumentationApp {
 		signedDoc.setName(signature.getName());
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
+		dataToValidateDTO.setSignatureId("id-ea10a0517cbc7f549ea3e685867ac95e");
+
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
 		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
