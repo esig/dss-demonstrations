@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -266,7 +267,7 @@ public class RestDocumentationApp {
 		originalDoc.setMimeType(MimeType.XML);
 		originalDoc.setName(detached.getName());
 
-		dataToValidateDTO.setOriginalDocument(originalDoc);
+		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
 
 		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));
@@ -353,7 +354,7 @@ public class RestDocumentationApp {
 		originalDoc.setMimeType(MimeType.XML);
 		originalDoc.setName(detached.getName());
 
-		dataToValidateDTO.setOriginalDocument(originalDoc);
+		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
 
 		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));

@@ -58,7 +58,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
-		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, null, null);
+		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, (RemoteDocument) null, null);
 
 		WSReportsDTO result = validationService.validateSignature(toValidate);
 
@@ -146,7 +146,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 		RemoteDocument policy = toRemoteDocument(new FileDocument("src/test/resources/constraint.xml"));
 
-		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, null, policy);
+		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, (RemoteDocument) null, policy);
 
 		WSReportsDTO result = validationService.validateSignature(toValidate);
 

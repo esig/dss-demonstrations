@@ -3,7 +3,6 @@ package eu.europa.esig.dss.web.ws;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import eu.europa.esig.dss.DataToValidateDTO;
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.RestDocumentValidationService;
 import eu.europa.esig.dss.validation.policy.rules.Indication;
 import eu.europa.esig.dss.validation.reports.Reports;
@@ -54,7 +52,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 	public void testWithNoPolicyAndNoOriginalFile() throws Exception {
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
-		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, null, null);
+		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, (RemoteDocument) null, null);
 
 		ReportsDTO result = validationService.validateSignature(toValidate);
 
@@ -143,7 +141,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 		RemoteDocument policy = toRemoteDocument(new FileDocument("src/test/resources/constraint.xml"));
 
-		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, null, policy);
+		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, (RemoteDocument) null, policy);
 
 		ReportsDTO result = validationService.validateSignature(toValidate);
 
@@ -200,8 +198,8 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertEquals(0, result.size());
 	}
 
-	private RemoteDocument toRemoteDocument(FileDocument fileDoc) throws IOException {
-		return new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName());
+	private RemoteDocument toRemoteDocument(FileDocument fileDoc) {
+		return new RemoteDocument(DSSUtils.toByteArray(fileDoc), fileDoc.getMimeType(), fileDoc.getName());
 	}
 
 }
