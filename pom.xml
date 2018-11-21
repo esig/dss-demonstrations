@@ -56,7 +56,7 @@
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.2.6</cxf.version>
+		<cxf.version>3.2.7</cxf.version>
 		<spring.version>4.3.19.RELEASE</spring.version>
 		<spring-security.version>4.2.8.RELEASE</spring-security.version>
 		<thymeleaf-spring4.version>3.0.9.RELEASE</thymeleaf-spring4.version>
@@ -351,11 +351,11 @@
 				<artifactId>dss-pades-pdfbox</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
-<!-- 			<dependency> -->
-<!-- 				<groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
-<!-- 				<artifactId>dss-pades-openpdf</artifactId> -->
-<!-- 				<version>${dss.framework.version}</version> -->
-<!-- 			</dependency> -->
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-pades-openpdf</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
 			
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
