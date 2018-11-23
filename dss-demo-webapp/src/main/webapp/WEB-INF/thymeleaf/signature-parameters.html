@@ -25,6 +25,9 @@
                         <div class="row">
                             <th:block th:replace="fragment/menu :: menu"></th:block>
                             <div class="col-md-9">
+                            
+								<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
+                            
                                 <h2 th:text="#{label.signADocument}"></h2>
 
                                 <form method="post" class="form-horizontal" enctype="multipart/form-data" th:action="@{/sign-a-document}" th:object="${signatureDocumentForm}">
@@ -46,7 +49,7 @@
                                     <div th:replace="fields::field-sign-expired"></div>
                                     
                                     <div th:replace="fields::field-content-timestamp"></div>
-
+                                    
                                     <div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-8">
                                         <span id="warning-text"></span> You can download the
                                         <a th:href="${downloadNexuUrl}">open source version of NexU</a>
