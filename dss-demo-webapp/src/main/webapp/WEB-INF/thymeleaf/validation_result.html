@@ -58,6 +58,20 @@
 										<div th:utext="${detailedReport}"></div>
 									</div>
 									<div role="tabpanel" class="tab-pane fade" id="diagnostic-tree">
+										<div class="panel panel-default">
+		                                    <div class="panel-heading collapsed" data-toggle="collapse" data-target="#downloads" aria-expanded='false' >
+		                                        <h3 class="panel-title" th:text="#{label.validation.download}"></h3>
+		                                    </div>
+		                                    
+		                                    <div class="panel-body collapse in" id="downloads">
+		                                        <!-- Certificates used -->
+		                                        <div th:replace="fields::field-base64-id(field=${usedCertificates}, text=#{label.validation.certificates.used}, url='/validation/download-certificate')"></div>
+		                                        <!-- Revocation data -->
+		                                        <div th:replace="fields::field-base64-id(field=${allRevocationData}, text=#{label.validation.revocation}, url='/validation/download-revocation')"></div>
+		                                        <!-- Timestamps -->
+		                                        <div th:replace="fields::field-base64-id(field=${allTimestamps}, text=#{label.validation.timestamps}, url='/validation/download-timestamp')"></div>
+		                                    </div>
+		                                </div>
 										<pre class="prettyprint lang-xml" th:text="${diagnosticTree}"></pre>
 									</div>
 								</div>

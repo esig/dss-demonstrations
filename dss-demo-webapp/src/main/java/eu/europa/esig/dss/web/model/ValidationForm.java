@@ -19,6 +19,10 @@ public class ValidationForm {
 	private boolean defaultPolicy;
 
 	private MultipartFile policyFile;
+	
+	private boolean includeRawRevocationData;
+	
+	private boolean includeRawTimestampTokens;
 
 	public MultipartFile getSignedFile() {
 		return signedFile;
@@ -58,6 +62,22 @@ public class ValidationForm {
 
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
+	}
+
+	public boolean isIncludeRawRevocationData() {
+		return includeRawRevocationData;
+	}
+
+	public void setIncludeRawRevocationData(boolean includeRawRevocationData) {
+		this.includeRawRevocationData = includeRawRevocationData;
+	}
+
+	public boolean isIncludeRawTimestampTokens() {
+		return includeRawTimestampTokens;
+	}
+
+	public void setIncludeRawTimestampTokens(boolean includeRawTimestampTokens) {
+		this.includeRawTimestampTokens = includeRawTimestampTokens;
 	}
 
 	@AssertTrue(message = "{error.signed.file.mandatory}")

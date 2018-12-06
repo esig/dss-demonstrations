@@ -32,30 +32,55 @@
 
                                     <div th:replace="fields::field-original-files"></div>
 
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label" th:text="#{label.validation.level}"></label>
-                                        <div class="col-sm-7">
-                                            <select th:field="*{validationLevel}" class="form-control input-sm">
-                                                <option th:each="level : ${validationLevels}" th:value="${level}" th:text="#{${'label.validation.level.'+level}}" />
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-7">
-                                            <input type="radio" th:field="*{defaultPolicy}" value="true" th:text="#{label.validation.default.policy.file}" />
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-4">
-                                            <input type="radio" th:field="*{defaultPolicy}" value="false" th:text="#{label.validation.custom.policy.file}" /> :
-                                        </div>
-
-                                        <div class="col-sm-6">
-                                            <input type="file" name="policyFile" id="policyFile" disabled="disabled" />
-                                        </div>
-                                    </div>
+									<a class="dss-link" data-toggle='collapse' data-target='#advancedOptions' aria-expanded='false' th:text="#{label.validation.advanced.options}"></a>
+									
+									<div id='advancedOptions' class='collapse div1'>
+	                                    <!-- Validation level -->
+	                                    <div class="form-group">
+	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.level}"></label>
+	                                        <div class="col-sm-7">
+	                                            <select th:field="*{validationLevel}" class="form-control input-sm">
+	                                                <option th:each="level : ${validationLevels}" th:value="${level}" th:text="#{${'label.validation.level.'+level}}" />
+	                                            </select>
+	                                        </div>
+	                                    </div>
+	
+	                                    <div class="form-group">
+	                                        <div class="col-sm-offset-2 col-sm-7">
+	                                            <input type="radio" th:field="*{defaultPolicy}" value="true" th:text="#{label.validation.default.policy.file}" />
+	                                        </div>
+	                                    </div>
+	                                    
+	                                    <div class="form-group">
+	                                        <div class="col-sm-offset-2 col-sm-4">
+	                                            <input type="radio" th:field="*{defaultPolicy}" value="false" th:text="#{label.validation.custom.policy.file}" /> :
+	                                        </div>
+	
+	                                        <div class="col-sm-6">
+	                                            <input type="file" name="policyFile" id="policyFile" disabled="disabled" />
+	                                        </div>
+	                                    </div>
+	                                    
+	                                    <!-- Timestamp -->
+	                                    <div class="form-group">
+	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.timestamps}"></label>
+	                                        <div class="col-sm-7">
+	                                            <input type="checkbox" th:field="*{includeRawTimestampTokens}" value="false"/>
+	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	                                            	data-placement="right" title=" Include raw timestamp tokens into the diagnostic report "></span>
+	                                        </div>
+	                                    </div>
+	                                    
+	                                    <!-- Revocation -->
+	                                    <div class="form-group">
+	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.revocation}"></label>
+	                                        <div class="col-sm-7">
+	                                            <input type="checkbox" th:field="*{includeRawRevocationData}" value="false"/>
+	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	                                            	data-placement="right" title=" Include raw revocation data into the diagnostic report "></span>
+	                                        </div>
+	                                    </div>
+	                                </div>
 
                                     <div class="form-group">
                                         <div class="col-sm-offset-2 col-sm-10">
@@ -64,7 +89,6 @@
                                         </div>
                                     </div>
                                 </form>
-
                             </div>
                         </div>
                     </div>
@@ -77,7 +101,11 @@
     <th:block th:replace="fragment/footer :: footer"></th:block>
 
     <script type="text/javascript">
-					$('input[name="defaultPolicy"]:radio').change(
+					    $(document).ready(function() {
+					   		$('[data-toggle="tooltip"]').tooltip();
+					   	});
+    
+    					$('input[name="defaultPolicy"]:radio').change(
 							function() {
 								$('#policyFile').attr("disabled",
 										this.value == 'true');

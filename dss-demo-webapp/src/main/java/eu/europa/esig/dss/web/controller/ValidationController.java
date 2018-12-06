@@ -1,8 +1,10 @@
 package eu.europa.esig.dss.web.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import eu.europa.esig.dss.DSSDocument;
@@ -30,6 +33,10 @@ import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
+import eu.europa.esig.dss.validation.reports.wrapper.CertificateWrapper;
+import eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData;
+import eu.europa.esig.dss.validation.reports.wrapper.RevocationWrapper;
+import eu.europa.esig.dss.validation.reports.wrapper.TimestampWrapper;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.model.ValidationForm;
@@ -37,7 +44,7 @@ import eu.europa.esig.dss.web.service.FOPService;
 import eu.europa.esig.dss.web.service.XSLTService;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml" })
+@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
 @RequestMapping(value = "/validation")
 public class ValidationController {
 
@@ -48,6 +55,7 @@ public class ValidationController {
 
 	private static final String SIMPLE_REPORT_ATTRIBUTE = "simpleReportXml";
 	private static final String DETAILED_REPORT_ATTRIBUTE = "detailedReportXml";
+	private static final String DIAGNOSTIC_DATA = "diagnosticTreeObject";
 
 	@Autowired
 	private CertificateVerifier certificateVerifier;
@@ -82,7 +90,11 @@ public class ValidationController {
 		}
 
 		SignedDocumentValidator documentValidator = SignedDocumentValidator.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
-		documentValidator.setCertificateVerifier(certificateVerifier);
+		
+		CertificateVerifier cv = certificateVerifier;
+		cv.setIncludeCertificateRevocationValues(validationForm.isIncludeRawRevocationData());
+		cv.setIncludeTimestampTokenValues(validationForm.isIncludeRawTimestampTokens());
+		documentValidator.setCertificateVerifier(cv);
 
 		List<DSSDocument> originalFiles = WebAppUtils.toDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
@@ -119,8 +131,21 @@ public class ValidationController {
 		model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
 		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
 
+		DiagnosticData diagnosticData = reports.getDiagnosticData();
+		model.addAttribute(DIAGNOSTIC_DATA, diagnosticData);
 		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
-
+		
+		if(cv.isIncludeCertificateRevocationValues()) {
+			Set<RevocationWrapper> allRevocationData = diagnosticData.getAllRevocationData();
+			model.addAttribute("allRevocationData", allRevocationData);
+		}
+		if(cv.isIncludeTimestampTokenValues()) {
+			Set<TimestampWrapper> allTimestamps = diagnosticData.getAllTimestamps();
+			model.addAttribute("allTimestamps", allTimestamps);
+		}
+		List<CertificateWrapper> usedCertificates = diagnosticData.getUsedCertificates();
+		model.addAttribute("usedCertificates", usedCertificates);
+		
 		return VALIDATION_RESULT_TILE;
 	}
 
@@ -151,7 +176,49 @@ public class ValidationController {
 			logger.error("An error occured while generating pdf for detailed report : " + e.getMessage(), e);
 		}
 	}
-
+	
+	@RequestMapping(value = "/download-certificate")
+	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
+		try {
+			DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
+			
+			response.setContentType(MimeType.BINARY.getMimeTypeString());
+			response.setHeader("Content-Disposition", "attachment; filename="+id);
+			Utils.copy(new ByteArrayInputStream(certificate.getBase64Encoded()), response.getOutputStream());
+		} catch (Exception e) {
+			logger.error("An error occured while downloading certificate : " + e.getMessage(), e);
+		}
+	}
+	
+	@RequestMapping(value = "/download-revocation")
+	public void downloadRevocationData(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
+		try {
+			DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+			RevocationWrapper revocationData = diagnosticData.getRevocationDataById(id);
+			
+			response.setContentType(MimeType.BINARY.getMimeTypeString());
+			response.setHeader("Content-Disposition", "attachment; filename="+id);
+			Utils.copy(new ByteArrayInputStream(revocationData.getBase64Encoded()), response.getOutputStream());
+		} catch (Exception e) {
+			logger.error("An error occured while downloading revocation data : " + e.getMessage(), e);
+		}
+	}
+	
+	@RequestMapping(value = "/download-timestamp")
+	public void downloadTimestamp(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
+		try {
+			DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+			TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
+			
+			response.setContentType(MimeType.BINARY.getMimeTypeString());
+			response.setHeader("Content-Disposition", "attachment; filename="+id);
+			Utils.copy(new ByteArrayInputStream(timestamp.getBase64Encoded()), response.getOutputStream());
+		} catch (Exception e) {
+			logger.error("An error occured while downloading timestamp : " + e.getMessage(), e);
+		}
+	}
+	
 	@ModelAttribute("validationLevels")
 	public ValidationLevel[] getValidationLevels() {
 		return new ValidationLevel[] { ValidationLevel.BASIC_SIGNATURES, ValidationLevel.LONG_TERM_DATA, ValidationLevel.ARCHIVAL_DATA };
@@ -161,5 +228,4 @@ public class ValidationController {
 	public boolean isDisplayDownloadPdf() {
 		return true;
 	}
-
 }
