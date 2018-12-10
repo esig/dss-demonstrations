@@ -172,15 +172,14 @@
 	</div>
 </div>
 
-<div class="row" th:if="${field != null && field.size() > 0}" th:fragment="field-base64-id (field, text, url)">
-	<label class="col-sm-2 control-label" th:text="${text}"></label>
-   	<div class="col-sm-7">
-    	<table>
-       		<tr th:each="f : ${field}"><td>
-       			<a th:text="${#strings.abbreviate(f.getId(), 64)}" th:href="@{|${url}?id=${f.getId()}|}"></a>
-       		</td></tr>
-       	</table>
-	</div>
+<div style="display: inline;" th:fragment="field-der-pem (isPemAvailable, url)">
+	<span>(</span>
+    <a th:text="#{label.DER}" th:href="@{|${url}&format=#{label.DER}|}"></a>
+    <div th:if="${isPemAvailable}" style="display: inline;">
+    	<span>| </span>
+     	<a th:text="#{label.PEM}" th:href="@{|${url}&format=#{label.PEM}|}"></a>
+    </div>
+    <span>) </span>
 </div>
 
 </html>

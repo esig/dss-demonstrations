@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import eu.europa.esig.dss.DSSASN1Utils;
 import eu.europa.esig.dss.DSSDocument;
+import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
@@ -39,6 +41,7 @@ import eu.europa.esig.dss.validation.reports.wrapper.RevocationWrapper;
 import eu.europa.esig.dss.validation.reports.wrapper.TimestampWrapper;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
 import eu.europa.esig.dss.web.service.XSLTService;
@@ -135,10 +138,7 @@ public class ValidationController {
 		model.addAttribute(DIAGNOSTIC_DATA, diagnosticData);
 		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
 		
-		if(cv.isIncludeCertificateRevocationValues()) {
-			Set<RevocationWrapper> allRevocationData = diagnosticData.getAllRevocationData();
-			model.addAttribute("allRevocationData", allRevocationData);
-		}
+		model.addAttribute("revocationEnabled", cv.isIncludeCertificateRevocationValues());
 		if(cv.isIncludeTimestampTokenValues()) {
 			Set<TimestampWrapper> allTimestamps = diagnosticData.getAllTimestamps();
 			model.addAttribute("allTimestamps", allTimestamps);
@@ -179,42 +179,105 @@ public class ValidationController {
 	
 	@RequestMapping(value = "/download-certificate")
 	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
+		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+		CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
+		if(certificate == null) {
+			String message = "Certificate " + id + " not found";
+			logger.warn(message);
+			throw new BadRequestException(message);
+		}
+		String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
+		String filename = DSSASN1Utils.getHumanReadableName(DSSUtils.loadCertificate(certificate.getBinaries())).replace(" ", "_")+".cer";
+		
+		response.setContentType(MimeType.CER.getMimeTypeString());
+		response.setHeader("Content-Disposition", "attachment; filename="+filename);
 		try {
-			DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
-			
-			response.setContentType(MimeType.BINARY.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename="+id);
-			Utils.copy(new ByteArrayInputStream(certificate.getBase64Encoded()), response.getOutputStream());
-		} catch (Exception e) {
+			Utils.copy(new ByteArrayInputStream(pemCert.getBytes()), response.getOutputStream());
+		} catch (IOException e) {
 			logger.error("An error occured while downloading certificate : " + e.getMessage(), e);
 		}
 	}
 	
 	@RequestMapping(value = "/download-revocation")
-	public void downloadRevocationData(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
-		try {
-			DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-			RevocationWrapper revocationData = diagnosticData.getRevocationDataById(id);
+	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format", required=false) String format, HttpSession session, HttpServletResponse response) {
+		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+		RevocationWrapper revocationData = diagnosticData.getRevocationDataById(id);
+		if(revocationData == null) {
+			String message = "Revocation data " + id + " not found";
+			logger.warn(message);
+			throw new BadRequestException(message);
+		}
+		String certId = revocationData.getSigningCertificateId();
+		String filename = "";
+				
+		CertificateWrapper cert = diagnosticData.getUsedCertificateById(certId);
+		if(cert != null) {
+			filename+=DSSASN1Utils.getHumanReadableName(DSSUtils.loadCertificate(cert.getBinaries()))+"_";
+		}
+		filename += revocationData.getSource().replace("Token", "");
+		String mimeType;
+		byte[] is;
+		
+		if(revocationData.getSource().contains("CRL")) {
+			mimeType = MimeType.CRL.getMimeTypeString();
+			filename += ".crl";
 			
-			response.setContentType(MimeType.BINARY.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename="+id);
-			Utils.copy(new ByteArrayInputStream(revocationData.getBase64Encoded()), response.getOutputStream());
-		} catch (Exception e) {
+			if(Utils.areStringsEqualIgnoreCase(format ,"pem")) {
+				String pem = "-----BEGIN CRL-----\n";
+				pem += Utils.toBase64(revocationData.getBinaries());
+				pem += "\n-----END CRL-----";
+				is = pem.getBytes();
+			} else {
+				is = revocationData.getBinaries();
+			}
+		} else {
+			mimeType = MimeType.BINARY.getMimeTypeString();
+			filename += ".ocsp";
+			is = revocationData.getBinaries();
+		}
+		response.setContentType(mimeType);
+		response.setHeader("Content-Disposition", "attachment; filename="+filename.replace(" ", "_"));
+		try {
+			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
+		} catch (IOException e) {
 			logger.error("An error occured while downloading revocation data : " + e.getMessage(), e);
 		}
 	}
 	
 	@RequestMapping(value = "/download-timestamp")
-	public void downloadTimestamp(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
+	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format", required=false) String format, HttpSession session, HttpServletResponse response) {
+		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+		TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
+		if(timestamp == null) {
+			String message = "Timestamp " + id + " not found";
+			logger.warn(message);
+			throw new BadRequestException(message);
+		}
+		String certId = timestamp.getSigningCertificateId();
+		CertificateWrapper cert = diagnosticData.getUsedCertificateById(certId);
+		String filename = "";
+		
+		if(cert != null) {
+			filename+=DSSASN1Utils.getHumanReadableName(DSSUtils.loadCertificate(cert.getBinaries()))+"_";
+		}
+		filename += timestamp.getType();
+		
+		response.setContentType(MimeType.TST.getMimeTypeString());
+		response.setHeader("Content-Disposition", "attachment; filename="+filename.replace(" ", "_")+".tst");
+		byte[] is;
+		
+		if(Utils.areStringsEqualIgnoreCase(format, "pem")) {
+			String pem = "-----BEGIN TIMESTAMP-----\n";
+			pem += Utils.toBase64(timestamp.getBinaries());
+			pem += "\n-----END TIMESTAMP-----";
+			is = pem.getBytes();
+		} else {
+			is = timestamp.getBinaries();
+		}
+		
 		try {
-			DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-			TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
-			
-			response.setContentType(MimeType.BINARY.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename="+id);
-			Utils.copy(new ByteArrayInputStream(timestamp.getBase64Encoded()), response.getOutputStream());
-		} catch (Exception e) {
+			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
+		} catch (IOException e) {
 			logger.error("An error occured while downloading timestamp : " + e.getMessage(), e);
 		}
 	}

@@ -64,12 +64,34 @@
 		                                    </div>
 		                                    
 		                                    <div class="panel-body collapse in" id="downloads">
-		                                        <!-- Certificates used -->
-		                                        <div th:replace="fields::field-base64-id(field=${usedCertificates}, text=#{label.validation.certificates.used}, url='/validation/download-certificate')"></div>
-		                                        <!-- Revocation data -->
-		                                        <div th:replace="fields::field-base64-id(field=${allRevocationData}, text=#{label.validation.revocation}, url='/validation/download-revocation')"></div>
+		                                        <!-- Certificates -->
+		                                        <div class="row" th:if="${usedCertificates != null && usedCertificates.size() > 0}">
+													<label class="col-sm-2 control-label" th:text="#{label.validation.certificates.used}"></label>
+												   	<div class="col-sm-7">
+												    	<table><tr th:each="uc : ${usedCertificates}"><td>
+											       			<a th:href="@{|/validation/download-certificate?id=${uc.getId()}|}">
+											       				<span th:text="${uc.getCommonName()}"></span>
+											       			</a>
+										       				<div th:if="${revocationEnabled && uc.isRevocationDataAvailable()}" style="display: inline;">
+										       					<span> - </span>
+										       					<div th:each="rd : ${uc.getRevocationData()}" style="display: inline;">
+										       						<span th:text="${#strings.replace(rd.getSource(), 'Token', '')}"></span>
+										       						<div th:replace="fields :: field-der-pem(${#strings.contains(rd.getSource(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)"></div>
+										       					</div>
+										       				</div>
+												       	</td></tr></table>
+													</div>
+												</div>
 		                                        <!-- Timestamps -->
-		                                        <div th:replace="fields::field-base64-id(field=${allTimestamps}, text=#{label.validation.timestamps}, url='/validation/download-timestamp')"></div>
+		                                        <div class="row" th:if="${allTimestamps != null && allTimestamps.size() > 0}">
+													<label class="col-sm-2 control-label" th:text="#{label.validation.timestamps}"></label>
+												   	<div class="col-sm-7">
+												    	<table><tr th:each="tst : ${allTimestamps}"><td>
+											       			<span th:text="${tst.getType()}"></span>
+											       			<div th:replace="fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)"></div>
+											       		</td></tr></table>
+													</div>
+												</div>
 		                                    </div>
 		                                </div>
 										<pre class="prettyprint lang-xml" th:text="${diagnosticTree}"></pre>
