@@ -30,6 +30,8 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
+import eu.europa.esig.dss.validation.reports.wrapper.CertificateWrapper;
+import eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import eu.europa.esig.dss.web.service.XSLTService;
@@ -38,9 +40,9 @@ import eu.europa.esig.dss.x509.CertificateToken;
 import eu.europa.esig.dss.x509.CommonCertificateSource;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml" })
+@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
 @RequestMapping(value = "/certificate-validation")
-public class CertificateValidationController {
+public class CertificateValidationController extends AbstractValidationController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CertificateValidationController.class);
 
@@ -94,8 +96,11 @@ public class CertificateValidationController {
 
 		LOG.info("Start certificate validation");
 
+		CertificateVerifier cv = certificateVerifier;
+		cv.setIncludeCertificateRevocationValues(certValidationForm.isIncludeRawRevocationData());
+		
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
-		certificateValidator.setCertificateVerifier(certificateVerifier);
+		certificateValidator.setCertificateVerifier(cv);
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
 
 		CertificateReports reports = certificateValidator.validate();
@@ -110,7 +115,13 @@ public class CertificateValidationController {
 		model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
 		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
 
+		DiagnosticData diagnosticData = reports.getDiagnosticData();
+		model.addAttribute(DIAGNOSTIC_DATA, diagnosticData);
 		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
+		
+		model.addAttribute("revocationEnabled", certValidationForm.isIncludeRawRevocationData());
+		List<CertificateWrapper> usedCertificates = diagnosticData.getUsedCertificates();
+		model.addAttribute("usedCertificates", usedCertificates);
 
 		LOG.info("End certificate validation");
 

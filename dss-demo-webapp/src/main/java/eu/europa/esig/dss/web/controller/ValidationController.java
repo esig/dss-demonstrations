@@ -37,7 +37,6 @@ import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.validation.reports.wrapper.CertificateWrapper;
 import eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData;
-import eu.europa.esig.dss.validation.reports.wrapper.RevocationWrapper;
 import eu.europa.esig.dss.validation.reports.wrapper.TimestampWrapper;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
@@ -49,7 +48,7 @@ import eu.europa.esig.dss.web.service.XSLTService;
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
 @RequestMapping(value = "/validation")
-public class ValidationController {
+public class ValidationController extends AbstractValidationController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ValidationController.class);
 
@@ -58,7 +57,6 @@ public class ValidationController {
 
 	private static final String SIMPLE_REPORT_ATTRIBUTE = "simpleReportXml";
 	private static final String DETAILED_REPORT_ATTRIBUTE = "detailedReportXml";
-	private static final String DIAGNOSTIC_DATA = "diagnosticTreeObject";
 
 	@Autowired
 	private CertificateVerifier certificateVerifier;
@@ -174,73 +172,6 @@ public class ValidationController {
 			fopService.generateDetailedReport(detailedReport, response.getOutputStream());
 		} catch (Exception e) {
 			logger.error("An error occured while generating pdf for detailed report : " + e.getMessage(), e);
-		}
-	}
-	
-	@RequestMapping(value = "/download-certificate")
-	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
-		if(certificate == null) {
-			String message = "Certificate " + id + " not found";
-			logger.warn(message);
-			throw new BadRequestException(message);
-		}
-		String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
-		String filename = DSSASN1Utils.getHumanReadableName(DSSUtils.loadCertificate(certificate.getBinaries())).replace(" ", "_")+".cer";
-		
-		response.setContentType(MimeType.CER.getMimeTypeString());
-		response.setHeader("Content-Disposition", "attachment; filename="+filename);
-		try {
-			Utils.copy(new ByteArrayInputStream(pemCert.getBytes()), response.getOutputStream());
-		} catch (IOException e) {
-			logger.error("An error occured while downloading certificate : " + e.getMessage(), e);
-		}
-	}
-	
-	@RequestMapping(value = "/download-revocation")
-	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format", required=false) String format, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		RevocationWrapper revocationData = diagnosticData.getRevocationDataById(id);
-		if(revocationData == null) {
-			String message = "Revocation data " + id + " not found";
-			logger.warn(message);
-			throw new BadRequestException(message);
-		}
-		String certId = revocationData.getSigningCertificateId();
-		String filename = "";
-				
-		CertificateWrapper cert = diagnosticData.getUsedCertificateById(certId);
-		if(cert != null) {
-			filename+=DSSASN1Utils.getHumanReadableName(DSSUtils.loadCertificate(cert.getBinaries()))+"_";
-		}
-		filename += revocationData.getSource().replace("Token", "");
-		String mimeType;
-		byte[] is;
-		
-		if(revocationData.getSource().contains("CRL")) {
-			mimeType = MimeType.CRL.getMimeTypeString();
-			filename += ".crl";
-			
-			if(Utils.areStringsEqualIgnoreCase(format ,"pem")) {
-				String pem = "-----BEGIN CRL-----\n";
-				pem += Utils.toBase64(revocationData.getBinaries());
-				pem += "\n-----END CRL-----";
-				is = pem.getBytes();
-			} else {
-				is = revocationData.getBinaries();
-			}
-		} else {
-			mimeType = MimeType.BINARY.getMimeTypeString();
-			filename += ".ocsp";
-			is = revocationData.getBinaries();
-		}
-		response.setContentType(mimeType);
-		response.setHeader("Content-Disposition", "attachment; filename="+filename.replace(" ", "_"));
-		try {
-			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
-		} catch (IOException e) {
-			logger.error("An error occured while downloading revocation data : " + e.getMessage(), e);
 		}
 	}
 	

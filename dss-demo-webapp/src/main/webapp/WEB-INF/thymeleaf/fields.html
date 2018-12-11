@@ -172,6 +172,15 @@
 	</div>
 </div>
 
+<div class="form-group" th:fragment="field-revocation-data">
+    <label for="certificateFile" class="col-sm-3 control-label" th:text="#{label.validation.revocation}"></label>
+    <div class="col-sm-3">
+        <input type="checkbox" th:field="*{includeRawRevocationData}" value="false"/>
+        <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+            data-placement="right" th:title="#{label.validation.revocation.tooltip}"></span>
+    </div>
+</div>
+
 <div style="display: inline;" th:fragment="field-der-pem (isPemAvailable, url)">
 	<span>(</span>
     <a th:text="#{label.DER}" th:href="@{|${url}&format=#{label.DER}|}"></a>

@@ -14,6 +14,8 @@ public class CertificateValidationForm {
 	private MultipartFile certificateFile;
 
 	private List<MultipartFile> certificateChainFiles;
+	
+	private boolean includeRawRevocationData;
 
 	public Date getValidationTime() {
 		return validationTime;
@@ -37,6 +39,14 @@ public class CertificateValidationForm {
 
 	public void setCertificateChainFiles(List<MultipartFile> certificateChainFiles) {
 		this.certificateChainFiles = certificateChainFiles;
+	}
+	
+	public boolean isIncludeRawRevocationData() {
+		return includeRawRevocationData;
+	}
+
+	public void setIncludeRawRevocationData(boolean includeRawRevocationData) {
+		this.includeRawRevocationData = includeRawRevocationData;
 	}
 
 	@AssertTrue(message = "{error.certificate.mandatory}")
