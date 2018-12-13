@@ -39,12 +39,6 @@
 		    <version>${tomcat.version}</version>
 			<type>zip</type>
 		</dependency>
-		<dependency>
-			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-bundle</artifactId>
-			<version>${nexu.version}</version>
-			<type>pom</type>
-		</dependency>
 	</dependencies>
 
 	<build>

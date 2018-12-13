@@ -62,7 +62,7 @@
 		<thymeleaf-spring4.version>3.0.9.RELEASE</thymeleaf-spring4.version>
 		<jackson-jaxrs-json-provider.version>2.9.7</jackson-jaxrs-json-provider.version>
 		<hsqldb.version>2.4.1</hsqldb.version>
-		<nexu.version>1.10.5</nexu.version>
+		<nexu.version>1.22</nexu.version>
 
 		<junit.version>4.12</junit.version>
 	</properties>
@@ -503,10 +503,6 @@
 	</dependencyManagement>
 
 	<repositories>
-		<repository>
-			<id>joinup-dss-thirdparty</id>
-			<url>http://joinup.ec.europa.eu/site/sd-dss/maven2</url>
-		</repository>
 		<repository>
 		  <id>cefdigital</id>
 		  <name>CEF Digital</name>
