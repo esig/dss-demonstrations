@@ -26,7 +26,8 @@
         <div class="list-group hidden-print">
             <a th:href="@{/extension}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/extension' ? 'active' : ''}" th:text="#{label.extend}">Extension</a>
             <a th:href="@{/validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/validation' ? 'active' : ''}" th:text="#{label.validate}">Signature Validation</a>
-                <a th:href="@{/certificate-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/certificate-validation' ? 'active' : ''}" th:text="#{label.cert.validate}">Certificate Validation</a>
+            <a th:href="@{/certificate-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/certificate-validation' ? 'active' : ''}" th:text="#{label.cert.validate}">Certificate Validation</a>
+            <a th:href="@{/replay-diag}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/replay-diag' ? 'active' : ''}" th:text="#{label.replay.diag}">Replay Diagnostic Data</a>
             <a th:href="@{/tsl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tsl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
         </div>
     </div>

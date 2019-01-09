@@ -1,10 +1,8 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,24 +24,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.DSSASN1Utils;
 import eu.europa.esig.dss.DSSDocument;
-import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
-import eu.europa.esig.dss.validation.reports.wrapper.CertificateWrapper;
 import eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData;
-import eu.europa.esig.dss.validation.reports.wrapper.TimestampWrapper;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
-import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
-import eu.europa.esig.dss.web.service.XSLTService;
 
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
@@ -55,14 +47,8 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_TILE = "validation";
 	private static final String VALIDATION_RESULT_TILE = "validation_result";
 
-	private static final String SIMPLE_REPORT_ATTRIBUTE = "simpleReportXml";
-	private static final String DETAILED_REPORT_ATTRIBUTE = "detailedReportXml";
-
 	@Autowired
 	private CertificateVerifier certificateVerifier;
-
-	@Autowired
-	private XSLTService xsltService;
 
 	@Autowired
 	private FOPService fopService;
@@ -123,27 +109,9 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		// reports.print();
-
-		String xmlSimpleReport = reports.getXmlSimpleReport();
-		model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
-		model.addAttribute("simpleReport", xsltService.generateSimpleReport(xmlSimpleReport));
-
-		String xmlDetailedReport = reports.getXmlDetailedReport();
-		model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
-		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
-
-		DiagnosticData diagnosticData = reports.getDiagnosticData();
-		model.addAttribute(DIAGNOSTIC_DATA, diagnosticData);
-		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
 		
-		model.addAttribute("revocationEnabled", cv.isIncludeCertificateRevocationValues());
-		if(cv.isIncludeTimestampTokenValues()) {
-			Set<TimestampWrapper> allTimestamps = diagnosticData.getAllTimestamps();
-			model.addAttribute("allTimestamps", allTimestamps);
-		}
-		List<CertificateWrapper> usedCertificates = diagnosticData.getUsedCertificates();
-		model.addAttribute("usedCertificates", usedCertificates);
-		
+		setSignatureValidationAttributesModel(model, reports);
+
 		return VALIDATION_RESULT_TILE;
 	}
 
@@ -175,42 +143,23 @@ public class ValidationController extends AbstractValidationController {
 		}
 	}
 	
-	@RequestMapping(value = "/download-timestamp")
-	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format", required=false) String format, HttpSession session, HttpServletResponse response) {
+	
+	@RequestMapping(value = "/download-certificate")
+	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
 		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
-		if(timestamp == null) {
-			String message = "Timestamp " + id + " not found";
-			logger.warn(message);
-			throw new BadRequestException(message);
-		}
-		String certId = timestamp.getSigningCertificateId();
-		CertificateWrapper cert = diagnosticData.getUsedCertificateById(certId);
-		String filename = "";
-		
-		if(cert != null) {
-			filename+=DSSASN1Utils.getHumanReadableName(DSSUtils.loadCertificate(cert.getBinaries()))+"_";
-		}
-		filename += timestamp.getType();
-		
-		response.setContentType(MimeType.TST.getMimeTypeString());
-		response.setHeader("Content-Disposition", "attachment; filename="+filename.replace(" ", "_")+".tst");
-		byte[] is;
-		
-		if(Utils.areStringsEqualIgnoreCase(format, "pem")) {
-			String pem = "-----BEGIN TIMESTAMP-----\n";
-			pem += Utils.toBase64(timestamp.getBinaries());
-			pem += "\n-----END TIMESTAMP-----";
-			is = pem.getBytes();
-		} else {
-			is = timestamp.getBinaries();
-		}
-		
-		try {
-			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
-		} catch (IOException e) {
-			logger.error("An error occured while downloading timestamp : " + e.getMessage(), e);
-		}
+		setCertificateResponse(id, diagnosticData, response);
+	}
+	
+	@RequestMapping(value = "/download-revocation")
+	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
+		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+		setRevocationResponse(id, format, diagnosticData, response);
+	}
+	
+	@RequestMapping(value = "/download-timestamp")
+	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
+		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
+		setTimestampResponse(id, format, diagnosticData, response);
 	}
 	
 	@ModelAttribute("validationLevels")

@@ -69,14 +69,14 @@
 													<label class="col-sm-2 control-label" th:text="#{label.validation.certificates.used}"></label>
 												   	<div class="col-sm-7">
 												    	<table><tr th:each="uc : ${usedCertificates}"><td>
-											       			<a th:href="@{|/validation/download-certificate?id=${uc.getId()}|}">
+											       			<a th:href="@{|/${validationTile}/download-certificate?id=${uc.getId()}|}">
 											       				<span th:text="${uc.getCommonName()}"></span>
 											       			</a>
-										       				<div th:if="${revocationEnabled && uc.isRevocationDataAvailable()}" style="display: inline;">
+										       				<div th:if="${showRevocation && uc.isRevocationDataAvailable()}" style="display: inline;">
 										       					<span> - </span>
 										       					<div th:each="rd : ${uc.getRevocationData()}" style="display: inline;">
 										       						<span th:text="${#strings.replace(rd.getSource(), 'Token', '')}"></span>
-										       						<div th:replace="fields :: field-der-pem(${#strings.contains(rd.getSource(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)"></div>
+										       						<div th:replace="fields :: field-der-pem(${#strings.contains(rd.getSource(), 'CRL')}, |/${validationTile}/download-revocation?id=${rd.getId()}|)"></div>
 										       					</div>
 										       				</div>
 												       	</td></tr></table>
@@ -88,7 +88,7 @@
 												   	<div class="col-sm-7">
 												    	<table><tr th:each="tst : ${allTimestamps}"><td>
 											       			<span th:text="${tst.getType()}"></span>
-											       			<div th:replace="fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)"></div>
+											       			<div th:replace="fields :: field-der-pem(true, |/${validationTile}/download-timestamp?id=${tst.getId()}|)"></div>
 											       		</td></tr></table>
 													</div>
 												</div>

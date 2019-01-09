@@ -173,7 +173,7 @@
 </div>
 
 <div class="form-group" th:fragment="field-revocation-data">
-    <label for="certificateFile" class="col-sm-3 control-label" th:text="#{label.validation.revocation}"></label>
+    <label class="col-sm-3 control-label" th:text="#{label.validation.revocation}"></label>
     <div class="col-sm-3">
         <input type="checkbox" th:field="*{includeRawRevocationData}" value="false"/>
         <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
