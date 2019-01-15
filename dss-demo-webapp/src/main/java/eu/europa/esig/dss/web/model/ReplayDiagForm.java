@@ -1,5 +1,7 @@
 package eu.europa.esig.dss.web.model;
 
+import javax.validation.constraints.AssertTrue;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public class ReplayDiagForm {
@@ -44,4 +46,8 @@ public class ReplayDiagForm {
 		this.policyFile = policyFile;
 	}
 	
+	@AssertTrue(message = "{error.diagnostic.file.mandatory}")
+	public boolean isSignedFile() {
+		return (diagnosticFile != null) && (!diagnosticFile.isEmpty());
+	}
 }

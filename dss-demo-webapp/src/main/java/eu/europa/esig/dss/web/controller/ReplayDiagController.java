@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -23,23 +24,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.xml.sax.SAXException;
 
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.jaxb.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.executor.CertificateProcessExecutor;
 import eu.europa.esig.dss.validation.executor.CustomProcessExecutor;
 import eu.europa.esig.dss.validation.policy.EtsiValidationPolicy;
+import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.ReplayDiagForm;
 import eu.europa.esig.jaxb.policy.ConstraintsParameters;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
-@RequestMapping(value = "/replay-diag")
+@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
+@RequestMapping(value = "/replay-diagnostic-data")
 public class ReplayDiagController extends AbstractValidationController {
 
-	private static final String REPLAY_TILE = "replay-diag";
+	private static final String REPLAY_TILE = "replay-diagnostic-data";
 	private static final String VALIDATION_RESULT_TILE = "validation_result";
 	
 	@Autowired
@@ -54,32 +58,46 @@ public class ReplayDiagController extends AbstractValidationController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("replayDiagForm") @Valid ReplayDiagForm replayDiagForm, BindingResult result, Model model) {
+	public String validate(@ModelAttribute("replayDiagForm") @Valid ReplayDiagForm replayDiagForm, BindingResult result, Model model) throws Exception {
 		if (result.hasErrors()) {
 			return REPLAY_TILE;
 		}
+			
+		InputStream is =  new BufferedInputStream(replayDiagForm.getDiagnosticFile().getInputStream());
+		DiagnosticData dd = getJAXBObjectFromString(is, DiagnosticData.class, "/xsd/DiagnosticData.xsd");
 		
-		try {
+		// Get policy
+		DSSDocument policyFile = WebAppUtils.toDSSDocument(replayDiagForm.getPolicyFile());
+		InputStream policyIs;
+		if (!replayDiagForm.isDefaultPolicy() && (policyFile != null)) {
+			policyIs = policyFile.openStream();
+		} else {
+			policyIs = defaultPolicy.getInputStream();
+		}
+		
+		// Get validation date
+		Date validationDate;
+		if(replayDiagForm.isResetDate()) {
+			validationDate = new Date();
+		} else {
+			validationDate = dd.getValidationDate();
+		}
+		
+		// Determine if Diagnostic data is a signature or certificate validation
+		if(dd.getSignatures() == null || dd.getSignatures().isEmpty()) {
+			// No signature -> Certificate validation
 			
-			InputStream is =  new BufferedInputStream(replayDiagForm.getDiagnosticFile().getInputStream());
-			DiagnosticData dd = getJAXBObjectFromString(is, DiagnosticData.class, "/xsd/DiagnosticData.xsd");
+			CertificateProcessExecutor executor = new CertificateProcessExecutor();
+			executor.setDiagnosticData(dd);
+			executor.setValidationPolicy(loadPolicy(policyIs));
+			executor.setCurrentTime(validationDate);
+			executor.setCertificateId(dd.getUsedCertificates().get(0).getId());
 			
-			// Get policy
-			DSSDocument policyFile = WebAppUtils.toDSSDocument(replayDiagForm.getPolicyFile());
-			InputStream policyIs;
-			if (!replayDiagForm.isDefaultPolicy() && (policyFile != null)) {
-				policyIs = policyFile.openStream();
-			} else {
-				policyIs = defaultPolicy.getInputStream();
-			}
+			CertificateReports reports = executor.execute();
 			
-			// Get validation date
-			Date validationDate;
-			if(replayDiagForm.isResetDate()) {
-				validationDate = new Date();
-			} else {
-				validationDate = dd.getValidationDate();
-			}
+			setCertificateValidationAttributesModels(model, reports);
+		} else {
+			// Signatures -> Signature validation
 			
 			CustomProcessExecutor executor = new CustomProcessExecutor();
 			executor.setDiagnosticData(dd);
@@ -88,20 +106,12 @@ public class ReplayDiagController extends AbstractValidationController {
 			
 			Reports reports = executor.execute();
 			
-			eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData diagnosticData = reports.getDiagnosticData();
-			
-			if(diagnosticData.getAllSignatures() == null) {
-				// No signature -> Certificate validation
-				setCertificateValidationAttributesModel(model, reports);
-			} else {
-				// Signatures -> Signature validation
-				setSignatureValidationAttributesModel(model, reports);
-			}
-			
-			return VALIDATION_RESULT_TILE;
-		} catch(Exception e) {
-			return REPLAY_TILE;
+			setSignatureValidationAttributesModels(model, reports);
 		}
+		
+		policyIs.close();
+		
+		return VALIDATION_RESULT_TILE;
 	}
 	
 	private EtsiValidationPolicy loadPolicy(InputStream is) throws Exception {
@@ -109,8 +119,8 @@ public class ReplayDiagController extends AbstractValidationController {
 		return new EtsiValidationPolicy(policyJaxB);
 	}
 	
-	@SuppressWarnings("unchecked") // TODO: move to Utils / DSSUtils
-	private <T extends Object> T getJAXBObjectFromString(InputStream is, Class<T> clazz, String xsd) throws Exception {
+	@SuppressWarnings("unchecked")
+	private <T extends Object> T getJAXBObjectFromString(InputStream is, Class<T> clazz, String xsd) throws JAXBException, SAXException  {
 		JAXBContext context = JAXBContext.newInstance(clazz.getPackage().getName());
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		if (Utils.isStringNotEmpty(xsd)) {

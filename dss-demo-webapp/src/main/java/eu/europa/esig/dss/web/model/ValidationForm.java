@@ -20,9 +20,11 @@ public class ValidationForm {
 
 	private MultipartFile policyFile;
 	
-	private boolean includeRawRevocationData;
+	private boolean includeCertificateTokens;
 	
-	private boolean includeRawTimestampTokens;
+	private boolean includeRevocationTokens;
+	
+	private boolean includeTimestampTokens;
 
 	public MultipartFile getSignedFile() {
 		return signedFile;
@@ -63,21 +65,29 @@ public class ValidationForm {
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
 	}
-
-	public boolean isIncludeRawRevocationData() {
-		return includeRawRevocationData;
+	
+	public boolean isIncludeCertificateTokens() {
+		return includeCertificateTokens;
 	}
 
-	public void setIncludeRawRevocationData(boolean includeRawRevocationData) {
-		this.includeRawRevocationData = includeRawRevocationData;
+	public void setIncludeCertificateTokens(boolean includeCertificateTokens) {
+		this.includeCertificateTokens = includeCertificateTokens;
 	}
 
-	public boolean isIncludeRawTimestampTokens() {
-		return includeRawTimestampTokens;
+	public boolean isIncludeRevocationTokens() {
+		return includeRevocationTokens;
 	}
 
-	public void setIncludeRawTimestampTokens(boolean includeRawTimestampTokens) {
-		this.includeRawTimestampTokens = includeRawTimestampTokens;
+	public void setIncludeRevocationTokens(boolean includeRevocationTokens) {
+		this.includeRevocationTokens = includeRevocationTokens;
+	}
+
+	public boolean isIncludeTimestampTokens() {
+		return includeTimestampTokens;
+	}
+
+	public void setIncludeTimestampTokens(boolean includeTimestampTokens) {
+		this.includeTimestampTokens = includeTimestampTokens;
 	}
 
 	@AssertTrue(message = "{error.signed.file.mandatory}")

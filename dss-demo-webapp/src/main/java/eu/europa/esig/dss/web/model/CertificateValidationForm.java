@@ -15,7 +15,9 @@ public class CertificateValidationForm {
 
 	private List<MultipartFile> certificateChainFiles;
 	
-	private boolean includeRawRevocationData;
+	private boolean includeCertificateTokens;
+	
+	private boolean includeRevocationTokens;
 
 	public Date getValidationTime() {
 		return validationTime;
@@ -41,12 +43,20 @@ public class CertificateValidationForm {
 		this.certificateChainFiles = certificateChainFiles;
 	}
 	
-	public boolean isIncludeRawRevocationData() {
-		return includeRawRevocationData;
+	public boolean isIncludeCertificateTokens() {
+		return includeCertificateTokens;
 	}
 
-	public void setIncludeRawRevocationData(boolean includeRawRevocationData) {
-		this.includeRawRevocationData = includeRawRevocationData;
+	public void setIncludeCertificateTokens(boolean includeCertificateTokens) {
+		this.includeCertificateTokens = includeCertificateTokens;
+	}
+	
+	public boolean isIncludeRevocationTokens() {
+		return includeRevocationTokens;
+	}
+
+	public void setIncludeRevocationTokens(boolean includeRevocationTokens) {
+		this.includeRevocationTokens = includeRevocationTokens;
 	}
 
 	@AssertTrue(message = "{error.certificate.mandatory}")

@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,20 +27,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import eu.europa.esig.dss.DSSDocument;
+import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
+import eu.europa.esig.dss.validation.reports.wrapper.CertificateWrapper;
 import eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData;
+import eu.europa.esig.dss.validation.reports.wrapper.RevocationWrapper;
+import eu.europa.esig.dss.validation.reports.wrapper.TimestampWrapper;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.exception.BadRequestException;
+import eu.europa.esig.dss.web.model.TokenDTO;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
+@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/validation")
 public class ValidationController extends AbstractValidationController {
 
@@ -79,8 +87,9 @@ public class ValidationController extends AbstractValidationController {
 		SignedDocumentValidator documentValidator = SignedDocumentValidator.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
 		
 		CertificateVerifier cv = certificateVerifier;
-		cv.setIncludeCertificateRevocationValues(validationForm.isIncludeRawRevocationData());
-		cv.setIncludeTimestampTokenValues(validationForm.isIncludeRawTimestampTokens());
+		cv.setIncludeCertificateTokenValues(validationForm.isIncludeCertificateTokens());
+		cv.setIncludeCertificateRevocationValues(validationForm.isIncludeRevocationTokens());
+		cv.setIncludeTimestampTokenValues(validationForm.isIncludeTimestampTokens());
 		documentValidator.setCertificateVerifier(cv);
 
 		List<DSSDocument> originalFiles = WebAppUtils.toDSSDocuments(validationForm.getOriginalFiles());
@@ -110,11 +119,24 @@ public class ValidationController extends AbstractValidationController {
 
 		// reports.print();
 		
-		setSignatureValidationAttributesModel(model, reports);
+		setSignatureValidationAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
 	}
 
+	@RequestMapping(value = "/download-diagnostic-data")
+	public void downloadDiagnosticData(HttpSession session, HttpServletResponse response) {
+		String report = (String) session.getAttribute(DIAGNOSTIC_DATA_ATTRIBUTE);
+		
+		response.setContentType(MimeType.XML.getMimeTypeString());
+		response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
+		try {
+			Utils.copy(new ByteArrayInputStream(report.getBytes()), response.getOutputStream());
+		} catch (IOException e) {
+			logger.error("An error occured while outputing diagnostic data : " + e.getMessage(), e);
+		}
+	}
+	
 	@RequestMapping(value = "/download-simple-report")
 	public void downloadSimpleReport(HttpSession session, HttpServletResponse response) {
 		try {
@@ -145,21 +167,95 @@ public class ValidationController extends AbstractValidationController {
 	
 	
 	@RequestMapping(value = "/download-certificate")
-	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		setCertificateResponse(id, diagnosticData, response);
+	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) throws JAXBException {
+		DiagnosticData diagnosticData = getDiagnosticData(session);
+		CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
+		if(certificate == null) {
+			String message = "Certificate " + id + " not found";
+			logger.warn(message);
+			throw new BadRequestException(message);
+		}
+		String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
+		TokenDTO certDTO = new TokenDTO(certificate);
+		String filename = certDTO.getName().replace(" ", "_")+".cer";
+		
+		response.setContentType(MimeType.CER.getMimeTypeString());
+		response.setHeader("Content-Disposition", "attachment; filename="+filename);
+		try {
+			Utils.copy(new ByteArrayInputStream(pemCert.getBytes()), response.getOutputStream());
+		} catch (IOException e) {
+			logger.error("An error occured while downloading certificate : " + e.getMessage(), e);
+		}
 	}
 	
 	@RequestMapping(value = "/download-revocation")
-	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		setRevocationResponse(id, format, diagnosticData, response);
+	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) throws JAXBException {
+		DiagnosticData diagnosticData = getDiagnosticData(session);
+		RevocationWrapper revocationData = diagnosticData.getRevocationDataById(id);
+		if(revocationData == null) {
+			String message = "Revocation data " + id + " not found";
+			logger.warn(message);
+			throw new BadRequestException(message);
+		}
+		String filename = revocationData.getSource().replace("Token", "")+revocationData.getOrigin();
+		String mimeType;
+		byte[] is;
+		
+		if(revocationData.getSource().contains("CRL")) {
+			mimeType = MimeType.CRL.getMimeTypeString();
+			filename += ".crl";
+			
+			if(Utils.areStringsEqualIgnoreCase(format ,"pem")) {
+				String pem = "-----BEGIN CRL-----\n";
+				pem += Utils.toBase64(revocationData.getBinaries());
+				pem += "\n-----END CRL-----";
+				is = pem.getBytes();
+			} else {
+				is = revocationData.getBinaries();
+			}
+		} else {
+			mimeType = MimeType.BINARY.getMimeTypeString();
+			filename += ".ocsp";
+			is = revocationData.getBinaries();
+		}
+		response.setContentType(mimeType);
+		response.setHeader("Content-Disposition", "attachment; filename="+filename.replace(" ", "_"));
+		try {
+			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
+		} catch (IOException e) {
+			logger.error("An error occured while downloading revocation data : " + e.getMessage(), e);
+		}
 	}
 	
 	@RequestMapping(value = "/download-timestamp")
-	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		setTimestampResponse(id, format, diagnosticData, response);
+	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) throws JAXBException {
+		DiagnosticData diagnosticData = getDiagnosticData(session);
+		TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
+		if(timestamp == null) {
+			String message = "Timestamp " + id + " not found";
+			logger.warn(message);
+			throw new BadRequestException(message);
+		}
+		String filename = timestamp.getType();
+		
+		response.setContentType(MimeType.TST.getMimeTypeString());
+		response.setHeader("Content-Disposition", "attachment; filename="+filename.replace(" ", "_")+".tst");
+		byte[] is;
+		
+		if(Utils.areStringsEqualIgnoreCase(format, "pem")) {
+			String pem = "-----BEGIN TIMESTAMP-----\n";
+			pem += Utils.toBase64(timestamp.getBinaries());
+			pem += "\n-----END TIMESTAMP-----";
+			is = pem.getBytes();
+		} else {
+			is = timestamp.getBinaries();
+		}
+		
+		try {
+			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
+		} catch (IOException e) {
+			logger.error("An error occured while downloading timestamp : " + e.getMessage(), e);
+		}
 	}
 	
 	@ModelAttribute("validationLevels")

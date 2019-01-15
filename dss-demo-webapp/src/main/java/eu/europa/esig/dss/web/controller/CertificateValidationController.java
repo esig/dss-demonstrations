@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +30,6 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.validation.reports.wrapper.DiagnosticData;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import eu.europa.esig.dss.x509.CertificateSource;
@@ -41,7 +37,7 @@ import eu.europa.esig.dss.x509.CertificateToken;
 import eu.europa.esig.dss.x509.CommonCertificateSource;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticTreeObject" })
+@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/certificate-validation")
 public class CertificateValidationController extends AbstractValidationController {
 
@@ -92,7 +88,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 		LOG.info("Start certificate validation");
 
 		CertificateVerifier cv = certificateVerifier;
-		cv.setIncludeCertificateRevocationValues(certValidationForm.isIncludeRawRevocationData());
+		cv.setIncludeCertificateTokenValues(certValidationForm.isIncludeCertificateTokens());
+		cv.setIncludeCertificateRevocationValues(certValidationForm.isIncludeRevocationTokens());
 		
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(cv);
@@ -102,7 +99,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		// reports.print();
 
-		setCertificateValidationAttributesModel(model, reports);
+		setCertificateValidationAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
 	}
@@ -119,18 +116,6 @@ public class CertificateValidationController extends AbstractValidationControlle
 		return null;
 	}
 	
-	@RequestMapping(value = "/download-certificate")
-	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		setCertificateResponse(id, diagnosticData, response);
-	}
-	
-	@RequestMapping(value = "/download-revocation")
-	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
-		DiagnosticData diagnosticData = (DiagnosticData) session.getAttribute(DIAGNOSTIC_DATA);
-		setRevocationResponse(id, format, diagnosticData, response);
-	}
-
 	@ModelAttribute("displayDownloadPdf")
 	public boolean isDisplayDownloadPdf() {
 		return false;

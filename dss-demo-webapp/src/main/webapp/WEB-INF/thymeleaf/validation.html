@@ -61,11 +61,21 @@
 	                                        </div>
 	                                    </div>
 	                                    
+	                                    <!-- Used certificates -->
+	                                    <div class="form-group">
+	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.certificates.used}"></label>
+	                                        <div class="col-sm-7">
+	                                            <input type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
+	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	                                            	data-placement="right" th:title="#{label.validation.certificate.tooltip}"></span>
+	                                        </div>
+	                                    </div>
+	                                    
 	                                    <!-- Timestamp -->
 	                                    <div class="form-group">
 	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.timestamps}"></label>
 	                                        <div class="col-sm-7">
-	                                            <input type="checkbox" th:field="*{includeRawTimestampTokens}" value="false"/>
+	                                            <input type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
 	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
 	                                            	data-placement="right" th:title="#{label.validation.timestamp.tooltip}"></span>
 	                                        </div>
@@ -75,7 +85,7 @@
 	                                    <div class="form-group">
 	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.revocation}"></label>
 	                                        <div class="col-sm-7">
-	                                            <input type="checkbox" th:field="*{includeRawRevocationData}" value="false"/>
+	                                            <input type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
 	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
 	                                            	data-placement="right" th:title="#{label.validation.revocation.tooltip}"></span>
 	                                        </div>
