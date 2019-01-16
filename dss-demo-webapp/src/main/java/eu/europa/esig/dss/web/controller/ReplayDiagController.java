@@ -1,20 +1,16 @@
 package eu.europa.esig.dss.web.controller;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -28,13 +24,15 @@ import org.xml.sax.SAXException;
 
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.jaxb.diagnostic.DiagnosticData;
-import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.ValidationResourceManager;
 import eu.europa.esig.dss.validation.executor.CertificateProcessExecutor;
 import eu.europa.esig.dss.validation.executor.CustomProcessExecutor;
+import eu.europa.esig.dss.validation.executor.ProcessExecutor;
 import eu.europa.esig.dss.validation.policy.EtsiValidationPolicy;
-import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.validation.reports.Reports;
+import eu.europa.esig.dss.validation.policy.XmlUtils;
+import eu.europa.esig.dss.validation.reports.AbstractReports;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.model.ReplayDiagForm;
 import eu.europa.esig.jaxb.policy.ConstraintsParameters;
 
@@ -43,6 +41,8 @@ import eu.europa.esig.jaxb.policy.ConstraintsParameters;
 @RequestMapping(value = "/replay-diagnostic-data")
 public class ReplayDiagController extends AbstractValidationController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ReplayDiagController.class);
+	
 	private static final String REPLAY_TILE = "replay-diagnostic-data";
 	private static final String VALIDATION_RESULT_TILE = "validation_result";
 	
@@ -58,78 +58,60 @@ public class ReplayDiagController extends AbstractValidationController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("replayDiagForm") @Valid ReplayDiagForm replayDiagForm, BindingResult result, Model model) throws Exception {
+	public String validate(@ModelAttribute("replayDiagForm") @Valid ReplayDiagForm replayDiagForm, BindingResult result, Model model) {
 		if (result.hasErrors()) {
 			return REPLAY_TILE;
 		}
-			
-		InputStream is =  new BufferedInputStream(replayDiagForm.getDiagnosticFile().getInputStream());
-		DiagnosticData dd = getJAXBObjectFromString(is, DiagnosticData.class, "/xsd/DiagnosticData.xsd");
 		
-		// Get policy
+		DiagnosticData dd;
+		try {
+			InputStream is =  new BufferedInputStream(replayDiagForm.getDiagnosticFile().getInputStream());
+			dd = XmlUtils.getJAXBObjectFromString(is, DiagnosticData.class, "/xsd/DiagnosticData.xsd");
+		} catch(IOException | JAXBException | SAXException e) {
+			throw new InternalServerException("Error while creating diagnostic data from given file");
+		}
+			
+		// Determine if Diagnostic data is a certificate or signature validation
+		ProcessExecutor<? extends AbstractReports> executor;
+		executor = (dd.getSignatures() == null || dd.getSignatures().isEmpty()) ? new CertificateProcessExecutor() : new CustomProcessExecutor();
+		executor.setDiagnosticData(dd);
+		
+		// Set validation date
+		Date validationDate = (replayDiagForm.isResetDate()) ? new Date() : dd.getValidationDate();
+		executor.setCurrentTime(validationDate);
+		
+		// Set policy
 		DSSDocument policyFile = WebAppUtils.toDSSDocument(replayDiagForm.getPolicyFile());
-		InputStream policyIs;
 		if (!replayDiagForm.isDefaultPolicy() && (policyFile != null)) {
-			policyIs = policyFile.openStream();
+			try (InputStream policyIs = policyFile.openStream()) {
+				executor.setValidationPolicy(loadPolicy(policyIs));
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+		} else if (defaultPolicy != null) {
+			try (InputStream policyIs = defaultPolicy.getInputStream()) {
+				executor.setValidationPolicy(loadPolicy(policyIs));
+			} catch (IOException e) {
+				logger.error("Unable to parse policy : " + e.getMessage(), e);
+			}
 		} else {
-			policyIs = defaultPolicy.getInputStream();
+			logger.error("Not correctly initialized");
 		}
 		
-		// Get validation date
-		Date validationDate;
-		if(replayDiagForm.isResetDate()) {
-			validationDate = new Date();
-		} else {
-			validationDate = dd.getValidationDate();
+		// If applicable, set certificate id
+		if(executor instanceof CertificateProcessExecutor) {
+			((CertificateProcessExecutor) executor).setCertificateId(dd.getUsedCertificates().get(0).getId());
 		}
 		
-		// Determine if Diagnostic data is a signature or certificate validation
-		if(dd.getSignatures() == null || dd.getSignatures().isEmpty()) {
-			// No signature -> Certificate validation
-			
-			CertificateProcessExecutor executor = new CertificateProcessExecutor();
-			executor.setDiagnosticData(dd);
-			executor.setValidationPolicy(loadPolicy(policyIs));
-			executor.setCurrentTime(validationDate);
-			executor.setCertificateId(dd.getUsedCertificates().get(0).getId());
-			
-			CertificateReports reports = executor.execute();
-			
-			setCertificateValidationAttributesModels(model, reports);
-		} else {
-			// Signatures -> Signature validation
-			
-			CustomProcessExecutor executor = new CustomProcessExecutor();
-			executor.setDiagnosticData(dd);
-			executor.setValidationPolicy(loadPolicy(policyIs));
-			executor.setCurrentTime(validationDate);
-			
-			Reports reports = executor.execute();
-			
-			setSignatureValidationAttributesModels(model, reports);
-		}
-		
-		policyIs.close();
+		AbstractReports reports = executor.execute();
+		setAttributesModels(model, reports);
 		
 		return VALIDATION_RESULT_TILE;
+		
 	}
 	
-	private EtsiValidationPolicy loadPolicy(InputStream is) throws Exception {
-		ConstraintsParameters policyJaxB = getJAXBObjectFromString(is, ConstraintsParameters.class, "/xsd/policy.xsd");
+	private EtsiValidationPolicy loadPolicy(InputStream is) {
+		ConstraintsParameters policyJaxB = ValidationResourceManager.loadPolicyData(is);
 		return new EtsiValidationPolicy(policyJaxB);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private <T extends Object> T getJAXBObjectFromString(InputStream is, Class<T> clazz, String xsd) throws JAXBException, SAXException  {
-		JAXBContext context = JAXBContext.newInstance(clazz.getPackage().getName());
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		if (Utils.isStringNotEmpty(xsd)) {
-			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			InputStream inputStream = this.getClass().getResourceAsStream(xsd);
-			Source source = new StreamSource(inputStream);
-			Schema schema = sf.newSchema(source);
-			unmarshaller.setSchema(schema);
-		}
-		return (T) unmarshaller.unmarshal(is);
 	}
 }

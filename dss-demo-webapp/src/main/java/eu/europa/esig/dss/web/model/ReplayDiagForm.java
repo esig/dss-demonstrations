@@ -47,7 +47,7 @@ public class ReplayDiagForm {
 	}
 	
 	@AssertTrue(message = "{error.diagnostic.file.mandatory}")
-	public boolean isSignedFile() {
+	public boolean isDiagnosticFile() {
 		return (diagnosticFile != null) && (!diagnosticFile.isEmpty());
 	}
 }

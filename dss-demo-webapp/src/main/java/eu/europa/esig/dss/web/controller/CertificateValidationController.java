@@ -99,7 +99,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		// reports.print();
 
-		setCertificateValidationAttributesModels(model, reports);
+		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
 	}

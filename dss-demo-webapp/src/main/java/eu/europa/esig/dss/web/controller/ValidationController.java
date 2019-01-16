@@ -3,13 +3,16 @@ package eu.europa.esig.dss.web.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +122,7 @@ public class ValidationController extends AbstractValidationController {
 
 		// reports.print();
 		
-		setSignatureValidationAttributesModels(model, reports);
+		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
 	}
@@ -167,7 +170,7 @@ public class ValidationController extends AbstractValidationController {
 	
 	
 	@RequestMapping(value = "/download-certificate")
-	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) throws JAXBException {
+	public void downloadCertificate(@RequestParam(value="id") String id, HttpSession session, HttpServletResponse response) {
 		DiagnosticData diagnosticData = getDiagnosticData(session);
 		CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
 		if(certificate == null) {
@@ -189,7 +192,7 @@ public class ValidationController extends AbstractValidationController {
 	}
 	
 	@RequestMapping(value = "/download-revocation")
-	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) throws JAXBException {
+	public void downloadRevocationData(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
 		DiagnosticData diagnosticData = getDiagnosticData(session);
 		RevocationWrapper revocationData = diagnosticData.getRevocationDataById(id);
 		if(revocationData == null) {
@@ -228,7 +231,7 @@ public class ValidationController extends AbstractValidationController {
 	}
 	
 	@RequestMapping(value = "/download-timestamp")
-	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) throws JAXBException {
+	public void downloadTimestamp(@RequestParam(value="id") String id, @RequestParam(value="format") String format, HttpSession session, HttpServletResponse response) {
 		DiagnosticData diagnosticData = getDiagnosticData(session);
 		TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
 		if(timestamp == null) {
@@ -256,6 +259,20 @@ public class ValidationController extends AbstractValidationController {
 		} catch (IOException e) {
 			logger.error("An error occured while downloading timestamp : " + e.getMessage(), e);
 		}
+	}
+	
+	public DiagnosticData getDiagnosticData(HttpSession session) {
+		String diagnosticDataXml = (String) session.getAttribute(DIAGNOSTIC_DATA_ATTRIBUTE);
+		
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(eu.europa.esig.dss.jaxb.diagnostic.DiagnosticData.class);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			
+			return new DiagnosticData((eu.europa.esig.dss.jaxb.diagnostic.DiagnosticData) unmarshaller.unmarshal(new StringReader(diagnosticDataXml)));
+		} catch(JAXBException e) {
+			logger.error("An error occured while generating DiagnosticData from XML : " + e.getMessage(), e);
+		}
+		return null;
 	}
 	
 	@ModelAttribute("validationLevels")
