@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.4-SNAPSHOT</version>
+		<version>5.4</version>
 	</parent>
 	<artifactId>dss-standalone-app-package</artifactId>
 	<name>DSS standalone application packager</name>
