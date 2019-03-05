@@ -24,6 +24,7 @@ import eu.europa.esig.dss.client.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.client.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.client.http.commons.OCSPDataLoader;
 import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
+import eu.europa.esig.dss.client.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.client.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureServiceImpl;
@@ -125,15 +126,27 @@ public class DSSBeanConfig {
 	public JdbcCacheCRLSource cachedCRLSource() throws Exception {
 		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
 		jdbcCacheCRLSource.setDataSource(dataSource);
-		jdbcCacheCRLSource.setCachedSource(onlineCRLSource());
+		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
+		jdbcCacheCRLSource.setCacheExpirationTime(180000); // 3 minutes
+		jdbcCacheCRLSource.initTable();
 		return jdbcCacheCRLSource;
 	}
 
 	@Bean
-	public OnlineOCSPSource ocspSource() {
+	public OnlineOCSPSource onlineOcspSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
 		return onlineOCSPSource;
+	}
+
+	@Bean
+	public JdbcCacheOCSPSource cachedOCSPSource() throws Exception {
+		JdbcCacheOCSPSource jdbcCacheOCSPSource = new JdbcCacheOCSPSource();
+		jdbcCacheOCSPSource.setDataSource(dataSource);
+		jdbcCacheOCSPSource.setProxySource(onlineOcspSource());
+		jdbcCacheOCSPSource.setCacheExpirationTime(180000); // 3 minutes
+		jdbcCacheOCSPSource.initTable();
+		return jdbcCacheOCSPSource;
 	}
 
 	@Bean
@@ -146,7 +159,7 @@ public class DSSBeanConfig {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setTrustedCertSource(trustedListSource());
 		certificateVerifier.setCrlSource(cachedCRLSource());
-		certificateVerifier.setOcspSource(ocspSource());
+		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setDataLoader(dataLoader());
 
 		// Default configs
