@@ -2,7 +2,10 @@ package eu.europa.esig.dss.web.config;
 
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
+import java.sql.SQLException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,30 @@ public class DSSBeanConfig {
 	// can be null
 	@Autowired(required = false)
 	private ProxyConfig proxyConfig;
+	
+	@PostConstruct
+	public void cachedCRLSourceInitialization() throws SQLException {
+		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
+		jdbcCacheCRLSource.initTable();
+	}
+	
+	@PostConstruct
+	public void cachedOCSPSourceInitialization() throws SQLException {
+		JdbcCacheOCSPSource jdbcCacheOCSPSource = cachedOCSPSource();
+		jdbcCacheOCSPSource.initTable();
+	}
+	
+	@PreDestroy
+	public void cachedCRLSourceClean() throws SQLException {
+		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
+		jdbcCacheCRLSource.destroyTable();
+	}
+	
+	@PreDestroy
+	public void cachedOCSPSourceClean() throws SQLException {
+		JdbcCacheOCSPSource jdbcCacheOCSPSource = cachedOCSPSource();
+		jdbcCacheOCSPSource.destroyTable();
+	}
 
 	@Bean
 	public CommonsDataLoader dataLoader() {
@@ -123,12 +150,11 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public JdbcCacheCRLSource cachedCRLSource() throws Exception {
+	public JdbcCacheCRLSource cachedCRLSource() {
 		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
 		jdbcCacheCRLSource.setDataSource(dataSource);
 		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
 		jdbcCacheCRLSource.setCacheExpirationTime(180000); // 3 minutes
-		jdbcCacheCRLSource.initTable();
 		return jdbcCacheCRLSource;
 	}
 
@@ -140,12 +166,11 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public JdbcCacheOCSPSource cachedOCSPSource() throws Exception {
+	public JdbcCacheOCSPSource cachedOCSPSource() {
 		JdbcCacheOCSPSource jdbcCacheOCSPSource = new JdbcCacheOCSPSource();
 		jdbcCacheOCSPSource.setDataSource(dataSource);
 		jdbcCacheOCSPSource.setProxySource(onlineOcspSource());
 		jdbcCacheOCSPSource.setCacheExpirationTime(180000); // 3 minutes
-		jdbcCacheOCSPSource.initTable();
 		return jdbcCacheOCSPSource;
 	}
 
