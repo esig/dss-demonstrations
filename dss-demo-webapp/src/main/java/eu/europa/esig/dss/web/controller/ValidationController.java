@@ -120,6 +120,7 @@ public class ValidationController {
 		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
 
 		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
+		model.addAttribute("etsiValidationReport", reports.getXmlValidationReport());
 
 		return VALIDATION_RESULT_TILE;
 	}
