@@ -29,7 +29,7 @@
 									<li role="presentation" class="active"><a href="#simple-report" th:text="#{label.simple.report}"></a></li>
 									<li role="presentation"><a href="#detailed-report" th:text="#{label.detailed.report}"></a></li>
 									<li role="presentation"><a href="#diagnostic-tree" th:text="#{label.diagnostic.tree}"></a></li>
-									<li role="presentation"><a href="#etsi-validation-report" th:text="#{label.etsi.validation.report}"></a></li>
+									<li th:if="${etsiValidationReport} != null" role="presentation"><a href="#etsi-validation-report" th:text="#{label.etsi.validation.report}"></a></li>
 								</ul>
 
 								<div class="tab-content" style="margin-top: 10px">
@@ -61,7 +61,7 @@
 									<div role="tabpanel" class="tab-pane fade" id="diagnostic-tree">
 										<pre class="prettyprint lang-xml" th:text="${diagnosticTree}"></pre>
 									</div>
-									<div role="tabpanel" class="tab-pane fade" id="etsi-validation-report">
+									<div th:if="${etsiValidationReport} != null" role="tabpanel" class="tab-pane fade" id="etsi-validation-report">
 										<pre class="prettyprint lang-xml" th:text="${etsiValidationReport}"></pre>
 									</div>
 								</div>
