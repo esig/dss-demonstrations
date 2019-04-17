@@ -64,8 +64,8 @@ public class DSSBeanConfig {
 	@Value("${lotl.root.scheme.info.uri}")
 	private String lotlRootSchemeInfoUri;
 
-	@Value("${current.oj.url}")
-	private String ojUrl;
+	@Value("${oj.domain.name}")
+	private String ojDomainName;
 
 	@Value("${oj.content.keystore.type}")
 	private String ksType;
@@ -154,7 +154,7 @@ public class DSSBeanConfig {
 		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
 		jdbcCacheCRLSource.setDataSource(dataSource);
 		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
-		jdbcCacheCRLSource.setCacheExpirationTime(180000); // 3 minutes
+		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) 1000 * 60 * 3); // 3 minutes
 		return jdbcCacheCRLSource;
 	}
 
@@ -170,7 +170,7 @@ public class DSSBeanConfig {
 		JdbcCacheOCSPSource jdbcCacheOCSPSource = new JdbcCacheOCSPSource();
 		jdbcCacheOCSPSource.setDataSource(dataSource);
 		jdbcCacheOCSPSource.setProxySource(onlineOcspSource());
-		jdbcCacheOCSPSource.setCacheExpirationTime(180000); // 3 minutes
+		jdbcCacheOCSPSource.setDefaultNextUpdateDelay((long) 1000 * 60 * 3); // 3 minutes
 		return jdbcCacheOCSPSource;
 	}
 
@@ -294,7 +294,7 @@ public class DSSBeanConfig {
 		validationJob.setLotlUrl(lotlUrl);
 		validationJob.setLotlRootSchemeInfoUri(lotlRootSchemeInfoUri);
 		validationJob.setLotlCode(lotlCountryCode);
-		validationJob.setOjUrl(ojUrl);
+		validationJob.setOjDomainName(ojDomainName);
 		validationJob.setOjContentKeyStore(ojContentKeyStore);
 		validationJob.setCheckLOTLSignature(true);
 		validationJob.setCheckTSLSignatures(true);

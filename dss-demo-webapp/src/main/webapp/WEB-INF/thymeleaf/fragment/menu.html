@@ -1,9 +1,5 @@
 <div th:fragment="menu" class="col-md-3 dss-menu" xmlns:th="http://www.thymeleaf.org">
 
-    <div th:if="${#httpServletRequest.getRequestURI().contains('/admin/')}" class="list-group hidden-print">
-        <a th:href="@{/admin/certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/admin/certificates' ? 'active' : ''}" th:text="#{label.certificates}">Certificates</a>
-    </div>
-
     <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
         <div class="panel-heading">e-Signature</div>
         <div class="list-group hidden-print">
@@ -28,6 +24,7 @@
             <a th:href="@{/validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/validation' ? 'active' : ''}" th:text="#{label.validate}">Signature Validation</a>
                 <a th:href="@{/certificate-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/certificate-validation' ? 'active' : ''}" th:text="#{label.cert.validate}">Certificate Validation</a>
             <a th:href="@{/tsl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tsl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
+      		<a th:href="@{/oj-certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/oj-certificates' ? 'active' : ''}" title="EU Official Journal Trusted Certificates">OJ Trusted Certificates</a>
         </div>
     </div>
 
