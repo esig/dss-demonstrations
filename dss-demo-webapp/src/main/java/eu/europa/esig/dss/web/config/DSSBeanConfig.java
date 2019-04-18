@@ -61,11 +61,8 @@ public class DSSBeanConfig {
 	@Value("${lotl.country.code}")
 	private String lotlCountryCode;
 
-	@Value("${lotl.root.scheme.info.uri}")
-	private String lotlRootSchemeInfoUri;
-
-	@Value("${oj.domain.name}")
-	private String ojDomainName;
+	@Value("${current.oj.url}")
+	private String currentOjUrl;
 
 	@Value("${oj.content.keystore.type}")
 	private String ksType;
@@ -292,9 +289,8 @@ public class DSSBeanConfig {
 		validationJob.setDataLoader(dataLoader);
 		validationJob.setRepository(tslRepository);
 		validationJob.setLotlUrl(lotlUrl);
-		validationJob.setLotlRootSchemeInfoUri(lotlRootSchemeInfoUri);
 		validationJob.setLotlCode(lotlCountryCode);
-		validationJob.setOjDomainName(ojDomainName);
+		validationJob.setUsedOjKeystoreUrl(currentOjUrl);
 		validationJob.setOjContentKeyStore(ojContentKeyStore);
 		validationJob.setCheckLOTLSignature(true);
 		validationJob.setCheckTSLSignatures(true);
