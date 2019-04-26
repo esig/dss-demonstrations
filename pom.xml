@@ -42,7 +42,6 @@
 	</developers>
 
 	<properties>
-
 		<project.source.version>1.8</project.source.version>
 		<project.encoding>UTF-8</project.encoding>
 
@@ -56,9 +55,9 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.2.8</cxf.version>
-		<spring.version>4.3.22.RELEASE</spring.version>
-		<spring-security.version>4.2.11.RELEASE</spring-security.version>
+		<cxf.version>3.3.1</cxf.version>
+		<spring.version>4.3.23.RELEASE</spring.version>
+		<spring-security.version>4.2.12.RELEASE</spring-security.version>
 		<thymeleaf-spring4.version>3.0.9.RELEASE</thymeleaf-spring4.version>
 		<jackson-jaxrs-json-provider.version>2.9.8</jackson-jaxrs-json-provider.version>
 		<hsqldb.version>2.4.1</hsqldb.version>
@@ -95,34 +94,25 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M2</version>
 				<executions>
 					<execution>
-						<id>prepare-unit-test-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
+						<id>enforce</id>
+				        <goals>
+							<goal>enforce</goal>
 						</goals>
-					</execution>
-					<execution>
-						<id>generate-unit-test-report</id>
-						<goals>
-							<goal>merge</goal>
-							<goal>report</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>prepare-integration-test-agent</id>
-						<goals>
-							<goal>prepare-agent-integration</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>generate-integration-test-report</id>
-						<goals>
-							<goal>merge</goal>
-							<goal>report-integration</goal>
-						</goals>
+						<configuration>
+							<rules>
+                				<banDuplicatePomDependencyVersions />
+								<bannedDependencies>
+									<excludes>
+										<exclude>xalan:xalan</exclude>
+									</excludes>
+								</bannedDependencies>
+							</rules>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -137,10 +127,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
 		</plugins>
 
@@ -204,11 +190,6 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.0.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.8.2</version>
 				</plugin>
@@ -218,9 +199,9 @@
 					<version>2.2</version>
 				</plugin>
 				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.1</version>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.22.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -564,7 +545,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>3.2.1</version>
+						<version>5.0.0-M2</version>
 						<executions>
 							<execution>
 								<goals>
