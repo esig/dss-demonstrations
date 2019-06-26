@@ -290,7 +290,7 @@ public class DSSBeanConfig {
 		validationJob.setRepository(tslRepository);
 		validationJob.setLotlUrl(lotlUrl);
 		validationJob.setLotlCode(lotlCountryCode);
-		validationJob.setOjUrl(currentOjUrl);
+		validationJob.setUsedOjKeystoreUrl(currentOjUrl);
 		validationJob.setOjContentKeyStore(ojContentKeyStore);
 		validationJob.setCheckLOTLSignature(true);
 		validationJob.setCheckTSLSignatures(true);

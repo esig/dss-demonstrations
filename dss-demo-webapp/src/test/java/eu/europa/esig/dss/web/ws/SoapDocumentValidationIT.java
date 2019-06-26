@@ -37,7 +37,8 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		factory.setServiceClass(SoapDocumentValidationService.class);
 
 		Map<String, Object> props = new HashMap<String, Object>();
-		props.put("mtom-enabled", Boolean.TRUE);
+//		props.put("mtom-enabled", Boolean.TRUE);
+//		props.put("jaxb.additionalContextClasses", getExtraClasses());
 		factory.setProperties(props);
 
 		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_VALIDATION);
@@ -56,7 +57,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	@Test
 	public void testWithNoPolicyAndNoOriginalFile() throws Exception {
 
-		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
+		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/QCSeal.pdf"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, (RemoteDocument) null, null);
 
@@ -67,10 +68,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getTimestamps().size());
+		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getFoundTimestamps().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -91,7 +92,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -115,7 +116,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -137,7 +138,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -157,7 +158,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getValidationReport());
 		assertNotNull(reports);
 	}
 

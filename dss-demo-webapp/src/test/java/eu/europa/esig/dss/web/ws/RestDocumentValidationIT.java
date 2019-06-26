@@ -61,10 +61,10 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getTimestamps().size());
+		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getFoundTimestamps().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getEtsiValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -85,7 +85,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getEtsiValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -109,7 +109,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getEtsiValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -131,7 +131,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getEtsiValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -152,7 +152,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
-		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport());
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), result.getEtsiValidationReport());
 		assertNotNull(reports);
 	}
 

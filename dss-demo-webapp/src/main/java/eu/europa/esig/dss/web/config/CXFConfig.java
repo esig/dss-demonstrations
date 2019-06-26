@@ -1,5 +1,8 @@
 package eu.europa.esig.dss.web.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
@@ -42,6 +45,7 @@ import eu.europa.esig.dss.validation.RestDocumentValidationService;
 import eu.europa.esig.dss.validation.RestDocumentValidationServiceImpl;
 import eu.europa.esig.dss.validation.SoapDocumentValidationService;
 import eu.europa.esig.dss.validation.SoapDocumentValidationServiceImpl;
+import eu.europa.esig.jaxb.validationreport.ValidationReportUtils;
 
 @Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
@@ -142,8 +146,18 @@ public class CXFConfig {
 	@Bean
 	public Endpoint createSoapValidationEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(bus, soapValidationService());
+
+		List<String> schemaLocations = Arrays.asList(
+				ValidationReportUtils.VALIDATION_REPORT_SCHEMA_LOCATION, 
+//				TrustedListUtils.TRUSTED_LIST_SCHEMA_LOCATION,
+//				XAdESUtils.XADES_SCHEMA_LOCATION,
+				"/xsd/DiagnosticData.xsd",
+				"/xsd/DetailedReport.xsd", "/xsd/SimpleReport.xsd");
+		endpoint.setSchemaLocations(schemaLocations);
+
 		endpoint.publish(SOAP_VALIDATION);
-		enableMTOM(endpoint);
+
+//		enableMTOM(endpoint);
 		return endpoint;
 	}
 
