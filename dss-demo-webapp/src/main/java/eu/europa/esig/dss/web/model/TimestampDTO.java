@@ -1,6 +1,6 @@
 package eu.europa.esig.dss.web.model;
 
-import eu.europa.esig.dss.x509.TimestampType;
+import eu.europa.esig.dss.enumerations.TimestampType;
 
 public class TimestampDTO {
 

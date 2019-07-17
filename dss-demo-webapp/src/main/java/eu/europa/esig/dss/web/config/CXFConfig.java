@@ -19,8 +19,6 @@ import org.springframework.context.annotation.ImportResource;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.signature.DateAdapter;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.signature.RemoteMultipleDocumentsSignatureService;
@@ -67,10 +65,10 @@ public class CXFConfig {
 	private Bus bus;
 
 	@Autowired
-	private RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> remoteSignatureService;
+	private RemoteDocumentSignatureService remoteSignatureService;
 
 	@Autowired
-	private RemoteMultipleDocumentsSignatureService<RemoteDocument, RemoteSignatureParameters> remoteMultipleDocumentsSignatureService;
+	private RemoteMultipleDocumentsSignatureService remoteMultipleDocumentsSignatureService;
 
 	@Autowired
 	private RemoteDocumentValidationService remoteValidationService;

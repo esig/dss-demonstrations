@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.standalone.controller.SignatureController;
@@ -21,7 +19,7 @@ public class DSSApplication extends Application {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DSSApplication.class);
 
-	private RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> signatureService;
+	private RemoteDocumentSignatureService signatureService;
 
 	private Stage stage;
 

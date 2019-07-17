@@ -292,7 +292,6 @@ public class DSSBeanConfig {
 		validationJob.setDataLoader(dataLoader);
 		validationJob.setRepository(tslRepository);
 		validationJob.setLotlUrl(lotlUrl);
-		validationJob.setLotlRootSchemeInfoUri(lotlRootSchemeInfoUri);
 		validationJob.setLotlCode(lotlCountryCode);
 		validationJob.setOjUrl(ojUrl);
 		validationJob.setOjContentKeyStore(ojContentKeyStore);

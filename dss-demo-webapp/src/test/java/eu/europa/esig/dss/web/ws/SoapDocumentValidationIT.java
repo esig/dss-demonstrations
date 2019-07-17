@@ -17,13 +17,13 @@ import org.junit.Test;
 
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.DataToValidateDTO;
-import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.SoapDocumentValidationService;
 import eu.europa.esig.dss.validation.WSReportsDTO;
-import eu.europa.esig.dss.validation.policy.rules.Indication;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.config.CXFConfig;
 
@@ -71,7 +71,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
-				result.getEtsiValidationReport());
+				result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -93,7 +93,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
-				result.getEtsiValidationReport());
+				result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -103,8 +103,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 
 		FileDocument fileDocument = new FileDocument("src/test/resources/sample.xml");
-		RemoteDocument originalFile = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileDocument), fileDocument.getMimeType(),
-				fileDocument.getName());
+		RemoteDocument originalFile = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileDocument), fileDocument.getName());
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, originalFile, null);
 
@@ -118,7 +117,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
-				result.getEtsiValidationReport());
+				result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -141,7 +140,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
-				result.getEtsiValidationReport());
+				result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -162,7 +161,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
-				result.getEtsiValidationReport());
+				result.getValidationReport());
 		assertNotNull(reports);
 	}
 
@@ -208,7 +207,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	private RemoteDocument toRemoteDocument(FileDocument fileDoc) throws IOException {
-		return new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getMimeType(), fileDoc.getName());
+		return new RemoteDocument(Utils.toByteArray(fileDoc.openStream()), fileDoc.getName());
 	}
 
 }

@@ -31,10 +31,10 @@ import javafx.concurrent.Task;
 
 public class SigningTask extends Task<DSSDocument> {
 
-	private RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> service;
+	private RemoteDocumentSignatureService service;
 	private SignatureModel model;
 
-	public SigningTask(RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> service, SignatureModel model) {
+	public SigningTask(RemoteDocumentSignatureService service, SignatureModel model) {
 		this.service = service;
 		this.model = model;
 	}

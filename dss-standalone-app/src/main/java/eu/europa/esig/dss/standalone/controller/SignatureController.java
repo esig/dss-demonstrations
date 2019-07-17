@@ -7,16 +7,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.DSSDocument;
-import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.MimeType;
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.RemoteSignatureParameters;
-import eu.europa.esig.dss.SignatureForm;
-import eu.europa.esig.dss.SignatureLevel;
-import eu.europa.esig.dss.SignaturePackaging;
-import eu.europa.esig.dss.SignatureTokenType;
+import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.SignatureForm;
+import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
@@ -144,7 +142,7 @@ public class SignatureController implements Initializable {
 
 	private SignatureModel model;
 
-	private RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> signatureService;
+	private RemoteDocumentSignatureService signatureService;
 
 	static {
 		// Fix a freeze in Windows 10, JDK 8 and touchscreen
@@ -156,7 +154,7 @@ public class SignatureController implements Initializable {
 	}
 
 	public void setSignatureService(
-			RemoteDocumentSignatureService<RemoteDocument, RemoteSignatureParameters> signatureService) {
+			RemoteDocumentSignatureService signatureService) {
 		this.signatureService = signatureService;
 	}
 

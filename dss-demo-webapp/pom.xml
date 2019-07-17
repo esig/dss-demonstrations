@@ -21,6 +21,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -129,6 +130,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		</pluginManagement>
 	</build>
 
 	<dependencies>
@@ -224,7 +226,7 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-soap</artifactId>
+			<artifactId>dss-signature-soap</artifactId>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
@@ -276,7 +278,7 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-rest</artifactId>
+			<artifactId>dss-signature-rest</artifactId>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>

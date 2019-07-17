@@ -23,21 +23,20 @@ import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
-import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.BLevelParameters;
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.DataToValidateDTO;
-import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
-import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.RemoteCertificate;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.RemoteSignatureParameters;
-import eu.europa.esig.dss.SignatureAlgorithm;
-import eu.europa.esig.dss.SignatureLevel;
-import eu.europa.esig.dss.SignaturePackaging;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
+import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
+import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.signature.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.signature.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.signature.ExtendDocumentDTO;
@@ -158,7 +157,6 @@ public class RestDocumentationApp {
 		File detached = new File("src/test/resources/sample.xml");
 		RemoteDocument detachedDoc = new RemoteDocument();
 		detachedDoc.setBytes(toByteArray(detached));
-		detachedDoc.setMimeType(MimeType.XML);
 		detachedDoc.setName(detached.getName());
 		detachedContents.add(detachedDoc);
 
@@ -169,7 +167,6 @@ public class RestDocumentationApp {
 
 		RemoteDocument toExtendDocument = new RemoteDocument();
 		toExtendDocument.setBytes(toByteArray(signature));
-		toExtendDocument.setMimeType(MimeType.XML);
 		toExtendDocument.setName(signature.getName());
 		extendOneDoc.setToExtendDocument(toExtendDocument);
 
@@ -257,14 +254,12 @@ public class RestDocumentationApp {
 		File signature = new File("src/test/resources/xades-detached.xml");
 		RemoteDocument signedDoc = new RemoteDocument();
 		signedDoc.setBytes(toByteArray(signature));
-		signedDoc.setMimeType(MimeType.XML);
 		signedDoc.setName(signature.getName());
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
 		File detached = new File("src/test/resources/sample.xml");
 		RemoteDocument originalDoc = new RemoteDocument();
 		originalDoc.setBytes(toByteArray(detached));
-		originalDoc.setMimeType(MimeType.XML);
 		originalDoc.setName(detached.getName());
 
 		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
@@ -343,7 +338,6 @@ public class RestDocumentationApp {
 		File signature = new File("src/test/resources/xades-detached.xml");
 		RemoteDocument signedDoc = new RemoteDocument();
 		signedDoc.setBytes(toByteArray(signature));
-		signedDoc.setMimeType(MimeType.XML);
 		signedDoc.setName(signature.getName());
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
@@ -351,7 +345,6 @@ public class RestDocumentationApp {
 		RemoteDocument originalDoc = new RemoteDocument();
 		originalDoc.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		originalDoc.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, detached));
-		originalDoc.setMimeType(MimeType.XML);
 		originalDoc.setName(detached.getName());
 
 		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
@@ -369,7 +362,6 @@ public class RestDocumentationApp {
 		File signature = new File("src/test/resources/hello-signed-xades.xml");
 		RemoteDocument signedDoc = new RemoteDocument();
 		signedDoc.setBytes(toByteArray(signature));
-		signedDoc.setMimeType(MimeType.XML);
 		signedDoc.setName(signature.getName());
 		dataToValidateDTO.setSignedDocument(signedDoc);
 

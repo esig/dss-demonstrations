@@ -38,6 +38,13 @@
 				<role>developer</role>
 			</roles>
 		</developer>
+		<developer>
+			<id>beliakov</id>
+			<name>Aleksandr Beliakov</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
 
 	</developers>
 
@@ -286,17 +293,17 @@
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-remote-services</artifactId>
+				<artifactId>dss-signature-remote</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-rest</artifactId>
+				<artifactId>dss-signature-rest</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-soap</artifactId>
+				<artifactId>dss-signature-soap</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>

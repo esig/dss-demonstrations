@@ -16,11 +16,11 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.DataToValidateDTO;
-import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.validation.RestDocumentValidationService;
-import eu.europa.esig.dss.validation.policy.rules.Indication;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.validation.reports.dto.ReportsDTO;
 import eu.europa.esig.dss.web.config.CXFConfig;
@@ -97,8 +97,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		RemoteDocument signedFile = toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 
 		FileDocument fileDocument = new FileDocument("src/test/resources/sample.xml");
-		RemoteDocument originalFile = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileDocument), fileDocument.getMimeType(),
-				fileDocument.getName());
+		RemoteDocument originalFile = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileDocument), fileDocument.getName());
 
 		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, originalFile, null);
 
@@ -204,7 +203,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 	}
 
 	private RemoteDocument toRemoteDocument(FileDocument fileDoc) {
-		return new RemoteDocument(DSSUtils.toByteArray(fileDoc), fileDoc.getMimeType(), fileDoc.getName());
+		return new RemoteDocument(DSSUtils.toByteArray(fileDoc), fileDoc.getName());
 	}
 
 }

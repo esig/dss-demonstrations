@@ -18,19 +18,18 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.europa.esig.dss.ASiCContainerType;
 import eu.europa.esig.dss.DSSUtils;
-import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.InMemoryDocument;
-import eu.europa.esig.dss.MimeType;
 import eu.europa.esig.dss.RemoteCertificate;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.RemoteSignatureParameters;
-import eu.europa.esig.dss.SignatureLevel;
-import eu.europa.esig.dss.SignaturePackaging;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
+import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.signature.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.signature.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.signature.DateAdapter;
@@ -109,7 +108,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
-			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getMimeType(), fileToSign.getName());
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
 			ToBeSigned dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
 			assertNotNull(dataToSign);
 
@@ -147,7 +146,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/dss-test.properties"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileToSign), DigestAlgorithm.SHA256,
-					fileToSign.getMimeType(), fileToSign.getName());
+					fileToSign.getName());
 
 			ToBeSigned dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
 			assertNotNull(dataToSign);
@@ -186,8 +185,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
-			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getMimeType(), fileToSign.getName());
-			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), MimeType.BINARY, "test.bin");
+			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
 			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);

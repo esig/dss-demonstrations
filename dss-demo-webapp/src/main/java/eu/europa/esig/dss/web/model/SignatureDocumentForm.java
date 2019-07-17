@@ -5,8 +5,8 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import eu.europa.esig.dss.ASiCContainerType;
-import eu.europa.esig.dss.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
 
 public class SignatureDocumentForm extends AbstractSignatureForm {
 
