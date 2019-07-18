@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+	<main class="page-row page-row-expanded">
+	<nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+	<!-- BODY -->
+	<div class="container-fluid">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-12"></div>
+
+						<!-- BREADCRUMP -->
+						<ul class="breadcrumb">
+							<th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+							<li class="active">EU Official Journal Trusted Certificates</li>
+						</ul>
+
+						<!-- CONTENT -->
+						<div class="row">
+							<th:block th:replace="fragment/menu :: menu"></th:block>
+							<div class="col-md-9">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<span class="badge pull-right"
+											th:text="${#lists.size(keystoreCertificates)}">
+											Cert(s)</span>
+										<h3 class="panel-title"
+											th:text="#{label.trusted.certificates.from.OJ}"></h3>
+									</div>
+									<div class="panel-body" th:if="${keystoreCertificates != null}">
+										<div class="eu-official-journal">
+											<p>Current keystore is synchronized with <a th:href="${currentOjUrl}" th:text="#{label.eu.oj.page}" target="_blank"></a></p>
+											<p th:if="${actualOjUrl != currentOjUrl}" class="warning">
+												The keystore is outdated! Please, update the keystore from the 
+												<a th:href="${actualOjUrl}" target="_blank" th:title="#{label.eu.oj.page}">link</a>
+											</p>
+										</div>
+										<th:block th:each="certificateDTO : ${keystoreCertificates}">
+											<dl class="dl-horizontal">
+												<dt th:text="#{label.service}"></dt>
+												<dd th:text="${certificateDTO.subjetName}"></dd>
+												<dt th:text="#{label.issuer}"></dt>
+												<dd th:text="${certificateDTO.issuerName}"></dd>
+												<dt th:text="#{label.validity_start}"></dt>
+												<dd
+													th:text="${#dates.format(certificateDTO.notBefore, 'dd/MM/yyyy HH:mm:ss')}"></dd>
+												<dt th:text="#{label.validity_end}"></dt>
+												<dd
+													th:text="${#dates.format(certificateDTO.notAfter, 'dd/MM/yyyy HH:mm:ss')}"></dd>
+
+												<dt>SHA-256 (Hex)</dt>
+												<dd th:text="${certificateDTO.sha256Hex}"></dd>
+												<dt>SHA-1 (Hex)</dt>
+												<dd th:text="${certificateDTO.sha1Hex}"></dd>
+												<dt>SHA-256 (Base64)</dt>
+												<dd th:text="${certificateDTO.sha256Base64}"></dd>
+												<dt>SHA-1 (Base64)</dt>
+												<dd th:text="${certificateDTO.sha1Base64}"></dd>
+											</dl>
+										</th:block>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	</main>
+	<th:block th:replace="fragment/footer :: footer"></th:block>
+</body>
+</html>

@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
+import eu.europa.esig.dss.RemoteDocumentValidationService;
 import eu.europa.esig.dss.asic.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
@@ -40,7 +41,6 @@ import eu.europa.esig.dss.tsl.service.TSLRepository;
 import eu.europa.esig.dss.tsl.service.TSLValidationJob;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
-import eu.europa.esig.dss.validation.RemoteDocumentValidationService;
 import eu.europa.esig.dss.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.x509.tsp.TSPSource;
 import eu.europa.esig.dss.xades.signature.XAdESService;
@@ -61,11 +61,8 @@ public class DSSBeanConfig {
 	@Value("${lotl.country.code}")
 	private String lotlCountryCode;
 
-	@Value("${lotl.root.scheme.info.uri}")
-	private String lotlRootSchemeInfoUri;
-
 	@Value("${current.oj.url}")
-	private String ojUrl;
+	private String currentOjUrl;
 
 	@Value("${oj.content.keystore.type}")
 	private String ksType;
@@ -154,7 +151,7 @@ public class DSSBeanConfig {
 		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
 		jdbcCacheCRLSource.setDataSource(dataSource);
 		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
-		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (1000 * 60 * 3)); // 3 minutes
+		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (60 * 3)); // 3 minutes
 		return jdbcCacheCRLSource;
 	}
 
@@ -293,7 +290,7 @@ public class DSSBeanConfig {
 		validationJob.setRepository(tslRepository);
 		validationJob.setLotlUrl(lotlUrl);
 		validationJob.setLotlCode(lotlCountryCode);
-		validationJob.setOjUrl(ojUrl);
+		validationJob.setOjUrl(currentOjUrl);
 		validationJob.setOjContentKeyStore(ojContentKeyStore);
 		validationJob.setCheckLOTLSignature(true);
 		validationJob.setCheckTSLSignatures(true);

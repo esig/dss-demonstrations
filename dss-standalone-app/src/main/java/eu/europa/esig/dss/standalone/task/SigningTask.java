@@ -10,6 +10,7 @@ import java.util.concurrent.FutureTask;
 import eu.europa.esig.dss.BLevelParameters;
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.FileDocument;
+import eu.europa.esig.dss.RemoteBLevelParameters;
 import eu.europa.esig.dss.RemoteCertificate;
 import eu.europa.esig.dss.RemoteConverter;
 import eu.europa.esig.dss.RemoteDocument;
@@ -17,6 +18,7 @@ import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -31,10 +33,10 @@ import javafx.concurrent.Task;
 
 public class SigningTask extends Task<DSSDocument> {
 
-	private RemoteDocumentSignatureService service;
+	private RemoteDocumentSignatureService<ToBeSigned> service;
 	private SignatureModel model;
 
-	public SigningTask(RemoteDocumentSignatureService service, SignatureModel model) {
+	public SigningTask(RemoteDocumentSignatureService<ToBeSigned> service, SignatureModel model) {
 		this.service = service;
 		this.model = model;
 	}
@@ -70,7 +72,7 @@ public class SigningTask extends Task<DSSDocument> {
 		parameters.setDigestAlgorithm(model.getDigestAlgorithm());
 		parameters.setSignatureLevel(model.getSignatureLevel());
 		parameters.setSignaturePackaging(model.getSignaturePackaging());
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(new Date());
 		parameters.setBLevelParams(bLevelParams);
 		parameters.setSigningCertificate(new RemoteCertificate(signer.getCertificate().getEncoded()));
@@ -113,7 +115,8 @@ public class SigningTask extends Task<DSSDocument> {
 		updateProgress(75, 100);
 		DSSDocument signDocument = null;
 		try {
-			signDocument = RemoteConverter.toDSSDocument(service.signDocument(toSignDocument, parameters, signatureValue));
+			signDocument = RemoteConverter.toDSSDocument(service.signDocument(toSignDocument, parameters, 
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue())));
 		} catch (Exception e) {
 			throwException("Unable to sign the document", e);
 		}

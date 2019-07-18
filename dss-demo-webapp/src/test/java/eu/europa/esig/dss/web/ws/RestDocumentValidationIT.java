@@ -15,14 +15,14 @@ import org.junit.Test;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import eu.europa.esig.dss.DSSUtils;
-import eu.europa.esig.dss.DataToValidateDTO;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
+import eu.europa.esig.dss.dto.DataToValidateDTO;
+import eu.europa.esig.dss.dto.ReportsDTO;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.validation.RestDocumentValidationService;
 import eu.europa.esig.dss.validation.reports.Reports;
-import eu.europa.esig.dss.validation.reports.dto.ReportsDTO;
 import eu.europa.esig.dss.web.config.CXFConfig;
 
 public class RestDocumentValidationIT extends AbstractIT {
@@ -59,6 +59,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getEtsiValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getFoundTimestamps().size());
@@ -82,9 +83,10 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getEtsiValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getEtsiValidationReport());
@@ -106,9 +108,10 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getEtsiValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getEtsiValidationReport());
@@ -129,9 +132,10 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getEtsiValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getEtsiValidationReport());
@@ -151,6 +155,7 @@ public class RestDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getEtsiValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);

@@ -36,6 +36,7 @@ import eu.europa.esig.dss.signature.DateAdapter;
 import eu.europa.esig.dss.signature.ExtendDocumentDTO;
 import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.signature.SignOneDocumentDTO;
+import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.signature.SoapDocumentSignatureService;
 import eu.europa.esig.dss.signature.SoapMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -45,8 +46,8 @@ import eu.europa.esig.dss.web.config.CXFConfig;
 
 public class SignatureSoapServiceIT extends AbstractIT {
 
-	private SoapDocumentSignatureService soapClient;
-	private SoapMultipleDocumentsSignatureService soapMultiDocsClient;
+	private SoapDocumentSignatureService<ToBeSigned> soapClient;
+	private SoapMultipleDocumentsSignatureService<ToBeSigned> soapMultiDocsClient;
 
 	@Before
 	public void init() {
@@ -113,7 +114,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(dataToSign);
 
 			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
-			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, signatureValue);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, 
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = soapClient.signDocument(signDocument);
 
 			assertNotNull(signedDocument);
@@ -152,7 +154,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(dataToSign);
 
 			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
-			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, signatureValue);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, 
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = soapClient.signDocument(signDocument);
 
 			assertNotNull(signedDocument);
@@ -194,7 +197,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(dataToSign);
 
 			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
-			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters, signatureValue);
+			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters, 
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = soapMultiDocsClient.signDocument(signDocument);
 
 			assertNotNull(signedDocument);

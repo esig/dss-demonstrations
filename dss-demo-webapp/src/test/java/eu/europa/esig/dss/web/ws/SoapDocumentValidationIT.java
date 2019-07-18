@@ -16,9 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.europa.esig.dss.DSSUtils;
-import eu.europa.esig.dss.DataToValidateDTO;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.RemoteDocument;
+import eu.europa.esig.dss.dto.DataToValidateDTO;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.utils.Utils;
@@ -38,6 +38,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put("mtom-enabled", Boolean.TRUE);
+//		props.put("jaxb.additionalContextClasses", getExtraClasses());
 		factory.setProperties(props);
 
 		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_VALIDATION);
@@ -65,13 +66,14 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
 		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getFoundTimestamps().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 		assertNotNull(reports);
 	}
 
@@ -88,9 +90,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
@@ -112,9 +115,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
@@ -135,9 +139,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.TOTAL_FAILED);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
@@ -156,9 +161,10 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getDiagnosticData());
 		assertNotNull(result.getDetailedReport());
 		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
 
 		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(result.getSimpleReport().getSignature().get(0).getIndication(), Indication.INDETERMINATE);
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());

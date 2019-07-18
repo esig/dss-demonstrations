@@ -270,6 +270,10 @@ footer li a, footer li a:hover {
 	border-color: #555;
 }
 
+.panel-default {
+	border-color: #5986bd;
+}
+
 .panel-default>.panel-heading, .panel-primary>.panel-heading {
 	color: white;
 	background-image: inherit;
@@ -277,8 +281,21 @@ footer li a, footer li a:hover {
 	border-color: #5986bd;
 }
 
-.panel-default {
-	border-color: #5986bd;
+.panel-default > .panel-body {
+	padding-top: 30px;
+}
+
+.panel-default dt, .panel-default dd {
+	word-break: break-all;
+}
+
+.eu-official-journal {
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.eu-official-journal .warning {
+	color: #f90202;
 }
 
 .dss-menu>.panel {

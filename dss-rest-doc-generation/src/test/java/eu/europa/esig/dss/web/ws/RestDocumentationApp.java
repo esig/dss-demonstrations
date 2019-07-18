@@ -23,15 +23,14 @@ import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
-import eu.europa.esig.dss.BLevelParameters;
 import eu.europa.esig.dss.DSSUtils;
-import eu.europa.esig.dss.DataToValidateDTO;
 import eu.europa.esig.dss.FileDocument;
+import eu.europa.esig.dss.RemoteBLevelParameters;
 import eu.europa.esig.dss.RemoteCertificate;
 import eu.europa.esig.dss.RemoteDocument;
 import eu.europa.esig.dss.RemoteSignatureParameters;
-import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
+import eu.europa.esig.dss.dto.DataToValidateDTO;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
@@ -42,6 +41,7 @@ import eu.europa.esig.dss.signature.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.signature.ExtendDocumentDTO;
 import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.signature.SignOneDocumentDTO;
+import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import io.restassured.RestAssured;
@@ -104,7 +104,7 @@ public class RestDocumentationApp {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(signingDate);
 		parameters.setBLevelParams(bLevelParams);
 		dataToSign.setParameters(parameters);
@@ -131,7 +131,7 @@ public class RestDocumentationApp {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(signingDate);
 		parameters.setBLevelParams(bLevelParams);
 		signOneDoc.setParameters(parameters);
@@ -140,7 +140,7 @@ public class RestDocumentationApp {
 		toSignDocument.setBytes("Hello".getBytes("UTF-8"));
 		signOneDoc.setToSignDocument(toSignDocument);
 
-		signOneDoc.setSignatureValue(new SignatureValue(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
+		signOneDoc.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
 
 		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/signDocument").then().assertThat().statusCode(equalTo(200));
@@ -188,7 +188,7 @@ public class RestDocumentationApp {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(signingDate);
 		parameters.setBLevelParams(bLevelParams);
 		dataToSignMultiDocs.setParameters(parameters);
@@ -223,7 +223,7 @@ public class RestDocumentationApp {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(signingDate);
 		parameters.setBLevelParams(bLevelParams);
 		signMultiDocsDto.setParameters(parameters);
@@ -240,7 +240,7 @@ public class RestDocumentationApp {
 		toSignDocuments.add(doc2);
 		signMultiDocsDto.setToSignDocuments(toSignDocuments);
 
-		signMultiDocsDto.setSignatureValue(new SignatureValue(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
+		signMultiDocsDto.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
 
 		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signMultiDocsDto, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/multiple-documents/signDocument").then().assertThat().statusCode(equalTo(200));
@@ -282,7 +282,7 @@ public class RestDocumentationApp {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(signingDate);
 		parameters.setBLevelParams(bLevelParams);
 		dataToSign.setParameters(parameters);
@@ -312,7 +312,7 @@ public class RestDocumentationApp {
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
-		BLevelParameters bLevelParams = new BLevelParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
 		bLevelParams.setSigningDate(signingDate);
 		parameters.setBLevelParams(bLevelParams);
 		signOneDoc.setParameters(parameters);
@@ -324,7 +324,7 @@ public class RestDocumentationApp {
 		toSignDocument.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, doc));
 		signOneDoc.setToSignDocument(toSignDocument);
 
-		signOneDoc.setSignatureValue(new SignatureValue(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
+		signOneDoc.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
 
 		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/signDocument").then().assertThat().statusCode(equalTo(200));

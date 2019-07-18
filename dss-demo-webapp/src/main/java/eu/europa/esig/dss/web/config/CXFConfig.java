@@ -19,6 +19,8 @@ import org.springframework.context.annotation.ImportResource;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import eu.europa.esig.dss.RemoteDocumentValidationService;
+import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.signature.DateAdapter;
 import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.signature.RemoteMultipleDocumentsSignatureService;
@@ -35,7 +37,6 @@ import eu.europa.esig.dss.token.RestSignatureTokenConnection;
 import eu.europa.esig.dss.token.RestSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.token.SoapSignatureTokenConnection;
 import eu.europa.esig.dss.token.SoapSignatureTokenConnectionImpl;
-import eu.europa.esig.dss.validation.RemoteDocumentValidationService;
 import eu.europa.esig.dss.validation.RestDocumentValidationService;
 import eu.europa.esig.dss.validation.RestDocumentValidationServiceImpl;
 import eu.europa.esig.dss.validation.SoapDocumentValidationService;
@@ -65,10 +66,10 @@ public class CXFConfig {
 	private Bus bus;
 
 	@Autowired
-	private RemoteDocumentSignatureService remoteSignatureService;
+	private RemoteDocumentSignatureService<ToBeSigned> remoteSignatureService;
 
 	@Autowired
-	private RemoteMultipleDocumentsSignatureService remoteMultipleDocumentsSignatureService;
+	private RemoteMultipleDocumentsSignatureService<ToBeSigned> remoteMultipleDocumentsSignatureService;
 
 	@Autowired
 	private RemoteDocumentValidationService remoteValidationService;
@@ -92,14 +93,14 @@ public class CXFConfig {
 	// --------------- SOAP
 
 	@Bean
-	public SoapDocumentSignatureService soapDocumentSignatureService() {
+	public SoapDocumentSignatureService<ToBeSigned> soapDocumentSignatureService() {
 		SoapDocumentSignatureServiceImpl service = new SoapDocumentSignatureServiceImpl();
 		service.setService(remoteSignatureService);
 		return service;
 	}
 
 	@Bean
-	public SoapMultipleDocumentsSignatureService soapMultipleDocumentsSignatureService() {
+	public SoapMultipleDocumentsSignatureService<ToBeSigned> soapMultipleDocumentsSignatureService() {
 		SoapMultipleDocumentsSignatureServiceImpl service = new SoapMultipleDocumentsSignatureServiceImpl();
 		service.setService(remoteMultipleDocumentsSignatureService);
 		return service;
@@ -167,14 +168,14 @@ public class CXFConfig {
 	// --------------- REST
 
 	@Bean
-	public RestDocumentSignatureService restSignatureService() {
+	public RestDocumentSignatureService<ToBeSigned> restSignatureService() {
 		RestDocumentSignatureServiceImpl service = new RestDocumentSignatureServiceImpl();
 		service.setService(remoteSignatureService);
 		return service;
 	}
 
 	@Bean
-	public RestMultipleDocumentSignatureService restMultipleDocumentsSignatureService() {
+	public RestMultipleDocumentSignatureService<ToBeSigned> restMultipleDocumentsSignatureService() {
 		RestMultipleDocumentSignatureServiceImpl service = new RestMultipleDocumentSignatureServiceImpl();
 		service.setService(remoteMultipleDocumentsSignatureService);
 		return service;

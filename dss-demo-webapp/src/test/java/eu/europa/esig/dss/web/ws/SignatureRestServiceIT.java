@@ -36,6 +36,7 @@ import eu.europa.esig.dss.signature.RestDocumentSignatureService;
 import eu.europa.esig.dss.signature.RestMultipleDocumentSignatureService;
 import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.signature.SignOneDocumentDTO;
+import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.utils.Utils;
@@ -43,8 +44,8 @@ import eu.europa.esig.dss.web.config.CXFConfig;
 
 public class SignatureRestServiceIT extends AbstractIT {
 
-	private RestDocumentSignatureService restClient;
-	private RestMultipleDocumentSignatureService restMultiDocsClient;
+	private RestDocumentSignatureService<ToBeSigned> restClient;
+	private RestMultipleDocumentSignatureService<ToBeSigned> restMultiDocsClient;
 
 	@Before
 	public void init() {
@@ -99,7 +100,8 @@ public class SignatureRestServiceIT extends AbstractIT {
 			assertNotNull(dataToSign);
 
 			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
-			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, signatureValue);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restClient.signDocument(signDocument);
 
 			assertNotNull(signedDocument);
@@ -138,7 +140,8 @@ public class SignatureRestServiceIT extends AbstractIT {
 			assertNotNull(dataToSign);
 
 			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
-			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, signatureValue);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restClient.signDocument(signDocument);
 
 			assertNotNull(signedDocument);
@@ -180,7 +183,8 @@ public class SignatureRestServiceIT extends AbstractIT {
 			assertNotNull(dataToSign);
 
 			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
-			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters, signatureValue);
+			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restMultiDocsClient.signDocument(signDocument);
 
 			assertNotNull(signedDocument);
