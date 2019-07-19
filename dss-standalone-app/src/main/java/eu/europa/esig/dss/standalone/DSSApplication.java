@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
-import eu.europa.esig.dss.signature.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.standalone.controller.SignatureController;
+import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

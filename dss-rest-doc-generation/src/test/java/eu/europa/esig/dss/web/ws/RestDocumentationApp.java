@@ -25,25 +25,25 @@ import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.FileDocument;
-import eu.europa.esig.dss.RemoteBLevelParameters;
-import eu.europa.esig.dss.RemoteCertificate;
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.ToBeSigned;
-import eu.europa.esig.dss.dto.DataToValidateDTO;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
-import eu.europa.esig.dss.signature.DataToSignMultipleDocumentsDTO;
-import eu.europa.esig.dss.signature.DataToSignOneDocumentDTO;
-import eu.europa.esig.dss.signature.ExtendDocumentDTO;
-import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
-import eu.europa.esig.dss.signature.SignOneDocumentDTO;
-import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
+import eu.europa.esig.dss.ws.dto.RemoteCertificate;
+import eu.europa.esig.dss.ws.dto.RemoteDocument;
+import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -94,7 +94,7 @@ public class RestDocumentationApp {
 	@Test
 	public void getDataToSignOneDocument() throws Exception {
 
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
+		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);	
 
 		DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
 

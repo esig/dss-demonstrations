@@ -20,32 +20,33 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.InMemoryDocument;
-import eu.europa.esig.dss.RemoteCertificate;
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.SignatureValue;
-import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
-import eu.europa.esig.dss.signature.DataToSignMultipleDocumentsDTO;
-import eu.europa.esig.dss.signature.DataToSignOneDocumentDTO;
-import eu.europa.esig.dss.signature.ExtendDocumentDTO;
-import eu.europa.esig.dss.signature.RestDocumentSignatureService;
-import eu.europa.esig.dss.signature.RestMultipleDocumentSignatureService;
-import eu.europa.esig.dss.signature.SignMultipleDocumentDTO;
-import eu.europa.esig.dss.signature.SignOneDocumentDTO;
-import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.config.CXFConfig;
+import eu.europa.esig.dss.ws.converter.DTOConverter;
+import eu.europa.esig.dss.ws.dto.RemoteCertificate;
+import eu.europa.esig.dss.ws.dto.RemoteDocument;
+import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
+import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 
 public class SignatureRestServiceIT extends AbstractIT {
 
-	private RestDocumentSignatureService<ToBeSigned> restClient;
-	private RestMultipleDocumentSignatureService<ToBeSigned> restMultiDocsClient;
+	private RestDocumentSignatureService restClient;
+	private RestMultipleDocumentSignatureService restMultiDocsClient;
 
 	@Before
 	public void init() {
@@ -96,10 +97,10 @@ public class SignatureRestServiceIT extends AbstractIT {
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
-			ToBeSigned dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
 			assertNotNull(dataToSign);
 
-			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
 			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restClient.signDocument(signDocument);
@@ -136,10 +137,10 @@ public class SignatureRestServiceIT extends AbstractIT {
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileToSign), DigestAlgorithm.SHA256,
 					fileToSign.getName());
 
-			ToBeSigned dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
 			assertNotNull(dataToSign);
 
-			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
 			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restClient.signDocument(signDocument);
@@ -179,10 +180,10 @@ public class SignatureRestServiceIT extends AbstractIT {
 			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
-			ToBeSigned dataToSign = restMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
+			ToBeSignedDTO dataToSign = restMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
 			assertNotNull(dataToSign);
 
-			SignatureValue signatureValue = token.sign(dataToSign, DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
 			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters,
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restMultiDocsClient.signDocument(signDocument);

@@ -17,15 +17,15 @@ import org.junit.Test;
 
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.FileDocument;
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.dto.DataToValidateDTO;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.SoapDocumentValidationService;
-import eu.europa.esig.dss.validation.WSReportsDTO;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.config.CXFConfig;
+import eu.europa.esig.dss.ws.dto.RemoteDocument;
+import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
+import eu.europa.esig.dss.ws.validation.soap.client.SoapDocumentValidationService;
+import eu.europa.esig.dss.ws.validation.soap.client.WSReportsDTO;
 
 public class SoapDocumentValidationIT extends AbstractIT {
 

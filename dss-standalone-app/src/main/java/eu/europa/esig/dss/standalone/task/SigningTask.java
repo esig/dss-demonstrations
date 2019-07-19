@@ -7,18 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
-import eu.europa.esig.dss.BLevelParameters;
 import eu.europa.esig.dss.DSSDocument;
 import eu.europa.esig.dss.FileDocument;
-import eu.europa.esig.dss.RemoteBLevelParameters;
-import eu.europa.esig.dss.RemoteCertificate;
-import eu.europa.esig.dss.RemoteConverter;
-import eu.europa.esig.dss.RemoteDocument;
-import eu.europa.esig.dss.RemoteSignatureParameters;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
-import eu.europa.esig.dss.signature.RemoteDocumentSignatureService;
-import eu.europa.esig.dss.signature.SignatureValueDTO;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -27,16 +19,24 @@ import eu.europa.esig.dss.token.Pkcs11SignatureToken;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.ws.converter.DTOConverter;
+import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
+import eu.europa.esig.dss.ws.dto.RemoteCertificate;
+import eu.europa.esig.dss.ws.dto.RemoteDocument;
+import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
+import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.x509.CertificateToken;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 public class SigningTask extends Task<DSSDocument> {
 
-	private RemoteDocumentSignatureService<ToBeSigned> service;
+	private RemoteDocumentSignatureService service;
 	private SignatureModel model;
 
-	public SigningTask(RemoteDocumentSignatureService<ToBeSigned> service, SignatureModel model) {
+	public SigningTask(RemoteDocumentSignatureService service, SignatureModel model) {
 		this.service = service;
 		this.model = model;
 	}
@@ -54,7 +54,7 @@ public class SigningTask extends Task<DSSDocument> {
 		DSSPrivateKeyEntry signer = getSigner(keys);
 
 		FileDocument fileToSign = new FileDocument(model.getFileToSign());
-		RemoteDocument toSignDocument = RemoteConverter.toRemoteDocument(fileToSign);
+		RemoteDocument toSignDocument = RemoteDocumentConverter.toRemoteDocument(fileToSign);
 		RemoteSignatureParameters parameters = buildParameters(signer);
 
 		ToBeSigned toBeSigned = getDataToSign(toSignDocument, parameters);
@@ -93,7 +93,7 @@ public class SigningTask extends Task<DSSDocument> {
 		updateProgress(25, 100);
 		ToBeSigned toBeSigned = null;
 		try {
-			toBeSigned = service.getDataToSign(toSignDocument, parameters);
+			toBeSigned = DTOConverter.toToBeSigned(service.getDataToSign(toSignDocument, parameters));
 		} catch (Exception e) {
 			throwException("Unable to compute the digest to sign", e);
 		}
@@ -115,7 +115,7 @@ public class SigningTask extends Task<DSSDocument> {
 		updateProgress(75, 100);
 		DSSDocument signDocument = null;
 		try {
-			signDocument = RemoteConverter.toDSSDocument(service.signDocument(toSignDocument, parameters, 
+			signDocument = RemoteDocumentConverter.toDSSDocument(service.signDocument(toSignDocument, parameters, 
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue())));
 		} catch (Exception e) {
 			throwException("Unable to sign the document", e);

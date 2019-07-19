@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import eu.europa.esig.dss.RemoteDocumentValidationService;
 import eu.europa.esig.dss.asic.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
@@ -31,16 +30,18 @@ import eu.europa.esig.dss.client.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.client.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.client.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.pades.signature.PAdESService;
-import eu.europa.esig.dss.signature.RemoteDocumentSignatureServiceImpl;
-import eu.europa.esig.dss.signature.RemoteMultipleDocumentsSignatureServiceImpl;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
-import eu.europa.esig.dss.token.RemoteSignatureTokenConnection;
-import eu.europa.esig.dss.token.RemoteSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.tsl.service.TSLRepository;
 import eu.europa.esig.dss.tsl.service.TSLValidationJob;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
+import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
+import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
+import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.x509.tsp.TSPSource;
 import eu.europa.esig.dss.xades.signature.XAdESService;
@@ -254,6 +255,13 @@ public class DSSBeanConfig {
 	@Bean
 	public RemoteDocumentValidationService remoteValidationService() throws Exception {
 		RemoteDocumentValidationService service = new RemoteDocumentValidationService();
+		service.setVerifier(certificateVerifier());
+		return service;
+	}
+	
+	@Bean
+	public RemoteCertificateValidationService RemoteCertificateValidationService() throws Exception {
+		RemoteCertificateValidationService service = new RemoteCertificateValidationService();
 		service.setVerifier(certificateVerifier());
 		return service;
 	}
