@@ -1,0 +1,165 @@
+package eu.europa.esig.dss.web.ws;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.ws.soap.SOAPFaultException;
+
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.Before;
+import org.junit.Test;
+
+import eu.europa.esig.dss.DSSUtils;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
+import eu.europa.esig.dss.simplecertificatereport.jaxb.XmlChainItem;
+import eu.europa.esig.dss.web.config.CXFConfig;
+import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
+import eu.europa.esig.dss.ws.cert.validation.soap.client.SoapCertificateValidationService;
+import eu.europa.esig.dss.ws.cert.validation.soap.client.WSCertificateReportsDTO;
+import eu.europa.esig.dss.ws.converter.RemoteCertificateConverter;
+import eu.europa.esig.dss.ws.dto.RemoteCertificate;
+
+public class SoapCertificateValidationIT extends AbstractIT {
+
+	private SoapCertificateValidationService validationService;
+
+	@Before
+	public void init() {
+		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapCertificateValidationService.class);
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put("mtom-enabled", Boolean.TRUE);
+//		props.put("jaxb.additionalContextClasses", getExtraClasses());
+		factory.setProperties(props);
+
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_CERTIFICATE_VALIDATION);
+
+		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		validationService = factory.create(SoapCertificateValidationService.class);
+	}
+	
+	@Test
+	public void testWithCertificateChainAndValdiationTime() {
+		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
+				DSSUtils.loadCertificate(new File("src/test/resources/good-user.cer")));
+		RemoteCertificate issuerCertificate = RemoteCertificateConverter.toRemoteCertificate(
+				DSSUtils.loadCertificate(new File("src/test/resources/good-ca.cer")));
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2018, 12, 31);
+		Date validationDate = calendar.getTime();
+		validationDate.setTime((validationDate.getTime() / 1000) * 1000); // clean millis
+		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, 
+				Arrays.asList(issuerCertificate), validationDate);
+		
+		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
+
+		assertNotNull(reportsDTO.getDiagnosticData());
+		assertNotNull(reportsDTO.getSimpleCertificateReport());
+		assertNotNull(reportsDTO.getDetailedReport());
+		
+		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
+		assertEquals(3, usedCertificates.size());
+		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
+		assertEquals(3, chain.size());
+		for (XmlCertificate certificate : usedCertificates) {
+			if (chain.get(0).getId().equals(certificate.getId())) {
+				assertEquals(2, certificate.getCertificateChain().size());
+			}
+		}
+		assertTrue(validationDate.compareTo(diagnosticData.getValidationDate()) == 0);
+	}
+	
+	@Test
+	public void testWithNoValidationTime() {
+		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
+				DSSUtils.loadCertificate(new File("src/test/resources/good-user.cer")));
+		RemoteCertificate issuerCertificate = RemoteCertificateConverter.toRemoteCertificate(
+				DSSUtils.loadCertificate(new File("src/test/resources/good-ca.cer")));
+		
+		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, 
+				Arrays.asList(issuerCertificate), null);
+		
+		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
+
+		assertNotNull(reportsDTO.getDiagnosticData());
+		assertNotNull(reportsDTO.getSimpleCertificateReport());
+		assertNotNull(reportsDTO.getDetailedReport());
+		
+		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
+		assertEquals(3, usedCertificates.size());
+		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
+		assertEquals(3, chain.size());
+		for (XmlCertificate certificate : usedCertificates) {
+			if (chain.get(0).getId().equals(certificate.getId())) {
+				assertEquals(2, certificate.getCertificateChain().size());
+			}
+		}
+		assertNotNull(diagnosticData.getValidationDate());
+	}
+	
+	@Test
+	public void testWithNoCertificateChain() {
+		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
+				DSSUtils.loadCertificate(new File("src/test/resources/good-user.cer")));
+		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate);
+		
+		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
+
+		assertNotNull(reportsDTO.getDiagnosticData());
+		assertNotNull(reportsDTO.getSimpleCertificateReport());
+		assertNotNull(reportsDTO.getDetailedReport());
+		
+		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
+		assertEquals(3, usedCertificates.size());
+		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
+		assertEquals(3, chain.size());
+		for (XmlCertificate certificate : usedCertificates) {
+			if (chain.get(0).getId().equals(certificate.getId())) {
+				assertEquals(2, certificate.getCertificateChain().size());
+			}
+		}
+		assertNotNull(diagnosticData.getValidationDate());
+	}
+	
+	@Test(expected = SOAPFaultException.class)
+	public void testWithNoCertificateProvided() {
+		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(null);
+		
+		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
+
+		assertNotNull(reportsDTO.getDiagnosticData());
+		assertNotNull(reportsDTO.getSimpleCertificateReport());
+		assertNotNull(reportsDTO.getDetailedReport());
+		
+		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
+		assertEquals(0, usedCertificates);
+		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
+		assertEquals(0, chain.size());
+		assertNotNull(diagnosticData.getValidationDate());
+	}
+
+}

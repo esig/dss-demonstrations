@@ -17,8 +17,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
+import eu.europa.esig.dss.web.exception.ExceptionRestMapper;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.cert.validation.rest.RestCertificateValidationServiceImpl;
 import eu.europa.esig.dss.ws.cert.validation.rest.client.RestCertificateValidationService;
@@ -231,6 +236,7 @@ public class CXFConfig {
 		sfb.setServiceBean(restValidationService());
 		sfb.setAddress(REST_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
 		return sfb.create();
 	}
 
@@ -240,6 +246,7 @@ public class CXFConfig {
 		sfb.setServiceBean(restCertificateValidationService());
 		sfb.setAddress(REST_CERTIFICATE_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
 		return sfb.create();
 	}
 
@@ -249,6 +256,7 @@ public class CXFConfig {
 		sfb.setServiceBean(restServerSigningService());
 		sfb.setAddress(REST_SERVER_SIGNING);
 		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
 		return sfb.create();
 	}
 
@@ -258,6 +266,7 @@ public class CXFConfig {
 		sfb.setServiceBean(restSignatureService());
 		sfb.setAddress(REST_SIGNATURE_ONE_DOCUMENT);
 		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
 		return sfb.create();
 	}
 
@@ -267,12 +276,34 @@ public class CXFConfig {
 		sfb.setServiceBean(restMultipleDocumentsSignatureService());
 		sfb.setAddress(REST_SIGNATURE_MULTIPLE_DOCUMENTS);
 		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
 		return sfb.create();
 	}
 
 	@Bean
 	public JacksonJsonProvider jacksonJsonProvider() {
-		return new JacksonJsonProvider();
+		JacksonJsonProvider jsonProvider = new JacksonJsonProvider();
+		jsonProvider.setMapper(objectMapper());
+		return jsonProvider;
+	}
+	
+	/**
+	 * ObjectMappers configures a proper way for (un)marshalling of json data
+	 * @return {@link ObjectMapper}
+	 */
+	@Bean
+	public ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		// true value allows to process {@code @IDREF}s cycles
+		JaxbAnnotationIntrospector jai = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
+		objectMapper.setAnnotationIntrospector(jai);
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		return objectMapper;
+	}
+	
+	@Bean
+	public ExceptionRestMapper exceptionRestMapper() {
+		return new ExceptionRestMapper();
 	}
 
 }

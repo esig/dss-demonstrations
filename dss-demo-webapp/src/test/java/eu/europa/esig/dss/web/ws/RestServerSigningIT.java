@@ -14,8 +14,6 @@ import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.Test;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.utils.Utils;
@@ -25,7 +23,7 @@ import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.server.signing.rest.client.RestSignatureTokenConnection;
 
-public class RestServerSigningIT extends AbstractIT {
+public class RestServerSigningIT extends AbstractRestIT {
 
 	@Test
 	public void testRemoteSignature() throws Exception {
@@ -60,7 +58,7 @@ public class RestServerSigningIT extends AbstractIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_SERVER_SIGNING);
 		factory.setServiceClass(RestSignatureTokenConnection.class);
-		factory.setProviders(Arrays.asList(new JacksonJsonProvider()));
+		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
 
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
 		factory.getInInterceptors().add(loggingInInterceptor);

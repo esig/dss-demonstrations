@@ -15,8 +15,6 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.FileDocument;
 import eu.europa.esig.dss.InMemoryDocument;
@@ -43,7 +41,7 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 
-public class SignatureRestServiceIT extends AbstractIT {
+public class SignatureRestServiceIT extends AbstractRestIT {
 
 	private RestDocumentSignatureService restClient;
 	private RestMultipleDocumentSignatureService restMultiDocsClient;
@@ -54,7 +52,7 @@ public class SignatureRestServiceIT extends AbstractIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_ONE_DOCUMENT);
 		factory.setServiceClass(RestDocumentSignatureService.class);
-		factory.setProviders(Arrays.asList(new JacksonJsonProvider()));
+		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
 
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
 		factory.getInInterceptors().add(loggingInInterceptor);
@@ -70,7 +68,7 @@ public class SignatureRestServiceIT extends AbstractIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_MULTIPLE_DOCUMENTS);
 		factory.setServiceClass(RestMultipleDocumentSignatureService.class);
-		factory.setProviders(Arrays.asList(new JacksonJsonProvider()));
+		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
 
 		factory.getInInterceptors().add(loggingInInterceptor);
 		factory.getInFaultInterceptors().add(loggingInInterceptor);
