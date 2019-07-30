@@ -7,8 +7,8 @@
 	<id>ootb-webapp</id>
 
 	<formats>
-		<format>zip</format>
 		<format>tar.gz</format>
+		<format>zip</format>
 	</formats>
 
 	<fileSets>
@@ -21,16 +21,14 @@
 			<directory>src/main/resources/tomcat/</directory>
 			<outputDirectory>${tomcat.root.folder}</outputDirectory>
 		</fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/java/${jre.root.folder}</directory>
+			<fileMode>0644</fileMode>
+			<outputDirectory>java</outputDirectory>
+		</fileSet>
 	</fileSets>
 	
 	<dependencySets>
-		<dependencySet>
-			<unpack>true</unpack>
-			<includes>
-				<include>com.oracle.java:jre:tgz:win64</include>
-			</includes>
-			<fileMode>0644</fileMode>
-		</dependencySet>
 		<dependencySet>
 			<includes>
 				<include>org.apache.tomcat:tomcat:zip</include>
