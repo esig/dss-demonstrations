@@ -37,7 +37,6 @@
 			<unpack>true</unpack>
 			<unpackOptions>
 				<excludes>
-					<exclude>${tomcat.root.folder}/conf/tomcat-users.xml</exclude>
 					<exclude>${tomcat.root.folder}/webapps/**/*</exclude>
 				</excludes>
 			</unpackOptions>
