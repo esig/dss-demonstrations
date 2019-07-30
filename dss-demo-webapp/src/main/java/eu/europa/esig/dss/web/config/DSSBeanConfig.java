@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import eu.europa.esig.dss.asic.signature.ASiCWithCAdESService;
-import eu.europa.esig.dss.asic.signature.ASiCWithXAdESService;
+import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
+import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.client.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.client.crl.OnlineCRLSource;
