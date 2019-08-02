@@ -135,7 +135,7 @@ public class ValidationController {
 
 			fopService.generateSimpleReport(simpleReport, response.getOutputStream());
 		} catch (Exception e) {
-			logger.error("An error occured while generating pdf for simple report : " + e.getMessage(), e);
+			logger.error("An error occurred while generating pdf for simple report : " + e.getMessage(), e);
 		}
 	}
 
@@ -149,7 +149,7 @@ public class ValidationController {
 
 			fopService.generateDetailedReport(detailedReport, response.getOutputStream());
 		} catch (Exception e) {
-			logger.error("An error occured while generating pdf for detailed report : " + e.getMessage(), e);
+			logger.error("An error occurred while generating pdf for detailed report : " + e.getMessage(), e);
 		}
 	}
 

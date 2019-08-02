@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 			throw e;
 		}
 
-		logger.error("Unhandle exception occured : " + e.getMessage(), e);
+		logger.error("Unhandled exception occurred : " + e.getMessage(), e);
 
 		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

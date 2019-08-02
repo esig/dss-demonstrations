@@ -142,7 +142,7 @@ public class SignaturePdfController {
 			Utils.copy(new ByteArrayInputStream(signedDocument.getBytes()), response.getOutputStream());
 
 		} catch (Exception e) {
-			logger.error("An error occured while pushing file in response : " + e.getMessage(), e);
+			logger.error("An error occurred while pushing file in response : " + e.getMessage(), e);
 		}
 		return null;
 	}
