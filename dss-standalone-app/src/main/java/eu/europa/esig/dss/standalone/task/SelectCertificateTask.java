@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import eu.europa.esig.dss.DSSASN1Utils;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSASN1Utils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.x509.CertificateToken;
 import javafx.scene.control.ChoiceDialog;
 
 public class SelectCertificateTask implements Callable<DSSPrivateKeyEntry> {
