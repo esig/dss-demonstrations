@@ -38,6 +38,12 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		// avoid urls with jsessionid param
 		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
 	}
+	
+	@Override
+	public void customizeRegistration(ServletRegistration.Dynamic registration) {
+		// throw an exception on NoHandlerFound (404 error, page not found exception)
+        registration.setInitParameter("throwExceptionIfNoHandlerFound", "true");
+    }
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {

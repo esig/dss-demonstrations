@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Error</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <H1>404 error</H1>
+                                <div class="alert alert-danger" role="alert">
+                                    <p><strong>The page "<span th:text="${url}"></span>" is not found ! </strong></p>
+                                </div>
+                                <p><a th:href="@{/}">Back to Homepage</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
+</body>
+</html>

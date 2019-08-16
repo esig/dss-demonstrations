@@ -20,6 +20,7 @@ public class GlobalExceptionHandler {
 	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	public static final String DEFAULT_ERROR_VIEW = "error";
+	public static final String PAGE_NOT_FOUND_ERROR_VIEW = "404_error";
 
 	@ExceptionHandler(value = Exception.class)
 	public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
@@ -31,25 +32,28 @@ public class GlobalExceptionHandler {
 
 		logger.error("Unhandled exception occurred : " + e.getMessage(), e);
 
-		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR);
+		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR, DEFAULT_ERROR_VIEW);
 	}
 
 	@ExceptionHandler(NoHandlerFoundException.class)
-	public ModelAndView handle(HttpServletRequest req, Exception e) {
-		return getMAV(req, e, HttpStatus.NOT_FOUND);
+	public ModelAndView pageNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+		if (logger.isDebugEnabled()) {
+			logger.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
+		}
+		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
 	}
 
 	@ExceptionHandler(BadRequestException.class)
 	public ModelAndView badRequest(HttpServletRequest req, Exception e) {
-		return getMAV(req, e, HttpStatus.BAD_REQUEST);
+		return getMAV(req, e, HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
 	}
 
-	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status) {
+	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("exception", e);
 		mav.addObject("url", req.getRequestURL());
 		mav.setStatus(status);
-		mav.setViewName(DEFAULT_ERROR_VIEW);
+		mav.setViewName(viewName);
 		return mav;
 	}
 
