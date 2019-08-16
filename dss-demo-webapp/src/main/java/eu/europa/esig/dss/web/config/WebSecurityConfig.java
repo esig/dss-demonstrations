@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -22,6 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// javadoc uses frames
 		http.headers().addHeaderWriter(javadocHeaderWriter());
+		http.headers().addHeaderWriter(serverEsigDSS());
 	}
 
 	@Bean
@@ -29,6 +31,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		final AntPathRequestMatcher javadocAntPathRequestMatcher = new AntPathRequestMatcher("/apidocs/**");
 		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
 		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);
+	}
+	
+	public HeaderWriter serverEsigDSS() {
+		return new StaticHeadersWriter("Server", "ESIG-DSS");
 	}
 
 }
