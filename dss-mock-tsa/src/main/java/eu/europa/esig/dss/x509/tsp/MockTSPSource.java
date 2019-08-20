@@ -65,6 +65,9 @@ public class MockTSPSource implements TSPSource {
 
 	@Override
 	public TimeStampToken getTimeStampResponse(DigestAlgorithm digestAlgorithm, byte[] digest) {
+		if (token == null) {
+			throw new DSSException("KeyStore token is not defined!");
+		}
 		try {
 			TimeStampRequestGenerator requestGenerator = new TimeStampRequestGenerator();
 			requestGenerator.setCertReq(true);

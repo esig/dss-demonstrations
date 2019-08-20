@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
@@ -47,6 +50,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class SignatureController implements Initializable {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
 
 	@FXML
 	private Button fileSelectButton;
@@ -270,9 +275,17 @@ public class SignatureController implements Initializable {
 				FileChooser fileChooser = new FileChooser();
 				if (SignatureTokenType.PKCS11.equals(model.getTokenType())) {
 					fileChooser.setTitle("Library");
+					fileChooser.getExtensionFilters().add(
+							new FileChooser.ExtensionFilter("PKCS11 library (*.dll)", "*.dll"));
 				} else if (SignatureTokenType.PKCS12.equals(model.getTokenType())) {
 					fileChooser.setTitle("Keystore");
+					fileChooser.getExtensionFilters().add(
+							new FileChooser.ExtensionFilter("PKCS12 keystore (*.p12, *.pfx)", "*.p12", "*.pfx"));
 				}
+				
+				FileChooser.ExtensionFilter allFilesExtensionFilter = new FileChooser.ExtensionFilter("All files", "*");
+				fileChooser.getExtensionFilters().add(allFilesExtensionFilter);
+				
 				File pkcsFile = fileChooser.showOpenDialog(stage);
 				model.setPkcsFile(pkcsFile);
 			}
@@ -329,8 +342,9 @@ public class SignatureController implements Initializable {
 				service.setOnFailed(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
-						Alert alert = new Alert(AlertType.ERROR, "Oops an error occurred : " + service.getMessage(),
-								ButtonType.CLOSE);
+						String errorMessage = "Oops an error occurred : " + service.getMessage();
+						LOG.error(errorMessage, service.getException());
+						Alert alert = new Alert(AlertType.ERROR, errorMessage, ButtonType.CLOSE);
 						alert.showAndWait();
 						signButton.disableProperty().bind(disableSignButton);
 						model.setPassword(null);
