@@ -35,26 +35,21 @@ import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
-import eu.europa.esig.dss.web.service.XSLTService;
+
+
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml" })
+@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/certificate-validation")
-public class CertificateValidationController {
+public class CertificateValidationController extends AbstractValidationController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CertificateValidationController.class);
 
 	private static final String VALIDATION_TILE = "certificate_validation";
 	private static final String VALIDATION_RESULT_TILE = "validation_result";
 
-	private static final String SIMPLE_REPORT_ATTRIBUTE = "simpleReportXml";
-	private static final String DETAILED_REPORT_ATTRIBUTE = "detailedReportXml";
-
 	@Autowired
 	private CertificateVerifier certificateVerifier;
-
-	@Autowired
-	private XSLTService xsltService;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -94,25 +89,19 @@ public class CertificateValidationController {
 
 		LOG.info("Start certificate validation");
 
+		CertificateVerifier cv = certificateVerifier;
+		cv.setIncludeCertificateTokenValues(certValidationForm.isIncludeCertificateTokens());
+		cv.setIncludeCertificateRevocationValues(certValidationForm.isIncludeRevocationTokens());
+		
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
-		certificateValidator.setCertificateVerifier(certificateVerifier);
+		certificateValidator.setCertificateVerifier(cv);
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
 
 		CertificateReports reports = certificateValidator.validate();
 
 		// reports.print();
 
-		String xmlSimpleReport = reports.getXmlSimpleReport();
-		model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
-		model.addAttribute("simpleReport", xsltService.generateSimpleCertificateReport(xmlSimpleReport));
-
-		String xmlDetailedReport = reports.getXmlDetailedReport();
-		model.addAttribute(DETAILED_REPORT_ATTRIBUTE, xmlDetailedReport);
-		model.addAttribute("detailedReport", xsltService.generateDetailedReport(xmlDetailedReport));
-
-		model.addAttribute("diagnosticTree", reports.getXmlDiagnosticData());
-
-		LOG.info("End certificate validation");
+		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
 	}
@@ -128,7 +117,7 @@ public class CertificateValidationController {
 		}
 		return null;
 	}
-
+	
 	@ModelAttribute("displayDownloadPdf")
 	public boolean isDisplayDownloadPdf() {
 		return false;

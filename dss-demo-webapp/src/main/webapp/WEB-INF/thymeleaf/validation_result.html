@@ -59,7 +59,51 @@
 										<div th:utext="${detailedReport}"></div>
 									</div>
 									<div role="tabpanel" class="tab-pane fade" id="diagnostic-tree">
-										<pre class="prettyprint lang-xml" th:text="${diagnosticTree}"></pre>
+										<div class="panel panel-default">
+		                                    <div class="panel-heading collapsed" data-toggle="collapse" data-target="#downloads" aria-expanded='false' >
+		                                        <h3 class="panel-title" th:text="#{label.validation.download}"></h3>
+		                                    </div>
+		                                    
+		                                    <div class="panel-body collapse in" id="downloads">
+		                                    	<!-- Diagnostic data -->
+		                                    	<div class="row">
+													<label class="col-sm-2 control-label" th:text="#{label.report}"></label>
+												   	<a class="col-sm-7" th:text="#{label.diagnostic.data}" th:href="@{/validation/download-diagnostic-data}"></a>
+												</div>
+		                                        <!-- Certificates -->
+		                                        <div class="row" th:if="${allCertificates != null && allCertificates.size() > 0}">
+													<label class="col-sm-2 control-label" th:text="#{label.certificates}"></label>
+												   	<div class="col-sm-7">
+												    	<table><tr th:each="cert : ${allCertificates}"><td>
+											       			<a th:href="@{|/validation/download-certificate?id=${cert.getId()}|}">
+											       				<span th:text="${cert.getName()}"></span>
+											       			</a>
+												       	</td></tr></table>
+													</div>
+												</div>
+												<!-- Revocation data -->
+												<div class="row" th:if="${allRevocationData != null && allRevocationData.size() > 0}">
+													<label class="col-sm-2 control-label" th:text="#{label.revocation-data}"></label>
+												   	<div class="col-sm-7">
+												    	<table><tr th:each="rd : ${allRevocationData}"><td>
+											       			<span th:text="${rd.getName()}"></span>
+											       			<div th:replace="fields :: field-der-pem(${#strings.startsWith(rd.getName(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)"></div>
+											       		</td></tr></table>
+													</div>
+												</div>
+		                                        <!-- Timestamps -->
+		                                        <div class="row" th:if="${allTimestamps != null && allTimestamps.size() > 0}">
+													<label class="col-sm-2 control-label" th:text="#{label.timestamps}"></label>
+												   	<div class="col-sm-7">
+												    	<table><tr th:each="tst : ${allTimestamps}"><td>
+											       			<span th:text="${tst.getName()}"></span>
+											       			<div th:replace="fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)"></div>
+											       		</td></tr></table>
+													</div>
+												</div>
+		                                    </div>
+		                                </div>
+										<pre class="prettyprint lang-xml" th:text="${diagnosticDataXml}"></pre>
 									</div>
 									<div th:if="${etsiValidationReport} != null" role="tabpanel" class="tab-pane fade" id="etsi-validation-report">
 										<pre class="prettyprint lang-xml" th:text="${etsiValidationReport}"></pre>

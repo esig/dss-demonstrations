@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragment/head :: head"></th:block>
+<th:block th:replace="fragment/header :: header"></th:block>
+<body>
+    <main class="page-row page-row-expanded">
+    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+
+    <!-- BODY -->
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12"></div>
+
+                        <!-- BREADCRUMP -->
+                        <ul class="breadcrumb">
+                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
+                            <li class="active">Replay Diagnostic Data</li>
+                        </ul>
+
+                        <!-- CONTENT -->
+                        <div class="row">
+                            <th:block th:replace="fragment/menu :: menu"></th:block>
+                            <div class="col-md-9">
+                                <h2 th:text="#{label.replay.diag}"></h2>
+
+                                <form method="post" class="form-horizontal" enctype="multipart/form-data" th:action="@{/replay-diagnostic-data}" th:object="${replayDiagForm}">
+
+									<!-- Diagnostic file -->
+									<div class="form-group">
+									    <label for="diagnosticFile" class="col-sm-2 control-label" th:text="#{label.replay.file}"></label>
+									    <div class="col-sm-5">
+									    	<input type="file" name="diagnosticFile" id="diagnosticFile" /> 
+									    </div>
+									    <div class="col-xs-4">
+									     	<p th:if="${#fields.hasErrors('diagnosticFile')}" th:errors="*{diagnosticFile}" class="text-danger">Error</p>
+									    </div>
+									</div>
+
+                                    <!-- Reset date -->
+									<div class="form-group">
+                                        <label class="col-sm-2 control-label" th:text="#{label.replay.date}"></label>
+                                        <div class="col-sm-7">
+                                            <input type="checkbox" th:field="*{resetDate}" value="false"/>
+                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+                                            	data-placement="right" th:title="#{label.replay.date.tooltip}"></span>
+                                        </div>
+                                    </div>
+									
+									<!-- Policies -->
+									<div class="form-group">
+                                        <label class="col-sm-2 control-label" th:text="#{label.validation-policy}"></label>
+                                        <div class="col-sm-7">
+                                            <input type="radio" th:field="*{defaultPolicy}" value="true" th:text="#{label.validation.default.policy.file}" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-4">
+                                            <input type="radio" th:field="*{defaultPolicy}" value="false" th:text="#{label.validation.custom.policy.file}" />
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <input type="file" name="policyFile" id="policyFile" disabled="disabled" />
+                                        </div>
+                                    </div>
+
+									<!-- Submit -->
+									<div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
+                                            <button type="reset" class="btn" th:text="#{label.clear}"></button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </main>
+    <th:block th:replace="fragment/footer :: footer"></th:block>
+    
+    <script type="text/javascript">
+		$('[data-toggle="tooltip"]').tooltip();
+		
+		$('input[name="defaultPolicy"]:radio').change(
+			function() {
+				$('#policyFile').attr("disabled",
+						this.value == 'true');
+			});
+	</script>
+</body>
+</html>

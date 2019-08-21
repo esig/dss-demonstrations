@@ -172,5 +172,28 @@
 	</div>
 </div>
 
+<div class="form-group" th:fragment="field-certificate-tokens">
+    <label class="col-sm-3 control-label" th:text="#{label.validation.certificates.used}"></label>
+    <div class="col-sm-3">
+        <input type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
+        <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+            data-placement="right" th:title="#{label.validation.certificate.tooltip}"></span>
+    </div>
+</div>
+
+<div class="form-group" th:fragment="field-revocation-data-tokens">
+    <label class="col-sm-3 control-label" th:text="#{label.validation.revocation}"></label>
+    <div class="col-sm-3">
+        <input type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
+        <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
+            data-placement="right" th:title="#{label.validation.revocation.tooltip}"></span>
+    </div>
+</div>
+
+<div style="display: inline;" th:fragment="field-der-pem (isPemAvailable, url)">
+    <a th:text="#{label.DER}" th:href="@{|${url}&format=#{label.DER}|}"></a>
+    <span th:if="${isPemAvailable}" th:text="'|'"></span>
+    <a th:if="${isPemAvailable}" th:text="#{label.PEM}" th:href="@{|${url}&format=#{label.PEM}|}"></a>
+</div>
 
 </html>

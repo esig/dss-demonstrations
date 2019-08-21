@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import eu.europa.esig.dss.web.exception.BadRequestException;
+import eu.europa.esig.dss.web.exception.InternalServerException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,6 +47,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(BadRequestException.class)
 	public ModelAndView badRequest(HttpServletRequest req, Exception e) {
 		return getMAV(req, e, HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
+	}
+	
+	@ExceptionHandler(InternalServerException.class)
+	public ModelAndView internalServer(HttpServletRequest req, Exception e) {
+		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR, DEFAULT_ERROR_VIEW);
 	}
 
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {
