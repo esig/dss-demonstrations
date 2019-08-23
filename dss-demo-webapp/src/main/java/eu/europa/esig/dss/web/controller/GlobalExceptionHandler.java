@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.exception.InternalServerException;
 
@@ -44,6 +46,11 @@ public class GlobalExceptionHandler {
 		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
 	}
 
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ModelAndView wrongArgument(HttpServletRequest req, Exception e) {
+		return getMAV(req, new DSSException("Bad Request"), HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
+	}
+
 	@ExceptionHandler(BadRequestException.class)
 	public ModelAndView badRequest(HttpServletRequest req, Exception e) {
 		return getMAV(req, e, HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
@@ -56,7 +63,7 @@ public class GlobalExceptionHandler {
 
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {
 		ModelAndView mav = new ModelAndView();
-		mav.addObject("exception", e);
+		mav.addObject("exception", e.getMessage());
 		mav.addObject("url", req.getRequestURL());
 		mav.setStatus(status);
 		mav.setViewName(viewName);
