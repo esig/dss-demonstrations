@@ -55,9 +55,9 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 	@Test
 	public void testWithCertificateChainAndValdiationTime() {
 		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
-				DSSUtils.loadCertificate(new File("src/test/resources/good-user.cer")));
-		RemoteCertificate issuerCertificate = RemoteCertificateConverter.toRemoteCertificate(
-				DSSUtils.loadCertificate(new File("src/test/resources/good-ca.cer")));
+				DSSUtils.loadCertificate(new File("src/test/resources/CZ.cer")));
+		RemoteCertificate issuerCertificate = RemoteCertificateConverter
+				.toRemoteCertificate(DSSUtils.loadCertificate(new File("src/test/resources/CA_CZ.cer")));
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2018, 12, 31);
 		Date validationDate = calendar.getTime();
@@ -87,9 +87,9 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 	@Test
 	public void testWithNoValidationTime() {
 		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
-				DSSUtils.loadCertificate(new File("src/test/resources/good-user.cer")));
-		RemoteCertificate issuerCertificate = RemoteCertificateConverter.toRemoteCertificate(
-				DSSUtils.loadCertificate(new File("src/test/resources/good-ca.cer")));
+				DSSUtils.loadCertificate(new File("src/test/resources/CZ.cer")));
+		RemoteCertificate issuerCertificate = RemoteCertificateConverter
+				.toRemoteCertificate(DSSUtils.loadCertificate(new File("src/test/resources/CA_CZ.cer")));
 		
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, 
 				Arrays.asList(issuerCertificate), null);
@@ -116,7 +116,7 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 	@Test
 	public void testWithNoCertificateChain() {
 		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
-				DSSUtils.loadCertificate(new File("src/test/resources/good-user.cer")));
+				DSSUtils.loadCertificate(new File("src/test/resources/CZ.cer")));
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate);
 		
 		CertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
