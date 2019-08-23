@@ -15,17 +15,22 @@
 	<dependencies>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-signature-remote</artifactId>
+			<artifactId>dss-signature-rest-client</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-validation-rest</artifactId>
+			<artifactId>dss-validation-rest-client</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-validation-soap</artifactId>
+			<artifactId>dss-certificate-validation-rest-client</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-server-signing-rest-client</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

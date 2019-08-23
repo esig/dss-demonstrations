@@ -298,6 +298,11 @@
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-signature-rest-client</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-signature-soap</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
@@ -308,12 +313,22 @@
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-validation-rest-client</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-validation-soap</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-certificate-validation-rest</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-certificate-validation-rest-client</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
@@ -329,6 +344,11 @@
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-server-signing-rest</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-server-signing-rest-client</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
 			<dependency>
