@@ -18,7 +18,7 @@
 	<properties>
 		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u222-b10_openj9-0.15.1/OpenJDK8U-jre_x64_windows_openj9_8u222b10_openj9-0.15.1.zip</jre.download.link>
 		<jre.root.folder>jdk8u222-b10-jre</jre.root.folder>
-		<tomcat.version>8.5.43</tomcat.version>
+		<tomcat.version>8.5.45</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -108,7 +108,7 @@
 			<properties>
 				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk12-binaries/releases/download/jdk12u-2019-07-28-21-29/OpenJDK12U-jre_x64_windows_hotspot_2019-07-28-21-29.zip</jre.download.link>
 				<jre.root.folder>jdk-12.0.2+10-jre</jre.root.folder>
-				<tomcat.version>9.0.22</tomcat.version>
+				<tomcat.version>9.0.24</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>
