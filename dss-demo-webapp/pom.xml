@@ -243,6 +243,11 @@
 			<artifactId>dss-server-signing-soap</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-timestamp-remote-soap</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		
 		<!-- Choose your PAdES implementation -->
 		<dependency>
@@ -298,6 +303,11 @@
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-server-signing-rest</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-timestamp-remote-rest</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

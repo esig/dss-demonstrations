@@ -286,6 +286,8 @@
 				<artifactId>dss-service</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
+			
+			<!-- Web Services -->
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-signature-remote</artifactId>
@@ -353,9 +355,26 @@
 			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-timestamp-remote-soap</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-timestamp-remote-rest</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-timestamp-remote-rest-client</artifactId>
+				<version>${dss.framework.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-tsl-validation</artifactId>
 				<version>${dss.framework.version}</version>
 			</dependency>
+			
 <!-- 			<dependency> -->
 <!-- 				<groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
 <!-- 				<artifactId>dss-utils-apache-commons</artifactId> -->

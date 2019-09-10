@@ -38,7 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.TimestampBinary;
 import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSASN1Utils;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KSPrivateKeyEntry;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
@@ -64,7 +66,7 @@ public class MockTSPSource implements TSPSource {
 	}
 
 	@Override
-	public TimeStampToken getTimeStampResponse(DigestAlgorithm digestAlgorithm, byte[] digest) {
+	public TimestampBinary getTimeStampResponse(DigestAlgorithm digestAlgorithm, byte[] digest) {
 		if (token == null) {
 			throw new DSSException("KeyStore token is not defined!");
 		}
@@ -108,9 +110,13 @@ public class MockTSPSource implements TSPSource {
 
 			TimeStampResponseGenerator responseGenerator = new TimeStampResponseGenerator(tokenGenerator, accepted);
 			TimeStampResponse response = responseGenerator.generate(request, new BigInteger(128, random), new Date());
-			return response.getTimeStampToken();
+			TimeStampToken timeStampToken = response.getTimeStampToken();
+			
+			return new TimestampBinary(DSSASN1Utils.getDEREncoded(timeStampToken));
+			
 		} catch (IOException | TSPException | OperatorException | CertificateException e) {
 			throw new DSSException("Unable to generate a timestamp from the Mock", e);
+			
 		}
 	}
 

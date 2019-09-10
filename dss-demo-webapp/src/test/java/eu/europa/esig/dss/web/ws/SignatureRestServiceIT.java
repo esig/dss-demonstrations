@@ -113,7 +113,8 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			assertNotNull(extendedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
-			iMD.save("target/test.xml");
+			// iMD.save("target/test.xml");
+			assertNotNull(iMD);
 		}
 	}
 
@@ -154,7 +155,8 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			assertNotNull(extendedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
-			iMD.save("target/test-digest.xml");
+			// iMD.save("target/test-digest.xml");
+			assertNotNull(iMD);
 		}
 	}
 
@@ -197,7 +199,8 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			assertNotNull(extendedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
-			iMD.save("target/test.asice");
+			// iMD.save("target/test.asice");
+			assertNotNull(iMD);
 		}
 	}
 

@@ -59,7 +59,7 @@ public class SoapCertificateValidationIT extends AbstractIT {
 	}
 	
 	@Test
-	public void testWithCertificateChainAndValdiationTime() {
+	public void testWithCertificateChainAndValidationTime() {
 		RemoteCertificate remoteCertificate = RemoteCertificateConverter.toRemoteCertificate(
 				DSSUtils.loadCertificate(new File("src/test/resources/CZ.cer")));
 		RemoteCertificate issuerCertificate = RemoteCertificateConverter

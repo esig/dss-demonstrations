@@ -43,6 +43,7 @@ import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectio
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 
@@ -277,6 +278,13 @@ public class DSSBeanConfig {
 		RemoteSignatureTokenConnectionImpl remoteSignatureTokenConnectionImpl = new RemoteSignatureTokenConnectionImpl();
 		remoteSignatureTokenConnectionImpl.setToken(remoteToken());
 		return remoteSignatureTokenConnectionImpl;
+	}
+	
+	@Bean
+	public RemoteTimestampService timestampService() throws IOException {
+		RemoteTimestampService timestampService = new RemoteTimestampService();
+		timestampService.setTSPSource(tspSource);
+		return timestampService;
 	}
 
 	@Bean
