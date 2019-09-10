@@ -20,6 +20,8 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.europa.esig.dss.diagnostic.CertificateWrapper;
+import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.simplecertificatereport.jaxb.XmlChainItem;
@@ -77,15 +79,20 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		assertNotNull(reportsDTO.getSimpleCertificateReport());
 		assertNotNull(reportsDTO.getDetailedReport());
 		
-		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
-		assertEquals(3, usedCertificates.size());
+		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
+		assertTrue(usedCertificates.size() > 1);
 		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertEquals(3, chain.size());
-		for (XmlCertificate certificate : usedCertificates) {
-			if (chain.get(0).getId().equals(certificate.getId())) {
-				assertEquals(2, certificate.getCertificateChain().size());
-			}
+		assertTrue(chain.size() > 1);
+		
+		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
+		assertNotNull(diagnosticData);
+		
+		for (XmlChainItem chainItem : chain) {
+			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
+			assertNotNull(certificate);
+			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
+			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
 		}
 		assertTrue(validationDate.compareTo(diagnosticData.getValidationDate()) == 0);
 	}
@@ -106,15 +113,20 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		assertNotNull(reportsDTO.getSimpleCertificateReport());
 		assertNotNull(reportsDTO.getDetailedReport());
 		
-		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
-		assertEquals(3, usedCertificates.size());
+		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
+		assertTrue(usedCertificates.size() > 1);
 		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertEquals(3, chain.size());
-		for (XmlCertificate certificate : usedCertificates) {
-			if (chain.get(0).getId().equals(certificate.getId())) {
-				assertEquals(2, certificate.getCertificateChain().size());
-			}
+		assertTrue(chain.size() > 1);
+		
+		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
+		assertNotNull(diagnosticData);
+		
+		for (XmlChainItem chainItem : chain) {
+			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
+			assertNotNull(certificate);
+			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
+			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
 		}
 		assertNotNull(diagnosticData.getValidationDate());
 	}
@@ -131,15 +143,20 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		assertNotNull(reportsDTO.getSimpleCertificateReport());
 		assertNotNull(reportsDTO.getDetailedReport());
 		
-		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
-		assertEquals(3, usedCertificates.size());
+		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
+		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
+		assertTrue(usedCertificates.size() > 1);
 		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertEquals(3, chain.size());
-		for (XmlCertificate certificate : usedCertificates) {
-			if (chain.get(0).getId().equals(certificate.getId())) {
-				assertEquals(2, certificate.getCertificateChain().size());
-			}
+		assertTrue(chain.size() > 1);
+		
+		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
+		assertNotNull(diagnosticData);
+		
+		for (XmlChainItem chainItem : chain) {
+			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
+			assertNotNull(certificate);
+			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
+			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
 		}
 		assertNotNull(diagnosticData.getValidationDate());
 	}
