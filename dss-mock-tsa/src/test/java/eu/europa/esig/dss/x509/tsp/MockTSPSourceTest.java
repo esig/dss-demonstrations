@@ -32,9 +32,9 @@ public class MockTSPSourceTest {
 		TimestampBinary timeStampResponse = mock.getTimeStampResponse(DigestAlgorithm.SHA256, digest);
 
 		assertNotNull(timeStampResponse);
-		assertNotNull(timeStampResponse.getEncoded());
-		assertFalse(Arrays.equals(new byte[] {}, timeStampResponse.getEncoded()));
-		CMSSignedData cmsSignedData = new CMSSignedData(timeStampResponse.getEncoded());
+		assertNotNull(timeStampResponse.getBytes());
+		assertFalse(Arrays.equals(new byte[] {}, timeStampResponse.getBytes()));
+		CMSSignedData cmsSignedData = new CMSSignedData(timeStampResponse.getBytes());
 		TimeStampToken timeStampToken = new TimeStampToken(cmsSignedData);
 		
 		assertArrayEquals(digest, timeStampToken.getTimeStampInfo().getMessageImprintDigest());

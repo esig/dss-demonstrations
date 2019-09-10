@@ -29,6 +29,6 @@ public class TSPConfigTest {
 	public void test() {
 		TimestampBinary timeStampResponse = tspSource.getTimeStampResponse(DigestAlgorithm.SHA256, DSSUtils.digest(DigestAlgorithm.SHA256, "Hello".getBytes()));
 		assertNotNull(timeStampResponse);
-		assertTrue(Utils.isArrayNotEmpty(timeStampResponse.getEncoded()));
+		assertTrue(Utils.isArrayNotEmpty(timeStampResponse.getBytes()));
 	}
 }
