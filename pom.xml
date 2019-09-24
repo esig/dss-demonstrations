@@ -490,6 +490,19 @@
 			    <version>${cxf.version}</version> 
 			    <scope>test</scope>
 			</dependency>
+			
+			<dependency>
+			    <groupId>org.apache.cxf</groupId>
+			    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+			    <version>${cxf.version}</version>
+			</dependency>
+			
+			<dependency>
+	            <groupId>org.webjars</groupId>
+	            <artifactId>swagger-ui</artifactId>
+	            <version>3.23.0</version>
+	        </dependency>
+			
 
 			<dependency>
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
