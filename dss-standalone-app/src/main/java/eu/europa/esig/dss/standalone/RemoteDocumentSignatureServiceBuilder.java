@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.standalone;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore.PasswordProtection;
 
 import org.slf4j.Logger;
@@ -83,9 +83,8 @@ public class RemoteDocumentSignatureServiceBuilder {
 	
 	private static TSPSource tspSource() {
 		MockTSPSource tspSource = new MockTSPSource();
-		try {
-			tspSource.setToken(new KeyStoreSignatureTokenConnection(new File("src/main/resources/self-signed-tsa.p12"), "PKCS12",
-					new PasswordProtection("ks-password".toCharArray())));
+		try (InputStream is = RemoteDocumentSignatureServiceBuilder.class.getResourceAsStream("/self-signed-tsa.p12")) {
+			tspSource.setToken(new KeyStoreSignatureTokenConnection(is, "PKCS12", new PasswordProtection("ks-password".toCharArray())));
 		} catch (IOException e) {
 			LOG.warn("Cannot load the KeyStore");
 		}
