@@ -93,6 +93,23 @@
 	</div>
 </div>
 
+<div class="form-group" th:fragment="field-document-digest">
+    <label for="digestToSign" class="col-sm-2 control-label" th:text="#{label.to.sign.digest}"></label>
+    <div class="col-sm-4">
+		<input type="text" class="form-control input-sm"  th:field="*{digestToSign}" />
+    </div>
+	<div style="float:left;">
+	  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" title="Compute digest from file">
+	    	<span class="glyphicon glyphicon-cog" style="margin-top: 5px;"></span>
+	  	</label>	
+		<input type="file" name="fileToCompute" id="fileToCompute" onchange="readFile(this)" /> 
+	</div>
+    <div class="loader" id="spinner"></div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
+    </div>
+</div>
+
 <div class="form-group" th:fragment="field-signature-level">
     <label for="signatureLevel" class="col-sm-2 control-label" th:text="#{label.signature.level}"></label>
     <div class="col-sm-4">
