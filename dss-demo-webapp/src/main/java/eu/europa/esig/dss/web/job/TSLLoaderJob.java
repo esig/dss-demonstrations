@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import eu.europa.esig.dss.tsl.service.TSLValidationJob;
+import eu.europa.esig.dss.tsl.job.TLValidationJob;
 
 @Service
 public class TSLLoaderJob {
@@ -16,17 +16,17 @@ public class TSLLoaderJob {
 	private boolean enable;
 
 	@Autowired
-	private TSLValidationJob job;
+	private TLValidationJob job;
 
 	@PostConstruct
 	public void init() {
-		job.initRepository();
+		job.offlineRefresh();
 	}
 
 	@Scheduled(initialDelayString = "${cron.initial.delay.tl.loader}", fixedDelayString = "${cron.delay.tl.loader}")
 	public void refresh() {
 		if (enable) {
-			job.refresh();
+			job.onlineRefresh();
 		}
 	}
 

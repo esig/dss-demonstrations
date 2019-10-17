@@ -1,5 +1,12 @@
 package eu.europa.esig.dss.web.controller;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,29 +14,54 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import eu.europa.esig.dss.tsl.service.TSLRepository;
-import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.spi.tsl.LOTLInfo;
+import eu.europa.esig.dss.spi.tsl.TLValidationJobSummary;
+import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 
 @Controller
 @RequestMapping(value = "/tsl-info")
 public class TrustedListController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TrustedListController.class);
+	
+	private static final String TL_SUMMARY = "tl-summary";
+	private static final String PIVOT_CHANGES = "pivot-changes";
+	private static final String ERROR = "error";
+
 	@Autowired
-	private TSLRepository tslRepository;
+	private TrustedListsCertificateSource trustedCertificateSource;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String getSummary(final Model model) {
-		model.addAttribute("summary", tslRepository.getSummary());
-		return "tsl-info";
+	public String tlInfoPage(Model model, HttpServletRequest request) {
+		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
+		model.addAttribute("summary", summary);
+		return TL_SUMMARY;
 	}
 
-	@RequestMapping(value = "/{country:[a-z][a-z]}", method = RequestMethod.GET)
-	public String getByCountry(@PathVariable String country, Model model) {
-		String countryUppercase = Utils.upperCase(country);
-		model.addAttribute("country", countryUppercase);
-		model.addAttribute("countries", tslRepository.getAllMapTSLValidationModels().keySet());
-		model.addAttribute("model", tslRepository.getByCountry(countryUppercase));
-		return "tsl-info-country";
+	@RequestMapping(value = "/pivot-changes/{lotlId}", method = RequestMethod.GET)
+	public String getPivotChangesPage(@PathVariable("lotlId") String lotlId, Model model) {
+		LOTLInfo lotlInfo = getLOTLInfoById(lotlId);
+		if (lotlInfo != null) {
+			model.addAttribute("lotl", lotlInfo);
+			model.addAttribute("originalKeystore", lotlInfo.getValidationCacheInfo().isResultExist() ? 
+					lotlInfo.getValidationCacheInfo().getPotentialSigners() : Collections.emptyList());
+			return PIVOT_CHANGES;
+		} else {
+			model.addAttribute("error", "The requested LOTL does not exist!");
+			return ERROR;
+		}
+	}
+	
+	private LOTLInfo getLOTLInfoById(String lotlId) {
+		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
+		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+		for (LOTLInfo lotlInfo : lotlInfos) {
+			if (lotlInfo.getIdentifier().asXmlId().equals(lotlId)) {
+				return lotlInfo;
+			}
+		}
+		LOG.warn("The LOTL with the specified id [{}] is not found!", lotlId);
+		return null;
 	}
 
 }
