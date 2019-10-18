@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.europa.esig.dss.spi.tsl.LOTLInfo;
+import eu.europa.esig.dss.spi.tsl.TLInfo;
 import eu.europa.esig.dss.spi.tsl.TLValidationJobSummary;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 
@@ -27,6 +28,8 @@ public class TrustedListController {
 	private static final String TL_SUMMARY = "tl-summary";
 	private static final String PIVOT_CHANGES = "pivot-changes";
 	private static final String ERROR = "error";
+	private static final String TL_DATA = "tl-info-country";
+	private static final String LOTL_DATA = "lotl-info";
 
 	@Autowired
 	private TrustedListsCertificateSource trustedCertificateSource;
@@ -37,7 +40,36 @@ public class TrustedListController {
 		model.addAttribute("summary", summary);
 		return TL_SUMMARY;
 	}
+	
 
+	@RequestMapping(method = RequestMethod.GET, value = "/lotl/{id}")
+	public String lotlInfoPaget(@PathVariable(value = "id") String id, Model model, HttpServletRequest request) {
+		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
+		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+		for(LOTLInfo lotlInfo : lotlInfos) {
+			if(lotlInfo.getIdentifier().asXmlId().equals(id)) 
+				model.addAttribute("lotlInfo", lotlInfo);
+		}
+		
+		return LOTL_DATA;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/tl/{id}")
+	public String tlInfoPageByCountry(@PathVariable(value = "id") String id, Model model, HttpServletRequest request) {
+		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
+		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+		for(LOTLInfo lotlInfo : lotlInfos) {
+			List<TLInfo> tlInfos = lotlInfo.getTLInfos();
+			for(TLInfo tlInfo: tlInfos) {
+				if(tlInfo.getIdentifier().asXmlId().equals(id))
+					model.addAttribute("tlInfo", tlInfo);
+			}
+		}
+		
+		return TL_DATA;
+	}
+	
+	
 	@RequestMapping(value = "/pivot-changes/{lotlId}", method = RequestMethod.GET)
 	public String getPivotChangesPage(@PathVariable("lotlId") String lotlId, Model model) {
 		LOTLInfo lotlInfo = getLOTLInfoById(lotlId);

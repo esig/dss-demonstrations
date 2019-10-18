@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Certificates -->
+<div class="certificate row" th:fragment="certificate-panel(certificateToken)">
+	
+	<div class="result-head col-xl-3" th:text="#{label.summary.cert.subject.name}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateToken.subjectX500Principal}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.summary.cert.issuer.name}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateToken.issuerX500Principal}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.summary.cert.serial.number}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateToken.getSerialNumber()}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.summary.cert.valid.before}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${#dates.format(certificateToken.getNotBefore(), 'dd-MMM-yyyy HH:mm:ss')}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.summary.cert.valid.after}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${#dates.format(certificateToken.getNotAfter(), 'dd-MMM-yyyy HH:mm:ss')}"></p>
+	</div>
+</div>
+
+<!-- Indication -->
+<span class="indication" th:fragment="indication(indicationName)">
+	<span th:with="status=${(indicationName == 'TOTAL_PASSED')?'success':((indicationName == 'TOTAL_FAILED')?'danger':'warning')}" 
+			th:class="${'badge badge-' + status}" th:text="${indicationName}"></span>
+</span>
+
+<!-- SubIndication -->
+<span class="sub-indication" th:fragment="subIndication(indicationName, subIndicationName)">
+	<span th:with="status=${(indicationName == 'TOTAL_FAILED')?'danger':'warning'}" 
+			th:class="${'badge badge-' + status}" th:text="${subIndicationName}"></span>
+</span>
+
+<!-- Cached Result -->
+<span class="task-result" th:fragment="task-result(result)">
+	<span th:text="${result.getStatusName()}"></span>
+	<span th:replace="fragment/tl-info-fragments :: result-status(result=${result})"></span>
+	<span th:text="${result.isError()}?${' (' + #dates.format(result.exceptionTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:
+			${#dates.format(result.lastSuccessDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+</span>
+
+<span th:fragment="result-status(result)">
+	<span th:if="${!result.resultExist and !result.isError()}" class="glyphicon glyphicon-ban-sign text-muted" title="Not performed"></span>
+	<span th:if="${result.isSynchronized()}" class="glyphicon glyphicon-ok-sign text-success" title="OK"></span>
+	<span th:if="${result.isError()}" class="glyphicon glyphicon glyphicon-remove-sign text-danger" 
+		th:title="${result.exceptionMessage}"></span>
+</span>
+
+<!-- Validation result -->
+<span class="task-result" th:fragment="validation-result(validationResult)">
+	<span th:text="${validationResult.getStatusName()}"></span>
+	<span th:replace="fragment/tl-info-fragments :: validation-status(validationResult=${validationResult})"></span>
+	<span th:text="${validationResult.isError()}?${' (' + #dates.format(validationResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:
+			${#dates.format(validationResult.lastSuccessDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+</span>
+
+<span th:fragment="validation-status(validationResult)">
+	<span th:if="${!validationResult.resultExist and !validationResult.isError()}" class="glyphicon glyphicon-ban-sign text-muted" title="Not performed"></span>
+	<span th:if="${validationResult.isValid()}" class="glyphicon glyphicon-ok-sign text-success"
+		th:title="${validationResult.indication}"></span>
+	<span th:if="${validationResult.isIndeterminate()}" class="glyphicon glyphicon-exclamation-sign text-warning"
+		th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
+	<span th:if="${validationResult.isInvalid()}" class="glyphicon glyphicon glyphicon-remove-sign text-danger" 
+		th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
+</span>
+
+<span th:fragment="tl-global-validation-status(parsingResult, validationResult)">
+	<span th:if="${!validationResult.resultExist and !validationResult.isError()}" 
+			class="glyphicon glyphicon-ban-sign text-muted" title="Not performed"></span>
+	<span th:if="${!(!validationResult.resultExist and !validationResult.isError()) and 
+				validationResult.isValid() and !(!parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow()))}" 
+			class="glyphicon glyphicon-ok-sign text-success" th:title="${validationResult.indication}"></span>
+	<span th:if="${!(!validationResult.resultExist and !validationResult.isError()) and 
+				(validationResult.isIndeterminate() or !parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow()))}" 
+			class="glyphicon glyphicon-exclamation-sign text-warning" 
+			th:title="${(validationResult.isIndeterminate()?(validationResult.indication + ' : ' + validationResult.subIndication):'EXPIRED')}"></span>
+	<span th:if="${validationResult.isError() or (validationResult.isInvalid() and !(!parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow())))}" 
+			class="glyphicon glyphicon glyphicon-remove-sign text-danger" th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
+</span>

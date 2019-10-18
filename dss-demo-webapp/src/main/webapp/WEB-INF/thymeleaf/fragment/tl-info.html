@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<thead th:fragment="tl-info-header()">
+	<tr>
+		<th class="limited-size" scope="col" th:text="#{label.summary.tl.info.country}"></th>
+		<th class="limited-size" scope="col" th:text="#{label.summary.tl.info.seq.num}"></th>
+		<th class="date" scope="col" th:text="#{label.summary.tl.info.last.sync}"></th>
+		<th scope="col" th:text="#{label.summary.tl.info.download.result}"></th>
+		<th scope="col" th:text="#{label.summary.tl.info.parsing.result}"></th>
+		<th scope="col" th:text="#{label.summary.tl.info.validation.result}"></th>
+		<th class="date" scope="col" th:text="#{label.summary.tl.info.next.update}"></th>
+		<th class="limited-size" scope="col" th:title="#{label.summary.tl.info.tsp.title}" th:text="#{label.summary.tl.info.tsp}"></th>
+		<th class="limited-size" scope="col" th:title="#{label.summary.tl.info.ts.title}" th:text="#{label.summary.tl.info.ts}"></th>
+		<th class="limited-size" scope="col" th:title="#{label.summary.tl.info.certs.title}" th:text="#{label.summary.tl.info.certs}"></th>
+	</tr>
+</thead>
+	
+<tr th:fragment="tl-info-preview(id, country, downloadResult, parsingResult, validationResult)" 
+		class="tl-info-preview collapsed" th:data-target="${'#' + id}" data-toggle="collapse" aria-expanded="false" th:aria-controls="${id}">
+
+	<!-- Country -->
+	<td>
+		<a th:href="@{/tsl-info/tl/} + ${id}">
+		<span th:class="${'small_flag flag_' + country}" th:title="${country != 'no_country'}?${country}:'?'"></span>
+		</a>
+	</td>
+	
+	<!-- Seq num -->
+	<td th:text="${parsingResult.sequenceNumber}?:'-'"></td>
+	
+	<!-- Last update -->
+	<td th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}"></td>
+	
+	<!-- Download result -->
+	<td>
+		<span th:replace="fragment/tl-info-fragments :: result-status(result=${downloadResult})"></span>
+	</td>
+	
+	<!-- Parsing result -->
+	<td>
+		<span th:replace="fragment/tl-info-fragments :: result-status(result=${parsingResult})"></span>
+	</td>
+	
+	<!-- Validation result -->
+	<td>
+		<span th:replace="fragment/tl-info-fragments :: tl-global-validation-status(parsingResult=${parsingResult}, validationResult=${validationResult})"></span>
+	</td>
+	
+	<!-- Next update -->
+	<td th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}?:'-'"></td>
+	
+	<!-- TSP number -->
+	<td th:text="${parsingResult.getTSPNumber()}"></td>
+	
+	<!-- TS number -->
+	<td th:text="${parsingResult.getTSNumber()}"></td>
+	
+	<!-- Cert number -->
+	<td th:text="${parsingResult.getCertNumber()}"></td>
+	
+</tr>
+
+<tr th:fragment="tl-info-body(id, url, downloadResult, parsingResult, validationResult)">
+	<td class="tl-info-body" colspan="10">
+		<div th:id="${id}" class="tl-content accordian-body collapse animate">
+			<th:block th:replace="fragment/tl-info :: tl-info-body-content(id=${id}, url=${url}, downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult}, potentialSigners=null)">
+			</th:block>
+		</div>
+	</td>
+</tr>
+
+<th:block th:fragment="tl-info-body-content(id, url, downloadResult, parsingResult, validationResult, potentialSigners)">
+	<!-- URL -->
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.url}"></div>
+		<div class="result-body col-xl-9">
+			<a th:text="${url}" th:href="${url}" target="_blank"></a>
+		</div>
+	</div>
+	
+	<!-- Download status -->
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.download.status}"></div>
+		<div class="result-body col-xl-9">
+			<span th:replace="fragment/tl-info-fragments :: task-result(result=${downloadResult})"></span>
+		</div>
+	</div>
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.last.sync.date}"></div>
+		<div class="result-body col-xl-9">
+			<p th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${downloadResult.isError()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.download.error}"></div>
+		<div class="result-body col-xl-9">
+			<p class="error" th:text="${downloadResult.exceptionMessage}"></p>
+		</div>
+	</div>
+	
+	<!-- Parsing status -->
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.parsing.status}"></div>
+		<div class="result-body col-xl-9">
+			<span th:replace="fragment/tl-info-fragments :: task-result(result=${parsingResult})"></span>
+		</div>
+	</div>
+	<div class="row" th:if="${parsingResult.isError()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.parsing.error}"></div>
+		<div class="result-body col-xl-9">
+			<p class="error" th:text="${parsingResult.exceptionMessage}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${parsingResult.isResultExist()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.issue.date}"></div>
+		<div class="result-body col-xl-9">
+			<p th:text="${#dates.format(parsingResult.issueDate, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${parsingResult.isResultExist()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.next.update}"></div>
+		<div class="result-body col-xl-9">
+			<p class="next-update" th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+			<span class="badge badge-danger" th:if="${parsingResult.nextUpdateDate.before(#dates.createNow())}" th:text="${'EXPIRED'}"></span>
+		</div>
+	</div>
+	<div class="row" th:if="${parsingResult.isResultExist()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.dist.points}"></div>
+		<div class="result-body col-xl-9" th:if="${#lists.isEmpty(parsingResult.distributionPoints)}">-</div>
+		<div class="result-body col-xl-9" th:if="${not #lists.isEmpty(parsingResult.distributionPoints)}">
+			<a class="distribution-point" th:each="point,iterPoints : ${parsingResult.distributionPoints}" th:href="${point}" th:text="${point}" target="_blank"></a>		
+		</div>
+	</div>
+	
+	<!-- Validation status -->
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.validation.status}"></div>
+		<div class="result-body col-xl-9">
+			<span th:replace="fragment/tl-info-fragments :: task-result(result=${validationResult})"></span>
+		</div>
+	</div>
+	<div class="row" th:if="${validationResult.isError()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.validation.error}"></div>
+		<div class="result-body col-xl-9">
+			<p th:text="${validationResult.exceptionMessage}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${validationResult.isResultExist()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.indication}"></div>
+		<div class="result-body col-xl-9">
+			<span th:replace="fragment/tl-info-fragments :: indication(indicationName=${validationResult.indication.name()})"></span>
+		</div>
+	</div>
+	<div class="row" th:if="${validationResult.isResultExist() and !validationResult.isValid()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.sub.indication}"></div>
+		<div class="result-body col-xl-9">
+			<span th:replace="fragment/tl-info-fragments :: subIndication(indicationName=${validationResult.indication.name()},
+					subIndicationName=${validationResult.subIndication.name()})"></span>
+		</div>
+	</div>
+	<div class="row" th:if="${validationResult.isResultExist()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.sign.time}"></div>
+		<div class="result-body col-xl-9">
+			<p th:text="${#dates.format(validationResult.signingTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${validationResult.isResultExist()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.sign.cert}"></div>
+		<div class="result-body col-xl-9" th:if="${validationResult.signingCertificate != null}">
+			<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${validationResult.signingCertificate})"></div>
+			<hr th:if="${potentialSigners != null}"/>
+		</div>
+	</div>
+	
+	<div class="row" th:if="${potentialSigners != null}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.potential.sign.cert}"></div>
+		<div class="result-body col-xl-9">
+			<th:block th:each="token, i : ${potentialSigners}">
+				<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${token})"></div>
+				<hr th:if="${!i.last}"/>
+			</th:block>
+		</div>
+	</div>
+
+</th:block>
+
+
+<!-- TL Info for Info page without table -->
+<div th:fragment="tl-info-body-no-collapse(id, url, downloadResult, parsingResult, validationResult)">
+	<div th:id="${id}" class="tl-content">
+		<!-- URL -->
+		<div class="row">
+			<div class="result-head col-md-2"><b>Url</b></div>
+			<a class="result-body col-md-10" th:text="${url}" th:href="${url}" target="_blank"></a>
+		</div>
+		
+		<!-- Download status -->
+		<div class="row">
+			<div class="result-head col-md-2"><b>Download Status</b></div>
+			<div class="result-body col-md-10" th:text="${downloadResult.getStatusName()}"></div>
+		</div>
+		<div class="row">
+			<div class="result-head col-md-2"><b>Last synchronization date</b></div>
+			<div class="result-body col-md-10" th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:'-'"></div>
+		</div>
+		<div class="row" th:if="${downloadResult.isError()}" 
+				th:data-target="${'#down-error-' + id}" data-toggle="collapse" aria-expanded="false" th:aria-controls="${'down-error-' + id}"
+				style="cursor: pointer;">
+			<div class="result-head col-md-2"><b>Download message error</b></div>
+			<div class="result-body col-md-10" th:text="${downloadResult.exceptionMessage}"></div>
+		</div>
+		<div class="row collapse animate" th:if="${downloadResult.isError()}" th:id="${'down-error-' + id}">
+			<div class="result-head col-md-2"><b>Download message stack trace</b></div>
+			<div class="result-body col-md-10" th:text="${downloadResult.exceptionStackTrace}"></div>
+		</div>
+		<div class="row" th:if="${downloadResult.isError()}">
+			<div class="result-head col-md-2"><b>Download error time</b></div>
+			<div class="result-body col-md-10" th:text="${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}"></div>
+		</div>
+		
+		<!-- Parsing status -->
+		<div class="row">
+			<div class="result-head col-md-2"><b>Parsing Status</b></div>
+			<div class="result-body col-md-10" th:text="${parsingResult.getStatusName()}"></div>
+		</div>
+		<div class="row" th:if="${parsingResult.isError()}" 
+				th:data-target="${'#pars-error-' + id}" data-toggle="collapse" aria-expanded="false" th:aria-controls="${'pars-error-' + id}"
+				style="cursor: pointer;">
+			<div class="result-head col-md-2"><b>Parsing message error</b></div>
+			<div class="result-body col-md-10" th:text="${parsingResult.exceptionMessage}"></div>
+		</div>
+		<div class="row collapse animate" th:if="${parsingResult.isError()}" th:id="${'pars-error-' + id}">
+			<div class="result-head col-md-2"><b>Parsing message stack trace</b></div>
+			<div class="result-body col-md-10" th:text="${parsingResult.exceptionStackTrace}"></div>
+		</div>
+		<div class="row" th:if="${parsingResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>TL Issue Date</b></div>
+			<div class="result-body col-md-10" th:text="${#dates.format(parsingResult.issueDate, 'dd-MMM-yyyy HH:mm:ss')}"></div>
+		</div>
+		<div class="row" th:if="${parsingResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>TL Next Update</b></div>
+			<div class="result-body col-md-10" th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></div>
+		</div>
+		<div class="row" th:if="${parsingResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>TL Distribution Points</b></div>
+			<div class="result-body col-md-10" th:if="${#lists.isEmpty(parsingResult.distributionPoints)}">-</div>
+			<div class="result-body col-md-10" th:if="${not #lists.isEmpty(parsingResult.distributionPoints)}">
+				<span class="distribution-point" th:each="point,iterPoints : ${parsingResult.distributionPoints}" 
+						th:text="${point}"></span>
+			</div>
+		</div>
+		
+		<!-- Validation status -->
+		<div class="row">
+			<div class="result-head col-md-2"><b>Validation Status</b></div>
+			<div class="result-body col-md-10" th:text="${validationResult.getStatusName()}"></div>
+		</div>
+		<div class="row" th:if="${validationResult.isError()}" 
+				th:data-target="${'#val-error-' + id}" data-toggle="collapse" aria-expanded="false" th:aria-controls="${'val-error-' + id}"
+				style="cursor: pointer;">
+			<div class="result-head col-md-2"><b>Validation message error</b></div>
+			<div class="result-body col-md-10" th:text="${validationResult.exceptionMessage}"></div>
+		</div>
+		<div class="row collapse animate" th:if="${validationResult.isError()}" th:id="${'val-error-' + id}">
+			<div class="result-head col-md-2"><b>Validation message stack trace</b></div>
+			<div class="result-body col-md-10" th:text="${validationResult.exceptionStackTrace}"></div>
+		</div>
+		<div class="row" th:if="${validationResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>Indication</b></div>
+			<div class="result-body col-md-10" th:text="${validationResult.indication}"></div>
+		</div>
+		<div class="row" th:if="${validationResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>SubIndication</b></div>
+			<div class="result-body col-md-10" th:text="${validationResult.subIndication}?:'-'"></div>
+		</div>
+		<div class="row" th:if="${validationResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>Signing Time</b></div>
+			<div class="result-body col-md-10" th:text="${#dates.format(validationResult.signingTime, 'dd-MMM-yyyy HH:mm:ss')}"></div>
+		</div>
+		<div class="row" th:if="${validationResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>Number of TSPs</b></div>
+			<div class="result-body col-md-10" th:if="${parsingResult.trustServiceProviders != null}" th:text="${#lists.size(tlInfo.parsingCacheInfo.trustServiceProviders)}"></div>
+		</div>
+		<div class="row" th:if="${validationResult.isResultExist()}">
+			<div class="result-head col-md-2"><b>Signing Certificate</b></div>
+			<div class="result-body col-md-10" th:if="${validationResult.signingCertificate != null}">
+				<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${validationResult.signingCertificate})"></div>
+			</div>
+		</div>			
+	</div>
+</div>
+
+
+
+
+<div th:fragment="tl-tsp(serviceProvider, sp)">
+	<div class="panel panel-primary" >
+        <div class="panel-heading" data-toggle="collapse" aria-expanded="true" th:data-target="'#countryProviders' + ${sp.index}">
+            <span class="badge pull-right" th:text="${#lists.size(serviceProvider.services)}" title="Number of Trust Services"></span>
+            <th:block th:each="name : ${serviceProvider.names}">
+             	<h3 th:if="${name.key == 'en'}" class="panel-title" th:text="${name.value[0]}"></h3>
+      		</th:block>
+        </div>
+        <div class="panel-body tl-content accordian-body collapse animate" th:id="'countryProviders' + ${sp.index}">
+			<div class="attributes">
+	      		<div class="container container-no-margin">
+	           		<div class="row">Name :</div>
+	           		<div class="row">
+	            		<ul>
+	             			<th:block th:each="name : ${serviceProvider.names}">
+	             				<li th:each="n : ${name.value}">
+	             					<p class="p-margin" th:text="'(' + ${name.key} + ')' + ' - ' + ${n}"></p>
+	             				</li>
+	             			</th:block>
+			    		</ul>
+		    		</div>
+	    		</div>
+	            <div class="container container-no-margin">
+	            	<div class="row">Trade name : <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapseTwo">+</button></div>
+	    			<div id="collapse2" class="panel-collapse collapse">
+	                  	<ul>
+	                   		<th:block th:each="tradeName : ${serviceProvider.tradeNames}">
+	                   			<li th:each="n : ${tradeName.value}">
+	                   				<p class="p-margin" th:text="'(' + ${tradeName.key} + ')' + ' - ' + ${n}"></p>
+	                   			</li>
+	                   		</th:block>
+		    			</ul>
+	    			</div>
+	            </div>
+	            <div class="container container-no-margin">
+	            	<div class="row">Postal address : <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapseTwo">+</button></div>
+	    			<div id="collapse3" class="panel-collapse collapse">
+						<ul>
+							<li th:each="postalAddress : ${serviceProvider.postalAddresses}">
+				  				<p class="p-margin" th:text="'(' + ${postalAddress.key} + ')' + ' - ' + ${postalAddress.value}"></p> 
+							</li>
+		    			</ul>
+	    			</div>
+	            </div>
+	            <div class="container container-no-margin">
+	            	<div class="row">Electronic address : <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapseTwo">+</button></div>
+		    		<div id="collapse4" class="panel-collapse collapse">
+	                	<ul>
+	                    	<th:block th:each="electronicAddress : ${serviceProvider.electronicAddresses}">
+	                    		<li th:each="n : ${electronicAddress.value}"><a th:href="${n}" th:text="'('+ ${electronicAddress.key} +')' + ' - ' + ${n}"></a></li>
+	                    	</th:block>
+	                   	</ul>
+		    		</div>
+	            </div>
+			</div>
+		
+			<!-- Add list of Trust Services -->
+			<th:block th:each="service,ser : ${serviceProvider.services}">
+				<div th:replace="fragment/tl-info :: tl-tsp-ts(service=${service}, ser=${ser})"></div>
+			</th:block>
+        </div>
+    </div>
+</div>
+
+
+<div th:fragment="tl-tsp-ts(service, ser)" class="panel panel-primary">
+	<th:block th:each="serviceStatus, i : ${service.getStatusAndInformationExtensions()}" th:if="${i.index} == 0">
+     	<div class="panel-heading" data-toggle="collapse" aria-expanded="true" th:data-target="'#countryServices' + ${ser.index}">
+     		<span class="pull-right">
+     			<a class="panel-title" th:href="${serviceStatus.type}" target="_blank" th:text="${serviceStatus.type.replaceFirst('http://uri.etsi.org/TrstSvc/Svctype/', '')}"></a>
+     		</span>
+			<th:block th:each="name : ${serviceStatus.names}">
+             	<h3 th:if="${name.key == 'en'}" class="panel-title" th:text="${name.value[0]}"></h3>
+      		</th:block>
+		</div>
+		<div class="panel-body tl-content accordian-body collapse animate" th:id="'countryServices' + ${ser.index}">
+        	<div class="container-fluid">
+            	<div class="row">
+                	<div class="col-sm-12 col-md-12 col-xl-12">
+                    	<div class="container container-no-margin reset-padding">
+                           	<div class="row">Name :</div>
+                                 	<div class="row">
+                                 		<ul>
+                                 			<th:block th:each="name : ${serviceStatus.names}">
+                                  			<li th:each="n : ${name.value}">
+                                  				<p class="p-margin" th:text="'(' + ${name.key} + ')' + ' - ' + ${n}"></p>
+                                  			</li>
+                                 			</th:block>
+                                 		</ul>
+					    	</div>
+					    	<div class="row">
+								<div style="margin-right:10px;">Type :</div>
+								<div>
+									<a th:href="${serviceStatus.type}" th:text="${serviceStatus.type}"></a>
+								</div>
+							</div>
+						</div>    
+					</div>
+                             
+                    <div class="col-sm-12 col-md-12 col-xl-12">
+                      	<table class="table table-bordered">
+                      		<thead>
+                       			<tr>
+                        			<th scope="col">Status</th>
+                        			<th scope="col">Start date</th>
+                        			<th scope="col">End date</th>
+                       			</tr>
+                       		<thead>
+                       		<tbody>
+                       			<tr th:each="serv : ${service.statusAndInformationExtensions}">
+                       				<td><a th:href="${serv.status}" th:text="${serv.status.substring(serv.status.lastIndexOf('/')+1)}"></a></td>
+                       				<td th:text="${#dates.format(serv.startDate, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                       				<td th:text="${serv.endDate != null} ? ${#dates.format(serv.endDate, 'dd/MM/yyyy HH:mm:ss')} : ''"></td>
+                       			</tr>
+                       		</tbody>
+                      	</table>
+                    </div>
+				</div>
+          	</div>
+			
+			<!-- Add list of Certificates -->
+			<th:block>
+				<div th:replace="fragment/tl-info :: tl-tsp-ts-cert(service=${service}, ser=${ser})"></div>
+			</th:block>
+    	</div>
+   	</th:block>
+</div>
+
+
+<div th:fragment="tl-tsp-ts-cert(service, ser)">
+ 	<div class="panel panel-primary" th:if="${not #lists.isEmpty(service.certificates)}">
+		<div class="panel-heading" data-toggle="collapse"
+		    th:data-target="'#countryCertificates' + ${country} + ${sp.index} + '-' + ${ser.index}">
+            <span class="badge pull-right" th:text="${#lists.size(service.certificates)}"  title="Number of Certificates"></span>
+        	<h3 class="panel-title">Certificates</h3>
+		</div>
+		<div class="panel-body collapse in" th:id="'countryCertificates' + ${country} + ${sp.index} + '-' + ${ser.index}">
+			<th:block th:each="token,i : ${service.certificates}">
+				<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${token})"></div>
+				<hr th:if="${!i.last}"/>
+			</th:block>
+		</div>
+	</div>
+</div>
+                    	

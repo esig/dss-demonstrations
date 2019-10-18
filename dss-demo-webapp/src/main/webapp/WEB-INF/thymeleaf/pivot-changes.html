@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.pivots.summary}">
+	<head>
+		<title th:text="#{label.pivots.summary}"></title>
+	</head>
+	<body>
+		<div class="row panel-row" th:if="${lotl != null}">
+			<div class="panel panel-default panel-body col-lg-10 col-lg-9" layout:fragment="panel">
+				
+			<p>This page contains the information about evolution of the original keystore by provided pivots.</p>
+			<p>The following notations are used:</p>
+			<ul class="pivot-summary-description">
+				<li><span class="pivot-circle circle-default"></span><span>Copied certificate from the previous source;</span></li>
+				<li><span class="pivot-circle circle-success"></span><span>Added certificate to the source by the pivot;</span></li>
+				<li><span class="pivot-circle circle-danger"></span><span>Removed certificate from the source by the pivot;</span></li>
+				<li><span class="pivot-circle circle-signed"></span><span>The signing certificate of the LOTL.</span></li>
+			</ul>
+			</div>
+		</div>
+		
+		<div layout:fragment="content" th:if="${lotl != null}" th:with="lotlSigningCertId=${lotl.validationCacheInfo?.signingCertificate.getDSSIdAsString()}">
+		
+			<!-- LOTL Info -->
+			<div class="current-lotl">
+				<span th:if="${lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}" 
+						th:class="${'lotl-flag small_flag flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
+				<h2><span th:text="#{label.summary.lotl}"></span>&nbsp;
+					<a class="lotl-url" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a></h2>
+			</div>
+		
+			<!-- Original certificates -->
+			<div class="certificates-container original-certificates row">
+				<div class="panel panel-primary">
+					<div class="panel-heading" th:text="#{label.summary.lotl.original.keystore}"></div>
+					<div class="panel-body">
+						<div th:each="certificate,iterCert : ${originalKeystore}" th:with="certId=${certificate.getDSSIdAsString()}">
+							<div th:class="${'panel certificate-container panel-' + ((certId == lotlSigningCertId)?'signed':'default')}">
+								<div class="panel-heading" th:data-target="${'#' + certId}" data-toggle="collapse" 
+										th:title="${(certId == lotlSigningCertId)?'Signing certificate':'Original keystore certificate'}">
+									<span class="certificate-header" th:text="${'Certificate Id = ' + certId}"></span>
+								</div>
+								<div class="panel-body collapse" th:id="${certId}">
+									<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${certificate})"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Pivot certificate source changes -->
+			<div th:if="${not #lists.isEmpty(lotl.pivotInfos)}" class="certificates-container original-certificates row" th:each="pivot,iterPivot : ${lotl.pivotInfos}"
+					th:with="pivotId=${pivot.getIdentifier().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
+					lotlLocation=${pivot.getLOTLLocation()}">
+					
+				<div class="panel panel-primary">
+					<div class="panel-heading" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
+					
+					<div class="panel-body">
+						<!-- LOTL location -->
+						<div class="lotl-location" th:if="${lotlLocation != null}">
+							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>&nbsp;
+							<span th:text="${lotlLocation}"></span>
+							<span class="lotl-change-warning" th:if="${lotl.url != lotlLocation}">
+								<span class="glyphicon glyphicon-exclamation-sign text-warning" title="Updated LOTL location"></span>
+								<span class="badge badge-warning" th:text="#{label.summary.pivot.found.new.lotl}"></span>
+							</span>
+						</div>
+						
+						<!-- Pivot certificate source -->
+						<div th:each="certificateEntry,iterCert : ${pivotCerts}" th:with="certId=${certificateEntry.key.getDSSIdAsString()},
+								certStatus=${certificateEntry.value.name()}">
+							<div th:class="${'panel certificate-container panel-' + 
+									((certId == lotlSigningCertId)?'signed':((certStatus == 'ADDED')?'success':((certStatus == 'REMOVED')?'danger':'default')))}">
+								<div class="panel-heading" th:data-target="${'#' + pivotId + '-' + certId}" data-toggle="collapse" 
+										th:title="${((certId == lotlSigningCertId)?'Signing certificate':((certStatus == 'ADDED')?'Added certificate':
+										((certStatus == 'REMOVED')?'Removed certificate':'Certificate')))}">
+									<span class="certificate-header" th:text="#{label.summary.cert.id(${certId})}"></span>
+								</div>
+								<div class="panel-body collapse" th:id="${pivotId + '-' + certId}">
+									<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${certificateEntry.key})"></div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<div layout:fragment="scripts"></div>
+	</body>
+</html>

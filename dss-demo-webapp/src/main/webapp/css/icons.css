@@ -44,3 +44,6 @@
 .glyphicon-circle-arrow-up:before {
 	content: "\f0aa"; /* fa-arrow-circle-up */
 }
+.glyphicon-link:before {
+	content: "\f0c1"; /* fa-link */
+}

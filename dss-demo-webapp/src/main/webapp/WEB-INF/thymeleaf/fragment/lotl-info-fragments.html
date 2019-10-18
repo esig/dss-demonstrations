@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- LOTL Info -->
+<div class="lotl-info row" th:fragment="lotl-info-summary(downloadResult, parsingResult, validationResult)">
+	<div class="lotl-panel">
+		<div th:with="status=${(parsingResult.resultExist and validationResult.resultExist and validationResult.isValid())?
+				((downloadResult.isSynchronized() and parsingResult.isSynchronized() and validationResult.isSynchronized())?'success':'warning'):
+				'danger'}"
+				th:class="${'panel panel-' + status}">
+			
+			<!-- LOTL indication -->
+			<div class="panel-heading"></div>
+			
+			<!-- LOTL info body -->
+			<div class="panel-body">
+				<div class="row">
+				
+					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.sync.date}"></div>
+					<div class="result-body col-xl-8 col-gs-9" 
+							th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}">
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.download.result}"></div>
+					<div class="result-body col-xl-8 col-gs-9">
+						<span th:replace="fragment/tl-info-fragments :: task-result(result=${downloadResult})"></span>
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.parsing.result}"></div>
+					<div class="result-body col-xl-8 col-gs-9">
+						<span th:replace="fragment/tl-info-fragments :: task-result(result=${parsingResult})"></span>
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.validation.result}"></div>
+					<div class="result-body col-xl-8 col-gs-9">
+						<span th:replace="fragment/tl-info-fragments :: task-result(result=${validationResult})"></span>
+					</div>
+					
+					<div class="result-head col-xl-4 col-gs-3" th:if="${parsingResult.isResultExist()}" 
+							th:text="#{label.summary.lotl.info.issue.date}"></div>
+					<div class="result-body col-xl-8 col-gs-9" th:if="${parsingResult.isResultExist()}">
+						<span th:text="${#dates.format(parsingResult.issueDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:if="${parsingResult.isResultExist()}" 
+							th:text="#{label.summary.lotl.info.next.update}"></div>
+					<div class="result-body col-xl-8 col-gs-9" th:if="${parsingResult.isResultExist()}">
+						<span th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+					</div>
+					
+					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
+							 th:text="#{label.summary.tl.info.indication}"></div>
+					<div class="result-body col-xl-8 col-gs-9" th:if="${validationResult.isResultExist()}">
+						<span th:replace="fragment/tl-info-fragments :: indication(indicationName=${validationResult.indication.name()})"></span>
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist() and validationResult.indication.name() != 'TOTAL_PASSED'}" 
+							 th:text="#{label.summary.tl.info.sub.indication}"></div>
+					<div class="result-body col-xl-8 col-gs-9" th:if="${validationResult.isResultExist() and validationResult.indication.name() != 'TOTAL_PASSED'}">
+						<span th:text="${validationResult.subIndication}?:'-'"></span>
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
+							 th:text="#{label.summary.tl.info.sign.time}"></div>
+					<div class="result-body col-xl-8 col-gs-9" th:if="${validationResult.isResultExist()}">
+						<span th:text="${#dates.format(validationResult.signingTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+					</div>
+					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
+							 th:text="#{label.summary.tl.info.sign.cert}"></div>
+					<div class="result-body col-xl-12 col-gs-9 signing-certificate" th:if="${validationResult.isResultExist() and validationResult.signingCertificate != null}">
+						<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${validationResult.signingCertificate})"></div>
+					</div>
+				
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	
+</div>

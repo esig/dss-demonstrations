@@ -336,6 +336,10 @@ footer li a, footer li a:hover {
 	color: #f90202;
 }
 
+.certificate-container .certificate > .result-head, .certificate-container .certificate > .result-body {
+	font-size: 14px;
+}
+
 .certificates > .certificate {
 	margin-bottom: 15px;
 }
@@ -386,7 +390,7 @@ footer li a, footer li a:hover {
 	color: inherit;
 }
 
-.glyphicon{
+.glyphicon {
 	font-size: 14px;
 }
 
@@ -396,6 +400,7 @@ footer li a, footer li a:hover {
 
 .report > .btn-group .btn {
 	max-height: 100%;
+    color: #212529;
 }
 
 /* ----- */
@@ -656,6 +661,15 @@ form#sign-pdf-form .form-group {
 }
 
 /* TL-Summary page */
+.lotl > a {
+	display: inline-block;
+	float: left;
+}
+
+.lotl > h2 {
+	line-height: 1.4em;
+}
+
 .lotl-url {
 	font-size: 20px;
     line-height: 1;
@@ -680,18 +694,16 @@ form#sign-pdf-form .form-group {
 	margin-bottom: 5px;
 }
 
-.lotl-info {
-	margin-top: 15px;
-	margin-bottom: 15px;
-}
-
-.pivot-changes-url {
-	font-size: 18px;
+.lotl-info, .lotl .table-container {
+	margin: 15px -30px 15px 0;
 }
 
 .table-container {
 	padding-right: 30px;
-    margin-top: 15px;
+}
+
+.pivot-changes-url {
+	font-size: 18px;
 }
 
 table.tl-summary {
@@ -911,4 +923,121 @@ span.distribution-point {
 
 #downloads .control-label {
 	font-weight: bold;
+}
+
+/* TL-Country */
+.container-no-margin {
+    margin-left: unset !important;
+    margin-right: unset !important;
+    padding-left: 25px;
+}
+
+.p-margin {
+    margin-bottom:0px;
+}
+
+.inner-card-container {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.reset-padding {
+    padding-left:15px !important;
+}
+
+.table-bordered {
+    margin-top:10px;
+}
+
+.btn-link{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.table-right {
+    float: right;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.link-h-center {
+    transform: translate(0%, -25%);
+}
+
+.panel .panel {
+    margin-top: 0;
+}
+
+dl.dl-horizontal .glyphicon {
+    margin-right: 3px;
+}
+
+.panel .attributes {
+    margin-bottom: 10px;
+}
+
+.lotl-location {
+    margin-bottom: 10px;
+}
+
+.pull-right > a {
+	color: #fff;
+}
+
+/* Large devices (large desktops, less than 1400px) */
+@media (min-width: 1380px) {
+	.container {
+	    max-width: 1340px;
+	}
+}
+@media (max-width: 1379.98px) {
+	.dss {
+	    margin-top: 40px;
+	}
+	.social-buttons {
+		margin-top: 20px;
+	}
+	.nowina-logo {
+	    margin: 0 0 15px 0;
+	}
+	.main-menu > ul:not(:first-child) {
+		margin-top: 20px;
+	}
+	.signing-certificate {
+		margin-top: 10px;
+		padding-left: 30px;
+	}
+	.summary-table th, .summary-table td {
+		font-size: 14px;
+	}
+	.summary-table th.limited-size {
+		width: 70px;
+    	white-space: nowrap;
+	}
+	.summary-table th.date {
+		width: 110px;
+	}
+}
+
+/* Big devices (small monitors, 1200px and down) */
+@media (max-width: 1199.98px) {
+	.table-container {
+	    overflow-x: scroll;
+	}
+}
+
+/* Medium devices (tablets, 992px and down) */
+@media (max-width: 991.98px) {
+	.signing-certificate {
+		padding-left: 15px;
+	}
+	.certificate-header {
+		font-size: 14px;
+	}
+	.panel {
+		font-size: 14px;
+	}
+	.lotl-url {
+		font-size: 14px
+	}
 }
