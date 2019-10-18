@@ -790,6 +790,10 @@ td.tl-info-body {
 	display: inline-block;
 }
 
+a.distribution-point {
+    display: block;
+}
+
 .certificate .result-body {
 	margin-bottom: 0;
 	line-height: 1;
