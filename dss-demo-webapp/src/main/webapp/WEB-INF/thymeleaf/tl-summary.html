@@ -103,7 +103,7 @@
 			<!-- Other TLs -->
 			<div class="table-container row" th:if="${not #lists.isEmpty(summary.otherTLInfos)}">
 				<h2 th:text=#{label.summary.tl.info.other.header}>Other Trusted Lists</h2>
-				<table class="tl-summary table accordion">
+				<table class="tl-summary summary-table table accordion">
 					<thead th:replace="fragment/tl-info :: tl-info-header()"></thead>
 					
 					<tbody th:each="tl,iterTL : ${summary.otherTLInfos}" th:with="id=${tl.getIdentifier().asXmlId()},

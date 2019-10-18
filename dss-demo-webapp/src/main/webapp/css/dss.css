@@ -661,6 +661,10 @@ form#sign-pdf-form .form-group {
 }
 
 /* TL-Summary page */
+.lotl {
+    margin-bottom: 20px;
+}
+
 .lotl > a {
 	display: inline-block;
 	float: left;

@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,16 +16,14 @@ import eu.europa.esig.dss.spi.tsl.LOTLInfo;
 import eu.europa.esig.dss.spi.tsl.TLInfo;
 import eu.europa.esig.dss.spi.tsl.TLValidationJobSummary;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 
 @Controller
 @RequestMapping(value = "/tsl-info")
 public class TrustedListController {
-
-	private static final Logger LOG = LoggerFactory.getLogger(TrustedListController.class);
 	
 	private static final String TL_SUMMARY = "tl-summary";
 	private static final String PIVOT_CHANGES = "pivot-changes";
-	private static final String ERROR = "error";
 	private static final String TL_DATA = "tl-info-country";
 	private static final String LOTL_DATA = "lotl-info";
 
@@ -43,29 +39,22 @@ public class TrustedListController {
 	
 
 	@RequestMapping(method = RequestMethod.GET, value = "/lotl/{id}")
-	public String lotlInfoPaget(@PathVariable(value = "id") String id, Model model, HttpServletRequest request) {
-		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
-		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
-		for(LOTLInfo lotlInfo : lotlInfos) {
-			if(lotlInfo.getIdentifier().asXmlId().equals(id)) 
-				model.addAttribute("lotlInfo", lotlInfo);
+	public String lotlInfoPage(@PathVariable(value = "id") String id, Model model, HttpServletRequest request) {
+		LOTLInfo lotlInfo = getLOTLInfoById(id);
+		if (lotlInfo == null) {
+			throw new SourceNotFoundException(String.format("The LOTL with the specified id [%s] is not found!", id));
 		}
-		
+		model.addAttribute("lotlInfo", lotlInfo);
 		return LOTL_DATA;
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/tl/{id}")
 	public String tlInfoPageByCountry(@PathVariable(value = "id") String id, Model model, HttpServletRequest request) {
-		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
-		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
-		for(LOTLInfo lotlInfo : lotlInfos) {
-			List<TLInfo> tlInfos = lotlInfo.getTLInfos();
-			for(TLInfo tlInfo: tlInfos) {
-				if(tlInfo.getIdentifier().asXmlId().equals(id))
-					model.addAttribute("tlInfo", tlInfo);
-			}
+		TLInfo tlInfo = getTLInfoById(id);
+		if (tlInfo == null) {
+			throw new SourceNotFoundException(String.format("The TL with the specified id [%s] is not found!", id));
 		}
-		
+		model.addAttribute("tlInfo", tlInfo);
 		return TL_DATA;
 	}
 	
@@ -79,8 +68,7 @@ public class TrustedListController {
 					lotlInfo.getValidationCacheInfo().getPotentialSigners() : Collections.emptyList());
 			return PIVOT_CHANGES;
 		} else {
-			model.addAttribute("error", "The requested LOTL does not exist!");
-			return ERROR;
+			throw new SourceNotFoundException(String.format("The requested LOTL with id [%s] does not exist!", lotlId));
 		}
 	}
 	
@@ -92,7 +80,32 @@ public class TrustedListController {
 				return lotlInfo;
 			}
 		}
-		LOG.warn("The LOTL with the specified id [{}] is not found!", lotlId);
+		return null;
+	}
+	
+	private TLInfo getTLInfoById(String tlId) {
+		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
+		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+		for (LOTLInfo lotlInfo : lotlInfos) {
+			TLInfo tlInfo = getTLInfoByIdFromList(tlId, lotlInfo.getTLInfos());
+			if (tlInfo != null) {
+				return tlInfo;
+			}
+		}
+		List<TLInfo> otherTLInfos = summary.getOtherTLInfos();
+		TLInfo tlInfo = getTLInfoByIdFromList(tlId, otherTLInfos);
+		if (tlInfo != null) {
+			return tlInfo;
+		}
+		return null;
+	}
+	
+	private TLInfo getTLInfoByIdFromList(String tlId, List<TLInfo> tlInfos) {
+		for (TLInfo tlInfo: tlInfos) {
+			if (tlInfo.getIdentifier().asXmlId().equals(tlId)) {
+				return tlInfo;
+			}
+		}
 		return null;
 	}
 

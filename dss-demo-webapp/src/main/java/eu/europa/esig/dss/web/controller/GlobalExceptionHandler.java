@@ -16,6 +16,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.exception.InternalServerException;
+import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,6 +41,14 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public ModelAndView pageNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+		if (logger.isDebugEnabled()) {
+			logger.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
+		}
+		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
+	}
+
+	@ExceptionHandler(SourceNotFoundException.class)
+	public ModelAndView sourceNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
 		}
