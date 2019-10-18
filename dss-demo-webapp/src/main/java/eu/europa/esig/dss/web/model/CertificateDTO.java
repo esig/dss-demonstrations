@@ -5,7 +5,7 @@ import java.util.Date;
 public class CertificateDTO {
 
 	private String dssId;
-	private String subjetName;
+	private String subjectName;
 	private String issuerName;
 	private Date notBefore;
 	private Date notAfter;
@@ -23,12 +23,12 @@ public class CertificateDTO {
 		this.dssId = dssId;
 	}
 
-	public String getSubjetName() {
-		return subjetName;
+	public String getSubjectName() {
+		return subjectName;
 	}
 
-	public void setSubjetName(String subjetName) {
-		this.subjetName = subjetName;
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
 	}
 
 	public String getIssuerName() {

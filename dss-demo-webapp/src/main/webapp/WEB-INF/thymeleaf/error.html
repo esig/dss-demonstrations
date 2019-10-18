@@ -1,41 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="fragment/head :: head"></th:block>
-<th:block th:replace="fragment/header :: header"></th:block>
-<body>
-    <main class="page-row page-row-expanded">
-    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
-
-    <!-- BODY -->
-    <div class="container-fluid">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-12"></div>
-
-                        <!-- BREADCRUMP -->
-                        <ul class="breadcrumb">
-                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
-                            <li class="active">Error</li>
-                        </ul>
-
-                        <!-- CONTENT -->
-                        <div class="row">
-                            <th:block th:replace="fragment/menu :: menu"></th:block>
-                            <div class="col-md-9">
-                                <div class="alert alert-danger" role="alert">
-                                    <strong>An error occurred ! </strong> <span th:text="${exception}"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Error'">
+	<body>		
+		<div layout:fragment="content">
+			<div class="alert alert-danger" role="alert">
+                <strong>An error occurred ! </strong> <span th:text="${exception}"></span>
             </div>
-        </div>
-
-    </div>
-    </main>
-    <th:block th:replace="fragment/footer :: footer"></th:block>
-</body>
+		</div>
+	</body>
 </html>

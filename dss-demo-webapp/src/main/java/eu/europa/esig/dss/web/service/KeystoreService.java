@@ -32,7 +32,7 @@ public class KeystoreService {
 
 		dto.setDssId(certificate.getDSSIdAsString());
 		dto.setIssuerName(certificate.getIssuerX500Principal().getName());
-		dto.setSubjetName(certificate.getSubjectX500Principal().getName());
+		dto.setSubjectName(certificate.getSubjectX500Principal().getName());
 		dto.setNotBefore(certificate.getNotBefore());
 		dto.setNotAfter(certificate.getNotAfter());
 

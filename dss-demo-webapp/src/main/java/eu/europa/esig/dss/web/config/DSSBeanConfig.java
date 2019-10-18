@@ -193,6 +193,7 @@ public class DSSBeanConfig {
 		certificateVerifier.setCrlSource(cachedCRLSource());
 		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setDataLoader(dataLoader());
+		certificateVerifier.setTrustedCertSources(trustedListSource());
 
 		// Default configs
 		certificateVerifier.setExceptionOnMissingRevocationData(true);
@@ -307,17 +308,11 @@ public class DSSBeanConfig {
 	@Bean 
 	public TLValidationJob job() {
 		TLValidationJob job = new TLValidationJob();
-		job.setTrustedListCertificateSource(trustedCertificateSource());
+		job.setTrustedListCertificateSource(trustedListSource());
 		job.setListOfTrustedListSources(europeanLOTL());
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
 		return job;
-	}
-
-	@Bean
-	public TrustedListsCertificateSource trustedCertificateSource() {
-		TrustedListsCertificateSource certificateSource = new TrustedListsCertificateSource();
-		return certificateSource;
 	}
 
 	@Bean

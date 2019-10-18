@@ -1,123 +1,110 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="fragment/head :: head"></th:block>
-<th:block th:replace="fragment/header :: header"></th:block>
-<body>
-    <main class="page-row page-row-expanded">
-    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Signature Validation'">
+	<body>
+	<div layout:fragment="content">
+		<h2 th:text="#{label.validate}"></h2>
 
-    <!-- BODY -->
-    <div class="container-fluid">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-12"></div>
+		<form method="post" class="form-horizontal"
+			enctype="multipart/form-data" th:action="@{/validation}"
+			th:object="${validationForm}">
 
-                        <!-- BREADCRUMP -->
-                        <ul class="breadcrumb">
-                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
-                            <li class="active">Signature validation</li>
-                        </ul>
+			<div th:replace="fragment/fields::field-signed-file"></div>
 
-                        <!-- CONTENT -->
-                        <div class="row">
-                            <th:block th:replace="fragment/menu :: menu"></th:block>
-                            <div class="col-md-9">
-                                <h2 th:text="#{label.validate}"></h2>
+			<div th:replace="fragment/fields::field-original-files"></div>
 
-                                <form method="post" class="form-horizontal" enctype="multipart/form-data" th:action="@{/validation}" th:object="${validationForm}">
-
-                                    <div th:replace="fields::field-signed-file"></div>
-
-                                    <div th:replace="fields::field-original-files"></div>
-
-									<a class="dss-link" data-toggle='collapse' data-target='#advancedOptions' aria-expanded='false' th:text="#{label.validation.advanced.options}"></a>
-									
-									<div id='advancedOptions' class='collapse div1'>
-	                                    <!-- Validation level -->
-	                                    <div class="form-group">
-	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.level}"></label>
-	                                        <div class="col-sm-7">
-	                                            <select th:field="*{validationLevel}" class="form-control input-sm">
-	                                                <option th:each="level : ${validationLevels}" th:value="${level}" th:text="#{${'label.validation.level.'+level}}" />
-	                                            </select>
-	                                        </div>
-	                                    </div>
+            <div class="panel panel-default">
+            	<div class="panel-heading dss-link" data-toggle='collapse' data-target='#advancedOptions' aria-expanded='false'>
+                    <span th:text="#{label.validation.advanced.options}"></span>
+                </div>
+                <div id="advancedOptions" class="panel-body div1 collapse in">
+	                <!-- Validation level -->
+					<div class="form-group row">
+						<label class="col-sm-3 control-label"
+							th:text="#{label.validation.level}"></label>
+						<div class="col-sm-8">
+							<select th:field="*{validationLevel}"
+								class="form-control input-sm">
+								<option th:each="level : ${validationLevels}" th:value="${level}"
+									th:text="#{${'label.validation.level.'+level}}" />
+							</select>
+						</div>
+					</div>
 	
-	                                    <div class="form-group">
-	                                        <div class="col-sm-offset-2 col-sm-7">
-	                                            <input type="radio" th:field="*{defaultPolicy}" value="true" th:text="#{label.validation.default.policy.file}" />
-	                                        </div>
-	                                    </div>
-	                                    
-	                                    <div class="form-group">
-	                                        <div class="col-sm-offset-2 col-sm-4">
-	                                            <input type="radio" th:field="*{defaultPolicy}" value="false" th:text="#{label.validation.custom.policy.file}" /> :
-	                                        </div>
+					<div class="form-group row">
+						<div class="offset-sm-3 col-sm-8">
+							<label class="radio-inline">
+								<input type="radio" th:field="*{defaultPolicy}" value="true"
+									th:text="#{label.validation.default.policy.file}" />
+							</label>
+						</div>
+					</div>
 	
-	                                        <div class="col-sm-6">
-	                                            <input type="file" name="policyFile" id="policyFile" disabled="disabled" />
-	                                        </div>
-	                                    </div>
-	                                    
-	                                    <!-- Used certificates -->
-	                                    <div class="form-group">
-	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.certificates.used}"></label>
-	                                        <div class="col-sm-7">
-	                                            <input type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
-	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	                                            	data-placement="right" th:title="#{label.validation.certificate.tooltip}"></span>
-	                                        </div>
-	                                    </div>
-	                                    
-	                                    <!-- Timestamp -->
-	                                    <div class="form-group">
-	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.timestamps}"></label>
-	                                        <div class="col-sm-7">
-	                                            <input type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
-	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	                                            	data-placement="right" th:title="#{label.validation.timestamp.tooltip}"></span>
-	                                        </div>
-	                                    </div>
-	                                    
-	                                    <!-- Revocation -->
-	                                    <div class="form-group">
-	                                        <label class="col-sm-2 control-label" th:text="#{label.validation.revocation}"></label>
-	                                        <div class="col-sm-7">
-	                                            <input type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
-	                                            <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	                                            	data-placement="right" th:title="#{label.validation.revocation.tooltip}"></span>
-	                                        </div>
-	                                    </div>
-	                                </div>
-
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
-                                            <button type="reset" class="btn" th:text="#{label.clear}"></button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+					<div class="form-group row">
+						<div class="offset-sm-3 col-sm-3">
+							<label class="radio-inline">
+								<input type="radio" th:field="*{defaultPolicy}" value="false"
+									th:text="#{label.validation.custom.policy.file}" /> :
+							</label>
+						</div>
+	
+						<div class="col-sm-5">
+							<input type="file" name="policyFile" id="policyFile"
+								disabled="disabled" />
+						</div>
+					</div>
+	
+					<!-- Used certificates -->
+					<div class="form-group row">
+						<label class="col-sm-3 control-label"
+							th:text="#{label.validation.certificates.used}"></label>
+						<div class="col-sm-8">
+							<input type="checkbox" th:field="*{includeCertificateTokens}" value="false" /> 
+							<span class="glyphicon glyphicon-info-sign text-info" style="margin-left: 10px" data-toggle="tooltip"
+								data-placement="top" th:title="#{label.validation.certificate.tooltip}"></span>
+						</div>
+					</div>
+	
+					<!-- Timestamp -->
+					<div class="form-group row">
+						<label class="col-sm-3 control-label"
+							th:text="#{label.validation.timestamps}"></label>
+						<div class="col-sm-8">
+							<input type="checkbox" th:field="*{includeTimestampTokens}" value="false" /> 
+							<span class="glyphicon glyphicon-info-sign text-info" style="margin-left: 10px" data-toggle="tooltip"
+								data-placement="top" th:title="#{label.validation.timestamp.tooltip}"></span>
+						</div>
+					</div>
+	
+					<!-- Revocation -->
+					<div class="form-group row">
+						<label class="col-sm-3 control-label"
+							th:text="#{label.validation.revocation}"></label>
+						<div class="col-sm-8">
+							<input type="checkbox" th:field="*{includeRevocationTokens}" value="false" /> 
+							<span class="glyphicon glyphicon-info-sign text-info" style="margin-left: 10px" data-toggle="tooltip"
+								data-placement="top" th:title="#{label.validation.revocation.tooltip}"></span>
+						</div>
+					</div>
                 </div>
             </div>
-        </div>
 
-    </div>
-    </main>
-    <th:block th:replace="fragment/footer :: footer"></th:block>
+			<div class="form-group row">
+				<div class="offset-sm-2 col-sm-10">
+					<button type="submit" class="btn btn-primary"
+						th:text="#{label.submit}"></button>
+					<button type="reset" class="btn btn-default" th:text="#{label.clear}"></button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div layout:fragment="scripts">
+		<script type="text/javascript">
+			$('[data-toggle="tooltip"]').tooltip();
 
-    <script type="text/javascript">
-    					$('[data-toggle="tooltip"]').tooltip();
-    
-    					$('input[name="defaultPolicy"]:radio').change(
-							function() {
-								$('#policyFile').attr("disabled",
-										this.value == 'true');
-							});
-				</script>
+			$('input[name="defaultPolicy"]:radio').change(function() {
+				$('#policyFile').attr("disabled", this.value == 'true');
+			});
+		</script>
+	</div>
 </body>
 </html>

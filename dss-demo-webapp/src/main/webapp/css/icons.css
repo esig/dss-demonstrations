@@ -1,0 +1,46 @@
+/* Contains lists of icons excluded from Bootstrap 4 */
+/* Based on Font-Awesome */
+
+.glyphicon {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-ok-sign:before {
+	content: "\f058"; /* fa-check-circle */
+}
+.glyphicon-remove-sign:before {
+	content: "\f057"; /* fa-times-circle */
+}
+.glyphicon-exclamation-sign:before {
+	content: "\f06a"; /* fa-exclamation-circle */
+}
+.glyphicon-info-sign:before {
+	content: "\f05a"; /* fa-info-circle  */
+}
+.glyphicon-plus-sign:before {
+	content: "\f055"; /* fa-plus-circle */
+}
+.glyphicon-ban-sign:before {
+	content: "\f05e"; /* fa-ban */
+}
+.glyphicon-time:before {
+	content: "\f017"; /* fa-clock-o */
+    margin-top: 3px;
+    display: inline-block;
+}
+.glyphicon-thumbs-up:before {
+	content: "\f164"; /* fa-thumbs-up */
+}
+.glyphicon-circle-arrow-right:before {
+	content: "\f0a9"; /* fa-arrow-circle-right */
+}
+.glyphicon-circle-arrow-down:before {
+	content: "\f0ab"; /* fa-arrow-circle-down */
+}
+.glyphicon-circle-arrow-up:before {
+	content: "\f0aa"; /* fa-arrow-circle-up */
+}

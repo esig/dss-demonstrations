@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import eu.europa.esig.dss.DSSXmlErrorListener;
-import eu.europa.esig.dss.detailedreport.DetailedReportFacade;
+import eu.europa.esig.dss.detailedreport.DetailedReportXmlDefiner;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
 import eu.europa.esig.dss.simplereport.SimpleReportFacade;
 
@@ -53,8 +53,11 @@ public class XSLTService {
 	}
 
 	public String generateDetailedReport(String detailedReport) {
-		try {
-			return DetailedReportFacade.newFacade().generateHtmlReport(detailedReport);
+		try (Writer writer = new StringWriter()) {
+			Transformer transformer = DetailedReportXmlDefiner.getHtmlBootstrap4Templates().newTransformer();
+			transformer.setErrorListener(new DSSXmlErrorListener());
+			transformer.transform(new StreamSource(new StringReader(detailedReport)), new StreamResult(writer));
+			return writer.toString();
 		} catch (Exception e) {
 			logger.error("Error while generating detailed report : " + e.getMessage(), e);
 			return null;

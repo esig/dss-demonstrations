@@ -1,21 +1,26 @@
 <head th:fragment="head" xmlns:th="http://www.thymeleaf.org">
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-
-<link rel="icon" type="image/png" th:href="@{/images/favicon.ico}" sizes="16x16">
-<title th:text="#{application.title}">Digital Signature Services</title>
-
-<!-- Bootstrap -->
-<link th:href="@{/webjars/jquery-ui/1.11.1/jquery-ui.min.css}" rel="stylesheet" />
-<link th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}" rel="stylesheet" />
-<link th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap-theme.min.css}" rel="stylesheet" />
-<link th:href="@{/webjars/google-code-prettify/1.0.5/src/prettify.css}" rel="stylesheet" />
-<link th:href="@{/css/dss.css}" rel="stylesheet" />
-
-<script type="text/javascript" th:src="@{/webjars/jquery/1.11.1/jquery.min.js}"></script>
-<script type="text/javascript" th:src="@{/webjars/jquery-ui/1.11.1/jquery-ui.min.js}"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
-<script type="text/javascript" th:src="@{/webjars/google-code-prettify/1.0.5/src/run_prettify.js}"></script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+	
+	<link rel="icon" type="image/png" th:href="@{/images/favicon.ico}" sizes="16x16">
+	<title th:text="#{application.title}">Digital Signature Services</title>
+	
+	<!-- Bootstrap -->
+	<link type="text/css" th:href="@{/webjars/jquery-ui/1.11.1/jquery-ui.min.css}" rel="stylesheet" />
+	<link type="text/css" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}" rel="stylesheet" />
+	<link type="text/css" th:href="@{/webjars/google-code-prettify/1.0.5/src/prettify.css}" rel="stylesheet" />
+	<link type="text/css" rel="stylesheet" th:href="@{/webjars/font-awesome/4.7.0/css/font-awesome.min.css}" />
+	
+	<link th:href="@{/css/icons.css}" rel="stylesheet" />
+	<link th:href="@{/css/style.css}" rel="stylesheet" />
+	<link th:href="@{/css/dss.css}" rel="stylesheet" />
+	
+	<link th:href="@{/webjars/google-code-prettify/1.0.5/src/prettify.css}" rel="stylesheet" />
+	
+	<script type="text/javascript" th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/jquery-ui/1.11.1/jquery-ui.min.js}"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script type="text/javascript" th:src="@{/webjars/popper.js/1.14.3/umd/popper.min.js}"></script> <!-- Bootstrap 4 dependency -->
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/4.3.1/js/bootstrap.min.js}"></script>
 </head>

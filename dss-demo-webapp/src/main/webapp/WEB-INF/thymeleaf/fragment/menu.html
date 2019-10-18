@@ -1,6 +1,6 @@
 <div th:fragment="menu" class="col-md-3 dss-menu" xmlns:th="http://www.thymeleaf.org">
 
-    <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
+    <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-primary">
         <div class="panel-heading">e-Signature</div>
         <div class="list-group hidden-print">
             <a th:href="@{/sign-a-document}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-document' ? 'active' : ''}" th:text="#{label.signADocument}">Sign
@@ -17,7 +17,7 @@
                 WebServices</a>
         </div>
     </div>
-    <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-default">
+    <div th:if="${! #httpServletRequest.getRequestURI().contains('/admin/')}" class="panel panel-primary">
         <div class="panel-heading">Server side</div>
         <div class="list-group hidden-print">
             <a th:href="@{/extension}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/extension' ? 'active' : ''}" th:text="#{label.extend}">Extension</a>
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">Documentation</div>
         <div class="list-group hidden-print">
             <a th:href="@{/doc/dss-documentation.html}" target="_blank" class="list-group-item">HTML</a>
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">Useful links</div>
         <div class="list-group hidden-print">
             <a href="https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eSignature" class="list-group-item" target="_blank">CEF Digital</a>

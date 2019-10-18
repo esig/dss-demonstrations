@@ -1,56 +1,24 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="fragment/head :: head"></th:block>
-<th:block th:replace="fragment/header :: header"></th:block>
-<body>
-    <main class="page-row page-row-expanded">
-    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
-
-    <!-- BODY -->
-    <div class="container-fluid">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-12"></div>
-
-                        <!-- BREADCRUMP -->
-                        <ul class="breadcrumb">
-                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
-                            <li class="active">
-                                <span>Home</span>
-                            </li>
-                        </ul>
-
-                        <!-- CONTENT -->
-                        <div class="row">
-                            <th:block th:replace="fragment/menu :: menu"></th:block>
-                            <div class="col-md-9">
-                                <h2 th:text="#{label.info}">Home</h2>
-                                <p>Please see the notes below for the features of the two applications:</p>
-                                <h3>Signature</h3>
-                                <ul>
-                                    <li>XAdES detached and enveloping signatures can be used to sign any file.</li>
-                                    <li>XAdES enveloped signature can be used to sign an XML file.</li>
-                                    <li>PDF files can be signed with an enveloped PAdES signature.</li>
-                                    <li>CAdES enveloping or detached signatures can be used to sign any arbitrary files.</li>
-                                    <li>ASiC-S or ASiC-E containers can be used to sign at least one document.</li>
-                                    <li>The multiple parallel signatures can be created.</li>
-                                    <li>A user can use PKCS#11-compliant QSCD, MS-CAPI, MOCCA and PKCS#12 to sign.</li>
-                                    <li>Any kind of signature: CAdES, PAdES, XAdES, ASiC-S or ASiC-E can be validated.</li>
-                                    <li>A validation policy can be applied.</li>
-                                    <li>Two validation reports are available: Simple and Detailed.</li>
-                                    <li>The Diagnostic Data representing each static information used during the validation process is available.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    </main>
-    <th:block th:replace="fragment/footer :: footer"></th:block>
-</body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Home'">
+	<body>		
+		<div layout:fragment="content">
+			<h2 th:text="#{label.info}"></h2>
+            <p>Please see the notes below for the features of the two applications:</p>
+            <h3>Signature</h3>
+            <ul>
+                <li>XAdES detached and enveloping signatures can be used to sign any file.</li>
+                <li>XAdES enveloped signature can be used to sign an XML file.</li>
+                <li>PDF files can be signed with an enveloped PAdES signature.</li>
+                <li>CAdES enveloping or detached signatures can be used to sign any arbitrary files.</li>
+                <li>ASiC-S or ASiC-E containers can be used to sign at least one document.</li>
+                <li>The multiple parallel signatures can be created.</li>
+                <li>A user can use PKCS#11-compliant QSCD, MS-CAPI, MOCCA and PKCS#12 to sign.</li>
+                <li>Any kind of signature: CAdES, PAdES, XAdES, ASiC-S or ASiC-E can be validated.</li>
+                <li>A validation policy can be applied.</li>
+                <li>Two validation reports are available: Simple and Detailed.</li>
+                <li>The Diagnostic Data representing each static information used during the validation process is available.</li>
+            </ul>
+		</div>
+		
+	</body>
 </html>

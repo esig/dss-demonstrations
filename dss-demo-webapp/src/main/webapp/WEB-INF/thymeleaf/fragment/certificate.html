@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Certificate Token -->
+<div class="certificate row" th:fragment="certificate(certificateToken)">
+	<div class="result-head col-xl-2" th:text="#{label.subject.name}"></div>
+	<div class="result-body col-xl-10">
+		<p th:text="${certificateToken.getSubjectX500Principal().getName()}"></p>
+	</div>
+	<div class="result-head col-xl-2" th:text="#{label.issuer.name}"></div>
+	<div class="result-body col-xl-10">
+		<p th:text="${certificateToken.getIssuerX500Principal().getName()}"></p>
+	</div>
+	<div class="result-head col-xl-2" th:text="#{label.ser.num}"></div>
+	<div class="result-body col-xl-10">
+		<p th:text="${certificateToken.getSerialNumber()}"></p>
+	</div>
+	<div class="result-head col-xl-2" th:text="#{label.validity_start}"></div>
+	<div class="result-body col-xl-10">
+		<p th:text="${#dates.format(certificateToken.getNotBefore(), 'dd-MMM-yyyy HH:mm:ss')}"></p>
+	</div>
+	<div class="result-head col-xl-2" th:text="#{label.validity_end}"></div>
+	<div class="result-body col-xl-10">
+		<p th:text="${#dates.format(certificateToken.getNotAfter(), 'dd-MMM-yyyy HH:mm:ss')}"></p>
+	</div>
+</div>
+
+<!-- Certificate DTO -->
+<div class="certificate row" th:fragment="certificateDTO(certificateDTO)">
+	<div class="result-head col-xl-3" th:text="#{label.subject.name}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateDTO.subjectName}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.issuer.name}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateDTO.issuerName}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.validity_start}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${#dates.format(certificateDTO.notBefore, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.validity_end}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${#dates.format(certificateDTO.notAfter, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.sha256.hex}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateDTO.sha256Hex}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.sha1.hex}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateDTO.sha1Hex}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.sha256.base64}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateDTO.sha256Base64}"></p>
+	</div>
+	<div class="result-head col-xl-3" th:text="#{label.sha1.base64}"></div>
+	<div class="result-body col-xl-9">
+		<p th:text="${certificateDTO.sha1Base64}"></p>
+	</div>
+</div>

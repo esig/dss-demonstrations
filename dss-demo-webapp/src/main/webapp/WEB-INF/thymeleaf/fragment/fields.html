@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<div class="form-group" th:fragment="field-document-to-sign">
-     <label for="documentToSign" class="col-sm-2 control-label" th:text="#{label.to.sign.file}"></label>
+<div class="form-group row" th:fragment="field-document-to-sign">
+     <label for="documentToSign" class="col-sm-3 control-label" th:text="#{label.to.sign.file}"></label>
      <div class="col-sm-5">
     	<input type="file" name="documentToSign" id="documentToSign" /> 
      </div>
@@ -11,8 +11,8 @@
      </div>
 </div>
 
-<div class="form-group" th:fragment="field-documents-to-sign">
-     <label for="documentsToSign" class="col-sm-2 control-label" th:text="#{label.to.sign.files}"></label>
+<div class="form-group row" th:fragment="field-documents-to-sign">
+     <label for="documentsToSign" class="col-sm-3 control-label" th:text="#{label.to.sign.files}"></label>
      <div class="col-sm-5">
     	<input type="file" name="documentsToSign" id="documentsToSign" multiple="multiple" /> 
      </div>
@@ -21,8 +21,8 @@
      </div>
 </div>
 
-<div class="form-group" th:fragment="field-file">
-     <label for="documentToSign" class="col-sm-2 control-label" th:text="#{label.file}"></label>
+<div class="form-group row" th:fragment="field-file">
+     <label for="documentToSign" class="col-sm-3 control-label" th:text="#{label.file}"></label>
      <div class="col-sm-5">
     	<input type="file" name="file" id="file" /> 
      </div>
@@ -31,8 +31,8 @@
      </div>
 </div>
 
-<div class="form-group" th:fragment="field-signed-file">
-    <label for="signedFile" class="col-sm-2 control-label" th:text="#{label.signed.file}"></label>
+<div class="form-group row" th:fragment="field-signed-file">
+    <label for="signedFile" class="col-sm-3 control-label" th:text="#{label.signed.file}"></label>
     <div class="col-sm-5">
     	<input type="file" name="signedFile" id="signedFile" /> 
     </div>
@@ -41,16 +41,16 @@
     </div>
 </div>
 
-<div class="form-group" th:fragment="field-original-files">
-    <label for="originalFiles" class="col-sm-2 control-label" th:text="#{label.original.files}"></label>
+<div class="form-group row" th:fragment="field-original-files">
+    <label for="originalFiles" class="col-sm-3 control-label" th:text="#{label.original.files}"></label>
     <div class="col-sm-5">
         <input type="file" name="originalFiles" id="originalFiles" multiple="multiple" />
     </div>
 </div>
 
 <div th:fragment="field-simplified-container-type-form">
-	<div class="form-group">
-		<label for="containerType" class="col-sm-2 control-label" th:text="#{label.asic.container.type}"></label>
+	<div class="form-group row">
+		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.asic.container.type}"></label>
 		<div class="col-sm-6">
             <label class="radio-inline" th:each="asicType : ${asicContainerTypes}">
             	<input type="radio" th:field="*{containerType}" th:value="${asicType}" th:text="#{${'label.'+asicType}}" />
@@ -63,8 +63,8 @@
 </div>
 
 <div th:fragment="field-container-type-form">
-	<div class="form-group">
-		<label for="containerType" class="col-sm-2 control-label" th:text="#{label.asic.container.type}"></label>
+	<div class="form-group row">
+		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.asic.container.type}"></label>
 		<div class="col-sm-6">
 			<label class="radio-inline">
             	<input type="radio" th:field="*{containerType}" th:value="none" th:text="#{label.container.none}" />
@@ -80,8 +80,8 @@
 </div>
 
 <div th:fragment="field-signature-form">
-	<div class="form-group">
-	    <label for="signatureForm" class="col-sm-2 control-label" th:text="#{label.signature.form}"></label>
+	<div class="form-group row">
+	    <label for="signatureForm" class="col-sm-3 control-label" th:text="#{label.signature.form}"></label>
 	    <div class="col-sm-5">
             <label class="radio-inline" th:each="sigForm : ${signatureForms}">
             	<input type="radio" th:field="*{signatureForm}" th:value="${sigForm}" th:text="#{${'label.'+sigForm}}" th:id="form +${sigForm}" />
@@ -93,8 +93,8 @@
 	</div>
 </div>
 
-<div class="form-group" th:fragment="field-signature-level">
-    <label for="signatureLevel" class="col-sm-2 control-label" th:text="#{label.signature.level}"></label>
+<div class="form-group row" th:fragment="field-signature-level">
+    <label for="signatureLevel" class="col-sm-3 control-label" th:text="#{label.signature.level}"></label>
     <div class="col-sm-4">
         <select name="signatureLevel" class="form-control input-sm" id="selectSignatureLevel">
         </select>
@@ -104,8 +104,8 @@
     </div>
 </div>
 
-<div class="form-group" th:fragment="field-signature-packaging">
-    <label for="signaturePackaging" class="col-sm-2 control-label" th:text="#{label.signature.packaging}"></label>
+<div class="form-group row" th:fragment="field-signature-packaging">
+    <label for="signaturePackaging" class="col-sm-3 control-label" th:text="#{label.signature.packaging}"></label>
     <div class="col-sm-5">
 	    <label class="radio-inline" th:each="sigPack : ${signaturePackagings}">
 		    <input type="radio" th:field="*{signaturePackaging}" th:value="${sigPack}" th:text="#{${'label.'+sigPack}}" th:id="${'signaturePackaging-'+sigPack}" />
@@ -116,8 +116,8 @@
     </div>
 </div>
 
-<div class="form-group" th:fragment="field-digest-algo">
-    <label for="digestAlgorithm" class="col-sm-2 control-label" th:text="#{label.digest.algorithm}"></label>
+<div class="form-group row" th:fragment="field-digest-algo">
+    <label for="digestAlgorithm" class="col-sm-3 control-label" th:text="#{label.digest.algorithm}"></label>
     <div class="col-sm-6">
 	    <label class="radio-inline" th:each="algo : ${digestAlgos}"> 
 		    <input type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:text="${algo}" />
@@ -128,21 +128,21 @@
     </div>
 </div>
 
-<div class="form-group" id="sign-expired-block" th:fragment="field-sign-expired">
-    <label for="signWithExpiredCertificate" class="col-sm-2 control-label" th:text="#{label.allow.expired.certificate}"></label>
+<div class="form-group row" id="sign-expired-block" th:fragment="field-sign-expired">
+    <label for="signWithExpiredCertificate" class="col-sm-3 control-label" th:text="#{label.allow.expired.certificate}"></label>
     <div class="col-sm-4">
     	<input type="checkbox" name="signWithExpiredCertificate" />
     </div>
 </div>
 
-<div class="form-group" id="content-timestamp-block" th:fragment="field-content-timestamp">
-    <label for="addContentTimestamp" class="col-sm-2 control-label" th:text="#{label.add.content.timestamp}"></label>
+<div class="form-group row" id="content-timestamp-block" th:fragment="field-content-timestamp">
+    <label for="addContentTimestamp" class="col-sm-3 control-label" th:text="#{label.add.content.timestamp}"></label>
     <div class="col-sm-4">
     	<input type="checkbox" name="addContentTimestamp" />
     </div>
 </div>
 
-<div class="form-group" th:fragment="field-certificate-file">
+<div class="form-group row" th:fragment="field-certificate-file">
 	<label for="certificateFile" class="col-sm-3 control-label" th:text="#{label.certificate.file}"></label>
 	<div class="col-sm-3">
 		<input type="file" name="certificateFile" />
@@ -152,7 +152,7 @@
 	</div>
 </div>
 
-<div class="form-group" th:fragment="field-certificate-chain-files">
+<div class="form-group row" th:fragment="field-certificate-chain-files">
 	<label for="certificateChainFiles" class="col-sm-3 control-label" th:text="#{label.certificate.chain.files.opt}"></label>
 	<div class="col-sm-3">
 		<input type="file" name="certificateChainFiles" multiple="multiple" />
@@ -162,7 +162,7 @@
 	</div>
 </div>
 
-<div class="form-group" th:fragment="field-validation-time">
+<div class="form-group row" th:fragment="field-validation-time">
 	<label for="validationTime" class="col-sm-3 control-label" th:text="#{label.validation.time.opt}"></label>
 	<div class="col-sm-3">
 		<input type="date" name="validationTime" th:field="*{validationTime}" />
@@ -172,28 +172,31 @@
 	</div>
 </div>
 
-<div class="form-group" th:fragment="field-certificate-tokens">
-    <label class="col-sm-3 control-label" th:text="#{label.validation.certificates.used}"></label>
+<div class="form-group row" th:fragment="field-certificate-tokens">
+    <label class="col-sm-3 control-label" th:text="#{label.validation.include.certificate.tokens}"></label>
     <div class="col-sm-3">
         <input type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
         <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
-            data-placement="right" th:title="#{label.validation.certificate.tooltip}"></span>
+            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></span>
     </div>
 </div>
 
-<div class="form-group" th:fragment="field-revocation-data-tokens">
-    <label class="col-sm-3 control-label" th:text="#{label.validation.revocation}"></label>
+<div class="form-group row" th:fragment="field-revocation-data-tokens">
+    <label class="col-sm-3 control-label" th:text="#{label.validation.include.revocation.tokens}"></label>
     <div class="col-sm-3">
         <input type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
         <span class="glyphicon glyphicon-info-sign text-info" style="margin-left : 10px" data-toggle="tooltip" 
-            data-placement="right" th:title="#{label.validation.revocation.tooltip}"></span>
+            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></span>
     </div>
 </div>
 
 <div style="display: inline;" th:fragment="field-der-pem (isPemAvailable, url)">
     <a th:text="#{label.DER}" th:href="@{|${url}&format=#{label.DER}|}"></a>
     <span th:if="${isPemAvailable}" th:text="'|'"></span>
-    <a th:if="${isPemAvailable}" th:text="#{label.PEM}" th:href="@{|${url}&format=#{label.PEM}|}"></a>
+    <a th:if="${isPemAvailable}" th:href="@{|${url}&format=#{label.PEM}|}">
+    	<span th:text="#{label.PEM}"></span>
+		<span class="fa fa-download"></span>
+    </a>
 </div>
 
 </html>
