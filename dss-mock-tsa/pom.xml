@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.5.RC1</version>
+		<version>5.5</version>
 	</parent>
 
 	<artifactId>dss-mock-tsa</artifactId>
