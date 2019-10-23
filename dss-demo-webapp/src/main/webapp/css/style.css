@@ -442,3 +442,7 @@ section {
 	    max-width: 100%;
 	}
 }
+
+td {
+    background-clip: padding-box;
+}
