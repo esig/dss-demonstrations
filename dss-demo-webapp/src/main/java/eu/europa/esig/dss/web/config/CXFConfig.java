@@ -1,5 +1,7 @@
 package eu.europa.esig.dss.web.config;
 
+import java.util.Arrays;
+
 import javax.annotation.PostConstruct;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
@@ -10,6 +12,7 @@ import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -269,6 +272,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
 
@@ -279,6 +283,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_CERTIFICATE_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
 
@@ -289,6 +294,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SERVER_SIGNING);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
 
@@ -299,6 +305,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_TIMESTAMP_SERVICE);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
 
@@ -309,6 +316,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_ONE_DOCUMENT);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
 
@@ -319,8 +327,20 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_MULTIPLE_DOCUMENTS);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
+	
+    @Bean
+    public OpenApiFeature createOpenApiFeature() {
+        final OpenApiFeature openApiFeature = new OpenApiFeature();
+        openApiFeature.setPrettyPrint(true);
+        openApiFeature.setScan(true);
+        openApiFeature.setRunAsFilter(true);
+        openApiFeature.setUseContextBasedConfig(true);
+        openApiFeature.setTitle("DSS WebServices");
+        return openApiFeature;
+    }
 
 	@Bean
 	public JacksonJsonProvider jacksonJsonProvider() {
@@ -328,7 +348,9 @@ public class CXFConfig {
 		jsonProvider.setMapper(objectMapper());
 		return jsonProvider;
 	}
-	
+
+    
+    
 	/**
 	 * ObjectMappers configures a proper way for (un)marshalling of json data
 	 * @return {@link ObjectMapper}

@@ -62,7 +62,7 @@
 		<slf4j.version>1.7.28</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
-		<cxf.version>3.3.3</cxf.version>
+		<cxf.version>3.3.4</cxf.version>
 		<spring.version>5.1.9.RELEASE</spring.version>
 		<spring-security.version>5.1.6.RELEASE</spring-security.version>
 		<thymeleaf-spring5.version>3.0.11.RELEASE</thymeleaf-spring5.version>
@@ -491,6 +491,19 @@
 			    <version>${cxf.version}</version> 
 			    <scope>test</scope>
 			</dependency>
+			
+			<dependency>
+			    <groupId>org.apache.cxf</groupId>
+			    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+			    <version>${cxf.version}</version>
+			</dependency>
+			
+			<dependency>
+	            <groupId>org.webjars</groupId>
+	            <artifactId>swagger-ui</artifactId>
+	            <version>3.23.0</version>
+	        </dependency>
+			
 
 			<dependency>
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
