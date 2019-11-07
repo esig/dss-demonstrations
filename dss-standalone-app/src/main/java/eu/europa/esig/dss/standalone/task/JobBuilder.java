@@ -1,7 +1,10 @@
 package eu.europa.esig.dss.standalone.task;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,17 +26,29 @@ import eu.europa.esig.dss.tsl.sync.AcceptAllStrategy;
 public class JobBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JobBuilder.class);
-
-	private final String LOTL_URL = "https://ec.europa.eu/tools/lotl/eu-lotl.xml";
-	private final String OJ_URL = "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.C_.2019.276.01.0001.01.ENG";
+	
+	private Properties prop;
+	private final String propertiesFilePath = "src/main/resources/app.config";
 
 	private TrustedListsCertificateSource tslCertificateSource;
+	private File cacheDirectory;
 
 	public JobBuilder() {
 		tslCertificateSource = new TrustedListsCertificateSource();
+		getProperties();
+		cacheDirectory = tlCacheDirectory();
 	}
-
-	public TLValidationJob job() {
+	
+	private void getProperties() {
+		prop = new Properties();
+		try (InputStream is = new FileInputStream(propertiesFilePath)) {
+		    prop.load(is);
+		} catch (IOException e) {
+			LOG.warn("Could not load properties file : {}", e.getMessage(), e);
+		}
+	}
+	
+	public TLValidationJob job() {	    
 		TLValidationJob job = new TLValidationJob();
 		job.setOnlineDataLoader(onlineLoader());
 		job.setOfflineDataLoader(offlineLoader());
@@ -51,7 +66,7 @@ public class JobBuilder {
 		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
 		offlineFileLoader.setCacheExpirationTime(0);
 		offlineFileLoader.setDataLoader(dataLoader());
-		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
+		offlineFileLoader.setFileCacheDirectory(cacheDirectory);
 		return offlineFileLoader;
 	}
 
@@ -59,7 +74,7 @@ public class JobBuilder {
 		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
 		offlineFileLoader.setCacheExpirationTime(Long.MAX_VALUE);
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader()); // do not download from Internet
-		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
+		offlineFileLoader.setFileCacheDirectory(cacheDirectory);
 		return offlineFileLoader;
 	}
 
@@ -69,9 +84,9 @@ public class JobBuilder {
 
 	private LOTLSource europeanLOTL() {
 		LOTLSource lotlSource = new LOTLSource();
-		lotlSource.setUrl(LOTL_URL);
+		lotlSource.setUrl(prop.getProperty("lotl.url"));
 		lotlSource.setCertificateSource(officialJournalContentKeyStore());
-		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(OJ_URL));
+		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(prop.getProperty("oj.url")));
 		lotlSource.setPivotSupport(true);
 		return lotlSource;
 	}
@@ -86,7 +101,7 @@ public class JobBuilder {
 
 	private CertificateSource officialJournalContentKeyStore() {
 		try {
-			return new KeyStoreCertificateSource(new File("src/main/resources/keystore.p12"), "PKCS12", "dss-password");
+			return new KeyStoreCertificateSource(new File(prop.getProperty("keystore.path")), prop.getProperty("keystore.type"), prop.getProperty("keystore.password"));
 		} catch (IOException e) {
 			throw new DSSException("Unable to load the keystore", e);
 		}
@@ -95,16 +110,14 @@ public class JobBuilder {
 	private FileCacheDataLoader getDSSFileLoader() {
 		FileCacheDataLoader fileLoader = new FileCacheDataLoader();
 		fileLoader.setCacheExpirationTime(0);
-		fileLoader.setFileCacheDirectory(tlCacheDirectory());
+		fileLoader.setFileCacheDirectory(cacheDirectory);
 		return fileLoader;
 	}
 
 	private File tlCacheDirectory() {
 		File rootFolder = new File(System.getProperty("java.io.tmpdir"));
 		File tslCache = new File(rootFolder, "dss-tsl-loader");
-		if (tslCache.mkdirs()) {
-			LOG.info("TL Cache folder : {}", tslCache.getAbsolutePath());
-		}
+		LOG.info("TL Cache folder : {}", tslCache.getAbsolutePath());
 		return tslCache;
 	}
 

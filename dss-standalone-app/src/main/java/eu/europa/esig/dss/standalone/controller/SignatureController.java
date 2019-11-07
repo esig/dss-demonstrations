@@ -18,8 +18,6 @@ import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.MimeType;
-import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
-import eu.europa.esig.dss.standalone.RemoteDocumentSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.standalone.task.JobBuilder;
@@ -27,8 +25,6 @@ import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
 import eu.europa.esig.dss.standalone.task.SigningTask;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
-import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -58,6 +54,8 @@ import javafx.stage.Stage;
 public class SignatureController implements Initializable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
+	
+	private final String nbCertificatesTest = "Number of Trusted Certificates : ";
 
 	@FXML
 	private Button fileSelectButton;
@@ -155,6 +153,9 @@ public class SignatureController implements Initializable {
 	@FXML
 	private HBox refreshBox;
 	
+	@FXML
+	private Label nbCertificates;
+	
 	private ProgressIndicator progressRefreshLOTL;
 	
 	private JobBuilder jobBuilder;
@@ -182,8 +183,8 @@ public class SignatureController implements Initializable {
 		jobBuilder = new JobBuilder();
 		tlValidationJob = jobBuilder.job();
 		tlValidationJob.offlineRefresh();
-		
 		warningLabel.setVisible(false);
+		updateLabelText();
 		
 		// Allows to collapse items
 		hPkcsFile.managedProperty().bind(hPkcsFile.visibleProperty());
@@ -391,14 +392,15 @@ public class SignatureController implements Initializable {
 		    	task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
-						Platform.runLater(() -> removeLoader());
+						removeLoader();
+						updateLabelText();
 					}
 				});
 		    	
 		    	task.setOnFailed(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
-						Platform.runLater(() -> removeLoader());
+						removeLoader();
 						warningLabel.setVisible(true);
 					}
 				});
@@ -419,6 +421,10 @@ public class SignatureController implements Initializable {
 		removeLoader();
 		progressRefreshLOTL = new ProgressIndicator();
     	refreshBox.getChildren().add(progressRefreshLOTL);
+	}
+	
+	private void updateLabelText() {
+		nbCertificates.setText(nbCertificatesTest + jobBuilder.getCertificateSources().getNumberOfCertificates());
 	}
 
 	protected void updateSignatureFormForASiC(ASiCContainerType newValue) {

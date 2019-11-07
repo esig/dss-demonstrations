@@ -122,11 +122,12 @@
 				<ProgressIndicator fx:id="progressSign" disable="true" progress="0" />
 			</children>
 		</HBox>		
-		<HBox styleClass="hbox-style" fx:id="refreshBox">
+		<HBox fx:id="refreshBox" styleClass="hbox-style">
 			<children>
 				<Button fx:id="refreshLOTL" mnemonicParsing="false" text="Refresh LOTL" />
 			</children>
 		</HBox>
+      	<Label fx:id="nbCertificates" text="Number of Trusted Certificates : 0" />
 		<Label fx:id="warningLabel" styleClass="warningLabel" text="There was an error while trying to load the trusted lists." />	
 	</children>
 </VBox>
