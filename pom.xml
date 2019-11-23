@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.5</version>
+	<version>5.5.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -63,8 +63,8 @@
 		<logback-classic.version>1.2.3</logback-classic.version>
 
 		<cxf.version>3.3.3</cxf.version>
-		<spring.version>5.1.9.RELEASE</spring.version>
-		<spring-security.version>5.1.6.RELEASE</spring-security.version>
+		<spring.version>5.2.1.RELEASE</spring.version>
+		<spring-security.version>5.2.1.RELEASE</spring-security.version>
 		<thymeleaf-spring5.version>3.0.11.RELEASE</thymeleaf-spring5.version>
 		<jackson-jaxrs-json-provider.version>2.9.9</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
