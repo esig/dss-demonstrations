@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -7,6 +9,11 @@
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
+	<properties>
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>11.0.2</javafx.version>
+		<project.source.version>11</project.source.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -22,18 +29,50 @@
 					</archive>
 				</configuration>
 			</plugin>
-		</plugins>
+			<plugin>
+              <groupId>org.openjfx</groupId>
+              <artifactId>javafx-maven-plugin</artifactId>
+              <version>0.0.3</version>
+              <configuration>
+                  <mainClass>eu.europa.esig.dss.standalone.DSSApplication</mainClass>
+              </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <shadedArtifactAttached>true</shadedArtifactAttached>
+                        <shadedClassifierName>project-classifier</shadedClassifierName>
+                        <outputFile>shade\${project.artifactId}.jar</outputFile>
+                        <transformers>
+                            <transformer implementation=
+                                                 "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>eu.europa.esig.dss.standalone.DSSApplication</mainClass>
+                            </transformer>
+                        </transformers>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        </plugins>
 	</build>
 
 	<dependencies>
-		
-<!-- 		<dependency> -->
-<!--             <groupId>com.oracle</groupId> -->
-<!--             <artifactId>javafx</artifactId> -->
-<!--             <version>8.0</version> -->
-<!--             <scope>system</scope> -->
-<!--             <systemPath>${jfxrt.jar}</systemPath> -->
-<!--         </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.oracle</groupId> -->
+		<!-- <artifactId>javafx</artifactId> -->
+		<!-- <version>8.0</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${jfxrt.jar}</systemPath> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -53,79 +92,93 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Choose your PAdES implementation -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-pades-pdfbox</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
-<!-- 			<artifactId>dss-pades-openpdf</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
+		<!-- <artifactId>dss-pades-openpdf</artifactId> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-token</artifactId>
 		</dependency>
-		
+
 		<!-- Choose your implementation -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
-<!-- 			<artifactId>dss-utils-apache-commons</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
+		<!-- <artifactId>dss-utils-apache-commons</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-utils-google-guava</artifactId>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-simple</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-base</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
 		<profile>
-            <id>jdk19-plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            
-            <build>
+			<id>jdk19-plus</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+
+			<build>
 				<plugins>
-		              <plugin>
+					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
 							<source>9</source>
 							<target>9</target>
 
-	                        <!-- jdk.crypto.cryptoki : SunPKCS11 -->
-	                        <compilerArgs>
+							<!-- jdk.crypto.cryptoki : SunPKCS11 -->
+							<compilerArgs>
 								<arg>--add-modules</arg>
 								<arg>jdk.crypto.cryptoki</arg>
-								
+
 								<arg>--add-exports</arg>
-								<arg>jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED</arg>		
-														
+								<arg>jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED</arg>
+
 								<!-- Reflection at runtime -->
 								<arg>--add-opens</arg>
 								<arg>jdk.crypto.cryptoki/sun.security.pkcs11=ALL-UNNAMED</arg>
 							</compilerArgs>
 						</configuration>
 					</plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>--add-modules jdk.crypto.cryptoki</argLine>
-                        </configuration>
-                    </plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<argLine>--add-modules jdk.crypto.cryptoki</argLine>
+						</configuration>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-
 
 </project>
