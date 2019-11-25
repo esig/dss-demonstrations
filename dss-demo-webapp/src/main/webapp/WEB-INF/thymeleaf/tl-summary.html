@@ -35,7 +35,7 @@
 						<thead>
 							<tr>
 								<th scope="col" th:text="#{label.summary.tl.info.url}"></th>
-								<th scope="col" th:text="#{label.summary.tl.info.last.sync}"></th>
+								<th scope="col" th:text="#{label.summary.tl.info.last.download.attempt}"></th>
 								<th scope="col" th:text="#{label.summary.tl.info.download.result}"></th>
 								<th scope="col" th:text="#{label.summary.tl.info.parsing.result}"></th>
 								<th scope="col" th:text="#{label.summary.tl.info.validation.result}"></th>
@@ -50,10 +50,10 @@
 								<td>
 									<span th:text="${pivot.url}"></span>
 								</td>
-								<!-- Last synchronization date -->
+								<!-- Last Download Attempt date -->
 								<td>
-									<span th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:
-											${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+									<span th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}?:
+											${#dates.format(downloadResult.exceptionFirstOccurrence, 'dd-MMM-yyyy HH:mm:ss')}"></span>
 								</td>
 								
 								<!-- Download result -->

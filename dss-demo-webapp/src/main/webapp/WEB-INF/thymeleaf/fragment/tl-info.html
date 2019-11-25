@@ -5,7 +5,7 @@
 	<tr>
 		<th class="limited-size" scope="col" th:text="#{label.summary.tl.info.country}"></th>
 		<th class="limited-size" scope="col" th:text="#{label.summary.tl.info.seq.num}"></th>
-		<th class="date" scope="col" th:text="#{label.summary.tl.info.last.sync}"></th>
+		<th class="date" scope="col" th:text="#{label.summary.tl.info.last.download.attempt}"></th>
 		<th scope="col" th:text="#{label.summary.tl.info.download.result}"></th>
 		<th scope="col" th:text="#{label.summary.tl.info.parsing.result}"></th>
 		<th scope="col" th:text="#{label.summary.tl.info.validation.result}"></th>
@@ -29,9 +29,9 @@
 	<!-- Seq num -->
 	<td th:text="${parsingResult.sequenceNumber}?:'-'"></td>
 	
-	<!-- Last update -->
-	<td th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}"></td>
-	
+	<!-- Last download attempt date -->
+    <td th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}"></td>
+
 	<!-- Download result -->
 	<td>
 		<span th:replace="fragment/tl-info-fragments :: result-status(result=${downloadResult})"></span>
@@ -79,6 +79,25 @@
 		</div>
 	</div>
 	
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.last.download.attempt.date}"></div>
+		<div class="result-body col-xl-9 col-gs-10">
+			<p th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${downloadResult.lastSuccessDownloadTime != null}">
+		<div class="result-head col-xl-3 col-gs-2" th:text="#{label.summary.tl.info.last.succ.download.date}"></div>
+		<div class="result-body col-xl-9 col-gs-10">
+			<p th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${downloadResult.exceptionFirstOccurrenceTime != null}">
+		<div class="result-head col-xl-3 col-gs-2" th:text="#{label.summary.tl.info.exception.first.occurrence}"></div>
+		<div class="result-body col-xl-9 col-gs-10">
+			<p th:text="${#dates.format(downloadResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+		</div>
+	</div>
+	
 	<!-- Download status -->
 	<div class="row">
 		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.download.status}"></div>
@@ -86,26 +105,13 @@
 			<span th:replace="fragment/tl-info-fragments :: task-result(result=${downloadResult})"></span>
 		</div>
 	</div>
-	<div class="row">
-		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.last.sync.date}"></div>
-		<div class="result-body col-xl-9">
-			<p th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
-		</div>
-	</div>
-	<div class="row">
-        <div class="result-head col-xl-3" th:text="#{label.summary.tl.info.sequence.num}"></div>
-        <div class="result-body col-xl-9">
-            <p th:text="${parsingResult.sequenceNumber}"></p>
-        </div>
-    </div>
 	<div class="row" th:if="${downloadResult.isError()}">
-		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.download.error}"></div>
-		<div class="result-body col-xl-9">
+		<div class="result-head col-xl-3 col-gs-2" th:text="#{label.summary.tl.info.download.error}"></div>
+		<div class="result-body col-xl-9 col-gs-10">
 			<p class="error" th:text="${downloadResult.exceptionMessage}"></p>
 		</div>
 	</div>
 	
-	<!-- Parsing status -->
 	<div class="row">
 		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.parsing.status}"></div>
 		<div class="result-body col-xl-9">
@@ -118,6 +124,28 @@
 			<p class="error" th:text="${parsingResult.exceptionMessage}"></p>
 		</div>
 	</div>
+	
+	<div class="row">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.validation.status}"></div>
+		<div class="result-body col-xl-9">
+			<span th:replace="fragment/tl-info-fragments :: task-result(result=${validationResult})"></span>
+		</div>
+	</div>
+	<div class="row" th:if="${validationResult.isError()}">
+		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.validation.error}"></div>
+		<div class="result-body col-xl-9">
+			<p th:text="${validationResult.exceptionMessage}"></p>
+		</div>
+	</div>
+	
+	<div class="row">
+        <div class="result-head col-xl-3" th:text="#{label.summary.tl.info.sequence.num}"></div>
+        <div class="result-body col-xl-9">
+            <p th:text="${parsingResult.sequenceNumber}"></p>
+        </div>
+    </div>
+	
+	<!-- Parsing status -->
 	<div class="row" th:if="${parsingResult.isResultExist()}">
 		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.issue.date}"></div>
 		<div class="result-body col-xl-9">
@@ -140,18 +168,6 @@
 	</div>
 	
 	<!-- Validation status -->
-	<div class="row">
-		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.validation.status}"></div>
-		<div class="result-body col-xl-9">
-			<span th:replace="fragment/tl-info-fragments :: task-result(result=${validationResult})"></span>
-		</div>
-	</div>
-	<div class="row" th:if="${validationResult.isError()}">
-		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.validation.error}"></div>
-		<div class="result-body col-xl-9">
-			<p th:text="${validationResult.exceptionMessage}"></p>
-		</div>
-	</div>
 	<div class="row" th:if="${validationResult.isResultExist()}">
 		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.indication}"></div>
 		<div class="result-body col-xl-9">

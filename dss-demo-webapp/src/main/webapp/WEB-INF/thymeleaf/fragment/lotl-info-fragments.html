@@ -15,11 +15,18 @@
 			<!-- LOTL info body -->
 			<div class="panel-body">
 				<div class="row">
-				
-					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.sync.date}"></div>
+					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.download.attempt}"></div>
 					<div class="result-body col-xl-8 col-gs-9" 
-							th:text="${#dates.format(downloadResult.lastSynchronizationDate, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss')}">
-					</div>
+                            th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}">
+                    </div>
+                    <div th:if="${downloadResult.exceptionFirstOccurrenceTime != null}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.exception.first.occurrence}"></div>
+                    <div th:if="${downloadResult.exceptionFirstOccurrenceTime != null}" class="result-body col-xl-8 col-gs-9" 
+                            th:text="${#dates.format(downloadResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}">
+                    </div>
+                    <div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.succ.download}"></div>
+                    <div class="result-body col-xl-8 col-gs-9" 
+                            th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}?:${#dates.format(downloadResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}">
+                    </div>
 					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.download.result}"></div>
 					<div class="result-body col-xl-8 col-gs-9">
 						<span th:replace="fragment/tl-info-fragments :: task-result(result=${downloadResult})"></span>

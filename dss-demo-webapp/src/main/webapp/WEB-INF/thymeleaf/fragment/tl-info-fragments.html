@@ -42,8 +42,8 @@
 <span class="task-result" th:fragment="task-result(result)">
 	<span th:text="${result.getStatusName()}"></span>
 	<span th:replace="fragment/tl-info-fragments :: result-status(result=${result})"></span>
-	<span th:text="${result.isError()}?${' (' + #dates.format(result.exceptionTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:
-			${#dates.format(result.lastSuccessDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+	<span th:text="${result.isError()}?${' (' + #dates.format(result.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:
+            ${#dates.format(result.lastStateTransitionTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
 </span>
 
 <span th:fragment="result-status(result)">
@@ -57,8 +57,8 @@
 <span class="task-result" th:fragment="validation-result(validationResult)">
 	<span th:text="${validationResult.getStatusName()}"></span>
 	<span th:replace="fragment/tl-info-fragments :: validation-status(validationResult=${validationResult})"></span>
-	<span th:text="${validationResult.isError()}?${' (' + #dates.format(validationResult.exceptionTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:
-			${#dates.format(validationResult.lastSuccessDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+    <span th:text="${validationResult.isError()}?${' (' + #dates.format(validationResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:
+            ${#dates.format(validationResult.lastStateTransitionTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
 </span>
 
 <span th:fragment="validation-status(validationResult)">
