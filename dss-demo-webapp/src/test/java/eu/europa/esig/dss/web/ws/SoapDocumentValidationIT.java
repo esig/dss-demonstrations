@@ -67,12 +67,12 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 		assertNotNull(result.getValidationReport());
 
-		assertEquals(1, result.getSimpleReport().getSignature().size());
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
 		assertEquals(2, result.getDiagnosticData().getSignatures().get(0).getFoundTimestamps().size());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
-		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication());
 		assertNotNull(reports);
 	}
 
@@ -91,8 +91,8 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 		assertNotNull(result.getValidationReport());
 
-		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
@@ -116,8 +116,8 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 		assertNotNull(result.getValidationReport());
 
-		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
@@ -140,8 +140,8 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 		assertNotNull(result.getValidationReport());
 
-		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
@@ -162,8 +162,8 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 		assertNotNull(result.getValidationReport());
 
-		assertEquals(1, result.getSimpleReport().getSignature().size());
-		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignature().get(0).getIndication());
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
 				result.getValidationReport());
