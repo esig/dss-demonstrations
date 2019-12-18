@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.summary.lotl}">
+	<head>
+		<title th:text="#{label.summary.lotl}"></title>
+	</head>
+	<body>
+		<div layout:fragment="panel" th:remove="tag"></div>
+		
+		<div layout:fragment="content">
+		<p th:if="${lotlInfo == null}">No info found for this LOTL</p>
+		
+		<div th:if="${lotlInfo != null}">
+
+			<div class="lotl" th:with="downloadResult=${lotlInfo.downloadCacheInfo}, parsingResult=${lotlInfo.parsingCacheInfo}, validationResult=${lotlInfo.validationCacheInfo}">
+				<a th:href="@{/tl-info/lotl/} + ${lotlInfo.getIdentifier().asXmlId()}">
+					<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
+					th:class="${'lotl-flag small_flag flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
+				</a>
+				<h2>
+					<span th:text="#{label.summary.lotl}"></span>&nbsp;
+					<a class="lotl-url link-h-center" th:href="${lotlInfo.url}" th:text="'(' + ${lotlInfo.url} + ')'" target="_blank"></a>
+				</h2>
+				
+				<!-- LOTL Info -->
+				<div th:replace="fragment/lotl-info-fragments :: lotl-info-summary(downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult})"></div>
+			</div>
+		</div>
+	</body>
+</html>
