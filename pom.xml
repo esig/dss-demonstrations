@@ -32,13 +32,6 @@
 			</roles>
 		</developer>
 		<developer>
-			<id>abinet</id>
-			<name>Axel Abinet</name>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-		<developer>
 			<id>beliakov</id>
 			<name>Aleksandr Beliakov</name>
 			<roles>
@@ -59,18 +52,18 @@
 		<dss.framework.version>5.6-SNAPSHOT</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<slf4j.version>1.7.28</slf4j.version>
+		<slf4j.version>1.7.30</slf4j.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
 		<cxf.version>3.3.4</cxf.version>
-		<spring.version>5.1.9.RELEASE</spring.version>
-		<spring-security.version>5.1.6.RELEASE</spring-security.version>
+		<spring.version>5.2.1.RELEASE</spring.version>
+		<spring-security.version>5.2.1.RELEASE</spring-security.version>
 		<thymeleaf-spring5.version>3.0.11.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>2.4.1</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.9.9</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.10.1</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<freemarker.version>2.3.29</freemarker.version>
-		<hikaricp.version>3.3.1</hikaricp.version>
+		<hikaricp.version>3.4.1</hikaricp.version>
 		<hsqldb.version>2.5.0</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
 
@@ -501,7 +494,7 @@
 			<dependency>
 	            <groupId>org.webjars</groupId>
 	            <artifactId>swagger-ui</artifactId>
-	            <version>3.23.0</version>
+	            <version>3.24.0</version>
 	        </dependency>
 			
 
