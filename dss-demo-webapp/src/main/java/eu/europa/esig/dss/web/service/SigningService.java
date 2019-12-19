@@ -19,7 +19,9 @@ import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.DigestDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
@@ -33,6 +35,7 @@ import eu.europa.esig.dss.validation.timestamp.TimestampToken;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.AbstractSignatureForm;
 import eu.europa.esig.dss.web.model.ExtensionForm;
+import eu.europa.esig.dss.web.model.SignatureDigestForm;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
 import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
 import eu.europa.esig.dss.xades.XAdESSignatureParameters;
@@ -97,6 +100,25 @@ public class SigningService {
 		logger.info("End getDataToSign with one document");
 		return toBeSigned;
 	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public ToBeSigned getDataToSign(SignatureDigestForm form) {
+		logger.info("Start getDataToSign with one digest");
+		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
+
+		AbstractSignatureParameters parameters = fillParameters(form);
+
+		ToBeSigned toBeSigned = null;
+		try {
+			DigestDocument toSignDigest = new DigestDocument();
+			toSignDigest.addDigest(form.getDigestAlgorithm(), form.getDigestToSign());
+			toBeSigned = service.getDataToSign(toSignDigest, parameters);
+		} catch (Exception e) {
+			logger.error("Unable to execute getDataToSign : " + e.getMessage(), e);
+		}
+		logger.info("End getDataToSign with one digest");
+		return toBeSigned;
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ToBeSigned getDataToSign(SignatureMultipleDocumentsForm form) {
@@ -129,6 +151,21 @@ public class SigningService {
 		logger.info("End getContentTimestamp with one document");
 		return contentTimestamp;
 	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public TimestampToken getContentTimestamp(SignatureDigestForm form) {
+		logger.info("Start getContentTimestamp with one digest");
+
+		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
+		AbstractSignatureParameters parameters = fillParameters(form);
+		DigestDocument toSignDigest = new DigestDocument();
+		toSignDigest.addDigest(form.getDigestAlgorithm(), form.getDigestToSign());
+		
+		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDigest, parameters);
+
+		logger.info("End getContentTimestamp with one digest");
+		return contentTimestamp;
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public TimestampToken getContentTimestamp(SignatureMultipleDocumentsForm form) {
@@ -154,6 +191,15 @@ public class SigningService {
 	private AbstractSignatureParameters fillParameters(SignatureDocumentForm form) {
 		AbstractSignatureParameters parameters = getSignatureParameters(form.getContainerType(), form.getSignatureForm());
 		parameters.setSignaturePackaging(form.getSignaturePackaging());
+
+		fillParameters(parameters, form);
+
+		return parameters;
+	}
+	
+	private AbstractSignatureParameters fillParameters(SignatureDigestForm form) {
+		AbstractSignatureParameters parameters = getSignatureParameters(null, form.getSignatureForm());
+		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
 
 		fillParameters(parameters, form);
 
@@ -202,6 +248,27 @@ public class SigningService {
 			logger.error("Unable to execute signDocument : " + e.getMessage(), e);
 		}
 		logger.info("End signDocument with one document");
+		return signedDocument;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public DSSDocument signDigest(SignatureDigestForm form) {
+		logger.info("Start signDigest with one digest");
+		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
+
+		AbstractSignatureParameters parameters = fillParameters(form);
+
+		DSSDocument signedDocument = null;
+		try {
+			DigestDocument toSignDigest = new DigestDocument();
+			toSignDigest.addDigest(form.getDigestAlgorithm(), form.getDigestToSign());
+			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			signedDocument = service.signDocument(toSignDigest, parameters, signatureValue);
+		} catch (Exception e) {
+			logger.error("Unable to execute signDigest : " + e.getMessage(), e);
+		}
+		logger.info("End signDigest with one digest");
 		return signedDocument;
 	}
 
