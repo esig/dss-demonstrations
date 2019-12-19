@@ -12,6 +12,8 @@ import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.standalone.RemoteDocumentSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -33,12 +35,16 @@ import javafx.concurrent.Task;
 
 public class SigningTask extends Task<DSSDocument> {
 
-	private RemoteDocumentSignatureService service;
-	private SignatureModel model;
+	private final SignatureModel model;
+	private final RemoteDocumentSignatureService service;
 
-	public SigningTask(RemoteDocumentSignatureService service, SignatureModel model) {
-		this.service = service;
+	public SigningTask (SignatureModel model, TrustedListsCertificateSource tslCertificateSource) {
 		this.model = model;
+		
+
+		RemoteDocumentSignatureServiceBuilder builder = new RemoteDocumentSignatureServiceBuilder();
+		builder.setTslCertificateSource(tslCertificateSource);
+		service = builder.build();
 	}
 
 	@Override

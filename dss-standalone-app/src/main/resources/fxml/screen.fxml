@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
 	<padding>
 		<Insets bottom="20" left="20" right="20" top="20" />
 	</padding>
@@ -121,8 +121,13 @@
 				<Button fx:id="signButton" mnemonicParsing="false" text="Sign" />
 				<ProgressIndicator fx:id="progressSign" disable="true" progress="0" />
 			</children>
+		</HBox>		
+		<HBox fx:id="refreshBox" styleClass="hbox-style">
+			<children>
+				<Button fx:id="refreshLOTL" mnemonicParsing="false" text="Refresh LOTL" />
+			</children>
 		</HBox>
-		
-		<Label fx:id="warningLabel" styleClass="warningLabel" text="This application doesn't load the trusted lists and trusted certificates. &#10;If you sign without the complete certificate chain, some data can be missed." />	
+      	<Label fx:id="nbCertificates" text="Number of Trusted Certificates : 0" />
+		<Label fx:id="warningLabel" styleClass="warningLabel" text="There was an error while trying to load the trusted lists." />	
 	</children>
 </VBox>

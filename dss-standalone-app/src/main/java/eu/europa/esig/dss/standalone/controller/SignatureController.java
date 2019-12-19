@@ -20,9 +20,11 @@ import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
+import eu.europa.esig.dss.standalone.task.JobBuilder;
+import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
 import eu.europa.esig.dss.standalone.task.SigningTask;
+import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,6 +54,8 @@ import javafx.stage.Stage;
 public class SignatureController implements Initializable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
+	
+	private final String nbCertificatesTest = "Number of Trusted Certificates : ";
 
 	@FXML
 	private Button fileSelectButton;
@@ -142,13 +146,26 @@ public class SignatureController implements Initializable {
 
 	@FXML
 	private ProgressIndicator progressSign;
-
+	
+	@FXML
+	private Button refreshLOTL;
+	
+	@FXML
+	private HBox refreshBox;
+	
+	@FXML
+	private Label nbCertificates;
+	
+	private ProgressIndicator progressRefreshLOTL;
+	
+	private JobBuilder jobBuilder;
+	
+	private TLValidationJob tlValidationJob;
+		
 	private Stage stage;
 
 	private SignatureModel model;
-
-	private RemoteDocumentSignatureService signatureService;
-
+			
 	static {
 		// Fix a freeze in Windows 10, JDK 8 and touchscreen
 		System.setProperty("glass.accessible.force", "false");
@@ -158,15 +175,17 @@ public class SignatureController implements Initializable {
 		this.stage = stage;
 	}
 
-	public void setSignatureService(
-			RemoteDocumentSignatureService signatureService) {
-		this.signatureService = signatureService;
-	}
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		model = new SignatureModel();
 
+		//Create JobBuilder && TLValidationJob
+		jobBuilder = new JobBuilder();
+		tlValidationJob = jobBuilder.job();
+		tlValidationJob.offlineRefresh();
+		warningLabel.setVisible(false);
+		updateLabelText();
+		
 		// Allows to collapse items
 		hPkcsFile.managedProperty().bind(hPkcsFile.visibleProperty());
 		hPkcsPassword.managedProperty().bind(hPkcsPassword.visibleProperty());
@@ -328,7 +347,7 @@ public class SignatureController implements Initializable {
 				final Service<DSSDocument> service = new Service<DSSDocument>() {
 					@Override
 					protected Task<DSSDocument> createTask() {
-						return new SigningTask(signatureService, model);
+						return new SigningTask(model, jobBuilder.getCertificateSources());
 					}
 				};
 				service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -356,6 +375,56 @@ public class SignatureController implements Initializable {
 				service.start();
 			}
 		});
+
+		
+		refreshLOTL.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {			
+		    	final RefreshLOTLTask task = new RefreshLOTLTask(tlValidationJob);
+		    	task.setOnRunning(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						warningLabel.setVisible(false);
+						addLoader();
+					}
+				});
+		    	
+		    	task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						removeLoader();
+						updateLabelText();
+					}
+				});
+		    	
+		    	task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						removeLoader();
+						warningLabel.setVisible(true);
+					}
+				});
+		    	
+			    //start Task
+		        Thread readValThread = new Thread(task);
+		        readValThread.setDaemon(true);
+		        readValThread.start();
+			}
+		});
+	}
+	
+	private void removeLoader() {
+		refreshBox.getChildren().remove(progressRefreshLOTL);
+	}
+	
+	private void addLoader() {
+		removeLoader();
+		progressRefreshLOTL = new ProgressIndicator();
+    	refreshBox.getChildren().add(progressRefreshLOTL);
+	}
+	
+	private void updateLabelText() {
+		nbCertificates.setText(nbCertificatesTest + jobBuilder.getCertificateSources().getNumberOfCertificates());
 	}
 
 	protected void updateSignatureFormForASiC(ASiCContainerType newValue) {

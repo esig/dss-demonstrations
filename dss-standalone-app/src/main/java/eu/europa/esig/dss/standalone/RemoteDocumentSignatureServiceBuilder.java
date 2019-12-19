@@ -16,6 +16,7 @@ import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
+import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
 import eu.europa.esig.dss.validation.CertificateVerifier;
@@ -29,7 +30,13 @@ public class RemoteDocumentSignatureServiceBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RemoteDocumentSignatureServiceBuilder.class);
 	
-	public static RemoteDocumentSignatureService build() {
+	private TrustedListsCertificateSource tslCertificateSource = new TrustedListsCertificateSource();
+	
+	public void setTslCertificateSource(TrustedListsCertificateSource tslCertificateSource) {
+		this.tslCertificateSource = tslCertificateSource;
+	}
+
+	public RemoteDocumentSignatureService build() {
 		RemoteDocumentSignatureServiceImpl service = new RemoteDocumentSignatureServiceImpl();
 		service.setAsicWithCAdESService(asicWithCadesService());
 		service.setAsicWithXAdESService(asicWithXadesService());
@@ -39,40 +46,41 @@ public class RemoteDocumentSignatureServiceBuilder {
 		return service;
 	}
 
-	private static CommonsDataLoader crlDataLoader() {
+	private CommonsDataLoader crlDataLoader() {
 		CommonsDataLoader dataLoader = new CommonsDataLoader();
 		dataLoader.setProxyConfig(proxyConfig());
 		return dataLoader;
 	}
 
-	private static OnlineCRLSource onlineCRLSource() {
+	private OnlineCRLSource onlineCRLSource() {
 		OnlineCRLSource onlineCRLSource = new OnlineCRLSource();
 		onlineCRLSource.setDataLoader(crlDataLoader());
 		return onlineCRLSource;
 	}
 
-	private static OCSPDataLoader ocspDataLoader() {
+	private OCSPDataLoader ocspDataLoader() {
 		OCSPDataLoader ocspDataLoader = new OCSPDataLoader();
 		ocspDataLoader.setProxyConfig(proxyConfig());
 		return ocspDataLoader;
 	}
 
-	private static OnlineOCSPSource onlineOcspSource() {
+	private OnlineOCSPSource onlineOcspSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
 		return onlineOCSPSource;
 	}
 	
-	private static ProxyConfig proxyConfig() {
+	private ProxyConfig proxyConfig() {
 		// not defined by default
 		return null;
 	}
 
-	private static CertificateVerifier certificateVerifier() {
+	private CertificateVerifier certificateVerifier() {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setCrlSource(onlineCRLSource());
 		certificateVerifier.setOcspSource(onlineOcspSource());
 		certificateVerifier.setDataLoader(crlDataLoader());
+		certificateVerifier.setTrustedCertSource(tslCertificateSource);
 
 		// Default configs
 		certificateVerifier.setExceptionOnMissingRevocationData(true);
@@ -81,7 +89,7 @@ public class RemoteDocumentSignatureServiceBuilder {
 		return certificateVerifier;
 	}
 	
-	private static TSPSource tspSource() {
+	private TSPSource tspSource() {
 		MockTSPSource tspSource = new MockTSPSource();
 		try (InputStream is = RemoteDocumentSignatureServiceBuilder.class.getResourceAsStream("/self-signed-tsa.p12")) {
 			tspSource.setToken(new KeyStoreSignatureTokenConnection(is, "PKCS12", new PasswordProtection("ks-password".toCharArray())));
@@ -92,34 +100,34 @@ public class RemoteDocumentSignatureServiceBuilder {
 		return tspSource;
 	}
 	
-	private static ASiCWithCAdESService asicWithCadesService() {
+	private ASiCWithCAdESService asicWithCadesService() {
 		ASiCWithCAdESService service = new ASiCWithCAdESService(certificateVerifier());
 		service.setTspSource(tspSource());
 		return service;
 	}
 
-	private static ASiCWithXAdESService asicWithXadesService() {
+	private ASiCWithXAdESService asicWithXadesService() {
 		ASiCWithXAdESService service = new ASiCWithXAdESService(certificateVerifier());
 		service.setTspSource(tspSource());
 		return service;
 	}
 
-	private static CAdESService cadesService() {
+	private CAdESService cadesService() {
 		CAdESService service = new CAdESService(certificateVerifier());
 		service.setTspSource(tspSource());
 		return service;
 	}
 
-	private static XAdESService xadesService() {
+	private XAdESService xadesService() {
 		XAdESService service = new XAdESService(certificateVerifier());
 		service.setTspSource(tspSource());
 		return service;
 	}
 
-	private static PAdESService padesService() {
+	private PAdESService padesService() {
 		PAdESService service = new PAdESService(certificateVerifier());
 		service.setTspSource(tspSource());
 		return service;
 	}
-
+	
 }
