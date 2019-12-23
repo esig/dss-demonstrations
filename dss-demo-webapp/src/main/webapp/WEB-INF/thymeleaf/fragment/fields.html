@@ -46,6 +46,9 @@
     <div class="col-sm-5">
         <input type="file" name="originalFiles" id="originalFiles" multiple="multiple" />
     </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
+    </div>
 </div>
 
 <div th:fragment="field-simplified-container-type-form">
@@ -68,6 +71,23 @@
 		<div class="col-sm-6">
 			<label class="radio-inline">
             	<input type="radio" th:field="*{containerType}" th:value="none" th:text="#{label.container.none}" />
+            </label>
+            <label class="radio-inline" th:each="asicType : ${asicContainerTypes}">
+            	<input type="radio" th:field="*{containerType}" th:value="${asicType}" th:text="#{${'label.'+asicType}}" />
+            </label>
+		</div>
+	    <div class="col-xs-4">
+	       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+	    </div>
+	</div>
+</div>
+
+<div th:fragment="field-container-type-form-timestamp">
+	<div class="form-group row">
+		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.asic.container.type}"></label>
+		<div class="col-sm-6">
+			<label class="radio-inline">
+            	<input type="radio" th:field="*{containerType}" th:value="none" th:text="PDF" checked="checked" />
             </label>
             <label class="radio-inline" th:each="asicType : ${asicContainerTypes}">
             	<input type="radio" th:field="*{containerType}" th:value="${asicType}" th:text="#{${'label.'+asicType}}" />
@@ -111,12 +131,12 @@
 </div>
 
 <div class="form-group" th:fragment="field-signature-level">
-    <label for="signatureLevel" class="col-sm-2 control-label" th:text="#{label.signature.level}"></label>
-    <div class="col-sm-4">
+    <label for="signatureLevel" class="col-sm-3 control-label" th:text="#{label.signature.level}"></label>
+    <div class="col-sm-5">
         <select name="signatureLevel" class="form-control input-sm" id="selectSignatureLevel">
         </select>
     </div>
-    <div class="col-xs-4 col-md-offset-1"> 	
+    <div class="col-xs-3 col-md-offset-1"> 	
     	<p th:if="${#fields.hasErrors('signatureLevel')}" th:errors="*{signatureLevel}" class="text-danger">Error</p>
     </div>
 </div>

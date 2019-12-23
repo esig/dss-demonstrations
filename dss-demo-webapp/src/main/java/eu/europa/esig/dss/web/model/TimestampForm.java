@@ -3,19 +3,26 @@ package eu.europa.esig.dss.web.model;
 import java.util.List;
 
 import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.utils.Utils;
 
-public class SignatureMultipleDocumentsForm extends AbstractSignatureForm {
+public class TimestampForm {
 
-	@NotNull(message = "{error.container.type.mandatory}")
+	private List<MultipartFile> originalFiles;
+
+	/* PAdES or ASiC-S or ASiC-E */
 	private ASiCContainerType containerType;
 
-	private List<MultipartFile> documentsToSign;
+	public List<MultipartFile> getOriginalFiles() {
+		return originalFiles;
+	}
+
+	public void setOriginalFiles(List<MultipartFile> originalFiles) {
+		this.originalFiles = originalFiles;
+	}
 
 	public ASiCContainerType getContainerType() {
 		return containerType;
@@ -25,20 +32,12 @@ public class SignatureMultipleDocumentsForm extends AbstractSignatureForm {
 		this.containerType = containerType;
 	}
 
-	public List<MultipartFile> getDocumentsToSign() {
-		return documentsToSign;
-	}
-
-	public void setDocumentsToSign(List<MultipartFile> documentsToSign) {
-		this.documentsToSign = documentsToSign;
-	}
-
-	@AssertTrue(message = "{error.to.sign.files.mandatory}")
-	public boolean isDocumentsToSign() {
-		boolean valid = Utils.isCollectionNotEmpty(documentsToSign);
+	@AssertTrue(message = "{error.original.files.mandatory}")
+	public boolean isOriginalFiles() {
+		boolean valid = Utils.isCollectionNotEmpty(originalFiles);
 		if (valid) {
 			boolean atLeastOneNotEmptyFile = false;
-			for (MultipartFile multipartFile : documentsToSign) {
+			for (MultipartFile multipartFile : originalFiles) {
 				if (multipartFile != null && !multipartFile.isEmpty()) {
 					atLeastOneNotEmptyFile = true;
 					break;

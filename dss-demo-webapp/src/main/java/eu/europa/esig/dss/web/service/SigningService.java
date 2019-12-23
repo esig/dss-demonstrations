@@ -21,6 +21,7 @@ import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.DigestDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
@@ -38,6 +39,7 @@ import eu.europa.esig.dss.web.model.ExtensionForm;
 import eu.europa.esig.dss.web.model.SignatureDigestForm;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
 import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
+import eu.europa.esig.dss.web.model.TimestampForm;
 import eu.europa.esig.dss.xades.XAdESSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 
@@ -178,6 +180,29 @@ public class SigningService {
 
 		logger.info("End getContentTimestamp with  multiple documents");
 		return contentTimestamp;
+	}
+
+	public DSSDocument timestamp(TimestampForm form) {
+		List<DSSDocument> dssDocuments = WebAppUtils.toDSSDocuments(form.getOriginalFiles());
+
+		logger.info("Start timestamp with {} document(s)", dssDocuments.size());
+
+		DSSDocument result = null;
+		ASiCContainerType containerType = form.getContainerType();
+		if (containerType == null) {
+			if (dssDocuments.size() > 1) {
+				throw new DSSException("Only one document is allowed for PAdES");
+			}
+			DSSDocument toTimestampDocument = dssDocuments.get(0);
+			result = padesService.timestamp(toTimestampDocument, new PAdESSignatureParameters());
+		} else {
+			ASiCWithCAdESSignatureParameters parameters = new ASiCWithCAdESSignatureParameters();
+			parameters.aSiC().setContainerType(containerType);
+			result = asicWithCAdESService.timestamp(dssDocuments, parameters);
+		}
+
+		logger.info("End timestamp with {} document(s)", dssDocuments.size());
+		return result;
 	}
 
 	private AbstractSignatureParameters fillParameters(SignatureMultipleDocumentsForm form) {
