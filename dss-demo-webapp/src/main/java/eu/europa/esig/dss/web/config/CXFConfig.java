@@ -12,6 +12,7 @@ import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +77,10 @@ public class CXFConfig {
 	public static final String REST_SERVER_SIGNING = "/rest/server-signing";
 	public static final String REST_TIMESTAMP_SERVICE = "/rest/timestamp-service";
 
-	@Value("${cxf.debug}")
+	@Value("${cxf.debug:false}")
 	private boolean cxfDebug;
 
-	@Value("${cxf.mtom.enabled}")
+	@Value("${cxf.mtom.enabled:true}")
 	private boolean mtomEnabled;
 
 	@Autowired
@@ -334,13 +335,20 @@ public class CXFConfig {
     @Bean
     public OpenApiFeature createOpenApiFeature() {
         final OpenApiFeature openApiFeature = new OpenApiFeature();
+		openApiFeature.setCustomizer(openApiCustomizer());
         openApiFeature.setPrettyPrint(true);
         openApiFeature.setScan(true);
-        openApiFeature.setRunAsFilter(true);
-        openApiFeature.setUseContextBasedConfig(true);
+		openApiFeature.setUseContextBasedConfig(true);
         openApiFeature.setTitle("DSS WebServices");
         return openApiFeature;
     }
+
+	@Bean
+	public OpenApiCustomizer openApiCustomizer() {
+		OpenApiCustomizer customizer = new OpenApiCustomizer();
+		customizer.setDynamicBasePath(true);
+		return customizer;
+	}
 
 	@Bean
 	public JacksonJsonProvider jacksonJsonProvider() {
@@ -348,8 +356,6 @@ public class CXFConfig {
 		jsonProvider.setMapper(objectMapper());
 		return jsonProvider;
 	}
-
-    
     
 	/**
 	 * ObjectMappers configures a proper way for (un)marshalling of json data
