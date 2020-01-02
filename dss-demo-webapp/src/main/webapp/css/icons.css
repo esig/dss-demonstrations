@@ -47,3 +47,6 @@
 .glyphicon-link:before {
 	content: "\f0c1"; /* fa-link */
 }
+.glyphicon-hashtag:before {
+	content: "\f292"; /* fas fa-hashtag */
+}

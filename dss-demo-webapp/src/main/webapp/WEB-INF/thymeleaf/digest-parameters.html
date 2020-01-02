@@ -1,131 +1,104 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="fragment/head :: head"></th:block>
-<th:block th:replace="fragment/header :: header"></th:block>
-<body>
-    <main class="page-row page-row-expanded">
-    <nav th:replace="fragment/nav_bar :: nav_bar"></nav>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Sign a digest'">
+	<body>		
+		<div layout:fragment="content">
+			<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
+              
+            <h2 th:text="#{label.signADigest}"></h2>
 
-    <!-- BODY -->
-    <div class="container-fluid">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-12"></div>
+            <form method="post" class="form-horizontal" th:action="@{/sign-a-digest}" th:object="${signatureDigestForm}">
 
-                        <!-- BREADCRUMP -->
-                        <ul class="breadcrumb">
-                            <th:block th:replace="fragment/breadcrumb :: breadcrumb"></th:block>
-                            <li class="active">Signature</li>
-                            <li class="active">Sign a digest</li>
-                        </ul>
+                <input type="hidden" id="isSign" value="true" />
 
-                        <!-- CONTENT -->
-                        <div class="row">
-                            <th:block th:replace="fragment/menu :: menu"></th:block>
-                            <div class="col-md-9">
-                            
-								<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
-                            
-                                <h2 th:text="#{label.signADigest}"></h2>
+                <div th:replace="fragment/fields::field-signature-form"></div>
 
-                                <form method="post" class="form-horizontal" th:action="@{/sign-a-digest}" th:object="${signatureDigestForm}">
+                <div th:replace="fragment/fields::field-signature-level"></div>
 
-                                    <input type="hidden" id="isSign" value="true" />
+                <div th:replace="fragment/fields::field-document-digest"></div>
 
-                                    <div th:replace="fields::field-signature-form"></div>
+                <div th:replace="fragment/fields::field-digest-algo"></div>
 
-                                    <div th:replace="fields::field-signature-level"></div>
+                <div th:replace="fragment/fields::field-sign-expired"></div>
+                
+                <div th:replace="fragment/fields::field-content-timestamp"></div>
+                
+                <div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-8">
+                    <span id="warning-text"></span> You can download the
+                    <a th:href="${downloadNexuUrl}">open source version of NexU</a>
+                    (
+                    <a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/">more info</a>
+                    )
+                </div>
 
-                                    <div th:replace="fields::field-document-digest"></div>
+                <div id="nexu_ready_alert" style="display: none;" class="alert alert-info col-lg-8">NexU ready. Please plug card reader, insert ID card and click on button
+                    below.</div>
 
-                                    <div th:replace="fields::field-digest-algo"></div>
-
-                                    <div th:replace="fields::field-sign-expired"></div>
-                                    
-                                    <div th:replace="fields::field-content-timestamp"></div>
-                                    
-                                    <div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-8">
-                                        <span id="warning-text"></span> You can download the
-                                        <a th:href="${downloadNexuUrl}">open source version of NexU</a>
-                                        (
-                                        <a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/">more info</a>
-                                        )
-                                    </div>
-
-                                    <div id="nexu_ready_alert" style="display: none;" class="alert alert-info col-lg-8">NexU ready. Please plug card reader, insert ID card and click on button
-                                        below.</div>
-
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}" disabled="disabled"></button>
-                                            <button type="reset" class="btn" th:text="#{label.clear}"></button>
-                                        </div>
-                                    </div>
-
-                                </form>
-                                <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
-                                <script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
-                            </div>
-                        </div>
+                <div class="form-group row">
+                    <div class="offset-sm-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}" disabled="disabled"></button>
+                        <button type="reset" class="btn btn-default" th:text="#{label.clear}"></button>
                     </div>
                 </div>
-            </div>
+
+            </form>
         </div>
-
-    </div>
-    </main>
-    <th:block th:replace="fragment/footer :: footer"></th:block>
+		<div layout:fragment="scripts">
+            <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+            <script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
     
-	<script type="text/javascript">
-		var spinner = document.getElementById("spinner");
+			<script type="text/javascript">
 
-		async function digestMessage(message) {
-			const digestElement = document.getElementById('digestToSign');
-			const inputRadio = document.querySelector('input[name="digestAlgorithm"]:checked');
-			var digestAlgo = "SHA-" + inputRadio.value.substring(3);
+				$('[data-toggle="tooltip"]').tooltip();
 
-			const msgUint8 = encode(message);                           // encode as (utf-8) Uint8Array
-			const hashBuffer = await crypto.subtle.digest(digestAlgo, msgUint8);           // hash the message
-
-			var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(hashBuffer)));
-			digestElement.value = base64String;
-			spinner.style.visibility = "hidden";
-
-		}
-
-		async function readFile(e){
-			var reader = new FileReader();
-			reader.onload = function(event) {
-			    var contents = event.target.result;
-				digestMessage(contents);
-			};
-
-			reader.onerror = function(event) {
-			    console.error("File could not be read! Code " + event.target.error.code);
-			};
-
-			if(e.files.length > 0){
-				spinner.style.visibility = "visible";
-				reader.readAsText(e.files[0]);
-			}
-		}
+				var spinner = document.getElementById("spinner");
 		
-		$('input[type=radio][name=digestAlgorithm]').change(function() {
-			readFile(document.getElementById('fileToCompute'));
-		});
+				async function digestMessage(message) {
+					const digestElement = document.getElementById('digestToSign');
+					const inputRadio = document.querySelector('input[name="digestAlgorithm"]:checked');
+					var digestAlgo = "SHA-" + inputRadio.value.substring(3);
 		
-		function encode(s) {
-			const e = new Uint8Array(s.length);
-
-			for (let i = 0; i < s.length; i += 1) {
-				e[i] = s.charCodeAt(i);
-			}
-
-			return e;
-		}
+					const msgUint8 = encode(message);                           // encode as (utf-8) Uint8Array
+					const hashBuffer = await crypto.subtle.digest(digestAlgo, msgUint8);           // hash the message
 		
-	</script>
-</body>
+					var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(hashBuffer)));
+					digestElement.value = base64String;
+					spinner.style.visibility = "hidden";
+		
+				}
+		
+				async function readFile(e){
+					var reader = new FileReader();
+					reader.onload = function(event) {
+					    var contents = event.target.result;
+						digestMessage(contents);
+					};
+		
+					reader.onerror = function(event) {
+					    console.error("File could not be read! Code " + event.target.error.code);
+					};
+		
+					if(e.files.length > 0){
+						spinner.style.visibility = "visible";
+						reader.readAsText(e.files[0]);
+					}
+				}
+				
+				$('input[type=radio][name=digestAlgorithm]').change(function() {
+					readFile(document.getElementById('fileToCompute'));
+				});
+				
+				function encode(s) {
+					const e = new Uint8Array(s.length);
+		
+					for (let i = 0; i < s.length; i += 1) {
+						e[i] = s.charCodeAt(i);
+					}
+		
+					return e;
+				}
+				
+			</script>
+	
+		</div>
+	</body>
 </html>
