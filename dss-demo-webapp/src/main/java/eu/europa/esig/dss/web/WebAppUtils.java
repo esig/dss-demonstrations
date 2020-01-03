@@ -16,7 +16,7 @@ import eu.europa.esig.dss.ws.signature.common.TimestampTokenConverter;
 
 public final class WebAppUtils {
 
-	private static final Logger logger = LoggerFactory.getLogger(WebAppUtils.class);
+	private static final Logger LOG = LoggerFactory.getLogger(WebAppUtils.class);
 
 	private WebAppUtils() {
 	}
@@ -24,11 +24,10 @@ public final class WebAppUtils {
 	public static DSSDocument toDSSDocument(MultipartFile multipartFile) {
 		try {
 			if ((multipartFile != null) && !multipartFile.isEmpty()) {
-				DSSDocument document = new InMemoryDocument(multipartFile.getBytes(), multipartFile.getOriginalFilename());
-				return document;
+				return new InMemoryDocument(multipartFile.getBytes(), multipartFile.getOriginalFilename());
 			}
 		} catch (IOException e) {
-			logger.error("Cannot read  file : " + e.getMessage(), e);
+			LOG.error("Cannot read file : " + e.getMessage(), e);
 		}
 		return null;
 	}

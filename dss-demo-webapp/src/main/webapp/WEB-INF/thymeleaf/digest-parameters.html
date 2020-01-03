@@ -56,14 +56,9 @@
 					const digestElement = document.getElementById('digestToSign');
 					const inputRadio = document.querySelector('input[name="digestAlgorithm"]:checked');
 					var digestAlgo = "SHA-" + inputRadio.value.substring(3);
-		
-					const msgUint8 = encode(message);                           // encode as (utf-8) Uint8Array
-					const hashBuffer = await crypto.subtle.digest(digestAlgo, msgUint8);           // hash the message
-		
-					var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(hashBuffer)));
-					digestElement.value = base64String;
+					const digestValue = await crypto.subtle.digest(digestAlgo, message);           // hash the message
+					digestElement.value = arrayBufferToBase64(digestValue);
 					spinner.style.visibility = "hidden";
-		
 				}
 		
 				async function readFile(e){
@@ -79,7 +74,10 @@
 		
 					if(e.files.length > 0){
 						spinner.style.visibility = "visible";
-						reader.readAsText(e.files[0]);
+						var currentFile = e.files[0];
+						reader.readAsArrayBuffer(currentFile);
+						const documentNameElement = document.getElementById('documentName');
+						documentName.value = currentFile.name;
 					}
 				}
 				
@@ -87,14 +85,14 @@
 					readFile(document.getElementById('fileToCompute'));
 				});
 				
-				function encode(s) {
-					const e = new Uint8Array(s.length);
-		
-					for (let i = 0; i < s.length; i += 1) {
-						e[i] = s.charCodeAt(i);
-					}
-		
-					return e;
+				function arrayBufferToBase64(buffer) {
+				    var binary = '';
+				    var bytes = new Uint8Array(buffer);
+				    var len = bytes.byteLength;
+				    for (var i = 0; i < len; i++) {
+				        binary += String.fromCharCode(bytes[i]);
+				    }
+				    return window.btoa(binary);
 				}
 				
 			</script>

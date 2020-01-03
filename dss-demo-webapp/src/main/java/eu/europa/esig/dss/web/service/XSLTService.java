@@ -21,7 +21,7 @@ import eu.europa.esig.dss.simplereport.SimpleReportFacade;
 @Component
 public class XSLTService {
 
-	private static final Logger logger = LoggerFactory.getLogger(XSLTService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(XSLTService.class);
 
 	@Value("${tl.browser.trustmark.root.url}")
 	private String rootTrustmarkUrlInTlBrowser;
@@ -33,7 +33,7 @@ public class XSLTService {
 		try {
 			return SimpleReportFacade.newFacade().generateHtmlReport(simpleReport);
 		} catch (Exception e) {
-			logger.error("Error while generating simple report : " + e.getMessage(), e);
+			LOG.error("Error while generating simple report : " + e.getMessage(), e);
 			return null;
 		}
 	}
@@ -47,7 +47,7 @@ public class XSLTService {
 			transformer.transform(new StreamSource(new StringReader(simpleReport)), new StreamResult(writer));
 			return writer.toString();
 		} catch (Exception e) {
-			logger.error("Error while generating simple certificate report : " + e.getMessage(), e);
+			LOG.error("Error while generating simple certificate report : " + e.getMessage(), e);
 			return null;
 		}
 	}
@@ -59,7 +59,7 @@ public class XSLTService {
 			transformer.transform(new StreamSource(new StringReader(detailedReport)), new StreamResult(writer));
 			return writer.toString();
 		} catch (Exception e) {
-			logger.error("Error while generating detailed report : " + e.getMessage(), e);
+			LOG.error("Error while generating detailed report : " + e.getMessage(), e);
 			return null;
 		}
 	}

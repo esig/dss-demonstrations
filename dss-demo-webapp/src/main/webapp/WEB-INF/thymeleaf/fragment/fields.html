@@ -118,6 +118,7 @@
 	    <label for="digestToSign" class="col-sm-3 control-label" th:text="#{label.to.sign.digest}"></label>
 	    <div class="col-sm-5">
 			<input type="text" class="form-control input-sm"  th:field="*{digestToSign}" />
+			<input type="hidden" class="form-control input-sm"  th:field="*{documentName}" />
 	    </div>
 		<div style="float:left;">
 		  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}">
@@ -128,6 +129,7 @@
 	    <div class="loader" id="spinner"></div>
 	    <div class="col-xs-4">
 	       	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
+	       	<p th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}" class="text-danger">Error</p>
 	    </div>
 	</div>
 </div>
