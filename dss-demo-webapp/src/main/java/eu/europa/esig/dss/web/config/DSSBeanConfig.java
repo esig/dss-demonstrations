@@ -181,7 +181,7 @@ public class DSSBeanConfig {
 		return jdbcCacheOCSPSource;
 	}
 
-	@Bean
+	@Bean(name = "european-trusted-list-certificate-source")
 	public TrustedListsCertificateSource trustedListSource() {
 		return new TrustedListsCertificateSource();
 	}
@@ -189,7 +189,6 @@ public class DSSBeanConfig {
 	@Bean
 	public CertificateVerifier certificateVerifier() throws Exception {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
-		certificateVerifier.setTrustedCertSource(trustedListSource());
 		certificateVerifier.setCrlSource(cachedCRLSource());
 		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setDataLoader(dataLoader());
@@ -324,7 +323,7 @@ public class DSSBeanConfig {
 		return offlineFileLoader;
 	}
 
-	@Bean
+	@Bean(name = "european-lotl-source")
 	public LOTLSource europeanLOTL() {
 		LOTLSource lotlSource = new LOTLSource();
 		lotlSource.setUrl(lotlUrl);
