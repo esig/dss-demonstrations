@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<div class="form-group row" th:fragment="field-original-files">
+	    <label for="originalFiles" class="col-sm-3 control-label" th:text="#{label.original.files}"></label>
+	    <div class="col-sm-5">
+	        <input type="file" id="detachedOriginalFiles" multiple="multiple"  />
+	    </div>
+	    <div class="col-xs-4">
+	     	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
+	    </div>
+	</div>
+	
+	<div class="form-group row" th:fragment="send-digest-algo">
+	    <label for="digestToSend" class="col-sm-3 control-label" th:text="#{label.send.detached.as}"></label>
+	    <div class="col-sm-6">
+	    	<label class="radio-inline">
+	    	    <input type="radio" value="" name="digestToSend" th:text="#{label.complete.documents}" checked="checked" /> 
+	    	</label>
+	    	<br />
+		    <label  class="radio-inline" th:each="algo : ${digestAlgos}"> 
+			    <input type="radio" th:value="${algo}" th:text="${algo}" name="digestToSend" />
+		    </label>
+	    </div>
+	    <div class="col-xs-4">
+	    </div>
+	</div>
+
+</html>

@@ -31,6 +31,7 @@ import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
 import eu.europa.esig.dss.diagnostic.RevocationWrapper;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -95,7 +96,7 @@ public class ValidationController extends AbstractValidationController {
 		cv.setIncludeTimestampTokenValues(validationForm.isIncludeTimestampTokens());
 		documentValidator.setCertificateVerifier(cv);
 
-		List<DSSDocument> originalFiles = WebAppUtils.toDSSDocuments(validationForm.getOriginalFiles());
+		List<DSSDocument> originalFiles = WebAppUtils.originalDocumentsToDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
 			documentValidator.setDetachedContents(originalFiles);
 		}
@@ -282,4 +283,12 @@ public class ValidationController extends AbstractValidationController {
 	public boolean isDisplayDownloadPdf() {
 		return true;
 	}
+
+	@ModelAttribute("digestAlgos")
+	public DigestAlgorithm[] getDigestAlgorithms() {
+		// see https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+		return new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
+				DigestAlgorithm.SHA512 };
+	}
+
 }

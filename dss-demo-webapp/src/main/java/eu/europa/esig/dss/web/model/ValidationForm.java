@@ -1,18 +1,20 @@
 package eu.europa.esig.dss.web.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.AssertTrue;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 
 public class ValidationForm {
 
 	private MultipartFile signedFile;
 
-	private List<MultipartFile> originalFiles;
+	private List<OriginalDocumentForm> originalFiles = new ArrayList<OriginalDocumentForm>(10);
 
 	private ValidationLevel validationLevel;
 
@@ -34,11 +36,11 @@ public class ValidationForm {
 		this.signedFile = signedFile;
 	}
 
-	public List<MultipartFile> getOriginalFiles() {
+	public List<OriginalDocumentForm> getOriginalFiles() {
 		return originalFiles;
 	}
 
-	public void setOriginalFiles(List<MultipartFile> originalFiles) {
+	public void setOriginalFiles(List<OriginalDocumentForm> originalFiles) {
 		this.originalFiles = originalFiles;
 	}
 
@@ -93,6 +95,21 @@ public class ValidationForm {
 	@AssertTrue(message = "{error.signed.file.mandatory}")
 	public boolean isSignedFile() {
 		return (signedFile != null) && (!signedFile.isEmpty());
+	}
+
+	@AssertTrue(message = "{error.signed.file.mandatory}")
+	public boolean isOriginalFiles() {
+		if (Utils.isCollectionNotEmpty(originalFiles)) {
+			boolean atLeastOneOriginalDoc = false;
+			for (OriginalDocumentForm originalDocumentForm : originalFiles) {
+				if (originalDocumentForm.isNotEmpty()) {
+					atLeastOneOriginalDoc = true;
+					break;
+				}
+			}
+			return atLeastOneOriginalDoc;
+		}
+		return true;
 	}
 
 }
