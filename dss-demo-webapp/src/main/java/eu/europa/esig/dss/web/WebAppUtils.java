@@ -13,7 +13,7 @@ import eu.europa.esig.dss.model.DigestDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.timestamp.TimestampToken;
-import eu.europa.esig.dss.web.model.OriginalDocumentForm;
+import eu.europa.esig.dss.web.model.OriginalFile;
 import eu.europa.esig.dss.ws.dto.TimestampDTO;
 import eu.europa.esig.dss.ws.signature.common.TimestampTokenConverter;
 
@@ -37,10 +37,12 @@ public final class WebAppUtils {
 
 	public static List<DSSDocument> toDSSDocuments(List<MultipartFile> documentsToSign) {
 		List<DSSDocument> dssDocuments = new ArrayList<DSSDocument>();
-		for (MultipartFile multipartFile : documentsToSign) {
-			DSSDocument dssDocument = toDSSDocument(multipartFile);
-			if (dssDocument != null) {
-				dssDocuments.add(dssDocument);
+		if (Utils.isCollectionNotEmpty(documentsToSign)) {
+			for (MultipartFile multipartFile : documentsToSign) {
+				DSSDocument dssDocument = toDSSDocument(multipartFile);
+				if (dssDocument != null) {
+					dssDocuments.add(dssDocument);
+				}
 			}
 		}
 		return dssDocuments;
@@ -54,20 +56,24 @@ public final class WebAppUtils {
 		return TimestampTokenConverter.toTimestampToken(dto);
 	}
 
-	public static List<DSSDocument> originalDocumentsToDSSDocuments(List<OriginalDocumentForm> originalFiles) {
+	public static List<DSSDocument> originalDocumentsToDSSDocuments(List<OriginalFile> originalFiles) {
 		List<DSSDocument> dssDocuments = new ArrayList<DSSDocument>();
-		for (OriginalDocumentForm originalDocumentForm : originalFiles) {
-			if (originalDocumentForm.isNotEmpty()) {
-				DSSDocument dssDocument = null;
-				if (Utils.isStringNotEmpty(originalDocumentForm.getBase64Complete())) {
-					dssDocument = new InMemoryDocument(Utils.fromBase64(originalDocumentForm.getBase64Complete()));
-				} else {
-					dssDocument = new DigestDocument(originalDocumentForm.getDigestAlgorithm(), originalDocumentForm.getBase64Digest());
+		if (Utils.isCollectionNotEmpty(originalFiles)) {
+			for (OriginalFile originalDocument : originalFiles) {
+				if (originalDocument.isNotEmpty()) {
+					DSSDocument dssDocument = null;
+					if (Utils.isStringNotEmpty(originalDocument.getBase64Complete())) {
+						dssDocument = new InMemoryDocument(Utils.fromBase64(originalDocument.getBase64Complete()));
+					} else {
+						dssDocument = new DigestDocument(originalDocument.getDigestAlgorithm(), originalDocument.getBase64Digest());
+					}
+					dssDocument.setName(originalDocument.getFilename());
+					dssDocuments.add(dssDocument);
+					LOG.debug("OriginalDocument with name {} added", originalDocument.getFilename());
 				}
-				dssDocument.setName(originalDocumentForm.getFilename());
-				dssDocuments.add(dssDocument);
 			}
 		}
+		LOG.debug("OriginalDocumentsLoaded : {}", dssDocuments.size());
 		return dssDocuments;
 	}
 

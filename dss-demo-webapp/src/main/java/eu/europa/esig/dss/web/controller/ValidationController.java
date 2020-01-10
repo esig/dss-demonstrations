@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -84,7 +85,12 @@ public class ValidationController extends AbstractValidationController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String validate(@ModelAttribute("validationForm") @Valid ValidationForm validationForm, BindingResult result, Model model) {
+		logger.trace("Validation BEGINS...");
 		if (result.hasErrors()) {
+			List<ObjectError> allErrors = result.getAllErrors();
+			for (ObjectError error : allErrors) {
+				logger.error(error.getDefaultMessage());
+			}
 			return VALIDATION_TILE;
 		}
 

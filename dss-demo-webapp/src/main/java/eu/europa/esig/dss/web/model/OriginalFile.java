@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.utils.Utils;
 
-public class OriginalDocumentForm {
+public class OriginalFile {
 
 	@NotNull
 	private String filename;
@@ -15,6 +15,9 @@ public class OriginalDocumentForm {
 	private String base64Digest;
 
 	private DigestAlgorithm digestAlgorithm;
+	
+	public OriginalFile() {
+	}
 
 	public String getFilename() {
 		return filename;

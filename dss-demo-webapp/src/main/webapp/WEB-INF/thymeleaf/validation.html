@@ -101,70 +101,7 @@
 		</form>
 	</div>
 	<div layout:fragment="scripts">
-		<script type="text/javascript">
-			$('[data-toggle="tooltip"]').tooltip();
-
-			$('input[name="defaultPolicy"]:radio').change(function() {
-				$('#policyFile').attr("disabled", this.value == 'true');
-			});
-			
-
-			$("#validation-form").submit(function(event) {
-				var originalFilesField = $('#detachedOriginalFiles');
-				var originalFiles = originalFilesField[0].files;
-				
-				var linkedFiles = $('#linked-files');
-				linkedFiles.empty();
-				
-				if (originalFiles.length > 0){
-					var digestToSend = $('input[name=digestToSend]:checked', '#validation-form').val()
-					
-					if (digestToSend == '') {
-						linkCompleteFiles(originalFiles, linkedFiles);
-					} else {
-						linkDigestFiles(originalFiles, digestToSend, linkedFiles);
-					}
-				}
-			});
-
-			function linkCompleteFiles(originalFiles, linkedFiles) {
-				for (var i = 0; i < originalFiles.length; i++) {
-					var currentFile = originalFiles[i];
-					addFilename(linkedFiles, currentFile, i);
-				}
-			}
-			
-			function linkDigestFiles(originalFiles, digestToSend, linkedFiles) {
-				for (var i = 0; i < originalFiles.length; i++) {
-					var currentFile = originalFiles[i];
-					addFilename(linkedFiles, currentFile, i);
-					addDigestToSend(linkedFiles, digestToSend, i);
-				}
-			}
-
-			function addFilename(linkedFiles, currentFile, i) {
-				var line = "<input type=\"hidden\" value=\"" +currentFile.name+ "\" name=\"originalFiles["+i+"].filename\" />";
-				console.log(line);
-				linkedFiles.append(line);
-			}
-
-			function addDigestToSend(linkedFiles, digestToSend, i) {
-				var line = "<input type=\"hidden\" value=\"" +digestToSend+ "\" name=\"originalFiles["+i+"].digestAlgorithm\" />";
-				console.log(line);
-				linkedFiles.append(line);
-			}
-			
-			function arrayBufferToBase64(buffer) {
-			    var binary = '';
-			    var bytes = new Uint8Array(buffer);
-			    var len = bytes.byteLength;
-			    for (var i = 0; i < len; i++) {
-			        binary += String.fromCharCode(bytes[i]);
-			    }
-			    return window.btoa(binary);
-			}
-			
-		</script>
+        <script type="text/javascript" th:src="@{/scripts/jsOriginalFilesProvider.js}"></script>
 	</div>
 </body>
 </html>
