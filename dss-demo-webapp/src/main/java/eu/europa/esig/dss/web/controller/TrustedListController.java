@@ -19,7 +19,7 @@ import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 
 @Controller
-@RequestMapping(value = "/tsl-info")
+@RequestMapping(value = "/tl-info")
 public class TrustedListController {
 	
 	private static final String TL_SUMMARY = "tl-summary";

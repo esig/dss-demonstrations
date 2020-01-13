@@ -7,12 +7,16 @@
 		<div layout:fragment="panel" th:remove="tag"></div>
 		
 		<div layout:fragment="content">
+
+			<p th:if="${summary == null}">Nothing to display - Please, check your configuration</p>
+		
+			<th:block th:if="${summary != null}">
 			<div class="lotl" th:each="lotl,iterLOTL : ${summary.getLOTLInfos()}" th:with="downloadResult=${lotl.downloadCacheInfo},
 						parsingResult=${lotl.parsingCacheInfo},
 						validationResult=${lotl.validationCacheInfo}">
 								
 				<!-- LOTL -->
-				<a th:href="@{/tsl-info/lotl/} + ${lotl.getIdentifier().asXmlId()}">
+				<a th:href="@{/tl-info/lotl/} + ${lotl.getIdentifier().asXmlId()}">
 					<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
 					th:class="${'lotl-flag small_flag flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
 				</a>
@@ -28,7 +32,7 @@
 				<div class="table-container row" th:if="${not #lists.isEmpty(lotl.pivotInfos)}">
 					<h4>
 						<span th:text=#{label.summary.pivot.loaded.header}></span>&nbsp;
-						<a class="pivot-changes-url" th:href="@{/tsl-info/pivot-changes/} + ${lotl.getIdentifier().asXmlId()}" 
+						<a class="pivot-changes-url" th:href="@{/tl-info/pivot-changes/} + ${lotl.getIdentifier().asXmlId()}" 
 								th:text="#{label.summary.pivot.check.text}"></a>
 					</h4>
 					<table class="pivot-summary summary-table table">
@@ -76,7 +80,7 @@
 				</div>
 				
 				<!-- TL summary -->
-				<div class="table-container row" th:if="${not #lists.isEmpty(lotl.getTLInfos())}">
+				<div  class="table-container row" th:if="${not #lists.isEmpty(lotl.getTLInfos())}">
 					<h4 th:text="#{label.summary.tl.info.header}"></h4>
 					<table class="tl-summary summary-table table accordion">
 						<thead th:replace="fragment/tl-info :: tl-info-header()"></thead>
@@ -123,8 +127,8 @@
 					
 				</table>
 			</div>
-			
 		</div>
+		</th:block>
 	
 		<div layout:fragment="scripts">
 		    <script type="text/javascript" th:inline="javascript">
