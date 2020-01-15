@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import eu.europa.esig.dss.AbstractSignatureParameters;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESSignatureParameters;
+import eu.europa.esig.dss.asic.cades.ASiCWithCAdESTimestampParameters;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.ASiCWithXAdESSignatureParameters;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
@@ -27,6 +28,7 @@ import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.pades.PAdESSignatureParameters;
+import eu.europa.esig.dss.pades.PAdESTimestampParameters;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.signature.DocumentSignatureService;
 import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
@@ -179,9 +181,9 @@ public class SigningService {
 				throw new DSSException("Only one document is allowed for PAdES");
 			}
 			DSSDocument toTimestampDocument = dssDocuments.get(0);
-			result = padesService.timestamp(toTimestampDocument, new PAdESSignatureParameters());
+			result = padesService.timestamp(toTimestampDocument, new PAdESTimestampParameters());
 		} else {
-			ASiCWithCAdESSignatureParameters parameters = new ASiCWithCAdESSignatureParameters();
+			ASiCWithCAdESTimestampParameters parameters = new ASiCWithCAdESTimestampParameters();
 			parameters.aSiC().setContainerType(containerType);
 			result = asicWithCAdESService.timestamp(dssDocuments, parameters);
 		}
@@ -320,7 +322,7 @@ public class SigningService {
 				break;
 			case PAdES:
 				PAdESSignatureParameters padesParams = new PAdESSignatureParameters();
-				padesParams.setSignatureSize(9472 * 2); // double reserved space for signature
+				padesParams.setContentSize(9472 * 2); // double reserved space for signature
 				parameters = padesParams;
 				break;
 			case XAdES:

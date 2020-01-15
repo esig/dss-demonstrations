@@ -86,11 +86,8 @@
 	<div class="form-group row">
 		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.timestamp.format}"></label>
 		<div class="col-sm-6">
-			<label class="radio-inline">
-            	<input type="radio" th:field="*{containerType}" th:value="none" th:text="PDF" checked="checked" />
-            </label>
-            <label class="radio-inline" th:each="asicType : ${asicContainerTypes}">
-            	<input type="radio" th:field="*{containerType}" th:value="${asicType}" th:text="#{${'label.'+asicType}}" />
+            <label class="radio-inline" th:each="timestampForm : ${timestampContainerForms}">
+            	<input type="radio" th:field="*{containerType}" th:value="${timestampForm}" th:text="#{${'label.'+timestampForm}}" />
             </label>
 		</div>
 	    <div class="col-xs-4">
