@@ -32,6 +32,7 @@ import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.executor.certificate.CertificateProcessExecutor;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
@@ -68,7 +69,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("certValidationForm") @Valid CertificateValidationForm certValidationForm, BindingResult result, Model model) {
+	public String validate(@ModelAttribute("certValidationForm") @Valid CertificateValidationForm certValidationForm, 
+			BindingResult result, Model model, HttpServletRequest request) {
 		if (result.hasErrors()) {
 			return VALIDATION_TILE;
 		}
@@ -87,7 +89,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 			certificateVerifier.setAdjunctCertSource(adjunctCertSource);
 		}
 
-		LOG.info("Start certificate validation");
+		LOG.trace("Start certificate validation");
 
 		CertificateVerifier cv = certificateVerifier;
 		cv.setIncludeCertificateTokenValues(certValidationForm.isIncludeCertificateTokens());
@@ -96,6 +98,11 @@ public class CertificateValidationController extends AbstractValidationControlle
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(cv);
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
+		
+		CertificateProcessExecutor processExecutor = certificateValidator.getDefaultProcessExecutor();
+		processExecutor.setLocale(request.getLocale());
+		LOG.trace("Requested locale : {}", request.getLocale());
+		certificateValidator.setProcessExecutor(processExecutor);
 
 		CertificateReports reports = certificateValidator.validate();
 

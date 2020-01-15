@@ -41,6 +41,7 @@ import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
+import eu.europa.esig.dss.validation.executor.SignatureProcessExecutor;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -84,7 +85,7 @@ public class ValidationController extends AbstractValidationController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("validationForm") @Valid ValidationForm validationForm, BindingResult result, Model model) {
+	public String validate(@ModelAttribute("validationForm") @Valid ValidationForm validationForm, BindingResult result, Model model, HttpServletRequest request) {
 		logger.trace("Validation BEGINS...");
 		if (result.hasErrors()) {
 			List<ObjectError> allErrors = result.getAllErrors();
@@ -101,6 +102,11 @@ public class ValidationController extends AbstractValidationController {
 		cv.setIncludeCertificateRevocationValues(validationForm.isIncludeRevocationTokens());
 		cv.setIncludeTimestampTokenValues(validationForm.isIncludeTimestampTokens());
 		documentValidator.setCertificateVerifier(cv);
+		
+		SignatureProcessExecutor processExecutor = documentValidator.getDefaultProcessExecutor();
+		processExecutor.setLocale(request.getLocale());
+		logger.trace("Requested locale : {}", request.getLocale());
+		documentValidator.setProcessExecutor(processExecutor);
 
 		List<DSSDocument> originalFiles = WebAppUtils.originalDocumentsToDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
