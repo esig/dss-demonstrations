@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,9 +104,15 @@ public class ValidationController extends AbstractValidationController {
 		cv.setIncludeTimestampTokenValues(validationForm.isIncludeTimestampTokens());
 		documentValidator.setCertificateVerifier(cv);
 		
+		Locale locale = request.getLocale();
+		logger.trace("Requested locale : {}", locale);
+		if (locale == null) {
+			locale = Locale.getDefault();
+			logger.warn("The request locale is null! Use the default one : {}", locale);
+		}
+		
 		SignatureProcessExecutor processExecutor = documentValidator.getDefaultProcessExecutor();
-		processExecutor.setLocale(request.getLocale());
-		logger.trace("Requested locale : {}", request.getLocale());
+		processExecutor.setLocale(locale);
 		documentValidator.setProcessExecutor(processExecutor);
 
 		List<DSSDocument> originalFiles = WebAppUtils.originalDocumentsToDSSDocuments(validationForm.getOriginalFiles());

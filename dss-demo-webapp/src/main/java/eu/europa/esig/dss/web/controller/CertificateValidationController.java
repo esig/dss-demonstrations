@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,10 +99,16 @@ public class CertificateValidationController extends AbstractValidationControlle
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(cv);
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
+
+		Locale locale = request.getLocale();
+		LOG.trace("Requested locale : {}", request.getLocale());
+		if (locale == null) {
+			locale = Locale.getDefault();
+			LOG.warn("The request locale is null! Use the default one : {}", locale);
+		}
 		
 		CertificateProcessExecutor processExecutor = certificateValidator.getDefaultProcessExecutor();
-		processExecutor.setLocale(request.getLocale());
-		LOG.trace("Requested locale : {}", request.getLocale());
+		processExecutor.setLocale(locale);
 		certificateValidator.setProcessExecutor(processExecutor);
 
 		CertificateReports reports = certificateValidator.validate();

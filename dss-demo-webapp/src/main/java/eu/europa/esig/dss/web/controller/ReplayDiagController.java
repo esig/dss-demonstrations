@@ -3,6 +3,7 @@ package eu.europa.esig.dss.web.controller;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -51,7 +52,8 @@ public class ReplayDiagController extends AbstractValidationController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("replayDiagForm") @Valid ReplayDiagForm replayDiagForm, BindingResult result, Model model) {
+	public String validate(@ModelAttribute("replayDiagForm") @Valid ReplayDiagForm replayDiagForm, BindingResult result, 
+			Model model, HttpServletRequest request) {
 		if (result.hasErrors()) {
 			return REPLAY_TILE;
 		}
@@ -69,6 +71,14 @@ public class ReplayDiagController extends AbstractValidationController {
 		executor = Utils.isCollectionEmpty(dd.getSignatures()) ? new DefaultCertificateProcessExecutor()
 				: new DefaultSignatureProcessExecutor();
 		executor.setDiagnosticData(dd);
+
+		Locale locale = request.getLocale();
+		LOG.trace("Requested locale : {}", request.getLocale());
+		if (locale == null) {
+			locale = Locale.getDefault();
+			LOG.warn("The request Locale is null! Use the default one : {}", locale);
+		}
+		executor.setLocale(locale);
 		
 		// Set validation date
 		Date validationDate = (replayDiagForm.isResetDate()) ? new Date() : dd.getValidationDate();
