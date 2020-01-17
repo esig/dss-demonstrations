@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
@@ -65,9 +66,9 @@ public class TimestampController {
 		return null;
 	}
 
-	@ModelAttribute("asicContainerTypes")
-	public ASiCContainerType[] getASiCContainerTypes() {
-		return ASiCContainerType.values();
+	@ModelAttribute("timestampContainerForms")
+	public TimestampContainerForm[] getTimestampContainerForms() {
+		return TimestampContainerForm.values();
 	}
 
 }

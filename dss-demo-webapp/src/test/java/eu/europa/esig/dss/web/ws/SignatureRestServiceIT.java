@@ -1,6 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,10 +17,16 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
+import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestParser;
+import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
+import eu.europa.esig.dss.asic.common.ASiCExtractResult;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.TimestampContainerForm;
+import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.SignatureValue;
@@ -26,8 +34,11 @@ import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.ManifestEntry;
+import eu.europa.esig.dss.validation.ManifestFile;
 import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
+import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
@@ -37,7 +48,10 @@ import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 
@@ -201,6 +215,106 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
 			// iMD.save("target/test.asice");
 			assertNotNull(iMD);
+		}
+	}
+	
+	@Test
+	public void testTimestamping() throws Exception {
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.PDF, DigestAlgorithm.SHA512);
+		
+		FileDocument fileToTimestamp = new FileDocument(new File("src/test/resources/sample.pdf"));
+		RemoteDocument remoteDocument = RemoteDocumentConverter.toRemoteDocument(fileToTimestamp);
+		
+		TimestampOneDocumentDTO timestampOneDocumentDTO = new TimestampOneDocumentDTO(remoteDocument, timestampParameters);
+		RemoteDocument timestampedDocument = restClient.timestampDocument(timestampOneDocumentDTO);
+
+		assertNotNull(timestampedDocument);
+
+		InMemoryDocument iMD = new InMemoryDocument(timestampedDocument.getBytes());
+		// iMD.save("target/testSigned.pdf");
+		assertNotNull(iMD);
+	}
+	
+	@Test
+	public void timestampMultipleDocumentsTest() throws Exception {
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_E, DigestAlgorithm.SHA512);
+		
+		List<DSSDocument> documentsToSign = new ArrayList<DSSDocument>(Arrays.asList(
+				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
+		
+		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
+		
+		TimestampMultipleDocumentDTO timestampMultipleDocumentDTO = new TimestampMultipleDocumentDTO(remoteDocuments, timestampParameters);
+		RemoteDocument timestampedDocument = restMultiDocsClient.timestampDocuments(timestampMultipleDocumentDTO);
+		
+		assertNotNull(timestampedDocument);
+
+		InMemoryDocument iMD = new InMemoryDocument(timestampedDocument.getBytes());
+		// iMD.save("target/testSigned.asice");
+		assertNotNull(iMD);
+		
+		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
+		ASiCExtractResult extractedResult = extractor.extract();
+		
+		assertEquals(1, extractedResult.getTimestampDocuments().size());
+		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
+		
+		DSSDocument timestampManifest = ASiCEWithCAdESManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
+		ManifestFile manifestFile = ASiCEWithCAdESManifestParser.getManifestFile(timestampManifest);
+		
+		ASiCEWithCAdESManifestValidator manifestValidator = new ASiCEWithCAdESManifestValidator(manifestFile, extractedResult.getSignedDocuments());
+		List<ManifestEntry> manifestEntries = manifestValidator.validateEntries();
+		
+		assertEquals(2, manifestEntries.size());
+		
+		for (ManifestEntry manifestEntry : manifestEntries) {
+			boolean signedDocFound = false;
+			for (DSSDocument document : documentsToSign) {
+				if (manifestEntry.getFileName().equals(document.getName())) {
+					signedDocFound = true;
+				}
+			}
+			assertTrue(signedDocFound);
+		}
+	}
+	
+	@Test
+	public void timestampASiCSTest() throws Exception {
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_S, DigestAlgorithm.SHA512);
+		
+		List<DSSDocument> documentsToSign = new ArrayList<DSSDocument>(Arrays.asList(
+				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
+		
+		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
+		
+		TimestampMultipleDocumentDTO timestampMultipleDocumentDTO = new TimestampMultipleDocumentDTO(remoteDocuments, timestampParameters);
+		RemoteDocument timestampedDocument = restMultiDocsClient.timestampDocuments(timestampMultipleDocumentDTO);
+		
+		assertNotNull(timestampedDocument);
+
+		InMemoryDocument iMD = new InMemoryDocument(timestampedDocument.getBytes());
+		// iMD.save("target/testSigned.asics");
+		assertNotNull(iMD);
+		
+		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
+		ASiCExtractResult extractedResult = extractor.extract();
+		
+		assertEquals(1, extractedResult.getTimestampDocuments().size());
+		
+		List<DSSDocument> signedDocuments = extractedResult.getSignedDocuments();
+		assertEquals(1, signedDocuments.size()); // ZIP container
+		
+		List<DSSDocument> containerDocuments = extractedResult.getContainerDocuments();
+		assertEquals(2, containerDocuments.size()); // Zip Container content - original docs
+		
+		for (DSSDocument conteinerContent : containerDocuments) {
+			boolean signedDocFound = false;
+			for (DSSDocument document : documentsToSign) {
+				if (conteinerContent.getName().equals(document.getName())) {
+					signedDocFound = true;
+				}
+			}
+			assertTrue(signedDocFound);
 		}
 	}
 
