@@ -42,7 +42,7 @@ import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.validation.executor.SignatureProcessExecutor;
+import eu.europa.esig.dss.validation.executor.DocumentProcessExecutor;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -111,7 +111,7 @@ public class ValidationController extends AbstractValidationController {
 			logger.warn("The request locale is null! Use the default one : {}", locale);
 		}
 		
-		SignatureProcessExecutor processExecutor = documentValidator.getDefaultProcessExecutor();
+		DocumentProcessExecutor processExecutor = documentValidator.getDefaultProcessExecutor();
 		processExecutor.setLocale(locale);
 		documentValidator.setProcessExecutor(processExecutor);
 
