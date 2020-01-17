@@ -47,9 +47,9 @@
 </span>
 
 <span th:fragment="result-status(result)">
-	<span th:if="${!result.resultExist and !result.isError()}" class="glyphicon glyphicon-ban-sign text-muted" title="Not performed"></span>
-	<span th:if="${result.isSynchronized()}" class="glyphicon glyphicon-ok-sign text-success" title="OK"></span>
-	<span th:if="${result.isError()}" class="glyphicon glyphicon glyphicon-remove-sign text-danger" 
+	<span th:if="${!result.resultExist and !result.isError()}" class="fa fa-ban text-muted" title="Not performed"></span>
+	<span th:if="${result.isSynchronized()}" class="fa fa-check-circle text-success" title="OK"></span>
+	<span th:if="${result.isError()}" class="fa fa fa-times-circle text-danger" 
 		th:title="${result.exceptionMessage}"></span>
 </span>
 
@@ -62,25 +62,25 @@
 </span>
 
 <span th:fragment="validation-status(validationResult)">
-	<span th:if="${!validationResult.resultExist and !validationResult.isError()}" class="glyphicon glyphicon-ban-sign text-muted" title="Not performed"></span>
-	<span th:if="${validationResult.isValid()}" class="glyphicon glyphicon-ok-sign text-success"
+	<span th:if="${!validationResult.resultExist and !validationResult.isError()}" class="fa fa-ban text-muted" title="Not performed"></span>
+	<span th:if="${validationResult.isValid()}" class="fa fa-check-circle text-success"
 		th:title="${validationResult.indication}"></span>
-	<span th:if="${validationResult.isIndeterminate()}" class="glyphicon glyphicon-exclamation-sign text-warning"
+	<span th:if="${validationResult.isIndeterminate()}" class="fa fa-exclamation-circle text-warning"
 		th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
-	<span th:if="${validationResult.isInvalid()}" class="glyphicon glyphicon glyphicon-remove-sign text-danger" 
+	<span th:if="${validationResult.isInvalid()}" class="fa fa-times-circle text-danger" 
 		th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
 </span>
 
 <span th:fragment="tl-global-validation-status(parsingResult, validationResult)">
 	<span th:if="${!validationResult.resultExist and !validationResult.isError()}" 
-			class="glyphicon glyphicon-ban-sign text-muted" title="Not performed"></span>
+			class="fa fa-ban text-muted" title="Not performed"></span>
 	<span th:if="${!(!validationResult.resultExist and !validationResult.isError()) and 
 				validationResult.isValid() and !(!parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow()))}" 
-			class="glyphicon glyphicon-ok-sign text-success" th:title="${validationResult.indication}"></span>
+			class="fa fa-check-circle text-success" th:title="${validationResult.indication}"></span>
 	<span th:if="${!(!validationResult.resultExist and !validationResult.isError()) and 
 				(validationResult.isIndeterminate() or !parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow()))}" 
-			class="glyphicon glyphicon-exclamation-sign text-warning" 
+			class="fa fa-exclamation-circle text-warning" 
 			th:title="${(validationResult.isIndeterminate()?(validationResult.indication + ' : ' + validationResult.subIndication):'EXPIRED')}"></span>
 	<span th:if="${validationResult.isError() or (validationResult.isInvalid() and !(!parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow())))}" 
-			class="glyphicon glyphicon glyphicon-remove-sign text-danger" th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
+			class="fa fa-times-circle text-danger" th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></span>
 </span>

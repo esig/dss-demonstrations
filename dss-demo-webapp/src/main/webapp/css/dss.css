@@ -390,7 +390,7 @@ footer li a, footer li a:hover {
 	color: inherit;
 }
 
-.glyphicon {
+.fa {
 	font-size: 14px;
 }
 
@@ -462,6 +462,8 @@ footer li a, footer li a:hover {
 
 .dss-clock {
 	margin-left: 5px;
+    margin-top: 3px;
+    display: inline-block;
 }
 
 form#sign-pdf-form{
@@ -871,7 +873,7 @@ span.distribution-point {
 	margin-bottom: 15px;
 }
 
-.lotl-change-warning > span.glyphicon {
+.lotl-change-warning > span.fa {
 	margin: 0 5px;
 }
 
@@ -976,7 +978,7 @@ span.distribution-point {
     margin-top: 0;
 }
 
-dl.dl-horizontal .glyphicon {
+dl.dl-horizontal .fa {
     margin-right: 3px;
 }
 
@@ -986,6 +988,10 @@ dl.dl-horizontal .glyphicon {
 
 .lotl-location {
     margin-bottom: 10px;
+}
+
+.pull-right {
+	margin-left: 3px;
 }
 
 .pull-right > a {
