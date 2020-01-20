@@ -280,6 +280,15 @@
 			<artifactId>cxf-rt-features-logging</artifactId>
 		</dependency>
 		<dependency>
+		    <groupId>org.apache.cxf</groupId>
+		    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+		</dependency>
+		<dependency>
+	    	<groupId>org.webjars</groupId>
+	        <artifactId>swagger-ui</artifactId>
+	    </dependency>
+		
+		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 		</dependency>
@@ -422,16 +431,6 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-				
-		<dependency>
-		    <groupId>org.apache.cxf</groupId>
-		    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-		</dependency>
-		
-		<dependency>
-	    	<groupId>org.webjars</groupId>
-	        <artifactId>swagger-ui</artifactId>
-	    </dependency>
 	    
 	</dependencies>
 
