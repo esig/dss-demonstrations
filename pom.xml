@@ -63,7 +63,7 @@
 		<jackson-jaxrs-json-provider.version>2.10.1</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<freemarker.version>2.3.29</freemarker.version>
-		<hikaricp.version>3.4.1</hikaricp.version>
+		<hikaricp.version>3.4.2</hikaricp.version>
 		<hsqldb.version>2.5.0</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
 
