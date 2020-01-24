@@ -166,4 +166,10 @@ public class DigestController {
 				DigestAlgorithm.SHA512 };
 		return algos;
 	}
+
+	@ModelAttribute("isMockUsed")
+	public boolean isMockUsed() {
+		return signingService.isMockTSPSourceUsed();
+	}
+
 }

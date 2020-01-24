@@ -33,6 +33,7 @@ import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.signature.DocumentSignatureService;
 import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.timestamp.TimestampToken;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -42,6 +43,7 @@ import eu.europa.esig.dss.web.model.SignatureDigestForm;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
 import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
 import eu.europa.esig.dss.web.model.TimestampForm;
+import eu.europa.esig.dss.x509.tsp.MockTSPSource;
 import eu.europa.esig.dss.xades.XAdESSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 
@@ -64,6 +66,13 @@ public class SigningService {
 
 	@Autowired
 	private ASiCWithXAdESService asicWithXAdESService;
+
+	@Autowired
+	private TSPSource tspSource;
+
+	public boolean isMockTSPSourceUsed() {
+		return tspSource instanceof MockTSPSource;
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DSSDocument extend(ExtensionForm extensionForm) {

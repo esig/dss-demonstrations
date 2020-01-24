@@ -71,4 +71,9 @@ public class TimestampController {
 		return TimestampContainerForm.values();
 	}
 
+	@ModelAttribute("isMockUsed")
+	public boolean isMockUsed() {
+		return signingService.isMockTSPSourceUsed();
+	}
+
 }

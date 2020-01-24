@@ -86,4 +86,9 @@ public class ExtensionController {
 		return SignaturePackaging.values();
 	}
 
+	@ModelAttribute("isMockUsed")
+	public boolean isMockUsed() {
+		return signingService.isMockTSPSourceUsed();
+	}
+
 }

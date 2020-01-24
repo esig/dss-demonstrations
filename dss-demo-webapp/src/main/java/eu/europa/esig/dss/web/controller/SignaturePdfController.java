@@ -147,4 +147,9 @@ public class SignaturePdfController {
 		return null;
 	}
 
+	@ModelAttribute("isMockUsed")
+	public boolean isMockUsed() {
+		return signingService.isMockTSPSourceUsed();
+	}
+
 }
