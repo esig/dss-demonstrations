@@ -1079,6 +1079,15 @@ dl.dl-horizontal .fa {
 	.lotl-url {
 		font-size: 14px
 	}
+}
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+	.form-horizontal .control-label {
+    	text-align: unset!important;
+	}
+}
+
 .loader {
   border: 8px solid #f3f3f3;
   border-radius: 50%;
