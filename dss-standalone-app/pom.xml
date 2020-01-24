@@ -22,6 +22,14 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>0.0.4</version>
+				<configuration>
+			        <mainClass>eu.europa.esig.dss.standalone.DSSApplication</mainClass>
+			    </configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -34,6 +42,12 @@
 <!--             <scope>system</scope> -->
 <!--             <systemPath>${jfxrt.jar}</systemPath> -->
 <!--         </dependency> -->
+
+		<dependency>
+		  <groupId>org.openjfx</groupId>
+		  <artifactId>javafx-fxml</artifactId>
+		  <version>13.0.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
