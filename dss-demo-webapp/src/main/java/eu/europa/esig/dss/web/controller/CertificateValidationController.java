@@ -33,7 +33,6 @@ import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.executor.certificate.CertificateProcessExecutor;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
@@ -106,10 +105,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 			locale = Locale.getDefault();
 			LOG.warn("The request locale is null! Use the default one : {}", locale);
 		}
-		
-		CertificateProcessExecutor processExecutor = certificateValidator.getDefaultProcessExecutor();
-		processExecutor.setLocale(locale);
-		certificateValidator.setProcessExecutor(processExecutor);
+		certificateValidator.setLocale(locale);
 
 		CertificateReports reports = certificateValidator.validate();
 
