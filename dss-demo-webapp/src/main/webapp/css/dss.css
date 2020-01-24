@@ -360,9 +360,10 @@ footer li a, footer li a:hover {
 
 .dss-menu .list-group > a {
 	color: #337ab7;
-	border-bottom: 0;
-	border-left: 0;
-	border-right: 0;
+    border-bottom-color: #337ab7;
+    border-left: 0;
+    border-right: 0;
+    border-top-color: #337ab7;
 }
 
 .dss-menu .list-group > a:hover {
@@ -646,6 +647,10 @@ form#sign-pdf-form .form-group {
 }
 .flag_UK {
   background: url(../images/flags/uk.svg);
+  background-size: contain;
+}
+.flag_no_country {
+  background: url(../images/flags/no_country.svg);
   background-size: contain;
 }
 
