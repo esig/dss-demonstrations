@@ -35,6 +35,7 @@ import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.exception.BadRequestException;
+import eu.europa.esig.dss.web.model.CertificateForm;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 
 
@@ -75,7 +76,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 			return VALIDATION_TILE;
 		}
 
-		CertificateToken certificate = getCertificate(certValidationForm.getCertificateFile());
+		CertificateToken certificate = getCertificate(certValidationForm.getCertificateForm());
 
 		List<MultipartFile> certificateChainFiles = certValidationForm.getCertificateChainFiles();
 		if (Utils.isCollectionNotEmpty(certificateChainFiles)) {
@@ -114,6 +115,17 @@ public class CertificateValidationController extends AbstractValidationControlle
 		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
+	}
+	
+	private CertificateToken getCertificate(CertificateForm certificateForm) {
+		CertificateToken certificateToken = getCertificate(certificateForm.getCertificateFile());
+		if (certificateToken == null) {
+			certificateToken = DSSUtils.loadCertificateFromBase64EncodedString(certificateForm.getCertificateBase64());
+			if (certificateToken == null) {
+				throw new DSSException("Cannot convert base64 to a CertificateToken!");
+			}
+		}
+		return certificateToken;
 	}
 
 	private CertificateToken getCertificate(MultipartFile file) {

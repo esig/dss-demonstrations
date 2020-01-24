@@ -8,7 +8,15 @@
 				th:action="@{/certificate-validation}"
 				th:object="${certValidationForm}">
 
-				<div th:replace="fragment/fields::field-certificate-file"></div>
+				<div class="certificate-form">
+					<div class="certificate-form-switcher form-group row">
+						<div class="col-lg-10">
+		            		<button id="certificate-switcher" class="btn btn-default" th:text="#{label.cert.switch.base64}"></button>
+						</div>
+					</div>
+					<div th:replace="fragment/fields::field-certificate-file"></div>
+					<div th:replace="fragment/fields::field-certificate-base64"></div>
+				</div>
 				<div th:replace="fragment/fields::field-certificate-chain-files"></div>
 				<div th:replace="fragment/fields::field-validation-time"></div>
 				<div th:replace="fragment/fields::field-certificate-tokens"></div>
@@ -26,6 +34,23 @@
 		<div layout:fragment="scripts">
 			<script type="text/javascript">
 				$('[data-toggle="tooltip"]').tooltip();
+				
+	        	$("#certificate-switcher").click(function (e) {
+	        		e.preventDefault();
+	        		var $base64form = $(".certificate-form-base64");
+	        		var $fileform = $(".certificate-form-file");
+	        	    if ($base64form.hasClass("d-none")) {
+	        	    	$fileform.find("input").val(null);
+	        	    	$fileform.addClass("d-none");
+	        	    	$base64form.removeClass("d-none");
+	        	    	$(this).text("[[#{label.cert.switch.file}]]");
+	        	    } else {
+	        	    	$base64form.find("textarea").val(null);
+	        	    	$base64form.addClass("d-none");
+	        	    	$fileform.removeClass("d-none");
+	        	    	$(this).text("[[#{label.cert.switch.base64}]]");
+	        	    }     
+	        	});
 			</script>
 		</div>
 	</body>

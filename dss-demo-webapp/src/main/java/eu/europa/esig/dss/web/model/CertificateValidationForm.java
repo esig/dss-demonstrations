@@ -11,7 +11,7 @@ public class CertificateValidationForm {
 
 	private Date validationTime;
 
-	private MultipartFile certificateFile;
+	private CertificateForm certificateForm;
 
 	private List<MultipartFile> certificateChainFiles;
 	
@@ -27,12 +27,12 @@ public class CertificateValidationForm {
 		this.validationTime = validationTime;
 	}
 
-	public MultipartFile getCertificateFile() {
-		return certificateFile;
+	public CertificateForm getCertificateForm() {
+		return certificateForm;
 	}
 
-	public void setCertificateFile(MultipartFile certificateFile) {
-		this.certificateFile = certificateFile;
+	public void setCertificateForm(CertificateForm certificateForm) {
+		this.certificateForm = certificateForm;
 	}
 
 	public List<MultipartFile> getCertificateChainFiles() {
@@ -60,8 +60,8 @@ public class CertificateValidationForm {
 	}
 
 	@AssertTrue(message = "{error.certificate.mandatory}")
-	public boolean isCertificateFile() {
-		return (certificateFile != null) && (!certificateFile.isEmpty());
+	public boolean isCertificateFormValid() {
+		return certificateForm != null && certificateForm.isNotEmpty();
 	}
 
 }

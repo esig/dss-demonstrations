@@ -185,20 +185,27 @@
     </div>
 </div>
 
-<div class="form-group row" th:fragment="field-certificate-file">
-	<label for="certificateFile" class="col-sm-3 control-label" th:text="#{label.certificate.file}"></label>
+<div class="certificate-form-file form-group row" th:fragment="field-certificate-file">
+	<label for="certificateForm.certificateFile" class="col-sm-3 control-label" th:text="#{label.certificate.file}"></label>
 	<div class="col-sm-3">
-		<input type="file" name="certificateFile" />
+		<input type="file" name="certificateForm.certificateFile" accept=".cer,.der,.pem,.crt" />
 	</div>
-	<div class="col-xs-3 col-md-offset-1">
-		<p th:if="${#fields.hasErrors('certificateFile')}" th:errors="*{certificateFile}" class="text-danger">Error</p>
+	<div class="col-sm-6 offset-sm-3 align-self-center">
+		<p th:if="${#fields.hasErrors('certificateFormValid')}" th:errors="*{certificateFormValid}" class="text-danger">Error</p>
+	</div>
+</div>
+
+<div class="certificate-form-base64 form-group row d-none" th:fragment="field-certificate-base64">
+	<label for="certificateForm.certificateBase64" class="col-sm-3 control-label" th:text="#{label.certificate.base64}"></label>
+	<div class="col-lg-5">
+		<textarea name="certificateForm.certificateBase64" th:placeholder="#{label.certificate.base64.planetext}"></textarea>
 	</div>
 </div>
 
 <div class="form-group row" th:fragment="field-certificate-chain-files">
 	<label for="certificateChainFiles" class="col-sm-3 control-label" th:text="#{label.certificate.chain.files.opt}"></label>
 	<div class="col-sm-3">
-		<input type="file" name="certificateChainFiles" multiple="multiple" />
+		<input type="file" name="certificateChainFiles" multiple="multiple" accept=".cer,.der,.pem,.crt" />
 	</div>
 	<div class="col-xs-3 col-md-offset-1">
 		<p th:if="${#fields.hasErrors('certificateChainFiles')}" th:errors="*{certificateChainFiles}" class="text-danger">Error</p>

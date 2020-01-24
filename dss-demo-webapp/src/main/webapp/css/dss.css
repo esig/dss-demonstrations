@@ -940,6 +940,26 @@ span.distribution-point {
 	font-weight: bold;
 }
 
+.form-group textarea {
+    width: 100%;
+    min-height: 200px;
+    font-size: 10px;
+}
+
+.certificate-form {
+	position: relative;
+}
+
+#certificate-switcher {
+    position: absolute;
+    right: 0;
+}
+
+.certificate-form-switcher {
+	position: absolute;
+    width: 100%;
+}
+
 /* TL-Country */
 .container-no-margin {
     margin-left: unset !important;
