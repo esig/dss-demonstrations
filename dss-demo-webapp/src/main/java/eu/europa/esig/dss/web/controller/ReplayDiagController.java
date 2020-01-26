@@ -25,6 +25,7 @@ import eu.europa.esig.dss.policy.EtsiValidationPolicy;
 import eu.europa.esig.dss.policy.ValidationPolicyFacade;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.executor.ProcessExecutor;
+import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.executor.certificate.CertificateProcessExecutor;
 import eu.europa.esig.dss.validation.executor.certificate.DefaultCertificateProcessExecutor;
 import eu.europa.esig.dss.validation.executor.signature.DefaultSignatureProcessExecutor;
@@ -46,6 +47,7 @@ public class ReplayDiagController extends AbstractValidationController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String showReplayDiagForm(Model model, HttpServletRequest request) {
 		ReplayDiagForm replayForm = new ReplayDiagForm();
+		replayForm.setValidationLevel(ValidationLevel.ARCHIVAL_DATA);
 		replayForm.setDefaultPolicy(true);
 		model.addAttribute("replayDiagForm", replayForm);
 		return REPLAY_TILE;
@@ -102,8 +104,10 @@ public class ReplayDiagController extends AbstractValidationController {
 		}
 		
 		// If applicable, set certificate id
-		if(executor instanceof CertificateProcessExecutor) {
+		if (executor instanceof CertificateProcessExecutor) {
 			((CertificateProcessExecutor) executor).setCertificateId(getCertificateId(dd));
+		} else {
+			((DefaultSignatureProcessExecutor) executor).setValidationLevel(replayDiagForm.getValidationLevel());
 		}
 		
 		AbstractReports reports = executor.execute();
@@ -126,5 +130,10 @@ public class ReplayDiagController extends AbstractValidationController {
 		}
 		return certificateId;
 	}
-	
+
+	@ModelAttribute("validationLevels")
+	public ValidationLevel[] getValidationLevels() {
+		return new ValidationLevel[] { ValidationLevel.BASIC_SIGNATURES, ValidationLevel.LONG_TERM_DATA, ValidationLevel.ARCHIVAL_DATA };
+	}
+
 }

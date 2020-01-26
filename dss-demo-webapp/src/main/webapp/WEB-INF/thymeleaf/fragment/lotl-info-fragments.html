@@ -3,17 +3,17 @@
 
 <!-- LOTL Info -->
 <div class="lotl-info row" th:fragment="lotl-info-summary(downloadResult, parsingResult, validationResult)">
-	<div class="lotl-panel">
+	<div class="lotl-card">
 		<div th:with="status=${(parsingResult.resultExist and validationResult.resultExist and validationResult.isValid())?
 				((downloadResult.isSynchronized() and parsingResult.isSynchronized() and validationResult.isSynchronized())?'success':'warning'):
 				'danger'}"
-				th:class="${'panel panel-' + status}">
+				th:class="${'card card-' + status}">
 			
 			<!-- LOTL indication -->
-			<div class="panel-heading"></div>
+			<div class="card-header"></div>
 			
 			<!-- LOTL info body -->
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="row">
 					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.download.attempt}"></div>
 					<div class="result-body col-xl-8 col-gs-9" 
@@ -93,8 +93,8 @@
 					</div>
 					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
 							 th:text="#{label.summary.tl.info.sign.cert}"></div>
-					<div class="result-body col-xl-12 col-gs-9 signing-certificate" th:if="${validationResult.isResultExist() and validationResult.signingCertificate != null}">
-						<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${validationResult.signingCertificate})"></div>
+					<div class="result-body col-xl-8 col-gs-9 signing-certificate" th:if="${validationResult.isResultExist() and validationResult.signingCertificate != null}">
+						<div th:replace="fragment/certificate:: certificate(certificateToken=${validationResult.signingCertificate})"></div>
 					</div>
 				
 				</div>

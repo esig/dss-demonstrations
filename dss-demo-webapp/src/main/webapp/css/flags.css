@@ -1,0 +1,148 @@
+
+.small_flag {
+  display: block;
+  width: 32px;
+  height : 24px;
+  float: left;
+  border: 1px solid #ececec;
+}
+
+.flag {
+  display: block;
+  width: 64px;
+  height : 48px;
+  border: 1px solid #ececec;
+}
+
+.flag_AT {
+  background: url(../images/flags/at.svg);
+  background-size: contain;
+}
+.flag_BG {
+  background: url(../images/flags/bg.svg);
+  background-size: contain;
+}
+.flag_CZ {
+  background: url(../images/flags/cz.svg);
+  background-size: contain;
+}
+.flag_DK {
+  background: url(../images/flags/dk.svg);
+  background-size: contain;
+}
+.flag_EL {
+  background: url(../images/flags/el.svg);
+  background-size: contain;
+}
+.flag_EU {
+  background: url(../images/flags/eu.svg);
+  background-size: contain;
+}
+.flag_FR {
+  background: url(../images/flags/fr.svg);
+  background-size: contain;
+}
+.flag_HU {
+  background: url(../images/flags/hu.svg);
+  background-size: contain;
+}
+.flag_IS {
+  background: url(../images/flags/is.svg);
+  background-size: contain;
+}
+.flag_LI {
+  background: url(../images/flags/li.svg);
+  background-size: contain;
+}
+.flag_LU {
+  background: url(../images/flags/lu.svg);
+  background-size: contain;
+}
+.flag_MT {
+  background: url(../images/flags/mt.svg);
+  background-size: contain;
+}
+.flag_NO {
+  background: url(../images/flags/no.svg);
+  background-size: contain;
+}
+.flag_PT {
+  background: url(../images/flags/pt.svg);
+  background-size: contain;
+}
+.flag_SE {
+  background: url(../images/flags/se.svg);
+  background-size: contain;
+}
+.flag_SK {
+  background: url(../images/flags/sk.svg);
+  background-size: contain;
+}
+.flag_BE {
+  background: url(../images/flags/be.svg);
+  background-size: contain;
+}
+.flag_CY {
+  background: url(../images/flags/cy.svg);
+  background-size: contain;
+}
+.flag_DE {
+  background: url(../images/flags/de.svg);
+  background-size: contain;
+}
+.flag_EE {
+  background: url(../images/flags/ee.svg);
+  background-size: contain;
+}
+.flag_ES {
+  background: url(../images/flags/es.svg);
+  background-size: contain;
+}
+.flag_FI {
+  background: url(../images/flags/fi.svg);
+  background-size: contain;
+}
+.flag_HR {
+  background: url(../images/flags/hr.svg);
+  background-size: contain;
+}
+.flag_IE {
+  background: url(../images/flags/ie.svg);
+  background-size: contain;
+}
+.flag_IT {
+  background: url(../images/flags/it.svg);
+  background-size: contain;
+}
+.flag_LT {
+  background: url(../images/flags/lt.svg);
+  background-size: contain;
+}
+.flag_LV {
+  background: url(../images/flags/lv.svg);
+  background-size: contain;
+}
+.flag_NL {
+  background: url(../images/flags/nl.svg);
+  background-size: contain;
+}
+.flag_PL {
+  background: url(../images/flags/pl.svg);
+  background-size: contain;
+}
+.flag_RO {
+  background: url(../images/flags/ro.svg);
+  background-size: contain;
+}
+.flag_SI {
+  background: url(../images/flags/si.svg);
+  background-size: contain;
+}
+.flag_UK {
+  background: url(../images/flags/uk.svg);
+  background-size: contain;
+}
+.flag_no_country {
+  background: url(../images/flags/no_country.svg);
+  background-size: contain;
+}

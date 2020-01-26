@@ -58,6 +58,9 @@ $('input[name="signatureForm"]:radio').change(
 	                    $.each(data, function(idx) {
 	                        $('#signaturePackaging-' + data[idx]).attr("disabled", false);
 	                    });
+	                    if (data.length == 1) {
+	                        $('#signaturePackaging-' + data[0]).prop("checked", true);
+	                    }
 	                }
 	            });
             }

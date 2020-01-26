@@ -3,7 +3,7 @@
 	<body>		
 		<div layout:fragment="content">
 			<h2 th:text="#{label.cert.validate}"></h2>
-			<form method="post" class="form-horizontal"
+			<form method="post"
 				enctype="multipart/form-data"
 				th:action="@{/certificate-validation}"
 				th:object="${certValidationForm}">
@@ -11,7 +11,7 @@
 				<div class="certificate-form">
 					<div class="certificate-form-switcher form-group row">
 						<div class="col-lg-10">
-		            		<button id="certificate-switcher" class="btn btn-default" th:text="#{label.cert.switch.base64}"></button>
+		            		<button id="certificate-switcher" class="btn btn-light" th:text="#{label.cert.switch.base64}"></button>
 						</div>
 					</div>
 					<div th:replace="fragment/fields::field-certificate-file"></div>
@@ -21,14 +21,8 @@
 				<div th:replace="fragment/fields::field-validation-time"></div>
 				<div th:replace="fragment/fields::field-certificate-tokens"></div>
 				<div th:replace="fragment/fields::field-revocation-data-tokens"></div>
-				
-				<div class="form-group row">
-					<div class="offset-sm-2 col-sm-10">
-						<button type="submit" class="btn btn-primary"
-							th:text="#{label.submit}"></button>
-						<button type="reset" class="btn btn-default" th:text="#{label.clear}"></button>
-					</div>
-				</div>
+
+				<div th:replace="fragment/fields::submit-reset"></div>
 			</form>
 		</div>
 		<div layout:fragment="scripts">

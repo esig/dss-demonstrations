@@ -202,7 +202,7 @@
 	<div class="row" th:if="${validationResult.isResultExist()}">
 		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.sign.cert}"></div>
 		<div class="result-body col-xl-9" th:if="${validationResult.signingCertificate != null}">
-			<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${validationResult.signingCertificate})"></div>
+			<div th:replace="fragment/certificate :: certificate(certificateToken=${validationResult.signingCertificate})"></div>
 			<hr th:if="${potentialSigners != null}"/>
 		</div>
 	</div>
@@ -211,7 +211,7 @@
 		<div class="result-head col-xl-3" th:text="#{label.summary.tl.info.potential.sign.cert}"></div>
 		<div class="result-body col-xl-9">
 			<th:block th:each="token, i : ${potentialSigners}">
-				<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${token})"></div>
+				<div th:replace="fragment/certificate :: certificate(certificateToken=${token})"></div>
 				<hr th:if="${!i.last}"/>
 			</th:block>
 		</div>
@@ -221,14 +221,14 @@
 
 
 <div th:fragment="tl-tsp(serviceProvider, sp)">
-	<div class="panel panel-primary" >
-        <div class="panel-heading" data-toggle="collapse" aria-expanded="true" th:data-target="'#countryProviders' + ${sp.index}">
-            <span class="badge pull-right" th:text="${#lists.size(serviceProvider.services)}" title="Number of Trust Services"></span>
+	<div class="card" >
+        <div class="card-header" data-toggle="collapse" aria-expanded="true" th:data-target="'#countryProviders' + ${sp.index}">
+            <span class="badge badge-secondary pull-right" th:text="${#lists.size(serviceProvider.services)}" title="Number of Trust Services"></span>
             <th:block th:each="name : ${serviceProvider.names}">
-             	<h3 th:if="${name.key == 'en'}" class="panel-title" th:text="${name.value[0]}"></h3>
+             	<h3 th:if="${name.key == 'en'}" th:text="${name.value[0]}" th:remove="tag"></h3>
       		</th:block>
         </div>
-        <div class="panel-body tl-content accordian-body collapse animate" th:id="'countryProviders' + ${sp.index}">
+        <div class="card-body tl-content accordian-body collapse animate" th:id="'countryProviders' + ${sp.index}">
 			<div class="attributes">
 	      		<div class="container container-no-margin">
 	           		<div class="row">Name :</div>
@@ -244,7 +244,7 @@
 	    		</div>
 	            <div class="container container-no-margin">
 	            	<div class="row">Trade name : <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapseTwo">+</button></div>
-	    			<div id="collapse2" class="panel-collapse collapse">
+	    			<div id="collapse2" class="card-collapse collapse">
 	                  	<ul>
 	                   		<th:block th:each="tradeName : ${serviceProvider.tradeNames}">
 	                   			<li th:each="n : ${tradeName.value}">
@@ -256,7 +256,7 @@
 	            </div>
 	            <div class="container container-no-margin">
 	            	<div class="row">Postal address : <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapseTwo">+</button></div>
-	    			<div id="collapse3" class="panel-collapse collapse">
+	    			<div id="collapse3" class="card-collapse collapse">
 						<ul>
 							<li th:each="postalAddress : ${serviceProvider.postalAddresses}">
 				  				<p class="p-margin" th:text="'(' + ${postalAddress.key} + ')' + ' - ' + ${postalAddress.value}"></p> 
@@ -266,7 +266,7 @@
 	            </div>
 	            <div class="container container-no-margin">
 	            	<div class="row">Electronic address : <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapseTwo">+</button></div>
-		    		<div id="collapse4" class="panel-collapse collapse">
+		    		<div id="collapse4" class="card-collapse collapse">
 	                	<ul>
 	                    	<th:block th:each="electronicAddress : ${serviceProvider.electronicAddresses}">
 	                    		<li th:each="n : ${electronicAddress.value}"><a th:href="${n}" th:text="'('+ ${electronicAddress.key} +')' + ' - ' + ${n}"></a></li>
@@ -285,17 +285,17 @@
 </div>
 
 
-<div th:fragment="tl-tsp-ts(service, ser)" class="panel panel-primary">
+<div th:fragment="tl-tsp-ts(service, ser)" class="card card-primary">
 	<th:block th:each="serviceStatus, i : ${service.getStatusAndInformationExtensions()}" th:if="${i.index} == 0">
-     	<div class="panel-heading" data-toggle="collapse" aria-expanded="true" th:data-target="'#countryServices' + ${ser.index}">
+     	<div class="card-header" data-toggle="collapse" aria-expanded="true" th:data-target="'#countryServices' + ${ser.index}">
      		<span class="pull-right">
-     			<a class="panel-title" th:href="${serviceStatus.type}" target="_blank" th:text="${serviceStatus.type.replaceFirst('http://uri.etsi.org/TrstSvc/Svctype/', '')}"></a>
+     			<a th:href="${serviceStatus.type}" target="_blank" th:text="${serviceStatus.type.replaceFirst('http://uri.etsi.org/TrstSvc/Svctype/', '')}"></a>
      		</span>
 			<th:block th:each="name : ${serviceStatus.names}">
-             	<h3 th:if="${name.key == 'en'}" class="panel-title" th:text="${name.value[0]}"></h3>
+             	<h3 th:if="${name.key == 'en'}" class="card-title" th:text="${name.value[0]}" th:remove="tag"></h3>
       		</th:block>
 		</div>
-		<div class="panel-body tl-content accordian-body collapse animate" th:id="'countryServices' + ${ser.index}">
+		<div class="card-body tl-content accordian-body collapse animate" th:id="'countryServices' + ${ser.index}">
         	<div class="container-fluid">
             	<div class="row">
                 	<div class="col-sm-12 col-md-12 col-xl-12">
@@ -348,15 +348,15 @@
 
 
 <div th:fragment="tl-tsp-ts-cert(service, ser)">
- 	<div class="panel panel-primary" th:if="${not #lists.isEmpty(service.certificates)}">
-		<div class="panel-heading" data-toggle="collapse"
+ 	<div class="card card-primary" th:if="${not #lists.isEmpty(service.certificates)}">
+		<div class="card-header" data-toggle="collapse"
 		    th:data-target="'#countryCertificates' + ${country} + ${sp.index} + '-' + ${ser.index}">
-            <span class="badge pull-right" th:text="${#lists.size(service.certificates)}"  title="Number of Certificates"></span>
-        	<h3 class="panel-title">Certificates</h3>
+            <span class="badge badge-secondary pull-right" th:text="${#lists.size(service.certificates)}"  title="Number of Certificates"></span>
+        	Certificates
 		</div>
-		<div class="panel-body collapse in" th:id="'countryCertificates' + ${country} + ${sp.index} + '-' + ${ser.index}">
+		<div class="card-body collapse in" th:id="'countryCertificates' + ${country} + ${sp.index} + '-' + ${ser.index}">
 			<th:block th:each="token,i : ${service.certificates}">
-				<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${token})"></div>
+				<div th:replace="fragment/certificate :: certificate(certificateToken=${token})"></div>
 				<hr th:if="${!i.last}"/>
 			</th:block>
 		</div>

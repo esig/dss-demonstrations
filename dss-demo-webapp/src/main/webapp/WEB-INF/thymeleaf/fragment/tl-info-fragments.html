@@ -1,31 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<!-- Certificates -->
-<div class="certificate row" th:fragment="certificate-panel(certificateToken)">
-	
-	<div class="result-head col-xl-3" th:text="#{label.summary.cert.subject.name}"></div>
-	<div class="result-body col-xl-9">
-		<p th:text="${certificateToken.subjectX500Principal}"></p>
-	</div>
-	<div class="result-head col-xl-3" th:text="#{label.summary.cert.issuer.name}"></div>
-	<div class="result-body col-xl-9">
-		<p th:text="${certificateToken.issuerX500Principal}"></p>
-	</div>
-	<div class="result-head col-xl-3" th:text="#{label.summary.cert.serial.number}"></div>
-	<div class="result-body col-xl-9">
-		<p th:text="${certificateToken.getSerialNumber()}"></p>
-	</div>
-	<div class="result-head col-xl-3" th:text="#{label.summary.cert.valid.before}"></div>
-	<div class="result-body col-xl-9">
-		<p th:text="${#dates.format(certificateToken.getNotBefore(), 'dd-MMM-yyyy HH:mm:ss')}"></p>
-	</div>
-	<div class="result-head col-xl-3" th:text="#{label.summary.cert.valid.after}"></div>
-	<div class="result-body col-xl-9">
-		<p th:text="${#dates.format(certificateToken.getNotAfter(), 'dd-MMM-yyyy HH:mm:ss')}"></p>
-	</div>
-</div>
-
 <!-- Indication -->
 <span class="indication" th:fragment="indication(indicationName)">
 	<span th:with="status=${(indicationName == 'TOTAL_PASSED')?'success':((indicationName == 'TOTAL_FAILED')?'danger':'warning')}" 

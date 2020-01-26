@@ -53,12 +53,14 @@ public class OJCertificatesController {
 
 	private String getActualOjUrl() {
 		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
-		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
-		for (LOTLInfo lotlInfo : lotlInfos) {
-			if (Utils.areStringsEqual(lotSource.getUrl(), lotlInfo.getUrl())) {
-				ParsingInfoRecord parsingCacheInfo = lotlInfo.getParsingCacheInfo();
-				if (parsingCacheInfo != null) {
-					return parsingCacheInfo.getSigningCertificateAnnouncementUrl();
+		if (summary != null) {
+			List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+			for (LOTLInfo lotlInfo : lotlInfos) {
+				if (Utils.areStringsEqual(lotSource.getUrl(), lotlInfo.getUrl())) {
+					ParsingInfoRecord parsingCacheInfo = lotlInfo.getParsingCacheInfo();
+					if (parsingCacheInfo != null) {
+						return parsingCacheInfo.getSigningCertificateAnnouncementUrl();
+					}
 				}
 			}
 		}

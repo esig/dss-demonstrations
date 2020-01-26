@@ -3,8 +3,7 @@
 	layout:decorate="~{layout.html}" th:with="currentPage='Results'">
 <body>
 	<div layout:fragment="content">
-		<ul class="nav nav-tabs nav-justified hidden-print" id="tabsResult"
-			style="margin-top: 25px;">
+		<ul class="nav nav-tabs nav-justified d-print-none" id="tabsResult">
 			<li class="nav-item" role="presentation">
 				<a class="nav-link active" href="#simple-report" th:text="#{label.simple.report}" data-toggle="tab" role="tab" 
 						aria-controls="simple-report" aria-selected="true"></a>
@@ -23,110 +22,112 @@
 			</li>
 		</ul>
 
-		<div class="tab-content" style="margin-top: 10px">
-
-			<div role="tabpanel" class="tab-pane fade in active show report" id="simple-report">
-				<div class="btn-group pull-right hidden-print" role="toolbar"
-					style="margin: 4px;">
-					<button type="button" class="btn btn-default"
-						onclick="window.print();">
-						<span class="fa fa-print"></span> Print
-					</button>
-					<a class="btn btn-default"
-						th:href="@{/validation/download-simple-report}" role="button"
-						th:if="${displayDownloadPdf}"> <span
-						class="fa fa-download"></span> Download as PDF
-					</a>
-				</div>
-
-				<div th:utext="${simpleReport}"></div>
-			</div>
-			<div role="tabpanel" class="tab-pane fade report" id="detailed-report">
-				<div class="btn-group pull-right hidden-print" role="toolbar"
-					style="margin: 4px;">
-					<button type="button" class="btn btn-default"
-						onclick="window.print();">
-						<span class="fa fa-print"></span> Print
-					</button>
-					<a class="btn btn-default"
-						th:href="@{/validation/download-detailed-report}" role="button"
-						th:if="${displayDownloadPdf}"> <span
-						class="fa fa-download"></span> Download as PDF
-					</a>
-				</div>
-
-				<div th:utext="${detailedReport}"></div>
-			</div>
-			<div role="tabpanel" class="tab-pane fade report" id="diagnostic-tree">
-				<div class="panel panel-default">
-					<div class="panel-heading collapsed" data-toggle="collapse"
-						data-target="#downloads" aria-expanded='false'>
-						<h3 class="panel-title" th:text="#{label.validation.download}"></h3>
+		<div class="tab-content mt-2">
+		
+			<div role="tabcard" class="tab-pane fade in active show report" id="simple-report">
+				<div class="position-relative">
+					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 4px; z-index : 3; right : 0">
+						<button type="button" class="btn btn-light"
+							onclick="window.print();">
+							<span class="fa fa-print"></span> Print
+						</button>
+						<a class="btn btn-light"
+							th:href="@{/validation/download-simple-report}" role="button"
+							th:if="${displayDownloadPdf}"> <span
+							class="fa fa-download"></span> Download as PDF
+						</a>
 					</div>
 
-					<div class="panel-body collapse in" id="downloads">
-						<!-- Diagnostic data -->
+					<div class="w-100" th:utext="${simpleReport}"></div>
+				</div>
+			</div>
+		
+			<div role="tabcard" class="tab-pane fade report" id="detailed-report">
+				<div class="position-relative">
+					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 4px; z-index : 3; right : 0">
+						<button type="button" class="btn btn-light"
+							onclick="window.print();">
+							<span class="fa fa-print"></span> Print
+						</button>
+						<a class="btn btn-light"
+							th:href="@{/validation/download-detailed-report}" role="button"
+							th:if="${displayDownloadPdf}"> <span
+							class="fa fa-download"></span> Download as PDF
+						</a>
+					</div>
+
+					<div class="w-100" th:utext="${detailedReport}"></div>
+				</div>
+			</div>
+			<div role="tabcard" class="tab-pane fade report" id="diagnostic-tree">
+				<div class="card mb-2">
+					<div class="card-header collapsed" data-toggle="collapse"
+						data-target="#downloads" aria-expanded='false'>
+						<h3 th:text="#{label.validation.download}" th:remove="tag"></h3>
+					</div>
+
+					<div class="card-body collapse in" id="downloads">
 						<div class="row">
-							<label class="col-sm-2 control-label" th:text="#{label.report}"></label>
-							<a th:href="@{/validation/download-diagnostic-data}">
-								<span th:text="#{label.diagnostic.data}"></span>
-								<span class="fa fa-download"></span>
-							</a>
-						</div>
-						<!-- Certificates -->
-						<div class="row"
-							th:if="${allCertificates != null && allCertificates.size() > 0}">
-							<label class="col-sm-2 control-label"
-								th:text="#{label.certificates}"></label>
-							<div class="col-sm-7">
-								<table>
-									<tr th:each="cert : ${allCertificates}">
-										<td><a
-											th:href="@{|/validation/download-certificate?id=${cert.getId()}|}">
-												<span th:text="${cert.getName()}"></span>
-												<span class="fa fa-download"></span>
-										</a></td>
-									</tr>
-								</table>
+							<div class="col-sm-2">
+								<p th:text="#{label.report}">Report</p>
+							</div>
+							<div class="col-sm-10">
+								<ul class="list-unstyled">
+									<li>
+										<a th:href="@{/validation/download-diagnostic-data}">
+											<span th:text="#{label.diagnostic.data}"></span>
+											<span class="fa fa-download"></span>
+										</a>
+									</li>
+								</ul>
 							</div>
 						</div>
-						<!-- Revocation data -->
-						<div class="row"
-							th:if="${allRevocationData != null && allRevocationData.size() > 0}">
-							<label class="col-sm-2 control-label"
-								th:text="#{label.revocation-data}"></label>
-							<div class="col-sm-7">
-								<table>
-									<tr th:each="rd : ${allRevocationData}">
-										<td><span th:text="${rd.getName()}"></span>
-											<div
-												th:replace="fields :: field-der-pem(${#strings.startsWith(rd.getName(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)"></div>
-										</td>
-									</tr>
-								</table>
+						<div class="row" th:if="${allCertificates != null && allCertificates.size() > 0}">
+							<div class="col-sm-2">
+								<p th:text="#{label.certificates}">Certificates</p>
+							</div>
+							<div class="col-sm-10">
+								<ul class="list-unstyled">
+									<li th:each="cert : ${allCertificates}">
+										<a th:href="@{|/validation/download-certificate?id=${cert.getId()}|}">
+											<span th:text="${cert.getName()}"></span>
+											<span class="fa fa-download"></span>
+										</a>
+									</li>
+								</ul>								
 							</div>
 						</div>
-						<!-- Timestamps -->
-						<div class="row"
-							th:if="${allTimestamps != null && allTimestamps.size() > 0}">
-							<label class="col-sm-2 control-label"
-								th:text="#{label.timestamps}"></label>
-							<div class="col-sm-7">
-								<table>
-									<tr th:each="tst : ${allTimestamps}">
-										<td><span th:text="${tst.getName()}"></span>
-											<div
-												th:replace="fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)"></div>
-										</td>
-									</tr>
-								</table>
+						<div class="row" th:if="${allRevocationData != null && allRevocationData.size() > 0}">
+							<div class="col-sm-2">
+								<p th:text="#{label.revocation-data}">Revocation data</p>
+							</div>
+							<div class="col-sm-10">
+								<ul class="list-unstyled">
+									<li th:each="rd : ${allRevocationData}">
+										<span th:text="${rd.getName()}"></span>
+										<div th:replace="fields :: field-der-pem(${#strings.startsWith(rd.getName(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)"></div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="row" th:if="${allTimestamps != null && allTimestamps.size() > 0}">
+							<div class="col-sm-2">
+								<p th:text="#{label.timestamps}">Timestamps</p>
+							</div>
+							<div class="col-sm-10">
+								<ul class="list-unstyled">
+									<li th:each="tst : ${allTimestamps}">
+										<span th:text="${tst.getName()}"></span>
+										<div th:replace="fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)"></div>
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
 				</div>
 				<pre class="prettyprint lang-xml" th:text="${diagnosticDataXml}"></pre>
 			</div>
-			<div th:if="${etsiValidationReport} != null" role="tabpanel" class="tab-pane fade report" id="etsi-validation-report">
+			<div th:if="${etsiValidationReport} != null" role="tabcard" class="tab-pane fade report" id="etsi-validation-report">
 				<pre class="prettyprint lang-xml" th:text="${etsiValidationReport}"></pre>
 			</div>
 		</div>
@@ -140,8 +141,8 @@
 
 			$('[data-toggle="tooltip"]').tooltip();
 			
-			/* Collapsed Bootstrap plugin, show all panels */
-			$(".tab-pane .panel > .panel-body.collapse").addClass("show");
+			/* Collapsed Bootstrap plugin, show all cards */
+			$(".tab-pane .card > .card-body.collapse").addClass("show");
 		</script>
 	</div>
 </body>

@@ -5,18 +5,12 @@
 			<div th:if="${isMockUsed}" th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
             <h2 th:text="#{label.timestamp.doc}"></h2>
             
-            <form method="post" class="form-horizontal" th:action="@{/timestamp-a-document}" th:object="${timestampForm}" enctype="multipart/form-data">
-
+            <form method="post" th:action="@{/timestamp-a-document}" th:object="${timestampForm}" enctype="multipart/form-data">
                 <div th:replace="fragment/fields::field-original-files"></div>
 
                 <div th:replace="fragment/fields::field-container-type-form-timestamp"></div>
 
-                <div class="form-group row">
-                    <div class="offset-sm-2 col-sm-10">
-                        <button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
-                        <button type="reset" class="btn btn-default" th:text="#{label.clear}"></button>
-                    </div>
-                </div>
+				<div th:replace="fragment/fields::submit-reset"></div>
             </form>
 		</div>
 	</body>

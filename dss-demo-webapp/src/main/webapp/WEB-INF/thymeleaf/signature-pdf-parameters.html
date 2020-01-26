@@ -6,11 +6,11 @@
 
 		<h2 th:text="#{label.signAPDF}"></h2>
 
-		<form method="post" class="form-horizontal" id="sign-pdf-form"
+		<form method="post" id="sign-pdf-form"
 			enctype="multipart/form-data" th:action="@{/sign-a-pdf}"
 			th:object="${signaturePdfForm}">
 
-			<input type="hidden" id="isSign" value="true" /> <input type="file"
+			<input type="hidden" id="isSign" value="true" /> <input type="file" class="form-control-file"
 				name="documentToSign" id="documentToSign" accept="application/pdf" />
 			<p id="filename">Drag a PDF document here or click in this area.</p>
 

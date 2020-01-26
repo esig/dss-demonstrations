@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700');
+
+body {
+	font-family: 'Source Sans Pro', Arial, sans-serif;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+}
+
+.header-highlight {
+	background: #5986bd;
+	height: 100px;
+}
+
+.footer {
+	height: 50px;
+}
+
+.bg-primary, .header-highlight {
+    background-color: #5986bd!important;
+    color : white;
+}
+
+.btn-primary, .btn-primary.active, .btn-primary.focus, .btn-primary:hover, .btn-primary:disabled {
+	background-color: #5986bd;
+	border-color : #5986bd;
+}
+
+.list-group-item.active {
+	background-color: white;
+	color :#5986bd;
+	text-decoration: underline;
+	border-color : rgba(0,0,0,.125); /* same color than no active */
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+}
+
+a, a:hover {
+	color : #5986bd;
+}

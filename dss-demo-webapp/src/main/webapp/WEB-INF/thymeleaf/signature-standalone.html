@@ -11,17 +11,15 @@
                 )
             </p>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">More info...</h3>
-                </div>
-                <div class="panel-body collapse in">
+            <div class="card">
+                <div class="card-header">More info...</div>
+                <div class="card-body collapse in">
                     <p>This demo is a standalone application which uses JavaFX (Java 8).</p>
                     <p>The application connects directly to the CA's infrastructure to retrieve information such as CRL, OCSP, certificates from AIA ...</p>
-                    <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, ASiC). This application doesn't requires a DSS server.</p>
+                    <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, ASiC). This application doesn't require a DSS server.</p>
                     <div class="col-sm-12">
                         <a th:href="@{/images/standalone-application.png}" class="thumbnail" target="_blank">
-                            <img th:src="@{/images/standalone-application.png}" alt="Standalone application" class="img-rounded" />
+                            <img th:src="@{/images/standalone-application.png}" alt="Standalone application" class="img-fluid" />
                         </a>
                     </div>
                 </div>

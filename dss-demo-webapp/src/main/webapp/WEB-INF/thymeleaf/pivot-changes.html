@@ -4,8 +4,8 @@
 		<title th:text="#{label.pivots.summary}"></title>
 	</head>
 	<body>
-		<div class="row panel-row" th:if="${lotl != null}">
-			<div class="panel panel-default panel-body col-lg-10 col-lg-9" layout:fragment="panel">
+		<div class="row card-row" th:if="${lotl != null}">
+			<div class="card card-body col-lg-10 col-lg-9" layout:fragment="card">
 				
 			<p>This page contains the information about evolution of the original keystore by provided pivots.</p>
 			<p>The following notations are used:</p>
@@ -30,17 +30,17 @@
 		
 			<!-- Original certificates -->
 			<div class="certificates-container original-certificates row">
-				<div class="panel panel-primary">
-					<div class="panel-heading" th:text="#{label.summary.lotl.original.keystore}"></div>
-					<div class="panel-body">
+				<div class="card card-primary">
+					<div class="card-header" th:text="#{label.summary.lotl.original.keystore}"></div>
+					<div class="card-body">
 						<div th:each="certificate,iterCert : ${originalKeystore}" th:with="certId=${certificate.getDSSIdAsString()}">
-							<div th:class="${'panel certificate-container panel-' + ((certId == lotlSigningCertId)?'signed':'default')}">
-								<div class="panel-heading" th:data-target="${'#' + certId}" data-toggle="collapse" 
+							<div th:class="${'card certificate-container card-' + ((certId == lotlSigningCertId)?'signed':'default')}">
+								<div class="card-header" th:data-target="${'#' + certId}" data-toggle="collapse" 
 										th:title="${(certId == lotlSigningCertId)?'Signing certificate':'Original keystore certificate'}">
 									<span class="certificate-header" th:text="${'Certificate Id = ' + certId}"></span>
 								</div>
-								<div class="panel-body collapse" th:id="${certId}">
-									<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${certificate})"></div>
+								<div class="card-body collapse" th:id="${certId}">
+									<div th:replace="fragment/certificate :: certificate(certificateToken=${certificate})"></div>
 								</div>
 							</div>
 						</div>
@@ -53,10 +53,10 @@
 					th:with="pivotId=${pivot.getIdentifier().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
 					lotlLocation=${pivot.getLOTLLocation()}">
 					
-				<div class="panel panel-primary">
-					<div class="panel-heading" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
+				<div class="card card-primary">
+					<div class="card-header" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
 					
-					<div class="panel-body">
+					<div class="card-body">
 						<!-- LOTL location -->
 						<div class="lotl-location" th:if="${lotlLocation != null}">
 							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>&nbsp;
@@ -70,15 +70,15 @@
 						<!-- Pivot certificate source -->
 						<div th:each="certificateEntry,iterCert : ${pivotCerts}" th:with="certId=${certificateEntry.key.getDSSIdAsString()},
 								certStatus=${certificateEntry.value.name()}">
-							<div th:class="${'panel certificate-container panel-' + 
+							<div th:class="${'card certificate-container card-' + 
 									((certId == lotlSigningCertId)?'signed':((certStatus == 'ADDED')?'success':((certStatus == 'REMOVED')?'danger':'default')))}">
-								<div class="panel-heading" th:data-target="${'#' + pivotId + '-' + certId}" data-toggle="collapse" 
+								<div class="card-header" th:data-target="${'#' + pivotId + '-' + certId}" data-toggle="collapse" 
 										th:title="${((certId == lotlSigningCertId)?'Signing certificate':((certStatus == 'ADDED')?'Added certificate':
 										((certStatus == 'REMOVED')?'Removed certificate':'Certificate')))}">
 									<span class="certificate-header" th:text="#{label.summary.cert.id(${certId})}"></span>
 								</div>
-								<div class="panel-body collapse" th:id="${pivotId + '-' + certId}">
-									<div th:replace="fragment/tl-info-fragments :: certificate-panel(certificateToken=${certificateEntry.key})"></div>
+								<div class="card-body collapse" th:id="${pivotId + '-' + certId}">
+									<div th:replace="fragment/certificate :: certificate(certificateToken=${certificateEntry.key})"></div>
 								</div>
 							</div>
 						</div>

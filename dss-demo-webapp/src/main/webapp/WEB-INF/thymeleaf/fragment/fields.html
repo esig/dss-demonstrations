@@ -2,19 +2,29 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <div class="form-group row" th:fragment="field-document-to-sign">
-     <label for="documentToSign" class="col-sm-3 control-label" th:text="#{label.to.sign.file}"></label>
+     <label class="col-sm-3 col-form-label" for="documentToSign" th:text="#{label.to.sign.file}"></label>
      <div class="col-sm-5">
-    	<input type="file" name="documentToSign" id="documentToSign" /> 
+    	<input type="file" class="form-control-file" name="documentToSign" id="documentToSign" /> 
      </div>
      <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('documentToSign')}" th:errors="*{documentToSign}" class="text-danger">Error</p>
      </div>
 </div>
 
+<div class="form-group row" th:fragment="field-diagnostic-data">
+    <label class="col-sm-3 col-form-label" for="diagnosticFile" th:text="#{label.replay.file}"></label>
+    <div class="col-sm-5">
+    	<input type="file" class="form-control-file" name="diagnosticFile" id="diagnosticFile" /> 
+    </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('diagnosticFile')}" th:errors="*{diagnosticFile}" class="text-danger">Error</p>
+    </div>
+</div>
+
 <div class="form-group row" th:fragment="field-documents-to-sign">
-     <label for="documentsToSign" class="col-sm-3 control-label" th:text="#{label.to.sign.files}"></label>
+     <label class="col-sm-3 col-form-label" for="documentsToSign" th:text="#{label.to.sign.files}"></label>
      <div class="col-sm-5">
-    	<input type="file" name="documentsToSign" id="documentsToSign" multiple="multiple" /> 
+    	<input type="file" class="form-control-file" name="documentsToSign" id="documentsToSign" multiple="multiple" /> 
      </div>
      <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('documentsToSign')}" th:errors="*{documentsToSign}" class="text-danger">Error</p>
@@ -22,9 +32,9 @@
 </div>
 
 <div class="form-group row" th:fragment="field-file">
-     <label for="documentToSign" class="col-sm-3 control-label" th:text="#{label.file}"></label>
+     <label class="col-sm-3 col-form-label" for="documentToSign" th:text="#{label.file}"></label>
      <div class="col-sm-5">
-    	<input type="file" name="file" id="file" /> 
+    	<input type="file" class="form-control-file" name="file" id="file" /> 
      </div>
      <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('file')}" th:errors="*{file}" class="text-danger">Error</p>
@@ -32,9 +42,9 @@
 </div>
 
 <div class="form-group row" th:fragment="field-signed-file">
-    <label for="signedFile" class="col-sm-3 control-label" th:text="#{label.signed.file}"></label>
+    <label class="col-sm-3 col-form-label" for="signedFile" th:text="#{label.signed.file}"></label>
     <div class="col-sm-5">
-    	<input type="file" name="signedFile" id="signedFile" /> 
+    	<input type="file" class="form-control-file" name="signedFile" id="signedFile" /> 
     </div>
     <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('signedFile')}" th:errors="*{signedFile}" class="text-danger">Error</p>
@@ -42,99 +52,103 @@
 </div>
 
 <div class="form-group row" th:fragment="field-original-files">
-    <label for="originalFiles" class="col-sm-3 control-label" th:text="#{label.original.files}"></label>
+    <label class="col-sm-3 col-form-label" for="originalFiles" th:text="#{label.original.files}"></label>
     <div class="col-sm-5">
-        <input type="file" name="originalFiles" id="originalFiles" multiple="multiple" />
+        <input type="file" class="form-control-file" name="originalFiles" id="originalFiles" multiple="multiple" />
     </div>
     <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
     </div>
 </div>
 
-<div th:fragment="field-simplified-container-type-form">
-	<div class="form-group row">
-		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.asic.container.type}"></label>
-		<div class="col-sm-6">
-            <label class="radio-inline" th:each="asicType : ${asicContainerTypes}">
-            	<input type="radio" th:field="*{containerType}" th:value="${asicType}" th:text="#{${'label.'+asicType}}" />
-            </label>
+<div class="form-group row" th:fragment="field-simplified-container-type-form">
+	<label  class="col-sm-3 col-form-label" for="containerType" th:text="#{label.asic.container.type}"></label>
+	<div class="col-sm-5">
+		<th:block th:each="asicType : ${asicContainerTypes}">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="${asicType}" th:id="container+${asicType}" />
+           		<label class="form-check-label" th:for="container+${asicType}" th:text="#{${'label.'+asicType}}"></label>
+           	</div>
+		</th:block>
+	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-container-type-form">
+	<label class="col-sm-3 col-form-label" for="containerType" th:text="#{label.asic.container.type}"></label>
+	<div class="col-sm-5">
+		<div class="form-check form-check-inline">
+           	<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="none" id="containerNone" />
+           	<label class="form-check-label" th:for="containerNone" th:text="#{label.container.none}"></label>
 		</div>
-	    <div class="col-xs-4">
-	       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
-	    </div>
+		
+		<th:block th:each="asicType : ${asicContainerTypes}">
+			<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="${asicType}" th:id="container+${asicType}" />
+            	<label class="form-check-label" th:for="container+${asicType}" th:text="#{${'label.'+asicType}}"></label>
+            </div>
+		</th:block>
 	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+    </div>
 </div>
 
-<div th:fragment="field-container-type-form">
-	<div class="form-group row">
-		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.asic.container.type}"></label>
-		<div class="col-sm-6">
-			<label class="radio-inline">
-            	<input type="radio" th:field="*{containerType}" th:value="none" th:text="#{label.container.none}" />
-            </label>
-            <label class="radio-inline" th:each="asicType : ${asicContainerTypes}">
-            	<input type="radio" th:field="*{containerType}" th:value="${asicType}" th:text="#{${'label.'+asicType}}" />
-            </label>
-		</div>
-	    <div class="col-xs-4">
-	       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
-	    </div>
+<div class="form-group row" th:fragment="field-container-type-form-timestamp">
+	<label class="col-sm-3 col-form-label" for="containerType" th:text="#{label.timestamp.format}"></label>
+	<div class="col-sm-5">
+		<th:block th:each="timestampForm : ${timestampContainerForms}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="${timestampForm}" th:id="container+${timestampForm}" />
+            	<label class="form-check-label" th:for="container+${timestampForm}" th:text="#{${'label.'+timestampForm}}"></label>
+            </div>
+		</th:block>
 	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+    </div>
 </div>
 
-<div th:fragment="field-container-type-form-timestamp">
-	<div class="form-group row">
-		<label for="containerType" class="col-sm-3 control-label" th:text="#{label.timestamp.format}"></label>
-		<div class="col-sm-6">
-            <label class="radio-inline" th:each="timestampForm : ${timestampContainerForms}">
-            	<input type="radio" th:field="*{containerType}" th:value="${timestampForm}" th:text="#{${'label.'+timestampForm}}" />
-            </label>
-		</div>
-	    <div class="col-xs-4">
-	       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
-	    </div>
-	</div>
-</div>
-
-<div th:fragment="field-signature-form">
-	<div class="form-group row">
-	    <label for="signatureForm" class="col-sm-3 control-label" th:text="#{label.signature.form}"></label>
-	    <div class="col-sm-5">
-            <label class="radio-inline" th:each="sigForm : ${signatureForms}">
-            	<input type="radio" th:field="*{signatureForm}" th:value="${sigForm}" th:text="#{${'label.'+sigForm}}" th:id="form +${sigForm}" />
-            </label>
-	    </div>
-	    <div class="col-xs-4">
-	       	<p th:if="${#fields.hasErrors('signatureForm')}" th:errors="*{signatureForm}" class="text-danger">Error</p>
-	    </div>
-	</div>
-</div>
-
-<div th:fragment="field-document-digest">
-	<div class="form-group row">
-	    <label for="digestToSign" class="col-sm-3 control-label" th:text="#{label.to.sign.digest}"></label>
-	    <div class="col-sm-5">
-			<input type="text" class="form-control input-sm"  th:field="*{digestToSign}" />
-			<input type="hidden" class="form-control input-sm"  th:field="*{documentName}" />
-	    </div>
-		<div style="float:left;">
-		  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}">
-		    	<span class="fa fa-hashtag" th:title="#{label.compute.digest}"></span>
-		  	</label>	
-			<input type="file" name="fileToCompute" id="fileToCompute" onchange="readFile(this)" /> 
-		</div>
-	    <div class="loader" id="spinner"></div>
-	    <div class="col-xs-4">
-	       	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
-	       	<p th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}" class="text-danger">Error</p>
-	    </div>
-	</div>
-</div>
-
-<div class="form-group" th:fragment="field-signature-level">
-    <label for="signatureLevel" class="col-sm-3 control-label" th:text="#{label.signature.level}"></label>
+<div class="form-group row" th:fragment="field-signature-form">
+    <label class="col-sm-3 col-form-label" for="signatureForm" th:text="#{label.signature.form}"></label>
     <div class="col-sm-5">
-        <select name="signatureLevel" class="form-control input-sm" id="selectSignatureLevel">
+		<th:block th:each="sigForm : ${signatureForms}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{signatureForm}" th:value="${sigForm}" th:id="form+${sigForm}" />
+            	<label class="form-check-label" th:for="form+${sigForm}" th:text="#{${'label.'+sigForm}}"></label>
+            </div>
+		</th:block>
+    </div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('signatureForm')}" th:errors="*{signatureForm}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-document-digest">
+    <label class="col-sm-3 col-form-label" for="digestToSign" th:text="#{label.to.sign.digest}"></label>
+    <div class="col-sm-5">
+		<input type="text" class="form-control input-sm"  th:field="*{digestToSign}" />
+		<input type="hidden" class="form-control input-sm"  th:field="*{documentName}" />
+    </div>
+	<div style="float:left;">
+	  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}">
+	    	<span class="fa fa-hashtag" th:title="#{label.compute.digest}"></span>
+	  	</label>	
+		<input type="file" class="d-none" name="fileToCompute" id="fileToCompute" onchange="readFile(this)" /> 
+	</div>
+    <div class="loader" id="spinner"></div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
+       	<p th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-level">
+    <label class="col-sm-3 col-form-label" for="signatureLevel" th:text="#{label.signature.level}"></label>
+    <div class="col-sm-5">
+        <select name="signatureLevel" class="custom-select" id="selectSignatureLevel">
         </select>
     </div>
     <div class="col-xs-3 col-md-offset-1"> 	
@@ -143,11 +157,14 @@
 </div>
 
 <div class="form-group row" th:fragment="field-signature-packaging">
-    <label for="signaturePackaging" class="col-sm-3 control-label" th:text="#{label.signature.packaging}"></label>
+    <label class="col-sm-3 col-form-label" for="signaturePackaging" th:text="#{label.signature.packaging}"></label>
     <div class="col-sm-5">
-	    <label class="radio-inline" th:each="sigPack : ${signaturePackagings}">
-		    <input type="radio" th:field="*{signaturePackaging}" th:value="${sigPack}" th:text="#{${'label.'+sigPack}}" th:id="${'signaturePackaging-'+sigPack}" />
-	    </label>
+		<th:block th:each="sigPack : ${signaturePackagings}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{signaturePackaging}" th:value="${sigPack}" th:id="${'signaturePackaging-'+sigPack}" />
+            	<label class="form-check-label" th:for="${'signaturePackaging-'+sigPack}" th:text="#{${'label.'+sigPack}}"></label>
+            </div>
+		</th:block>
     </div>
     <div class="col-xs-3">
     	<p th:if="${#fields.hasErrors('signaturePackaging')}" th:errors="*{signaturePackaging}" class="text-danger">Error</p>
@@ -155,15 +172,14 @@
 </div>
 
 <div class="form-group row" th:fragment="field-digest-algo">
-    <label for="digestAlgorithm" class="col-sm-3 control-label" th:text="#{label.digest.algorithm}"></label>
-    <div class="col-sm-6">
+    <label class="col-sm-3 col-form-label" for="digestAlgorithm" th:text="#{label.digest.algorithm}"></label>
+    <div class="col-sm-5">
    		<th:block th:each="algo : ${digestAlgos}">
-		    <label th:if="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="radio-inline" data-toggle="tooltip" data-placement="top" th:title="#{label.deprecated}"> 
-			    <input type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:text="${algo}"  />
-		    </label>
-		    <label th:unless="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="radio-inline"> 
-			    <input type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:text="${algo}"  />
-		    </label>
+   			<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:id="algo+${algo}" />
+            	<label th:if="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" th:text="${algo}" data-toggle="tooltip" data-placement="top" th:title="#{label.deprecated}"></label>
+            	<label th:unless="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" th:text="${algo}"></label>
+            </div>
 		</th:block>
     </div>
     <div class="col-xs-4">
@@ -172,23 +188,38 @@
 </div>
 
 <div class="form-group row" id="sign-expired-block" th:fragment="field-sign-expired">
-    <label for="signWithExpiredCertificate" class="col-sm-3 control-label" th:text="#{label.allow.expired.certificate}"></label>
-    <div class="col-sm-4">
-    	<input type="checkbox" name="signWithExpiredCertificate" />
-    </div>
+	<label class="col-sm-3 col-form-label" for="signWithExpiredCertificate" th:text="#{label.allow.expired.certificate}">Accept expired certificate</label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="signWithExpiredCertificate" th:aria-label="#{label.allow.expired.certificate}" />
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-reset-date">
+     <label class="col-sm-3 col-form-label" th:text="#{label.replay.date}"></label>
+     <div class="col-sm-5">
+		<div class="form-check">
+	         <input class="form-check-input position-static" type="checkbox" th:field="*{resetDate}" value="false"/>
+	         <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	         	data-placement="right" th:title="#{label.replay.date.tooltip}"></span>
+		</div>
+	</div>
 </div>
 
 <div class="form-group row" id="content-timestamp-block" th:fragment="field-content-timestamp">
-    <label for="addContentTimestamp" class="col-sm-3 control-label" th:text="#{label.add.content.timestamp}"></label>
-    <div class="col-sm-4">
-    	<input type="checkbox" name="addContentTimestamp" />
-    </div>
+	<label class="col-sm-3 col-form-label" for="addContentTimestamp" th:text="#{label.add.content.timestamp}">Add a content timestamp</label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="addContentTimestamp" th:aria-label="#{label.add.content.timestamp}" />
+		</div>
+	</div>
 </div>
 
 <div class="certificate-form-file form-group row" th:fragment="field-certificate-file">
-	<label for="certificateForm.certificateFile" class="col-sm-3 control-label" th:text="#{label.certificate.file}"></label>
+	<label class="col-sm-3 col-form-label" for="certificateForm.certificateFile" th:text="#{label.certificate.file}"></label>
 	<div class="col-sm-3">
-		<input type="file" name="certificateForm.certificateFile" accept=".cer,.der,.pem,.crt" />
+		<input type="file" class="form-control-file" name="certificateForm.certificateFile" accept=".cer,.der,.pem,.crt" />
 	</div>
 	<div class="col-sm-6 offset-sm-3 align-self-center">
 		<p th:if="${#fields.hasErrors('certificateFormValid')}" th:errors="*{certificateFormValid}" class="text-danger">Error</p>
@@ -196,16 +227,16 @@
 </div>
 
 <div class="certificate-form-base64 form-group row d-none" th:fragment="field-certificate-base64">
-	<label for="certificateForm.certificateBase64" class="col-sm-3 control-label" th:text="#{label.certificate.base64}"></label>
+	<label class="col-sm-3 col-form-label" for="certificateForm.certificateBase64" th:text="#{label.certificate.base64}"></label>
 	<div class="col-lg-5">
-		<textarea name="certificateForm.certificateBase64" th:placeholder="#{label.certificate.base64.planetext}"></textarea>
+		<textarea class="form-control" name="certificateForm.certificateBase64" th:placeholder="#{label.certificate.base64.planetext}"></textarea>
 	</div>
 </div>
 
 <div class="form-group row" th:fragment="field-certificate-chain-files">
-	<label for="certificateChainFiles" class="col-sm-3 control-label" th:text="#{label.certificate.chain.files.opt}"></label>
+	<label class="col-sm-3 col-form-label" for="certificateChainFiles" th:text="#{label.certificate.chain.files.opt}"></label>
 	<div class="col-sm-3">
-		<input type="file" name="certificateChainFiles" multiple="multiple" accept=".cer,.der,.pem,.crt" />
+		<input type="file" class="form-control-file" name="certificateChainFiles" multiple="multiple" accept=".cer,.der,.pem,.crt" />
 	</div>
 	<div class="col-xs-3 col-md-offset-1">
 		<p th:if="${#fields.hasErrors('certificateChainFiles')}" th:errors="*{certificateChainFiles}" class="text-danger">Error</p>
@@ -213,8 +244,8 @@
 </div>
 
 <div class="form-group row" th:fragment="field-validation-time">
-	<label for="validationTime" class="col-sm-3 control-label" th:text="#{label.validation.time.opt}"></label>
-	<div class="col-sm-3">
+	<label class="col-sm-3 col-form-label" for="validationTime" th:text="#{label.validation.time.opt}"></label>
+	<div class="col-sm-5">
 		<input type="date" name="validationTime" th:field="*{validationTime}" />
 	</div>
 	<div class="col-xs-3 col-md-offset-1">
@@ -223,21 +254,107 @@
 </div>
 
 <div class="form-group row" th:fragment="field-certificate-tokens">
-    <label class="col-sm-3 control-label" th:text="#{label.validation.include.certificate.tokens}"></label>
-    <div class="col-sm-3">
-        <input type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
-        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
-            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></span>
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.certificates.used}"></label>
+    <div class="col-sm-9">
+		<div class="form-check">
+	        <input class="form-check-input" type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
+	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></span>
+		</div>
     </div>
 </div>
 
 <div class="form-group row" th:fragment="field-revocation-data-tokens">
-    <label class="col-sm-3 control-label" th:text="#{label.validation.include.revocation.tokens}"></label>
-    <div class="col-sm-3">
-        <input type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
-        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
-            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></span>
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.revocation}"></label>
+    <div class="col-sm-9">
+		<div class="form-check">
+	        <input class="form-check-input" type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
+	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></span>
+		</div>
     </div>
+</div>
+
+<div class="form-group row" th:fragment="field-timestamp-tokens">
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.timestamps}"></label>
+    <div class="col-sm-9">
+		<div class="form-check">
+	        <input class="form-check-input" type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
+	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.timestamp.tooltip}"></span>
+		</div>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-detached-original-files">
+    <label class="col-sm-3 col-form-label" for="originalFiles" th:text="#{label.original.files}"></label>
+    <div class="col-sm-5">
+        <input type="file" class="form-control-file" id="detachedOriginalFiles" multiple="multiple" />
+    </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="send-digest-algo">
+    <label class="col-sm-3 col-form-label" for="digestToSend" th:text="#{label.send.detached.as}"></label>
+    <div class="col-sm-5">
+    	<div class="form-check form-check-inline">
+           	<input class="form-check-input" type="radio" name="digestToSend" value="" id="algoNone" />
+           	<label class="form-check-label" th:for="algoNone" th:text="#{label.complete.documents}"></label>
+		</div>
+    
+    	<br />
+    	
+		<th:block th:each="algo : ${digestAlgos}">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" name="digestToSend" th:value="${algo}" th:id="algo+${algo}" th:attr="data-javaname=${algo.javaName}" />
+           		<label class="form-check-label" th:for="algo+${algo}" th:text="${algo}"></label>
+           	</div>
+		</th:block>
+    </div>
+    <div class="col-xs-4">
+    </div>
+</div>
+
+<th:block th:fragment="validation-level-policy">
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" th:text="#{label.validation.level}"></label>
+		<div class="col-sm-9">
+			<select th:field="*{validationLevel}" class="custom-select">
+				<option th:each="level : ${validationLevels}" th:value="${level}"
+					th:text="#{${'label.validation.level.'+level}}" />
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<div class="offset-sm-3 col-sm-9">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="true" th:id="defaultPolicy" />
+           		<label class="form-check-label" th:for="defaultPolicy" th:text="#{label.validation.default.policy.file}"></label>
+           	</div>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<div class="offset-sm-3 col-sm-3">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="false" th:id="otherPolicy" />
+           		<label class="form-check-label" th:for="otherPolicy" th:text="#{label.validation.custom.policy.file}"></label>
+           	</div>
+		</div>
+		<div class="col-sm-5">
+			<input type="file" class="form-control-file" name="policyFile" id="policyFile" disabled="disabled" />
+		</div>
+	</div>
+</th:block>
+
+<div class="form-group row" th:fragment="submit-reset">
+	<div class="offset-sm-3 col-sm-9">
+		<button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
+		<button type="reset" class="btn btn-secondary" th:text="#{label.clear}"></button>
+	</div>
 </div>
 
 <div style="display: inline;" th:fragment="field-der-pem (isPemAvailable, url)">

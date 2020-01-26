@@ -1,0 +1,91 @@
+
+/** digest parameters */
+
+#spinner {
+	float: left; 
+	visibility: hidden; 
+	margin-left: 10px;
+}
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 25px;
+  height: 25px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/** /digest parameters */
+
+/* PDF signature */
+
+form#sign-pdf-form{
+  margin: 0 auto;
+  width: 500px;
+  height: 200px;
+  border: 4px dashed #5986bd;
+  position: relative;
+}
+form#sign-pdf-form p#filename{
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 190px;
+  color: #5986bd;
+}
+form#sign-pdf-form input{
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  opacity: 0;
+  max-width: 100%;
+  max-height: 100%;
+}
+form#sign-pdf-form button{
+  margin: 0;
+  width: 500px;
+  height: 35px;
+  margin-left: -4px;
+  outline: none;
+}
+form#sign-pdf-form .form-group {
+  margin-top: 20px;
+  width: 500px;
+  outline: none;
+  margin-left: -4px;
+}
+
+/* / PDF signature */
+
+/* Certificate validation */
+
+.certificate-form {
+	position: relative;
+}
+
+#certificate-switcher {
+    position: absolute;
+    right: 0;
+}
+
+.certificate-form-switcher {
+	position: absolute;
+    width: 100%;
+}
+/* / Certificate validation */

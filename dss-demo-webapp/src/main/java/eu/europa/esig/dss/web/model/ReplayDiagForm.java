@@ -4,10 +4,14 @@ import javax.validation.constraints.AssertTrue;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import eu.europa.esig.dss.validation.executor.ValidationLevel;
+
 public class ReplayDiagForm {
 
 	private MultipartFile diagnosticFile;
 	
+	private ValidationLevel validationLevel;
+
 	private boolean resetDate;
 	
 	private boolean defaultPolicy;
@@ -20,6 +24,14 @@ public class ReplayDiagForm {
 
 	public void setDiagnosticFile(MultipartFile diagnosticFile) {
 		this.diagnosticFile = diagnosticFile;
+	}
+
+	public ValidationLevel getValidationLevel() {
+		return validationLevel;
+	}
+
+	public void setValidationLevel(ValidationLevel validationLevel) {
+		this.validationLevel = validationLevel;
 	}
 
 	public boolean isResetDate() {
