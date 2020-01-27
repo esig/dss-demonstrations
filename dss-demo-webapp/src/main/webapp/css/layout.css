@@ -28,7 +28,7 @@ body {
 }
 
 .list-group-item.active {
-	background-color: white;
+	background-color: #e9f3ff;
 	color :#5986bd;
 	text-decoration: underline;
 	border-color : rgba(0,0,0,.125); /* same color than no active */

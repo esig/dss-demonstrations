@@ -3,9 +3,7 @@
 	<head>
 		<title th:text="#{label.tsl}"></title>
 	</head>
-	<body>
-		<div layout:fragment="card" th:remove="tag"></div>
-		
+	<body>		
 		<div layout:fragment="content">
 		<p th:if="${tlInfo == null}">No data found for this country</p>
 		

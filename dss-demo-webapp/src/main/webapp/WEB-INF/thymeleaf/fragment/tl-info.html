@@ -3,16 +3,16 @@
 
 <thead th:fragment="tl-info-header()">
 	<tr class="text-center">
-		<th class="align-middle limited-size" scope="col" th:text="#{label.summary.tl.info.country}"></th>
-		<th class="align-middle limited-size" scope="col" th:text="#{label.summary.tl.info.seq.num}"></th>
-		<th class="align-middle date" scope="col" th:text="#{label.summary.tl.info.last.download.attempt}"></th>
+		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.country}"></th>
+		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.seq.num}"></th>
+		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.last.download.attempt}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.download.result}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.parsing.result}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.validation.result}"></th>
-		<th class="align-middle date" scope="col" th:text="#{label.summary.tl.info.next.update}"></th>
-		<th class="align-middle limited-size" scope="col" th:title="#{label.summary.tl.info.tsp.title}" th:text="#{label.summary.tl.info.tsp}"></th>
-		<th class="align-middle limited-size" scope="col" th:title="#{label.summary.tl.info.ts.title}" th:text="#{label.summary.tl.info.ts}"></th>
-		<th class="align-middle limited-size" scope="col" th:title="#{label.summary.tl.info.certs.title}" th:text="#{label.summary.tl.info.certs}"></th>
+		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.next.update}"></th>
+		<th class="align-middle" scope="col" th:title="#{label.summary.tl.info.tsp.title}" th:text="#{label.summary.tl.info.tsp}"></th>
+		<th class="align-middle" scope="col" th:title="#{label.summary.tl.info.ts.title}" th:text="#{label.summary.tl.info.ts}"></th>
+		<th class="align-middle" scope="col" th:title="#{label.summary.tl.info.certs.title}" th:text="#{label.summary.tl.info.certs}"></th>
 	</tr>
 </thead>
 	
@@ -22,7 +22,7 @@
 	<!-- Country -->
 	<td class="align-middle">
 		<a th:href="@{/tl-info/tl/} + ${id}">
-		<span th:class="${'small_flag flag_' + country}" th:title="${country != 'no_country'}?${country}:'?'"></span>
+			<span th:class="${'small_flag flag_' + country}" th:title="${country != 'no_country'}?${country}:'?'"></span>
 		</a>
 	</td>
 	
@@ -228,7 +228,7 @@
              	<h3 th:if="${name.key == 'en'}" th:text="${name.value[0]}" th:remove="tag"></h3>
       		</th:block>
         </div>
-        <div class="card-body tl-content accordian-body collapse animate" th:id="'countryProviders' + ${sp.index}">
+        <div class="card-body tl-content collapse animate" th:id="'countryProviders' + ${sp.index}">
 			<div class="attributes">
 	      		<div class="row">
 	           		<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.name} + ' :'"></div>
@@ -295,7 +295,7 @@
              	<h3 th:if="${name.key == 'en'}" class="card-title" th:text="${name.value[0]}" th:remove="tag"></h3>
       		</th:block>
 		</div>
-		<div class="card-body tl-content accordian-body collapse animate" th:id="'countryServices' + ${ser.index}">
+		<div class="card-body tl-content collapse animate" th:id="'countryServices' + ${ser.index}">
            	<div class="row">
                    	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.electronic.address} + ' :'"></div>
                    	<div class="col-sm-12">
