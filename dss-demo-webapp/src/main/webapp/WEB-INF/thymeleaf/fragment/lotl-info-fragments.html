@@ -2,103 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <!-- LOTL Info -->
-<div class="lotl-info row" th:fragment="lotl-info-summary(downloadResult, parsingResult, validationResult)">
-	<div class="lotl-card">
-		<div th:with="status=${(parsingResult.resultExist and validationResult.resultExist and validationResult.isValid())?
+<div class="lotl-info row mb-4" th:fragment="lotl-info-summary(downloadResult, parsingResult, validationResult)">
+	<div th:with="status=${(parsingResult.resultExist and validationResult.resultExist and validationResult.isValid())?
 				((downloadResult.isSynchronized() and parsingResult.isSynchronized() and validationResult.isSynchronized())?'success':'warning'):
-				'danger'}"
-				th:class="${'card card-' + status}">
+				'danger'}" 
+				 th:class="${'lotl-card border rounded border-' + status}" class="lotl-card border-success border rounded">
+		<div>
 			
 			<!-- LOTL indication -->
-			<div class="card-header"></div>
+			<div th:class="${'card-header bg-' + status}"></div>
 			
 			<!-- LOTL info body -->
 			<div class="card-body">
-				<div class="row">
-					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.download.attempt}"></div>
-					<div class="result-body col-xl-8 col-gs-9" 
-                            th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}">
-                    </div>
-                    <div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.last.succ.download.short}"></div>
-                    <div class="result-body col-xl-8 col-gs-9" 
-                            th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}">
-                    </div>
-					
-					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.download.result}"></div>
-					<div class="result-body col-xl-8 col-gs-9">
-						<span th:replace="fragment/tl-info-fragments :: task-result(result=${downloadResult})"></span>
-					</div>
-					<div th:if="${downloadResult.isError()}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.download.exception.first.occurrence}"></div>
-                    <div th:if="${downloadResult.isError()}" class="result-body col-xl-8 col-gs-9" 
-                            th:text="${#dates.format(downloadResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}">
-                    </div>
-                    <div th:if="${downloadResult.isError()}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.download.error}">
-                    </div>
-                    <div th:if="${downloadResult.isError()}" class="result-body col-xl-9"><p th:text="${downloadResult.exceptionMessage}"></p></div>
-                    
-					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.parsing.result}"></div>
-					<div class="result-body col-xl-8 col-gs-9">
-						<span th:replace="fragment/tl-info-fragments :: task-result(result=${parsingResult})"></span>
-					</div>
-					<div th:if="${parsingResult.isError()}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.parsing.exception.first.occurrence}"></div>
-                    <div th:if="${parsingResult.isError()}" class="result-body col-xl-8 col-gs-9" 
-                            th:text="${#dates.format(parsingResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}">
-                    </div>
-                    <div th:if="${parsingResult.isError()}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.parsing.error}">
-                    </div>
-                    <div th:if="${parsingResult.isError()}" class="result-body col-xl-9"><p th:text="${parsingResult.exceptionMessage}"></p></div>
-					
-					<div class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.validation.result}"></div>
-					<div class="result-body col-xl-8 col-gs-9">
-						<span th:replace="fragment/tl-info-fragments :: task-result(result=${validationResult})"></span>
-					</div>
-					<div th:if="${validationResult.isError()}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.validation.exception.first.occurrence}"></div>
-                    <div th:if="${validationResult.isError()}" class="result-body col-xl-8 col-gs-9" 
-                            th:text="${#dates.format(validationResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}">
-                    </div>
-                    <div th:if="${validationResult.isError()}" class="result-head col-xl-4 col-gs-3" th:text="#{label.summary.tl.info.validation.error}">
-                    </div>
-                    <div th:if="${validationResult.isError()}" class="result-body col-xl-9"><p th:text="${validationResult.exceptionMessage}"></p></div>
-                    
-					<div class="result-head col-xl-4 col-gs-3" th:if="${parsingResult.isResultExist()}" 
-							th:text="#{label.summary.lotl.info.issue.date}"></div>
-					<div class="result-body col-xl-8 col-gs-9" th:if="${parsingResult.isResultExist()}">
-						<span th:text="${#dates.format(parsingResult.issueDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
-					</div>
-					<div class="result-head col-xl-4 col-gs-3" th:if="${parsingResult.isResultExist()}" 
-							th:text="#{label.summary.lotl.info.next.update}"></div>
-					<div class="result-body col-xl-8 col-gs-9" th:if="${parsingResult.isResultExist()}">
-						<span th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
-					</div>
-					<div class="result-head col-xl-4 col-gs-3" th:if="${parsingResult.getSequenceNumber()}" 
-							th:text="#{label.summary.tl.info.sequence.num}"></div>
-					<div class="result-body col-xl-8 col-gs-9" th:if="${parsingResult.getSequenceNumber()}">
-                        <p th:text="${parsingResult.getSequenceNumber()}"></p>
-					</div>
-					
-					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
-							 th:text="#{label.summary.tl.info.indication}"></div>
-					<div class="result-body col-xl-8 col-gs-9" th:if="${validationResult.isResultExist()}">
-						<span th:replace="fragment/tl-info-fragments :: indication(indicationName=${validationResult.indication.name()})"></span>
-					</div>
-					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist() and validationResult.indication.name() != 'TOTAL_PASSED'}" 
-							 th:text="#{label.summary.tl.info.sub.indication}"></div>
-					<div class="result-body col-xl-8 col-gs-9" th:if="${validationResult.isResultExist() and validationResult.indication.name() != 'TOTAL_PASSED'}">
-						<span th:text="${validationResult.subIndication}?:'-'"></span>
-					</div>
-					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
-							 th:text="#{label.summary.tl.info.sign.time}"></div>
-					<div class="result-body col-xl-8 col-gs-9" th:if="${validationResult.isResultExist()}">
-						<span th:text="${#dates.format(validationResult.signingTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
-					</div>
-					<div class="result-head col-xl-4 col-gs-3" th:if="${validationResult.isResultExist()}" 
-							 th:text="#{label.summary.tl.info.sign.cert}"></div>
-					<div class="result-body col-xl-8 col-gs-9 signing-certificate" th:if="${validationResult.isResultExist() and validationResult.signingCertificate != null}">
-						<div th:replace="fragment/certificate:: certificate(certificateToken=${validationResult.signingCertificate})"></div>
-					</div>
-				
-				</div>
-				
+				<div th:replace="fragment/tl-info :: tl-info-body-content(url='lotl',
+						downloadResult=${downloadResult}, 
+						parsingResult=${parsingResult}, 
+						validationResult=${validationResult}, 
+						potentialSigners=null)"></div>
 			</div>
 		</div>
 	</div>

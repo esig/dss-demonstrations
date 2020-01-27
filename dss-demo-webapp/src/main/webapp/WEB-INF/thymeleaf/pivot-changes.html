@@ -4,42 +4,46 @@
 		<title th:text="#{label.pivots.summary}"></title>
 	</head>
 	<body>
-		<div class="row card-row" th:if="${lotl != null}">
-			<div class="card card-body col-lg-10 col-lg-9" layout:fragment="card">
-				
-			<p>This page contains the information about evolution of the original keystore by provided pivots.</p>
-			<p>The following notations are used:</p>
-			<ul class="pivot-summary-description">
-				<li><span class="pivot-circle circle-default"></span><span>Copied certificate from the previous source;</span></li>
-				<li><span class="pivot-circle circle-success"></span><span>Added certificate to the source by the pivot;</span></li>
-				<li><span class="pivot-circle circle-danger"></span><span>Removed certificate from the source by the pivot;</span></li>
-				<li><span class="pivot-circle circle-signed"></span><span>The signing certificate of the LOTL.</span></li>
-			</ul>
-			</div>
-		</div>
 		
 		<div layout:fragment="content" th:if="${lotl != null}" th:with="lotlSigningCertId=${lotl.validationCacheInfo?.signingCertificate.getDSSIdAsString()}">
 		
+			<div class="pb-3" th:if="${lotl != null}">
+				<div class="card card-body col-sm-12" layout:fragment="card">
+					
+				<p>This page contains the information about evolution of the original keystore by provided pivots.</p>
+				<p>The following notations are used:</p>
+				<ul class="list-unstyled m-0">
+					<li><i class="fa fa-circle text-secondary" aria-hidden="true"></i>&nbsp;<span>Copied certificate from the previous source;</span></li>
+					<li><i class="fa fa-circle text-success" aria-hidden="true"></i>&nbsp;<span>Added certificate to the source by the pivot;</span></li>
+					<li><i class="fa fa-circle text-danger" aria-hidden="true"></i>&nbsp;<span>Removed certificate from the source by the pivot;</span></li>
+					<li><i class="fa fa-circle text-info" aria-hidden="true"></i>&nbsp;<span>The signing certificate of the LOTL.</span></li>
+				</ul>
+				</div>
+			</div>
+		
 			<!-- LOTL Info -->
 			<div class="current-lotl">
-				<span th:if="${lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}" 
-						th:class="${'lotl-flag small_flag flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
-				<h2><span th:text="#{label.summary.lotl}"></span>&nbsp;
-					<a class="lotl-url" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a></h2>
+				<h2>
+					<span th:if="${lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}" 
+							th:class="${'lotl-flag small_flag mt-2 flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
+					<span th:text="#{label.summary.lotl}"></span>&nbsp;
+					<a class="lotl-url h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a>
+				</h2>
 			</div>
 		
 			<!-- Original certificates -->
-			<div class="certificates-container original-certificates row">
-				<div class="card card-primary">
+			<div class="certificates-container original-certificates">
+				<div class="card mb-3">
 					<div class="card-header" th:text="#{label.summary.lotl.original.keystore}"></div>
 					<div class="card-body">
-						<div th:each="certificate,iterCert : ${originalKeystore}" th:with="certId=${certificate.getDSSIdAsString()}">
-							<div th:class="${'card certificate-container card-' + ((certId == lotlSigningCertId)?'signed':'default')}">
-								<div class="card-header" th:data-target="${'#' + certId}" data-toggle="collapse" 
-										th:title="${(certId == lotlSigningCertId)?'Signing certificate':'Original keystore certificate'}">
-									<span class="certificate-header" th:text="${'Certificate Id = ' + certId}"></span>
-								</div>
-								<div class="card-body collapse" th:id="${certId}">
+						<div th:each="certificate,iterCert : ${originalKeystore}" th:with="certId=${certificate.getDSSIdAsString()}"
+								th:class="${'card mb-2 bg-' + ((certId == lotlSigningCertId)?'info text-white':'default')}">
+							<div class="card-header cursor-pointer" th:data-target="${'#' + certId}" data-toggle="collapse" 
+									th:title="${(certId == lotlSigningCertId)?'Signing certificate':'Original keystore certificate'}">
+								<span class="certificate-header" th:text="${'Certificate Id = ' + certId}"></span>
+							</div>
+							<div class="card-body rounded-bottom bg-white text-dark p-0 collapse" th:id="${certId}">
+								<div class="p-3">
 									<div th:replace="fragment/certificate :: certificate(certificateToken=${certificate})"></div>
 								</div>
 							</div>
@@ -49,18 +53,18 @@
 			</div>
 			
 			<!-- Pivot certificate source changes -->
-			<div th:if="${not #lists.isEmpty(lotl.pivotInfos)}" class="certificates-container original-certificates row" th:each="pivot,iterPivot : ${lotl.pivotInfos}"
+			<div th:if="${not #lists.isEmpty(lotl.pivotInfos)}" class="certificates-container original-certificates" th:each="pivot,iterPivot : ${lotl.pivotInfos}"
 					th:with="pivotId=${pivot.getIdentifier().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
 					lotlLocation=${pivot.getLOTLLocation()}">
 					
-				<div class="card card-primary">
+				<div class="card mb-3">
 					<div class="card-header" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
 					
 					<div class="card-body">
 						<!-- LOTL location -->
-						<div class="lotl-location" th:if="${lotlLocation != null}">
+						<div class="lotl-location mb-2" th:if="${lotlLocation != null}">
 							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>&nbsp;
-							<span th:text="${lotlLocation}"></span>
+							<a class="lotl-url h6 font-weight-bold" th:href="${lotlLocation}" th:text="'(' + ${lotlLocation} + ')'" target="_blank"></a>
 							<span class="lotl-change-warning" th:if="${lotl.url != lotlLocation}">
 								<span class="fa fa-exclamation-circle text-warning" title="Updated LOTL location"></span>
 								<span class="badge badge-warning" th:text="#{label.summary.pivot.found.new.lotl}"></span>
@@ -70,15 +74,17 @@
 						<!-- Pivot certificate source -->
 						<div th:each="certificateEntry,iterCert : ${pivotCerts}" th:with="certId=${certificateEntry.key.getDSSIdAsString()},
 								certStatus=${certificateEntry.value.name()}">
-							<div th:class="${'card certificate-container card-' + 
-									((certId == lotlSigningCertId)?'signed':((certStatus == 'ADDED')?'success':((certStatus == 'REMOVED')?'danger':'default')))}">
-								<div class="card-header" th:data-target="${'#' + pivotId + '-' + certId}" data-toggle="collapse" 
+							<div th:class="${'card mb-2 bg-' + 
+									((certId == lotlSigningCertId)?'info text-white':((certStatus == 'ADDED')?'success text-white':((certStatus == 'REMOVED')?'danger text-white':'default')))}">
+								<div class="card-header cursor-pointer" th:data-target="${'#' + pivotId + '-' + certId}" data-toggle="collapse" 
 										th:title="${((certId == lotlSigningCertId)?'Signing certificate':((certStatus == 'ADDED')?'Added certificate':
 										((certStatus == 'REMOVED')?'Removed certificate':'Certificate')))}">
 									<span class="certificate-header" th:text="#{label.summary.cert.id(${certId})}"></span>
 								</div>
-								<div class="card-body collapse" th:id="${pivotId + '-' + certId}">
-									<div th:replace="fragment/certificate :: certificate(certificateToken=${certificateEntry.key})"></div>
+								<div class="card-body rounded-bottom bg-white text-dark p-0 collapse" th:id="${pivotId + '-' + certId}">
+									<div class="p-3">
+										<div th:replace="fragment/certificate :: certificate(certificateToken=${certificateEntry.key})"></div>
+									</div>
 								</div>
 							</div>
 						</div>

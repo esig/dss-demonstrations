@@ -12,13 +12,13 @@
 		<div th:if="${lotlInfo != null}">
 
 			<div class="lotl" th:with="downloadResult=${lotlInfo.downloadCacheInfo}, parsingResult=${lotlInfo.parsingCacheInfo}, validationResult=${lotlInfo.validationCacheInfo}">
-				<a th:href="@{/tl-info/lotl/} + ${lotlInfo.getIdentifier().asXmlId()}">
-					<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
-					th:class="${'lotl-flag small_flag flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
-				</a>
 				<h2>
+					<a th:href="@{/tl-info/lotl/} + ${lotlInfo.getIdentifier().asXmlId()}">
+						<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
+						th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
+					</a>
 					<span th:text="#{label.summary.lotl}"></span>&nbsp;
-					<a class="lotl-url link-h-center" th:href="${lotlInfo.url}" th:text="'(' + ${lotlInfo.url} + ')'" target="_blank"></a>
+					<a class="lotl-url link-h-center h5 font-weight-bold" th:href="${lotlInfo.url}" th:text="'(' + ${lotlInfo.url} + ')'" target="_blank"></a>
 				</h2>
 				
 				<!-- LOTL Info -->

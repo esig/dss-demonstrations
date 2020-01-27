@@ -1,5 +1,17 @@
+/* Main */
+.cursor-pointer {
+	cursor: pointer;
+}
+.animate, .animate * {
+    -webkit-transition: all 0.2s 0.0s linear;
+    -moz-transition: all 0.2s 0.0s linear;
+    -ms-transition: all 0.2s 0.0s linear;
+    -o-transition: all 0.2s 0.0s linear;
+    transition: all 0.2s 0.0s linear;
+}
+/* End Main */
 
-/** digest parameters */
+/* Digest parameters */
 
 #spinner {
 	float: left; 
@@ -28,7 +40,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/** /digest parameters */
+/* End digest parameters */
 
 /* PDF signature */
 
@@ -71,7 +83,7 @@ form#sign-pdf-form .form-group {
   margin-left: -4px;
 }
 
-/* / PDF signature */
+/* End PDF signature */
 
 /* Certificate validation */
 
@@ -88,4 +100,25 @@ form#sign-pdf-form .form-group {
 	position: absolute;
     width: 100%;
 }
-/* / Certificate validation */
+/* End Certificate validation */
+
+/* TL-Loading */
+.summary-table tbody:nth-of-type(odd) {
+    background-color: rgba(0,0,0,.05);
+}
+.tl-info-preview:after {
+    display: inline-block;
+    position: absolute;
+    font: normal normal normal 14px/1 FontAwesome;
+    content: "\f077";
+    opacity: 0.3;
+    right: -25px;
+    margin-top: 30px;
+}
+.tl-info-preview.collapsed:after {
+    content: "\f078";
+}
+.tl-info-preview:hover:after {
+	opacity: 0.6;
+}
+/* End TL-Loading */

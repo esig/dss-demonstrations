@@ -16,13 +16,13 @@
 						validationResult=${lotl.validationCacheInfo}">
 								
 				<!-- LOTL -->
-				<a th:href="@{/tl-info/lotl/} + ${lotl.getIdentifier().asXmlId()}">
-					<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
-					th:class="${'lotl-flag small_flag flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
-				</a>
 				<h2>
+					<a th:href="@{/tl-info/lotl/} + ${lotl.getIdentifier().asXmlId()}">
+						<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
+								th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
+					</a>
 					<span th:text="#{label.summary.lotl.number(${iterLOTL.count})}"></span>&nbsp;
-					<a class="lotl-url link-h-center" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a>
+					<a class="lotl-url link-h-center h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a>
 				</h2>
 				
 				<!-- LOTL Info -->
@@ -32,7 +32,7 @@
 				<div class="table-container row" th:if="${not #lists.isEmpty(lotl.pivotInfos)}">
 					<h4>
 						<span th:text=#{label.summary.pivot.loaded.header}></span>&nbsp;
-						<a class="pivot-changes-url" th:href="@{/tl-info/pivot-changes/} + ${lotl.getIdentifier().asXmlId()}" 
+						<a class="pivot-changes-url h6 font-weight-bold" th:href="@{/tl-info/pivot-changes/} + ${lotl.getIdentifier().asXmlId()}" 
 								th:text="#{label.summary.pivot.check.text}"></a>
 					</h4>
 					<table class="pivot-summary summary-table table">
@@ -80,7 +80,7 @@
 				</div>
 				
 				<!-- TL summary -->
-				<div  class="table-container row" th:if="${not #lists.isEmpty(lotl.getTLInfos())}">
+				<div class="table-container row" th:if="${not #lists.isEmpty(lotl.getTLInfos())}">
 					<h4 th:text="#{label.summary.tl.info.header}"></h4>
 					<table class="tl-summary summary-table table accordion">
 						<thead th:replace="fragment/tl-info :: tl-info-header()"></thead>
@@ -106,7 +106,7 @@
 			
 			<!-- Other TLs -->
 			<div class="table-container row" th:if="${not #lists.isEmpty(summary.otherTLInfos)}">
-				<h2 th:text=#{label.summary.tl.info.other.header}>Other Trusted Lists</h2>
+				<h2 th:text=#{label.summary.tl.info.other.header}></h2>
 				<table class="tl-summary summary-table table accordion">
 					<thead th:replace="fragment/tl-info :: tl-info-header()"></thead>
 					
