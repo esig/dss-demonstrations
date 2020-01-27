@@ -26,7 +26,7 @@
 		
 			<div role="tabcard" class="tab-pane fade in active show report" id="simple-report">
 				<div class="position-relative">
-					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 4px; z-index : 3; right : 0">
+					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
 							<span class="fa fa-print"></span> Print
@@ -44,7 +44,7 @@
 		
 			<div role="tabcard" class="tab-pane fade report" id="detailed-report">
 				<div class="position-relative">
-					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 4px; z-index : 3; right : 0">
+					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
 							<span class="fa fa-print"></span> Print
@@ -68,10 +68,10 @@
 
 					<div class="card-body collapse in" id="downloads">
 						<div class="row">
-							<div class="col-sm-2">
+							<div class="col-sm-3">
 								<p th:text="#{label.report}">Report</p>
 							</div>
-							<div class="col-sm-10">
+							<div class="col-sm-9">
 								<ul class="list-unstyled">
 									<li>
 										<a th:href="@{/validation/download-diagnostic-data}">
@@ -83,10 +83,10 @@
 							</div>
 						</div>
 						<div class="row" th:if="${allCertificates != null && allCertificates.size() > 0}">
-							<div class="col-sm-2">
+							<div class="col-sm-3">
 								<p th:text="#{label.certificates}">Certificates</p>
 							</div>
-							<div class="col-sm-10">
+							<div class="col-sm-9">
 								<ul class="list-unstyled">
 									<li th:each="cert : ${allCertificates}">
 										<a th:href="@{|/validation/download-certificate?id=${cert.getId()}|}">
@@ -98,27 +98,27 @@
 							</div>
 						</div>
 						<div class="row" th:if="${allRevocationData != null && allRevocationData.size() > 0}">
-							<div class="col-sm-2">
+							<div class="col-sm-3">
 								<p th:text="#{label.revocation-data}">Revocation data</p>
 							</div>
-							<div class="col-sm-10">
+							<div class="col-sm-9">
 								<ul class="list-unstyled">
 									<li th:each="rd : ${allRevocationData}">
 										<span th:text="${rd.getName()}"></span>
-										<div th:replace="fields :: field-der-pem(${#strings.startsWith(rd.getName(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)"></div>
+										<div th:replace="fragment/fields::field-der-pem(${#strings.startsWith(rd.getName(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)" th:remove="tag"></div>
 									</li>
 								</ul>
 							</div>
 						</div>
 						<div class="row" th:if="${allTimestamps != null && allTimestamps.size() > 0}">
-							<div class="col-sm-2">
+							<div class="col-sm-3">
 								<p th:text="#{label.timestamps}">Timestamps</p>
 							</div>
-							<div class="col-sm-10">
+							<div class="col-sm-9">
 								<ul class="list-unstyled">
 									<li th:each="tst : ${allTimestamps}">
 										<span th:text="${tst.getName()}"></span>
-										<div th:replace="fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)"></div>
+										<div th:replace="fragment/fields::field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)" th:remove="tag"></div>
 									</li>
 								</ul>
 							</div>

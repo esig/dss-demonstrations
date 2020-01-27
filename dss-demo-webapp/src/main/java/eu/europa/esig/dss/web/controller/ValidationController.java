@@ -1,8 +1,8 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
@@ -150,7 +150,7 @@ public class ValidationController extends AbstractValidationController {
 		response.setContentType(MimeType.XML.getMimeTypeString());
 		response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
 		try {
-			Utils.copy(new ByteArrayInputStream(report.getBytes()), response.getOutputStream());
+			Utils.write(report.getBytes(StandardCharsets.UTF_8), response.getOutputStream());
 		} catch (IOException e) {
 			logger.error("An error occured while outputing diagnostic data : " + e.getMessage(), e);
 		}
@@ -200,7 +200,7 @@ public class ValidationController extends AbstractValidationController {
 		response.setContentType(MimeType.CER.getMimeTypeString());
 		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 		try {
-			Utils.copy(new ByteArrayInputStream(pemCert.getBytes()), response.getOutputStream());
+			Utils.write(pemCert.getBytes(StandardCharsets.UTF_8), response.getOutputStream());
 		} catch (IOException e) {
 			logger.error("An error occured while downloading certificate : " + e.getMessage(), e);
 		}
@@ -218,7 +218,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 		String filename = revocationData.getOrigin().name();
 		String mimeType;
-		byte[] is;
+		byte[] byteArray;
 
 		if (RevocationType.CRL.equals(revocationData.getRevocationType())) {
 			mimeType = MimeType.CRL.getMimeTypeString();
@@ -228,19 +228,19 @@ public class ValidationController extends AbstractValidationController {
 				String pem = "-----BEGIN CRL-----\n";
 				pem += Utils.toBase64(revocationData.getBinaries());
 				pem += "\n-----END CRL-----";
-				is = pem.getBytes();
+				byteArray = pem.getBytes(StandardCharsets.UTF_8);
 			} else {
-				is = revocationData.getBinaries();
+				byteArray = revocationData.getBinaries();
 			}
 		} else {
 			mimeType = MimeType.BINARY.getMimeTypeString();
 			filename += ".ocsp";
-			is = revocationData.getBinaries();
+			byteArray = revocationData.getBinaries();
 		}
 		response.setContentType(mimeType);
 		response.setHeader("Content-Disposition", "attachment; filename=" + filename.replace(" ", "_"));
 		try {
-			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
+			Utils.write(byteArray, response.getOutputStream());
 		} catch (IOException e) {
 			logger.error("An error occured while downloading revocation data : " + e.getMessage(), e);
 		}
@@ -260,19 +260,19 @@ public class ValidationController extends AbstractValidationController {
 
 		response.setContentType(MimeType.TST.getMimeTypeString());
 		response.setHeader("Content-Disposition", "attachment; filename=" + type.name() + ".tst");
-		byte[] is;
+		byte[] byteArray;
 
 		if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
 			String pem = "-----BEGIN TIMESTAMP-----\n";
 			pem += Utils.toBase64(timestamp.getBinaries());
 			pem += "\n-----END TIMESTAMP-----";
-			is = pem.getBytes();
+			byteArray = pem.getBytes(StandardCharsets.UTF_8);
 		} else {
-			is = timestamp.getBinaries();
+			byteArray = timestamp.getBinaries();
 		}
 
 		try {
-			Utils.copy(new ByteArrayInputStream(is), response.getOutputStream());
+			Utils.write(byteArray, response.getOutputStream());
 		} catch (IOException e) {
 			logger.error("An error occured while downloading timestamp : " + e.getMessage(), e);
 		}

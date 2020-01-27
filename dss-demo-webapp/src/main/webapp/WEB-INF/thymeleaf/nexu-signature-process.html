@@ -3,12 +3,12 @@
 	<body>		
 		<div layout:fragment="content">
 			<h2>NexU signature process</h2>
-            <div class="progress">
-                <div class="progress-bar progress-bar-striped active" style="width: 0%" id="bar">
+            <div class="progress" style="height: 35px">
+                <div class="progress-bar progress-bar-striped  progress-bar-animated active" style="width: 0%" id="bar">
                     <span id="bar-text"></span>
                 </div>
             </div>
-            <div id="error" style="display: none" class="alert alert-danger" role="danger">
+            <div id="error" style="display: none" class="alert alert-danger mt-3" role="danger">
                 <strong id="errorText">Oops... an error occurred </strong><span id="errorcontent"></span>
             </div>
 		</div>
@@ -31,7 +31,7 @@
 		            
 		            function getDataToSign(certificateData) {
 		                if(certificateData.response == null) {
-		                    $('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
+		                    $('#bar').removeClass('bg-success progress-bar-striped progress-bar-animated active').addClass('bg-danger');
 		                    $('#bar-text').html("Error");
 		                    document.getElementById("errorcontent").innerHTML = "error while reading the Smart Card";
 		                    $("#error").show();
@@ -49,7 +49,7 @@
 		            
 		            function sign(dataToSignResponse) {
 		                if (dataToSignResponse == null) {
-		                    $('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
+		                    $('#bar').removeClass('bg-success progress-bar-striped progress-bar-animated active').addClass('bg-danger');
 		                    $('#bar-text').html("Error");
 		                    $("#errorcontent").text("unable to compute the data to sign (see server logs)");
 		                    $("#error").show();
@@ -73,11 +73,11 @@
 		                window.open(url, "_self");
 		                updateProgressBar("Done !", "100%");
 		                $('#bar').removeClass('progress-bar-striped active');
-		                $('#bar').addClass('progress-bar-success');
+		                $('#bar').addClass('bg-success');
 		            }
 		            
 		            function error(error) {
-		                $('#bar').removeClass('progress-bar-success active').addClass('progress-bar-danger');
+		                $('#bar').removeClass('bg-success progress-bar-striped progress-bar-animated active').addClass('bg-danger');
 		                if (error!= null && error.responseJSON !=null) {
 		                    var jsonResp = error.responseJSON;
 		                    if (jsonResp.errorMessage != null){

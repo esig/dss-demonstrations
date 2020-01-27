@@ -41,3 +41,8 @@ body {
 a, a:hover {
 	color : #5986bd;
 }
+
+.badge-primary {
+	background-color: #5986bd;
+}
+
