@@ -127,18 +127,22 @@
 </div>
 
 <div class="form-group row" th:fragment="field-document-digest">
-    <label class="col-sm-3 col-form-label" for="digestToSign" th:text="#{label.to.sign.digest}"></label>
+    <label class="col-sm-3 col-form-label" for="digestToSign">
+    	<span th:text="#{label.to.sign.digest}"></span>
+		<i class="fa fa-hashtag ml-2" th:title="#{label.compute.digest}"></i>
+    </label>
     <div class="col-sm-5">
-		<input type="text" class="form-control input-sm"  th:field="*{digestToSign}" />
-		<input type="hidden" class="form-control input-sm"  th:field="*{documentName}" />
+		<input type="text" class="form-control input-sm" th:field="*{digestToSign}" />
+		<input type="hidden" class="form-control input-sm" th:field="*{documentName}" />
     </div>
-	<div style="float:left;">
-	  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}">
-	    	<span class="fa fa-hashtag" th:title="#{label.compute.digest}"></span>
-	  	</label>	
-		<input type="file" class="d-none" name="fileToCompute" id="fileToCompute" onchange="readFile(this)" /> 
-	</div>
     <div class="loader" id="spinner"></div>
+	<div class="offset-sm-3 col-sm-5">
+		<div class="position-relative">
+		  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}"></label>	
+			<input type="file" id="fileToCompute" class="cursor-pointer drag-file" name="fileToCompute" onchange="readFile(this)" /> 
+			<p id="filename" class="drag-file-label" th:text="#{label.compute.digest}"></p>
+		</div>
+	</div>
     <div class="col-xs-4">
        	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
        	<p th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}" class="text-danger">Error</p>
@@ -201,8 +205,8 @@
      <div class="col-sm-5">
 		<div class="form-check mt-1">
 	         <input class="form-check-input position-static mt-2" type="checkbox" th:field="*{resetDate}" value="false"/>
-	         <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	         	data-placement="right" th:title="#{label.replay.date.tooltip}"></span>
+	         <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	         	data-placement="right" th:title="#{label.replay.date.tooltip}"></i>
 		</div>
 	</div>
 </div>
@@ -258,8 +262,8 @@
     <div class="col-sm-9">
 		<div class="form-check mt-1">
 	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
-	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></span>
+	        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></i>
 		</div>
     </div>
 </div>
@@ -269,8 +273,8 @@
     <div class="col-sm-9">
 		<div class="form-check mt-1">
 	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
-	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></span>
+	        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></i>
 		</div>
     </div>
 </div>
@@ -280,8 +284,8 @@
     <div class="col-sm-9">
 		<div class="form-check mt-1">
 	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
-	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
-	            data-placement="top" th:title="#{label.validation.timestamp.tooltip}"></span>
+	        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.timestamp.tooltip}"></i>
 		</div>
     </div>
 </div>
@@ -362,7 +366,7 @@
     <span th:if="${isPemAvailable}" th:text="'|'"></span>
     <a th:if="${isPemAvailable}" th:href="@{|${url}&format=#{label.PEM}|}">
     	<span th:text="#{label.PEM}"></span>
-		<span class="fa fa-download"></span>
+		<i class="fa fa-download"></i>
     </a>
 </div>
 

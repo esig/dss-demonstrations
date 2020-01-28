@@ -59,9 +59,9 @@ public class CertificateValidationForm {
 		this.includeRevocationTokens = includeRevocationTokens;
 	}
 
-	@AssertTrue(message = "{error.certificate.mandatory}")
+	@AssertTrue(message = "{error.certificate.invalid}")
 	public boolean isCertificateFormValid() {
-		return certificateForm != null && certificateForm.isNotEmpty();
+		return certificateForm != null && certificateForm.isValid();
 	}
 
 }

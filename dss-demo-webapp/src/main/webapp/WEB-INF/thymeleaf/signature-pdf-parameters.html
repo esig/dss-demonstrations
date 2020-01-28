@@ -15,8 +15,8 @@
 					
 					<div class="position-relative">
 						<input type="hidden" id="isSign" value="true" />
-						<input type="file" class="cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />
-						<p id="filename">Drag a PDF document here or click in this area.</p>
+						<input type="file" class="drag-file cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />
+						<p id="filename" class="drag-file-label">Drag a PDF document here or click in this area.</p>
 					</div>
 		
 					<p th:if="${#fields.hasErrors('documentToSign')}"

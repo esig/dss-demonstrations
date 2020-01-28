@@ -29,16 +29,16 @@ public class CertificateForm {
 		this.certificateBase64 = certificateBase64;
 	}
 	
-	private boolean isCertificateFileEmpty() {
-		return certificateFile == null || certificateFile.isEmpty();
+	private boolean isCertificateFileNotEmpty() {
+		return certificateFile != null && !certificateFile.isEmpty();
 	}
 	
-	private boolean isCertificateBase64Empty() {
-		return Utils.isStringBlank(certificateBase64);
+	private boolean isCertificateBase64Valid() {
+		return Utils.isStringNotBlank(certificateBase64) && Utils.isBase64Encoded(certificateBase64);
 	}
 
-	public boolean isNotEmpty() {
-		return !isCertificateFileEmpty() || !isCertificateBase64Empty();
+	public boolean isValid() {
+		return isCertificateFileNotEmpty() || isCertificateBase64Valid();
 	}
 
 }

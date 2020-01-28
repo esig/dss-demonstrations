@@ -6,17 +6,17 @@
               
             <h2 class="mb-3" th:text="#{label.signADigest}"></h2>
 
-            <form method="post" th:action="@{/sign-a-digest}" th:object="${signatureDigestForm}">
+            <form id="digest-sign-form" method="post" th:action="@{/sign-a-digest}" th:object="${signatureDigestForm}">
 
                 <input type="hidden" id="isSign" value="true" />
 
                 <div th:replace="fragment/fields::field-signature-form"></div>
 
-                <div th:replace="fragment/fields::field-signature-level"></div>
+                <div th:replace="fragment/fields::field-digest-algo"></div>
 
                 <div th:replace="fragment/fields::field-document-digest"></div>
 
-                <div th:replace="fragment/fields::field-digest-algo"></div>
+                <div th:replace="fragment/fields::field-signature-level"></div>
 
                 <div th:replace="fragment/fields::field-sign-expired"></div>
                 
@@ -36,7 +36,7 @@
                 <div class="form-group row">
                     <div class="offset-sm-3 col-sm-9">
                         <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}" disabled="disabled"></button>
-                        <button type="reset" class="btn btn-secondary" th:text="#{label.clear}"></button>
+                        <button id="btnClear" class="btn btn-secondary" th:text="#{label.clear}"></button>
                     </div>
                 </div>
 
@@ -44,57 +44,30 @@
         </div>
 		<div layout:fragment="scripts">
             <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+            <script type="text/javascript" th:src="@{/scripts/jsDigestParameters.js}"></script>
             <script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
-    
 			<script type="text/javascript">
-
 				$('[data-toggle="tooltip"]').tooltip();
-
-				var spinner = document.getElementById("spinner");
-		
-				async function digestMessage(message) {
-					const digestElement = document.getElementById('digestToSign');
-					const inputRadio = document.querySelector('input[name="digestAlgorithm"]:checked');
-					var digestAlgo = "SHA-" + inputRadio.value.substring(3);
-					const digestValue = await crypto.subtle.digest(digestAlgo, message);           // hash the message
-					digestElement.value = arrayBufferToBase64(digestValue);
-					spinner.style.visibility = "hidden";
-				}
-		
-				async function readFile(e){
-					var reader = new FileReader();
-					reader.onload = function(event) {
-					    var contents = event.target.result;
-						digestMessage(contents);
-					};
-		
-					reader.onerror = function(event) {
-					    console.error("File could not be read! Code " + event.target.error.code);
-					};
-		
-					if(e.files.length > 0){
-						spinner.style.visibility = "visible";
-						var currentFile = e.files[0];
-						reader.readAsArrayBuffer(currentFile);
-						const documentNameElement = document.getElementById('documentName');
-						documentName.value = currentFile.name;
+				
+				$('#fileToCompute').change(function() {
+					if (this.files != null && this.files.length == 1) {
+						let file = this.files[0];
+						$('#filename').text(file.name);
+					} else {
+						resetName();
 					}
-				}
-				
-				$('input[type=radio][name=digestAlgorithm]').change(function() {
-					readFile(document.getElementById('fileToCompute'));
 				});
-				
-				function arrayBufferToBase64(buffer) {
-				    var binary = '';
-				    var bytes = new Uint8Array(buffer);
-				    var len = bytes.byteLength;
-				    for (var i = 0; i < len; i++) {
-				        binary += String.fromCharCode(bytes[i]);
-				    }
-				    return window.btoa(binary);
+
+				$('#btnClear').click(function(e) {
+					e.preventDefault();
+					form = e.toElement.form;
+					form.reset();
+					resetName();
+				});
+
+				function resetName() {
+					$('#filename').text("[[#{label.compute.digest}]]");
 				}
-				
 			</script>
 	
 		</div>

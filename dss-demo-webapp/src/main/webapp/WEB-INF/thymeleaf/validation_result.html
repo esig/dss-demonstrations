@@ -29,12 +29,12 @@
 					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
-							<span class="fa fa-print"></span> Print
+							<i class="fa fa-print"></i> Print
 						</button>
 						<a class="btn btn-light"
 							th:href="@{/validation/download-simple-report}" role="button"
-							th:if="${displayDownloadPdf}"> <span
-							class="fa fa-download"></span> Download as PDF
+							th:if="${displayDownloadPdf}"> <i
+							class="fa fa-download"></i> Download as PDF
 						</a>
 					</div>
 
@@ -47,12 +47,12 @@
 					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
-							<span class="fa fa-print"></span> Print
+							<i class="fa fa-print"></i> Print
 						</button>
 						<a class="btn btn-light"
 							th:href="@{/validation/download-detailed-report}" role="button"
-							th:if="${displayDownloadPdf}"> <span
-							class="fa fa-download"></span> Download as PDF
+							th:if="${displayDownloadPdf}"> <i
+							class="fa fa-download"></i> Download as PDF
 						</a>
 					</div>
 
@@ -76,7 +76,7 @@
 									<li>
 										<a th:href="@{/validation/download-diagnostic-data}">
 											<span th:text="#{label.diagnostic.data}"></span>
-											<span class="fa fa-download"></span>
+											<i class="fa fa-download"></i>
 										</a>
 									</li>
 								</ul>
@@ -91,7 +91,7 @@
 									<li th:each="cert : ${allCertificates}">
 										<a th:href="@{|/validation/download-certificate?id=${cert.getId()}|}">
 											<span th:text="${cert.getName()}"></span>
-											<span class="fa fa-download"></span>
+											<i class="fa fa-download"></i>
 										</a>
 									</li>
 								</ul>								

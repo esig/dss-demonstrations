@@ -66,7 +66,7 @@
 							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>&nbsp;
 							<a class="lotl-url h6 font-weight-bold" th:href="${lotlLocation}" th:text="'(' + ${lotlLocation} + ')'" target="_blank"></a>
 							<span class="lotl-change-warning" th:if="${lotl.url != lotlLocation}">
-								<span class="fa fa-exclamation-circle text-warning" title="Updated LOTL location"></span>
+								<i class="fa fa-exclamation-circle text-warning" title="Updated LOTL location"></i>
 								<span class="badge badge-warning" th:text="#{label.summary.pivot.found.new.lotl}"></span>
 							</span>
 						</div>
