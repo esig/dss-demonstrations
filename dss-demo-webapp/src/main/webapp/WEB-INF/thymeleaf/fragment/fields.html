@@ -199,8 +199,8 @@
 <div class="form-group row" th:fragment="field-reset-date">
      <label class="col-sm-3 col-form-label" th:text="#{label.replay.date}"></label>
      <div class="col-sm-5">
-		<div class="form-check">
-	         <input class="form-check-input position-static" type="checkbox" th:field="*{resetDate}" value="false"/>
+		<div class="form-check mt-1">
+	         <input class="form-check-input position-static mt-2" type="checkbox" th:field="*{resetDate}" value="false"/>
 	         <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
 	         	data-placement="right" th:title="#{label.replay.date.tooltip}"></span>
 		</div>
@@ -218,10 +218,10 @@
 
 <div class="certificate-form-file form-group row" th:fragment="field-certificate-file">
 	<label class="col-sm-3 col-form-label" for="certificateForm.certificateFile" th:text="#{label.certificate.file}"></label>
-	<div class="col-sm-3">
+	<div class="col-sm-6">
 		<input type="file" class="form-control-file" name="certificateForm.certificateFile" accept=".cer,.der,.pem,.crt" />
 	</div>
-	<div class="col-sm-6 offset-sm-3 align-self-center">
+	<div class="col-sm-9 offset-sm-3 align-self-center">
 		<p th:if="${#fields.hasErrors('certificateFormValid')}" th:errors="*{certificateFormValid}" class="text-danger">Error</p>
 	</div>
 </div>
@@ -235,20 +235,20 @@
 
 <div class="form-group row" th:fragment="field-certificate-chain-files">
 	<label class="col-sm-3 col-form-label" for="certificateChainFiles" th:text="#{label.certificate.chain.files.opt}"></label>
-	<div class="col-sm-3">
+	<div class="col-sm-6">
 		<input type="file" class="form-control-file" name="certificateChainFiles" multiple="multiple" accept=".cer,.der,.pem,.crt" />
 	</div>
-	<div class="col-xs-3 col-md-offset-1">
+	<div class="col-sm-9 offset-sm-3 align-self-center">
 		<p th:if="${#fields.hasErrors('certificateChainFiles')}" th:errors="*{certificateChainFiles}" class="text-danger">Error</p>
 	</div>
 </div>
 
 <div class="form-group row" th:fragment="field-validation-time">
 	<label class="col-sm-3 col-form-label" for="validationTime" th:text="#{label.validation.time.opt}"></label>
-	<div class="col-sm-5">
+	<div class="col-sm-6">
 		<input type="date" name="validationTime" th:field="*{validationTime}" />
 	</div>
-	<div class="col-xs-3 col-md-offset-1">
+	<div class="col-sm-9 offset-sm-3 align-self-center">
 		<p th:if="${#fields.hasErrors('validationTime')}" th:errors="*{validationTime}" class="text-danger">Error</p>
 	</div>
 </div>
@@ -256,8 +256,8 @@
 <div class="form-group row" th:fragment="field-certificate-tokens">
     <label class="col-sm-3 col-form-label" th:text="#{label.validation.certificates.used}"></label>
     <div class="col-sm-9">
-		<div class="form-check">
-	        <input class="form-check-input" type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
+		<div class="form-check mt-1">
+	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
 	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
 	            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></span>
 		</div>
@@ -267,8 +267,8 @@
 <div class="form-group row" th:fragment="field-revocation-data-tokens">
     <label class="col-sm-3 col-form-label" th:text="#{label.validation.revocation}"></label>
     <div class="col-sm-9">
-		<div class="form-check">
-	        <input class="form-check-input" type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
+		<div class="form-check mt-1">
+	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
 	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
 	            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></span>
 		</div>
@@ -278,8 +278,8 @@
 <div class="form-group row" th:fragment="field-timestamp-tokens">
     <label class="col-sm-3 col-form-label" th:text="#{label.validation.timestamps}"></label>
     <div class="col-sm-9">
-		<div class="form-check">
-	        <input class="form-check-input" type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
+		<div class="form-check mt-1">
+	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
 	        <span class="fa fa-info-circle text-info" style="margin-left : 10px" data-toggle="tooltip" 
 	            data-placement="top" th:title="#{label.validation.timestamp.tooltip}"></span>
 		</div>

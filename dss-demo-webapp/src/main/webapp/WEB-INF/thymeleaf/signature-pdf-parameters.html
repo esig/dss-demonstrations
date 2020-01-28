@@ -2,39 +2,46 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Sign a PDF'">
 	<body>
 	<div layout:fragment="content">
-			<div th:if="${isMockUsed}" th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
+		<div th:if="${isMockUsed}" th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
 
-		<h2 th:text="#{label.signAPDF}"></h2>
-
-		<form method="post" id="sign-pdf-form"
-			enctype="multipart/form-data" th:action="@{/sign-a-pdf}"
-			th:object="${signaturePdfForm}">
-
-			<input type="hidden" id="isSign" value="true" /> <input type="file" class="form-control-file"
-				name="documentToSign" id="documentToSign" accept="application/pdf" />
-			<p id="filename">Drag a PDF document here or click in this area.</p>
-
-			<p th:if="${#fields.hasErrors('documentToSign')}"
-				th:errors="*{documentToSign}" class="text-danger">Error</p>
-
-			<div class="form-group row">
-				<div id="nexu_missing_alert" style="display: none;"
-					class="alert alert-warning">
-					<span id="warning-text"></span> You can download the <a
-						th:href="${downloadNexuUrl}">open source version of NexU</a> (<a
-						href="http://nowina.lu/solutions/java-less-browser-signing-nexu/">more
-						info</a>)
-				</div>
-
-				<div id="nexu_ready_alert" style="display: none;"
-					class="alert alert-info">NexU ready. Please plug card reader,
-					insert ID card and click on button below.</div>
+		<div class="row">
+			<div class="col-lg-8">
+				<h2 th:text="#{label.signAPDF}"></h2>
 			</div>
-
-			<button type="submit" class="btn btn-primary" id="submit-button"
-				th:text="#{label.sign}" disabled="disabled"></button>
-
-		</form>
+			<div class="col-lg-8">
+				<form method="post" id="sign-pdf-form"
+					enctype="multipart/form-data" th:action="@{/sign-a-pdf}"
+					th:object="${signaturePdfForm}">
+					
+					<div class="position-relative">
+						<input type="hidden" id="isSign" value="true" />
+						<input type="file" class="cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />
+						<p id="filename">Drag a PDF document here or click in this area.</p>
+					</div>
+		
+					<p th:if="${#fields.hasErrors('documentToSign')}"
+						th:errors="*{documentToSign}" class="text-danger">Error</p>
+		
+					<div class="form-group">
+						<div id="nexu_missing_alert" style="display: none;"
+							class="alert alert-warning">
+							<span id="warning-text"></span> You can download the <a
+								th:href="${downloadNexuUrl}">open source version of NexU</a> (<a
+								href="http://nowina.lu/solutions/java-less-browser-signing-nexu/">more
+								info</a>)
+						</div>
+		
+						<div id="nexu_ready_alert" style="display: none;"
+							class="alert alert-info">NexU ready. Please plug card reader,
+							insert ID card and click on button below.</div>
+					</div>
+		
+					<button type="submit" class="btn btn-primary w-100" id="submit-button"
+						th:text="#{label.sign}" disabled="disabled"></button>
+		
+				</form>
+			</div>
+		</div>
 	</div>
 	<div layout:fragment="scripts">
 		<script type="text/javascript">
