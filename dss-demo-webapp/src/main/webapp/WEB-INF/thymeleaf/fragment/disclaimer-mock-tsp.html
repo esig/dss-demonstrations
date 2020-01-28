@@ -1,7 +1,9 @@
-<div th:fragment="mock-tsp-warn" class="row" xmlns:th="http://www.thymeleaf.org">
-	<div class="col-lg-8">
-		<div class="alert alert-warning">
-			<strong>Warning !</strong> The demonstration uses a dummy timestamp source.
+<th:block th:fragment="mock-tsp-warn" xmlns:th="http://www.thymeleaf.org">
+	<div th:if="${isMockUsed}" class="row" xmlns:th="http://www.thymeleaf.org">
+		<div class="col-lg-8">
+			<div class="alert alert-warning">
+				<strong>Warning !</strong> The demonstration uses a dummy timestamp source.
+			</div>
 		</div>
 	</div>
-</div>
+</th:block>

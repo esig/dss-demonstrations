@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Sign a PDF'">
 	<body>
 	<div layout:fragment="content">
-		<div th:if="${isMockUsed}" th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
+		<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
 
 		<div class="row">
 			<div class="col-lg-8">
