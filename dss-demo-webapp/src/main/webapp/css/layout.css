@@ -15,6 +15,7 @@ body {
 
 .footer {
 	height: 50px;
+	background-color: #f8f9fa;
 }
 
 .bg-primary, .header-highlight {
@@ -28,7 +29,7 @@ body {
 }
 
 .list-group-item.active {
-	background-color: #e9f3ff;
+	background-color: #f8f9fa!important; /* bg-light color */
 	color :#5986bd;
 	text-decoration: underline;
 	border-color : rgba(0,0,0,.125); /* same color than no active */
