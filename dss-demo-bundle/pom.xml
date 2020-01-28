@@ -16,8 +16,8 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u232-b09.1_openj9-0.17.0/OpenJDK8U-jre_x64_windows_openj9_8u232b09_openj9-0.17.0.zip</jre.download.link>
-		<jre.root.folder>jdk8u232-b09-jre</jre.root.folder>
+		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jre_x64_windows_hotspot_8u242b08.zip</jre.download.link>
+		<jre.root.folder>jdk8u242-b08-jre</jre.root.folder>
 		<tomcat.version>8.5.50</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
@@ -106,8 +106,8 @@
 		<profile>
 			<id>java13</id>
 			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.1%2B9.1_openj9-0.17.0/OpenJDK13U-jre_x64_windows_openj9_13.0.1_9_openj9-0.17.0.zip</jre.download.link>
-				<jre.root.folder>jdk-13.0.1+9-jre</jre.root.folder>
+				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.2%2B8/OpenJDK13U-jre_x64_windows_hotspot_13.0.2_8.zip</jre.download.link>
+				<jre.root.folder>jdk-13.0.2+8-jre</jre.root.folder>
 				<tomcat.version>9.0.30</tomcat.version>
 			</properties>
 		</profile>
