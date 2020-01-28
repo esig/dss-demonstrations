@@ -5,18 +5,47 @@
 			<h2>REST/SOAP WebServices</h2>
 
             <p>
-                DSS offers some
-                <a th:href="@{/services/}" title="eSignature REST/SOAP WebServices" target="_blank">REST and SOAP WebServices</a>
-                which allows to execute the following operations :
+                DSS offers&nbsp;
+                <a th:href="@{/services/}" title="eSignature REST/SOAP WebServices" target="_blank">REST and SOAP WebServices</a>&nbsp;
+                with the following functions :
             </p>
             <ul>
-                <li>Compute the digest to be signed (getDataToSign) ;</li>
-                <li>Incorporate the signature value in the final file (signDocument) ;</li>
-                <li>Extend an existing signature;</li>
-                <li>Validate a signature.</li>
+            	<li>Remote signature
+	            	<ul>
+		                <li>Compute the digest to be signed (getDataToSign);</li>
+		                <li>Incorporate the signature value in the final file (signDocument);</li>
+		                <li>Extend an existing signature;</li>
+		                <li>Validate a signature;</li>
+		                <li>Timestamp a file.</li>
+	            	</ul>
+            	</li>
+            	<li>Server signing
+	            	<ul>
+	            		<li>Retrieve keys from a token;</li>
+	            		<li>Retrieve a key from a token by its alias;</li>
+	            		<li>Sign digest with a key by given alias.</li>
+	            	</ul>
+            	</li>
+            	<li>Document validation
+	            	<ul>
+	            		<li>Validate a document (signed or timestamped);</li>
+	            		<li>Retrieve an original signed document.</li>
+	            	</ul>
+            	</li>
+            	<li>Certificate validation
+	            	<ul>
+	            		<li>Validate a certificate.</li>
+	            	</ul>
+	            </li>
+            	<li>Remote timestamp
+	            	<ul>
+	            		<li>Timestamp digest.</li>
+	            	</ul>
+            	</li>
             </ul>
 
             <p>These services hide the signature complexity (CAdES, PAdES, XAdES, ASiC) and made integration easier.</p>
+            <p>Since DSS v5.6 the REST webServices are complaint with <a href="http://cxf.apache.org/docs/openapifeature.html">openAPI Specification</a>.</p>
 		</div>
 		
 	</body>
