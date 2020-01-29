@@ -28,7 +28,7 @@ public class OJCertificatesController {
 
 	@Autowired
 	@Qualifier("european-lotl-source")
-	private LOTLSource lotSource;
+	private LOTLSource lotlSource;
 	
 	@Autowired
 	@Qualifier("european-trusted-list-certificate-source")
@@ -40,9 +40,9 @@ public class OJCertificatesController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String showCertificates(Model model, HttpServletRequest request) {
 		// From Config
-		model.addAttribute("keystoreCertificates", keystoreService.getCertificatesDTOFromKeyStore(lotSource.getCertificateSource().getCertificates()));
+		model.addAttribute("keystoreCertificates", keystoreService.getCertificatesDTOFromKeyStore(lotlSource.getCertificateSource().getCertificates()));
 
-		OfficialJournalSchemeInformationURI ojUriInfo = (OfficialJournalSchemeInformationURI) lotSource.getSigningCertificatesAnnouncementPredicate();
+		OfficialJournalSchemeInformationURI ojUriInfo = (OfficialJournalSchemeInformationURI) lotlSource.getSigningCertificatesAnnouncementPredicate();
 		model.addAttribute("currentOjUrl", ojUriInfo.getOfficialJournalURL());
 
 		// From Job
@@ -56,7 +56,7 @@ public class OJCertificatesController {
 		if (summary != null) {
 			List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
 			for (LOTLInfo lotlInfo : lotlInfos) {
-				if (Utils.areStringsEqual(lotSource.getUrl(), lotlInfo.getUrl())) {
+				if (Utils.areStringsEqual(lotlSource.getUrl(), lotlInfo.getUrl())) {
 					ParsingInfoRecord parsingCacheInfo = lotlInfo.getParsingCacheInfo();
 					if (parsingCacheInfo != null) {
 						return parsingCacheInfo.getSigningCertificateAnnouncementUrl();
