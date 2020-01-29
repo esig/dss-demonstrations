@@ -21,7 +21,7 @@ import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	public static final String DEFAULT_ERROR_VIEW = "error";
 	public static final String PAGE_NOT_FOUND_ERROR_VIEW = "404_error";
@@ -34,23 +34,23 @@ public class GlobalExceptionHandler {
 			throw e;
 		}
 
-		logger.error("Unhandled exception occurred : " + e.getMessage(), e);
+		LOG.error("Unhandled exception occurred : " + e.getMessage(), e);
 
 		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR, DEFAULT_ERROR_VIEW);
 	}
 
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public ModelAndView pageNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
-		if (logger.isDebugEnabled()) {
-			logger.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
 		}
 		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
 	}
 
 	@ExceptionHandler(SourceNotFoundException.class)
 	public ModelAndView sourceNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
-		if (logger.isDebugEnabled()) {
-			logger.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
 		}
 		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
 	}

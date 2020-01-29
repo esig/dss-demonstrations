@@ -1,5 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,7 +33,7 @@ import eu.europa.esig.dss.web.service.SigningService;
 @RequestMapping(value = "/extension")
 public class ExtensionController {
 
-	private static final Logger logger = LoggerFactory.getLogger(ExtensionController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ExtensionController.class);
 
 	private static final String EXTENSION_TILE = "extension";
 
@@ -55,6 +58,12 @@ public class ExtensionController {
 	public String extend(HttpServletRequest request, HttpServletResponse response, @ModelAttribute("extensionForm") @Valid ExtensionForm extensionForm,
 			BindingResult result) {
 		if (result.hasErrors()) {
+			if (LOG.isDebugEnabled()) {
+				List<ObjectError> allErrors = result.getAllErrors();
+				for (ObjectError error : allErrors) {
+					LOG.debug(error.getDefaultMessage());
+				}
+			}
 			return EXTENSION_TILE;
 		}
 
@@ -65,7 +74,7 @@ public class ExtensionController {
 		try {
 			Utils.copy(extendedDocument.openStream(), response.getOutputStream());
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
 		}
 
 		return null;

@@ -94,26 +94,6 @@
 		                $('#bar-text').html(action);
 		                $('#bar').width(percent);
 		            }
-					
-					function callCurrentServer(url, type, data, headers, success_callback, error_callback) {
-					    $.ajax({
-					          type: type,
-					          url: url,
-					          data: data,
-					          crossDomain: true, 
-					          contentType: "application/json; charset=utf-8",
-					          dataType: "json",
-					          headers : headers,
-					          success: function (result) {
-					              console.log(url + " : OK");
-					              success_callback.call(this, result);
-					          }
-					        }).fail(function (error, textStatus ) {
-					            console.log(url + " : KO " + textStatus);
-					            eval(error);
-					            error_callback.call(this, error);
-					        });
-					} 
 		
 		            /*]]>*/
 		    </script>

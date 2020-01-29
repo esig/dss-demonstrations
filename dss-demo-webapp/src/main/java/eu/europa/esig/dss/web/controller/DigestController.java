@@ -2,6 +2,7 @@ package eu.europa.esig.dss.web.controller;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,8 +86,11 @@ public class DigestController {
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
 			@ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
 		if (result.hasErrors()) {
-			for (ObjectError error : result.getAllErrors()) {
-				LOG.error(error.getDefaultMessage());
+			if (LOG.isDebugEnabled()) {
+				List<ObjectError> allErrors = result.getAllErrors();
+				for (ObjectError error : allErrors) {
+					LOG.debug(error.getDefaultMessage());
+				}
 			}
 			return SIGN_DIGEST;
 		}

@@ -2,6 +2,7 @@ package eu.europa.esig.dss.web.controller;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,7 +52,7 @@ import eu.europa.esig.dss.web.service.SigningService;
 @RequestMapping(value = "/sign-multiple-documents")
 public class SignatureMultipleDocumentsController {
 
-	private static final Logger logger = LoggerFactory.getLogger(SignatureMultipleDocumentsController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SignatureMultipleDocumentsController.class);
 
 	private static final String SIGNATURE_PARAMETERS = "signature-multiple-documents";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
@@ -86,8 +87,11 @@ public class SignatureMultipleDocumentsController {
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
 			@ModelAttribute("signatureMultipleDocumentsForm") @Valid SignatureMultipleDocumentsForm signatureMultipleDocumentsForm, BindingResult result) {
 		if (result.hasErrors()) {
-			for (ObjectError error : result.getAllErrors()) {
-				logger.error(error.getDefaultMessage());
+			if (LOG.isDebugEnabled()) {
+				List<ObjectError> allErrors = result.getAllErrors();
+				for (ObjectError error : allErrors) {
+					LOG.debug(error.getDefaultMessage());
+				}
 			}
 			return SIGNATURE_PARAMETERS;
 		}
@@ -152,7 +156,7 @@ public class SignatureMultipleDocumentsController {
 			Utils.copy(new ByteArrayInputStream(signedDocument.getBytes()), response.getOutputStream());
 
 		} catch (Exception e) {
-			logger.error("An error occurred while pushing file in response : " + e.getMessage(), e);
+			LOG.error("An error occurred while pushing file in response : " + e.getMessage(), e);
 		}
 		return null;
 	}
