@@ -1,7 +1,6 @@
 package eu.europa.esig.dss.standalone.task;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -9,7 +8,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
@@ -26,9 +24,8 @@ import eu.europa.esig.dss.tsl.sync.AcceptAllStrategy;
 public class JobBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JobBuilder.class);
-	
+
 	private Properties prop;
-	private final String propertiesFilePath = "src/main/resources/app.config";
 
 	private TrustedListsCertificateSource tslCertificateSource;
 	private File cacheDirectory;
@@ -38,17 +35,17 @@ public class JobBuilder {
 		getProperties();
 		cacheDirectory = tlCacheDirectory();
 	}
-	
+
 	private void getProperties() {
 		prop = new Properties();
-		try (InputStream is = new FileInputStream(propertiesFilePath)) {
-		    prop.load(is);
+		try (InputStream is = JobBuilder.class.getResourceAsStream("/app.config")) {
+			prop.load(is);
 		} catch (IOException e) {
 			LOG.warn("Could not load properties file : {}", e.getMessage(), e);
 		}
 	}
-	
-	public TLValidationJob job() {	    
+
+	public TLValidationJob job() {
 		TLValidationJob job = new TLValidationJob();
 		job.setOnlineDataLoader(onlineLoader());
 		job.setOfflineDataLoader(offlineLoader());
@@ -100,11 +97,8 @@ public class JobBuilder {
 	}
 
 	private CertificateSource officialJournalContentKeyStore() {
-		try {
-			return new KeyStoreCertificateSource(new File(prop.getProperty("keystore.path")), prop.getProperty("keystore.type"), prop.getProperty("keystore.password"));
-		} catch (IOException e) {
-			throw new DSSException("Unable to load the keystore", e);
-		}
+		return new KeyStoreCertificateSource(JobBuilder.class.getResourceAsStream((prop.getProperty("keystore.path"))), prop.getProperty("keystore.type"),
+				prop.getProperty("keystore.password"));
 	}
 
 	private FileCacheDataLoader getDSSFileLoader() {

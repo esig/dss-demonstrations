@@ -3,18 +3,18 @@
 	<body>		
 		<div layout:fragment="content">
 			<h2>Standalone application</h2>
-            <p>
-                Download the standalone application (
-                <a th:href="@{/downloads/dss-app.zip}" title="e-signature standalone">zip</a>
-                ) or (
-                <a th:href="@{/downloads/dss-app.tar.gz}" title="e-signature standalone">tar.gz</a>
-                )
-            </p>
+            
+            <p>Download the standalone application (Windows x64)</p>
+
+           	<ul>
+               	<li><a th:href="@{/downloads/dss-app-minimal-windows-x64.zip}" title="e-signature standalone">Minimal ZIP</a> (application + bat file (uses system properties))</li>
+           		<li><a th:href="@{/downloads/dss-app-complete-windows-x64.zip}" title="e-signature standalone">Complete ZIP</a> (application + bat file + <a href="https://adoptopenjdk.net/">OpenJDK</a> + <a href="https://gluonhq.com/products/javafx/">JavaFX SDK</a>)</li>
+           	</ul>
 
             <div class="card">
                 <div class="card-header">More info...</div>
                 <div class="card-body collapse in">
-                    <p>This demo is a standalone application which uses JavaFX (Java 8).</p>
+                    <p>This demo is a standalone application which uses JavaFX.</p>
                     <p>The application connects directly to the CA's infrastructure to retrieve information such as CRL, OCSP, certificates from AIA ...</p>
                     <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, ASiC). This application doesn't require a DSS server.</p>
                     <div class="col-sm-12">

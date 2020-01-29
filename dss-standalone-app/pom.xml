@@ -7,6 +7,10 @@
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
+	
+	<properties>
+		<javafx.version>13.0.2</javafx.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -35,18 +39,20 @@
 
 	<dependencies>
 		
-<!-- 		<dependency> -->
-<!--             <groupId>com.oracle</groupId> -->
-<!--             <artifactId>javafx</artifactId> -->
-<!--             <version>8.0</version> -->
-<!--             <scope>system</scope> -->
-<!--             <systemPath>${jfxrt.jar}</systemPath> -->
-<!--         </dependency> -->
-
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-base</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
 		<dependency>
 		  <groupId>org.openjfx</groupId>
 		  <artifactId>javafx-fxml</artifactId>
-		  <version>13.0.1</version>
+		  <version>${javafx.version}</version>
 		</dependency>
 
 		<dependency>
@@ -56,6 +62,16 @@
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-signature-remote</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.glassfish.jaxb</groupId>
+					<artifactId>jaxb-runtime</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>

@@ -27,7 +27,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>copy-standalone-zip</id>
+						<id>copy-standalone-complete</id>
 						<phase>process-resources</phase>
 						<goals>
 							<goal>copy</goal>
@@ -37,15 +37,16 @@
 								<artifactItem>
 									<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 									<artifactId>dss-standalone-app-package</artifactId>
+									<classifier>complete-zip</classifier>
 									<type>zip</type>
 									<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
-									<destFileName>/downloads/dss-app.zip</destFileName>
+									<destFileName>/downloads/dss-app-complete-windows-x64.zip</destFileName>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
 					</execution>
 					<execution>
-						<id>copy-standalone-tar-gz</id>
+						<id>copy-standalone-minimal</id>
 						<phase>process-resources</phase>
 						<goals>
 							<goal>copy</goal>
@@ -55,9 +56,10 @@
 								<artifactItem>
 									<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 									<artifactId>dss-standalone-app-package</artifactId>
-									<type>tar.gz</type>
+									<classifier>minimal-zip</classifier>
+									<type>zip</type>
 									<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
-									<destFileName>/downloads/dss-app.tar.gz</destFileName>
+									<destFileName>/downloads/dss-app-minimal-windows-x64.zip</destFileName>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
