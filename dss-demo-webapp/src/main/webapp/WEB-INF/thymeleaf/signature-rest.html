@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Rest'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.rest.soap.webservices}">
 	<body>		
 		<div layout:fragment="content">
-			<h2>REST/SOAP WebServices</h2>
-
             <p>
                 DSS offers&nbsp;
                 <a th:href="@{/services/}" title="eSignature REST/SOAP WebServices" target="_blank">REST and SOAP WebServices</a>&nbsp;

@@ -12,11 +12,11 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,8 +38,6 @@ import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateForm;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 
-
-
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/certificate-validation")
@@ -49,9 +47,6 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 	private static final String VALIDATION_TILE = "certificate_validation";
 	private static final String VALIDATION_RESULT_TILE = "validation_result";
-
-	@Autowired
-	private CertificateVerifier certificateVerifier;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -73,6 +68,12 @@ public class CertificateValidationController extends AbstractValidationControlle
 	public String validate(@ModelAttribute("certValidationForm") @Valid CertificateValidationForm certValidationForm, 
 			BindingResult result, Model model, HttpServletRequest request) {
 		if (result.hasErrors()) {
+			if (LOG.isDebugEnabled()) {
+				List<ObjectError> allErrors = result.getAllErrors();
+				for (ObjectError error : allErrors) {
+					LOG.debug(error.getDefaultMessage());
+				}
+			}
 			return VALIDATION_TILE;
 		}
 

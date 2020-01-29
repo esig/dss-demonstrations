@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Error'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.error.404}">
 	<body>		
 		<div layout:fragment="content">
-			<h1>404 error</h1>
             <div class="alert alert-danger" role="alert">
                 <p><strong>The page "<span th:text="${url}"></span>" is not found ! </strong></p>
             </div>

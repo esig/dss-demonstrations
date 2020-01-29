@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Extend a Signature'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.extend}">
 	<body>		
 		<div layout:fragment="content">
 			<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
-			
-            <h2 class="mb-3" th:text="#{label.extend}"></h2>
             
             <form method="post" th:action="@{/extension}" th:object="${extensionForm}" enctype="multipart/form-data">
 

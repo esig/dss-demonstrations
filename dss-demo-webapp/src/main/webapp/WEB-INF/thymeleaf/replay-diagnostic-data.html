@@ -2,8 +2,6 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Replay Diagnostic Data'">
 	<body>		
 		<div layout:fragment="content">
-           <h2 class="mb-3" th:text="#{label.replay.diag}"></h2>
-
            <form method="post" enctype="multipart/form-data" th:action="@{/replay-diagnostic-data}" th:object="${replayDiagForm}">
 
 				<div th:replace="fragment/fields::field-diagnostic-data"></div>

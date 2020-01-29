@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<!-- head -->
-<th:block th:replace="fragment/head :: head"></th:block>
-<!-- head-end -->
+
+<head th:replace="fragment/head :: head"></head>
 
 <body>
 
@@ -21,6 +20,7 @@
           
 			<!-- CONTENT -->
 			<div class="col-sm-9">
+				<h1 class="mb-3" th:text="${currentPage}"></h1>
 				<div class="content" layout:fragment="content"></div>
 			</div>
 		</div>

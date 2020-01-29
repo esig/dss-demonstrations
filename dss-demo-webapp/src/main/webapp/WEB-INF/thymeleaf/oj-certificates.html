@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='EU Official Journal Trusted Certificates'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.eu.oj.certificates.page}">
 	<body>		
 		<div layout:fragment="content">
 			<div class="card">
 				<div class="card-header">
-					<span class="badge badge-secondary pull-right" th:text="${#lists.size(keystoreCertificates)}"> Cert(s)</span>
-    				<span th:text="#{label.trusted.certificates.from.OJ}" th:remove="tag">Trusted certificates from Official Journal (OJ) in the DSS keystore</span>
+					<span class="badge badge-secondary pull-right">
+						<span th:text="${#lists.size(keystoreCertificates)}"></span>&nbsp;
+						<span th:text="#{label.eu.oj.certificates.page}"></span>
+					</span>
+    				<span th:text="#{label.trusted.certificates.from.OJ}"></span>
 				</div>
 				<div class="card-body" th:if="${keystoreCertificates != null}">
 					<div class="eu-official-journal">
-						<p>Current keystore is synchronized with <a th:href="${currentOjUrl}" th:text="#{label.eu.oj.page}" target="_blank"></a></p>
-						<p th:if="${actualOjUrl == null}" class="text-danger">
-							Unable to retrieve the actual OJ URL
-						</p>
+						<p><span th:text="#{label.keystore.synchronized.with}"></span>&nbsp;<a th:href="${currentOjUrl}" th:text="#{label.eu.oj.page}" target="_blank"></a></p>
+						<p th:if="${actualOjUrl == null}" class="text-danger" th:text="#{label.eu.oj.unable.retrieve}"></p>
 						<p th:if="${actualOjUrl != null && actualOjUrl != currentOjUrl}" class="text-danger">
-							The keystore is outdated! Please, update the keystore from the 
+							<span th:text="#{label.eu.oj.keystore.outdated}"></span>&nbsp;
 							<a th:href="${actualOjUrl}" target="_blank" th:title="#{label.eu.oj.page}">link</a>
 						</p>
 					</div>

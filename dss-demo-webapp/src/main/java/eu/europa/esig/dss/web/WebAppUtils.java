@@ -56,7 +56,7 @@ public final class WebAppUtils {
 		return TimestampTokenConverter.toTimestampToken(dto);
 	}
 
-	public static List<DSSDocument> originalDocumentsToDSSDocuments(List<OriginalFile> originalFiles) {
+	public static List<DSSDocument> originalFilesToDSSDocuments(List<OriginalFile> originalFiles) {
 		List<DSSDocument> dssDocuments = new ArrayList<DSSDocument>();
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
 			for (OriginalFile originalDocument : originalFiles) {

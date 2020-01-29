@@ -53,13 +53,13 @@ public class SignatureMultipleDocumentsController {
 
 	private static final Logger logger = LoggerFactory.getLogger(SignatureMultipleDocumentsController.class);
 
-	private static final String SIGNATURE_PARAMETERS = "signature-multiple-documents-parameters";
+	private static final String SIGNATURE_PARAMETERS = "signature-multiple-documents";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
 
-	@Value("${baseUrl}")
+	@Value("${nexuDownloadUrl}")
 	private String downloadNexuUrl;
 
 	@Autowired

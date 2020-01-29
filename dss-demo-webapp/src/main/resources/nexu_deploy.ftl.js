@@ -44,7 +44,7 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 	$("#submit-button").html("Install NexU");
 	$("#submit-button").on("click", function() {
 		console.log("Install NexU");
-		window.location = "${baseUrl}";
+		window.location = "${nexuDownloadUrl}";
 		return false;
 	});
 	

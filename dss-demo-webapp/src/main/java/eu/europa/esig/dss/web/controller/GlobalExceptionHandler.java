@@ -72,6 +72,7 @@ public class GlobalExceptionHandler {
 
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {
 		ModelAndView mav = new ModelAndView();
+		mav.addObject("error", status.getReasonPhrase());
 		mav.addObject("exception", e.getMessage());
 		mav.addObject("url", req.getRequestURL());
 		mav.setStatus(status);

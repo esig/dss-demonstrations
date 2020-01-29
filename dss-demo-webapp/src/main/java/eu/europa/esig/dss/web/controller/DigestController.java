@@ -50,15 +50,15 @@ import eu.europa.esig.dss.web.service.SigningService;
 @RequestMapping(value = "/sign-a-digest")
 public class DigestController {
 
-	private static final Logger logger = LoggerFactory.getLogger(DigestController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DigestController.class);
 
-	private static final String DIGEST_PARAMETERS = "digest-parameters";
+	private static final String SIGN_DIGEST = "signature-digest";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
 
-	@Value("${baseUrl}")
+	@Value("${nexuDownloadUrl}")
 	private String downloadNexuUrl;
 
 	@Autowired
@@ -78,7 +78,7 @@ public class DigestController {
 		signatureDigestForm.setDigestAlgorithm(DigestAlgorithm.SHA256);
 		model.addAttribute("signatureDigestForm", signatureDigestForm);
 		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
-		return DIGEST_PARAMETERS;
+		return SIGN_DIGEST;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
@@ -86,9 +86,9 @@ public class DigestController {
 			@ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
 		if (result.hasErrors()) {
 			for (ObjectError error : result.getAllErrors()) {
-				logger.error(error.getDefaultMessage());
+				LOG.error(error.getDefaultMessage());
 			}
-			return DIGEST_PARAMETERS;
+			return SIGN_DIGEST;
 		}
 		model.addAttribute("signatureDigestForm", signatureDigestForm);
 		model.addAttribute("digestAlgorithm", signatureDigestForm.getDigestAlgorithm());
@@ -150,7 +150,7 @@ public class DigestController {
 			Utils.copy(new ByteArrayInputStream(signedDocument.getBytes()), response.getOutputStream());
 
 		} catch (Exception e) {
-			logger.error("An error occurred while pushing file in response : " + e.getMessage(), e);
+			LOG.error("An error occurred while pushing file in response : " + e.getMessage(), e);
 		}
 		return null;
 	}

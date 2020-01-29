@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='NexU process'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.nexu.signature.process}">
 	<body>		
 		<div layout:fragment="content">
-			<h2>NexU signature process</h2>
             <div class="progress" style="height: 35px">
                 <div class="progress-bar progress-bar-striped  progress-bar-animated active" style="width: 0%" id="bar">
                     <span id="bar-text"></span>
                 </div>
             </div>
             <div id="error" style="display: none" class="alert alert-danger mt-3" role="danger">
-                <strong id="errorText">Oops... an error occurred </strong><span id="errorcontent"></span>
+                <strong id="errorText" th:text="#{label.error.occurred}"></strong>&nbsp;<span id="errorcontent"></span>
             </div>
 		</div>
 		<div layout:fragment="scripts">
@@ -95,6 +94,26 @@
 		                $('#bar-text').html(action);
 		                $('#bar').width(percent);
 		            }
+					
+					function callCurrentServer(url, type, data, headers, success_callback, error_callback) {
+					    $.ajax({
+					          type: type,
+					          url: url,
+					          data: data,
+					          crossDomain: true, 
+					          contentType: "application/json; charset=utf-8",
+					          dataType: "json",
+					          headers : headers,
+					          success: function (result) {
+					              console.log(url + " : OK");
+					              success_callback.call(this, result);
+					          }
+					        }).fail(function (error, textStatus ) {
+					            console.log(url + " : KO " + textStatus);
+					            eval(error);
+					            error_callback.call(this, error);
+					        });
+					} 
 		
 		            /*]]>*/
 		    </script>

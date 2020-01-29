@@ -46,15 +46,15 @@ import eu.europa.esig.dss.web.service.SigningService;
 @RequestMapping(value = "/sign-a-pdf")
 public class SignaturePdfController {
 
-	private static final Logger logger = LoggerFactory.getLogger(SignaturePdfController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SignaturePdfController.class);
 
-	private static final String SIGNATURE_PDF_PARAMETERS = "signature-pdf-parameters";
+	private static final String SIGNATURE_PDF_PARAMETERS = "signature-pdf";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
 
-	@Value("${baseUrl}")
+	@Value("${nexuDownloadUrl}")
 	private String downloadNexuUrl;
 
 	@Autowired
@@ -80,7 +80,7 @@ public class SignaturePdfController {
 			@ModelAttribute("signaturePdfForm") @Valid SignatureDocumentForm signaturePdfForm, BindingResult result) {
 		if (result.hasErrors()) {
 			for (ObjectError error : result.getAllErrors()) {
-				logger.error(error.getDefaultMessage());
+				LOG.error(error.getDefaultMessage());
 			}
 			return SIGNATURE_PDF_PARAMETERS;
 		}
@@ -142,7 +142,7 @@ public class SignaturePdfController {
 			Utils.copy(new ByteArrayInputStream(signedDocument.getBytes()), response.getOutputStream());
 
 		} catch (Exception e) {
-			logger.error("An error occurred while pushing file in response : " + e.getMessage(), e);
+			LOG.error("An error occurred while pushing file in response : " + e.getMessage(), e);
 		}
 		return null;
 	}

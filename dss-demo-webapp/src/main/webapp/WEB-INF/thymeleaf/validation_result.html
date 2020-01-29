@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-	layout:decorate="~{layout.html}" th:with="currentPage='Results'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.validation.results}">
 <body>
 	<div layout:fragment="content">
 		<ul class="nav nav-tabs nav-justified d-print-none" id="tabsResult">
@@ -29,12 +28,12 @@
 					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
-							<i class="fa fa-print"></i> Print
+							<i class="fa fa-print"></i>&nbsp;<span th:text="#{label.print}"></span>
 						</button>
 						<a class="btn btn-light"
 							th:href="@{/validation/download-simple-report}" role="button"
-							th:if="${displayDownloadPdf}"> <i
-							class="fa fa-download"></i> Download as PDF
+							th:if="${displayDownloadPdf}">
+							<i class="fa fa-download"></i>&nbsp;<span th:text="#{label.download.pdf}"></span>
 						</a>
 					</div>
 
@@ -47,12 +46,12 @@
 					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
-							<i class="fa fa-print"></i> Print
+							<i class="fa fa-print"></i>&nbsp;<span th:text="#{label.print}"></span>
 						</button>
 						<a class="btn btn-light"
 							th:href="@{/validation/download-detailed-report}" role="button"
-							th:if="${displayDownloadPdf}"> <i
-							class="fa fa-download"></i> Download as PDF
+							th:if="${displayDownloadPdf}">
+							<i class="fa fa-download"></i>&nbsp;<span th:text="#{label.download.pdf}"></span>
 						</a>
 					</div>
 
@@ -69,7 +68,7 @@
 					<div class="card-body collapse in" id="downloads">
 						<div class="row">
 							<div class="col-sm-3">
-								<p th:text="#{label.report}">Report</p>
+								<p th:text="#{label.report}"></p>
 							</div>
 							<div class="col-sm-9">
 								<ul class="list-unstyled">
@@ -84,7 +83,7 @@
 						</div>
 						<div class="row" th:if="${allCertificates != null && allCertificates.size() > 0}">
 							<div class="col-sm-3">
-								<p th:text="#{label.certificates}">Certificates</p>
+								<p th:text="#{label.certificates}"></p>
 							</div>
 							<div class="col-sm-9">
 								<ul class="list-unstyled">
@@ -99,7 +98,7 @@
 						</div>
 						<div class="row" th:if="${allRevocationData != null && allRevocationData.size() > 0}">
 							<div class="col-sm-3">
-								<p th:text="#{label.revocation-data}">Revocation data</p>
+								<p th:text="#{label.revocation-data}"></p>
 							</div>
 							<div class="col-sm-9">
 								<ul class="list-unstyled">
@@ -112,7 +111,7 @@
 						</div>
 						<div class="row" th:if="${allTimestamps != null && allTimestamps.size() > 0}">
 							<div class="col-sm-3">
-								<p th:text="#{label.timestamps}">Timestamps</p>
+								<p th:text="#{label.timestamps}"></p>
 							</div>
 							<div class="col-sm-9">
 								<ul class="list-unstyled">

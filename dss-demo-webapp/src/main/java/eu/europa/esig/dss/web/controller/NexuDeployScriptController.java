@@ -19,8 +19,8 @@ import freemarker.template.Template;
 @Controller
 public class NexuDeployScriptController {
 
-	@Value("${baseUrl}")
-	private String baseUrl;
+	@Value("${nexuDownloadUrl}")
+	private String nexuDownloadUrl;
 
 	@Value("${nexuVersion}")
 	private String nexuVersion;
@@ -47,7 +47,7 @@ public class NexuDeployScriptController {
 
 		Map<String, String> model = new HashMap<String, String>();
 
-		model.put("baseUrl", baseUrl);
+		model.put("nexuDownloadUrl", nexuDownloadUrl);
 		model.put("nexuVersion", nexuVersion);
 		model.put("nexuUrl", nexuUrl);
 
