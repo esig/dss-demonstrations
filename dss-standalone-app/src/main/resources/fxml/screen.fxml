@@ -122,6 +122,9 @@
 				<ProgressIndicator fx:id="progressSign" disable="true" progress="0" />
 			</children>
 		</HBox>		
+
+		<Label fx:id="warningTSALabel" styleClass="warningLabel" text="Warning ! The demonstration uses a dummy timestamp source." />	
+
 		<HBox fx:id="refreshBox" styleClass="hbox-style">
 			<children>
 				<Button fx:id="refreshLOTL" mnemonicParsing="false" text="Refresh LOTL" />
