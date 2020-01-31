@@ -181,8 +181,10 @@
    		<th:block th:each="algo : ${digestAlgos}">
    			<div class="form-check form-check-inline">
             	<input class="form-check-input" type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:id="algo+${algo}" />
-            	<label th:if="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" th:text="${algo}" data-toggle="tooltip" data-placement="top" th:title="#{label.deprecated}"></label>
-            	<label th:unless="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" th:text="${algo}"></label>
+                <label th:if="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" 
+                        th:text="${algo}" data-toggle="tooltip" data-placement="top" th:title="#{label.deprecated}"></label>
+                <label th:unless="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" 
+                        th:text="${algo}"></label>
             </div>
 		</th:block>
     </div>
@@ -304,7 +306,7 @@
     <label class="col-sm-3 col-form-label" for="digestToSend" th:text="#{label.send.detached.as}"></label>
     <div class="col-sm-5">
     	<div class="form-check form-check-inline">
-           	<input class="form-check-input" type="radio" name="digestToSend" value="" id="algoNone" />
+           	<input class="form-check-input" type="radio" name="digestToSend" value="" id="algoNone" checked='checked' />
            	<label class="form-check-label" th:for="algoNone" th:text="#{label.complete.documents}"></label>
 		</div>
     

@@ -62,6 +62,9 @@ public class SignatureMultipleDocumentsController {
 
 	@Value("${nexuDownloadUrl}")
 	private String downloadNexuUrl;
+	
+    @Value("${default.digest.algo}")
+    private String defaultDigestAlgo;
 
 	@Autowired
 	private SigningService signingService;
@@ -78,6 +81,7 @@ public class SignatureMultipleDocumentsController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String showSignatureParameters(Model model, HttpServletRequest request) {
 		SignatureMultipleDocumentsForm signatureMultipleDocumentsForm = new SignatureMultipleDocumentsForm();
+		signatureMultipleDocumentsForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("signatureMultipleDocumentsForm", signatureMultipleDocumentsForm);
 		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
 		return SIGNATURE_PARAMETERS;
@@ -173,7 +177,7 @@ public class SignatureMultipleDocumentsController {
 
 	@ModelAttribute("digestAlgos")
 	public DigestAlgorithm[] getDigestAlgorithms() {
-		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
+		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
 				DigestAlgorithm.SHA512 };
 		return algos;
 	}
