@@ -129,7 +129,6 @@
 <div class="form-group row" th:fragment="field-document-digest">
     <label class="col-sm-3 col-form-label" for="digestToSign">
     	<span th:text="#{label.to.sign.digest}"></span>
-		<i class="fa fa-hashtag ml-2" th:title="#{label.compute.digest}"></i>
     </label>
     <div class="col-sm-5">
 		<input type="text" class="form-control input-sm" th:field="*{digestToSign}" />
@@ -146,6 +145,15 @@
     <div class="col-xs-4">
        	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
        	<p th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}" class="text-danger">Error</p>
+    </div>
+    
+    <div th:replace="fragment/fields::field-digest-alert"></div>
+</div>
+
+<div id="alert-digest" class="col-sm-12" style="display: none" th:fragment="field-digest-alert">
+    <div class="alert alert-warning m-0" role="alert">
+         The digest computation is not available in your browser! More information is available by the 
+         <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest" target="_blank">link</a>.
     </div>
 </div>
 
@@ -302,9 +310,9 @@
     </div>
 </div>
 
-<div class="form-group row" th:fragment="send-digest-algo">
-    <label class="col-sm-3 col-form-label" for="digestToSend" th:text="#{label.send.detached.as}"></label>
-    <div class="col-sm-5">
+<div id="digestAlgoToSend" class="form-group row" th:fragment="send-digest-algo">
+    <label class="col-sm-3 mb-2 col-form-label font-weight-bold" for="digestToSend" th:text="#{label.send.detached.as}"></label>
+    <div class="col-sm-5 mb-2">
     	<div class="form-check form-check-inline">
            	<input class="form-check-input" type="radio" name="digestToSend" value="" id="algoNone" checked='checked' />
            	<label class="form-check-label" th:for="algoNone" th:text="#{label.complete.documents}"></label>
@@ -314,13 +322,14 @@
     	
 		<th:block th:each="algo : ${digestAlgos}">
 			<div class="form-check form-check-inline">
-           		<input class="form-check-input" type="radio" name="digestToSend" th:value="${algo}" th:id="algo+${algo}" th:attr="data-javaname=${algo.javaName}" />
+                   <input class="form-check-input digest-algo-input" type="radio" name="digestToSend" th:value="${algo}" th:id="algo+${algo}" th:attr="data-javaname=${algo.javaName}" />
            		<label class="form-check-label" th:for="algo+${algo}" th:text="${algo}"></label>
            	</div>
 		</th:block>
     </div>
-    <div class="col-xs-4">
-    </div>
+    <div class="col-xs-4"></div>
+    
+    <div th:replace="fragment/fields::field-digest-alert"></div>
 </div>
 
 <th:block th:fragment="validation-level-policy">

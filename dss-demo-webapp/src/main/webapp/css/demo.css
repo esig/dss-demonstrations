@@ -2,6 +2,9 @@
 .cursor-pointer {
 	cursor: pointer;
 }
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
 .animate, .animate * {
     -webkit-transition: all 0.2s 0.0s linear;
     -moz-transition: all 0.2s 0.0s linear;
