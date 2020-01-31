@@ -20,7 +20,6 @@ body {
 
 .bg-primary, .header-highlight {
     background-color: #5986bd!important;
-    color : white;
 }
 
 .btn-primary, .btn-primary.active, .btn-primary.focus, .btn-primary:hover, .btn-primary:disabled {
