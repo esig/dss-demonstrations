@@ -22,7 +22,7 @@
 			</div>
 		
 			<!-- LOTL Info -->
-			<div class="current-lotl">
+			<div class="current-lotl text-break">
 				<h2>
 					<span th:if="${lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}" 
 							th:class="${'lotl-flag small_flag mt-2 flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
@@ -33,9 +33,9 @@
 		
 			<!-- Original certificates -->
 			<div class="certificates-container original-certificates">
-				<div class="card mb-3">
-					<div class="card-header" th:text="#{label.summary.lotl.original.keystore}"></div>
-					<div class="card-body">
+				<div class="card bg-primary mb-3">
+					<div class="card-header text-white" th:text="#{label.summary.lotl.original.keystore}"></div>
+					<div class="card-body bg-white rounded-bottom">
 						<div th:each="certificate,iterCert : ${originalKeystore}" th:with="certId=${certificate.getDSSIdAsString()}"
 								th:class="${'card mb-2 bg-' + ((certId == lotlSigningCertId)?'info text-white':'default')}">
 							<div class="card-header cursor-pointer" th:data-target="${'#' + certId}" data-toggle="collapse" 
@@ -57,10 +57,10 @@
 					th:with="pivotId=${pivot.getIdentifier().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
 					lotlLocation=${pivot.getLOTLLocation()}">
 					
-				<div class="card mb-3">
-					<div class="card-header" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
+				<div class="card bg-primary mb-3">
+					<div class="card-header text-white" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
 					
-					<div class="card-body">
+					<div class="card-body bg-white rounded-bottom">
 						<!-- LOTL location -->
 						<div class="lotl-location mb-2" th:if="${lotlLocation != null}">
 							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>&nbsp;

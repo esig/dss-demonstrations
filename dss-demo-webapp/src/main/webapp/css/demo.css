@@ -9,6 +9,9 @@
     -o-transition: all 0.2s 0.0s linear;
     transition: all 0.2s 0.0s linear;
 }
+.card-header.bg-primary {
+	color: #fff!important;
+}
 /* End Main */
 
 /* Digest parameters */
