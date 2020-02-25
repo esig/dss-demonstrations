@@ -55,7 +55,7 @@
 									<!-- Last Download Attempt date -->
 									<td>
 										<span th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}?:
-												${#dates.format(downloadResult.exceptionFirstOccurrence, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+												${#dates.format(downloadResult.exceptionLastOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
 									</td>
 									
 									<!-- Download result -->

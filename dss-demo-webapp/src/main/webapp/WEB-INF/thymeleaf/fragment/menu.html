@@ -21,7 +21,7 @@
             <a th:href="@{/certificate-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/certificate-validation' ? 'active' : ''}" th:text="#{label.cert.validate}">Certificate Validation</a>
             <a th:href="@{/replay-diagnostic-data}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/replay-diagnostic-data' ? 'active' : ''}" th:text="#{label.replay.diag}">Replay Diagnostic Data</a>
             <a th:href="@{/tl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
-      		<a th:href="@{/oj-certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/oj-certificates' ? 'active' : ''}" title="EU Official Journal Trusted Certificates">OJ Trusted Certificates</a>
+      		<a th:href="@{/oj-certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/oj-certificates' ? 'active' : ''}" th:title="#{label.eu.oj.certificates.page}" th:text="#{label.eu.oj.certificates}"></a>
         </div>
     </div>
 
