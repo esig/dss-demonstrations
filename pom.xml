@@ -60,7 +60,7 @@
 		<spring-security.version>5.2.1.RELEASE</spring-security.version>
 		<thymeleaf-spring5.version>3.0.11.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>2.4.1</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.10.1</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.10.2.1</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<freemarker.version>2.3.29</freemarker.version>
 		<hikaricp.version>3.4.2</hikaricp.version>
