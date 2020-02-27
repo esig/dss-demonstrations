@@ -217,7 +217,7 @@
         <div class="card-body tl-content collapse animate" th:id="'countryProviders' + ${sp.index}">
 			<div class="attributes">
 	      		<div class="row">
-	           		<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.name} + ' :'"></div>
+	           		<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.name} + ' :'"></div>
 	           		<div class="col-sm-12">
 	            		<ul>
 	             			<th:block th:each="name : ${serviceProvider.names}">
@@ -229,7 +229,7 @@
 		    		</div>
 	    		</div>
 	            <div class="row">
-	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.trade.name} + ' :'"></div>
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.trade.name} + ' :'"></div>
 	    			<div class="col-sm-12">
 	                  	<ul>
 	                   		<th:block th:each="tradeName : ${serviceProvider.tradeNames}">
@@ -241,7 +241,7 @@
 	    			</div>
 	            </div>
 	            <div class="row">
-	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.postal.address} + ' :'"></div>
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.postal.address} + ' :'"></div>
 	    			<div class="col-sm-12">
 						<ul>
 							<li th:each="postalAddress : ${serviceProvider.postalAddresses}">
@@ -251,7 +251,7 @@
 	    			</div>
 	            </div>
 	            <div class="row">
-	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.electronic.address} + ' :'"></div>
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.electronic.address} + ' :'"></div>
 		    		<div class="col-sm-12">
 	                	<ul>
 	                    	<th:block th:each="electronicAddress : ${serviceProvider.electronicAddresses}">
@@ -283,7 +283,7 @@
 		</div>
 		<div class="card-body tl-content collapse animate" th:id="'countryServices' + ${ser.index}">
            	<div class="row">
-                   	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.electronic.address} + ' :'"></div>
+                   	<div class="col-sm-12 font-weight-bold" th:text="#{label.tsp.name} + ' :'"></div>
                    	<div class="col-sm-12">
                    		<ul>
                    			<th:block th:each="name : ${serviceStatus.names}">
