@@ -109,19 +109,19 @@ form#sign-pdf-form p#filename {
 .summary-table tbody:nth-of-type(odd) {
     background-color: rgba(0,0,0,.05);
 }
-.tl-info-preview:after {
+.tl-info-preview td:last-child:after {
     display: inline-block;
     position: absolute;
     font: normal normal normal 14px/1 FontAwesome;
     content: "\f077";
     opacity: 0.3;
     right: -25px;
-    margin-top: 30px;
+    margin-top: 4px;
 }
-.tl-info-preview.collapsed:after {
+.tl-info-preview.collapsed td:last-child:after {
     content: "\f078";
 }
-.tl-info-preview:hover:after {
+.tl-info-preview:hover td:last-child:after {
 	opacity: 0.6;
 }
 /* End TL-Loading */
