@@ -19,13 +19,13 @@
 					<p th:if="${#fields.hasErrors('documentToSign')}"
 						th:errors="*{documentToSign}" class="text-danger" th:text="#{label.error}"></p>
 		
-					<div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-8">
-                    <span id="warning-text"></span>&nbsp;
-                    <a th:href="${downloadNexuUrl}" th:text="#{label.nexu.download}"></a>&nbsp;
-                    (<a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/" th:text=#{label.nexu.more.info}></a>)
-                </div>
+					<div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-12">
+	                    <span id="warning-text"></span>&nbsp;
+	                    <a th:href="${downloadNexuUrl}" th:text="#{label.nexu.download}"></a>&nbsp;
+	                    (<a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/" th:text=#{label.nexu.more.info}></a>)
+	                </div>
 
-                <div id="nexu_ready_alert" style="display: none;" class="alert alert-info" th:text="#{label.nexu.ready}"></div>
+                	<div id="nexu_ready_alert" style="display: none;" class="alert alert-info col-lg-12" th:text="#{label.nexu.ready}"></div>
 		
 					<button type="submit" class="btn btn-primary w-100" id="submit-button"
 						th:text="#{label.sign}" disabled="disabled"></button>
