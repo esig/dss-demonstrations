@@ -18,7 +18,7 @@
 	<properties>
 		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jre_x64_windows_hotspot_8u242b08.zip</jre.download.link>
 		<jre.root.folder>jdk8u242-b08-jre</jre.root.folder>
-		<tomcat.version>8.5.50</tomcat.version>
+		<tomcat.version>8.5.51</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
