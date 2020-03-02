@@ -55,7 +55,7 @@
 									<!-- Last Download Attempt date -->
 									<td>
 										<span th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}?:
-												${#dates.format(downloadResult.exceptionFirstOccurrence, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+												${#dates.format(downloadResult.exceptionLastOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
 									</td>
 									
 									<!-- Download result -->
@@ -90,12 +90,12 @@
 									validationResult=${tl.validationCacheInfo}">
 									
 									<!-- TL-Info preview -->
-									<td th:replace="fragment/tl-info :: tl-info-preview(id=${id}, country=${country}, downloadResult=${downloadResult},
-											parsingResult=${parsingResult}, validationResult=${validationResult})"></td>
+									<tr th:replace="fragment/tl-info :: tl-info-preview(id=${id}, country=${country}, downloadResult=${downloadResult},
+											parsingResult=${parsingResult}, validationResult=${validationResult})"></tr>
 											
 									<!-- TL-Info body -->
-									<td th:replace="fragment/tl-info :: tl-info-body(id=${id}, url=${tl.url}, downloadResult=${downloadResult},
-											parsingResult=${parsingResult}, validationResult=${validationResult})"></td>
+									<tr th:replace="fragment/tl-info :: tl-info-body(id=${id}, url=${tl.url}, downloadResult=${downloadResult},
+											parsingResult=${parsingResult}, validationResult=${validationResult})"></tr>
 							</tbody>
 							
 						</table>
@@ -115,12 +115,12 @@
 								validationResult=${tl.validationCacheInfo}">
 								
 								<!-- TL-Info preview -->
-								<td th:replace="fragment/tl-info :: tl-info-preview(id=${id}, country=${country}, downloadResult=${downloadResult},
-										parsingResult=${parsingResult}, validationResult=${validationResult})"></td>
+								<tr th:replace="fragment/tl-info :: tl-info-preview(id=${id}, country=${country}, downloadResult=${downloadResult},
+										parsingResult=${parsingResult}, validationResult=${validationResult})"></tr>
 										
 								<!-- TL-Info body -->
-								<td th:replace="fragment/tl-info :: tl-info-body(id=${id}, url=${tl.url}, downloadResult=${downloadResult},
-										parsingResult=${parsingResult}, validationResult=${validationResult})"></td>
+								<tr th:replace="fragment/tl-info :: tl-info-body(id=${id}, url=${tl.url}, downloadResult=${downloadResult},
+										parsingResult=${parsingResult}, validationResult=${validationResult})"></tr>
 						</tbody>
 						
 					</table>

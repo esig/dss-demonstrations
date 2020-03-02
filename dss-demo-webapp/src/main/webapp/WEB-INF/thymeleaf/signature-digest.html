@@ -4,8 +4,6 @@
 		<div layout:fragment="content">
 			<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
               
-            <h2 class="mb-3" th:text="#{label.signADigest}"></h2>
-
             <form id="digest-sign-form" method="post" th:action="@{/sign-a-digest}" th:object="${signatureDigestForm}">
 
                 <input type="hidden" id="isSign" value="true" />
@@ -42,6 +40,7 @@
 		<div layout:fragment="scripts">
             <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
             <script type="text/javascript" th:src="@{/scripts/jsDigestParameters.js}"></script>
+            <script type="text/javascript" th:src="@{/scripts/jsCryptoSupportAlert.js}"></script>
             <script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
 			<script type="text/javascript">
 				$('[data-toggle="tooltip"]').tooltip();

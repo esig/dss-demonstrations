@@ -46,16 +46,14 @@
 		th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></i>
 </span>
 
-<span th:fragment="tl-global-validation-status(parsingResult, validationResult)">
-	<i th:if="${!validationResult.resultExist and !validationResult.isError()}" 
-			class="fa fa-ban text-muted" title="Not performed"></i>
-	<i th:if="${!(!validationResult.resultExist and !validationResult.isError()) and 
-				validationResult.isValid() and !(!parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow()))}" 
-			class="fa fa-check-circle text-success" th:title="${validationResult.indication}"></i>
-	<i th:if="${!(!validationResult.resultExist and !validationResult.isError()) and 
-				(validationResult.isIndeterminate() or !parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow()))}" 
-			class="fa fa-exclamation-circle text-warning" 
-			th:title="${(validationResult.isIndeterminate()?(validationResult.indication + ' : ' + validationResult.subIndication):'EXPIRED')}"></i>
-	<i th:if="${validationResult.isError() or (validationResult.isInvalid() and !(!parsingResult.resultExist or parsingResult.nextUpdateDate.before(#dates.createNow())))}" 
-			class="fa fa-times-circle text-danger" th:title="${validationResult.indication + ' : ' + validationResult.subIndication}"></i>
-</span>
+<!-- Next Update -->
+<th:block th:fragment="next-update(parsingResult)">
+    <span th:if="${!parsingResult.resultExist or parsingResult.nextUpdateDate == null}" th:text="${'-'}"></span>
+    <span th:if="${parsingResult.resultExist and parsingResult.nextUpdateDate != null and parsingResult.nextUpdateDate.after(#dates.createNow())}">
+        <span th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+    </span>
+    <span th:if="${parsingResult.resultExist and parsingResult.nextUpdateDate != null and !(parsingResult.nextUpdateDate.after(#dates.createNow()))}">
+        <span th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+        <i class="fa fa-exclamation-circle text-danger" th:title="#{label.summary.tl.info}"></i>
+    </span>
+</th:block>

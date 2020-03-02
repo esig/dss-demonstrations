@@ -5,22 +5,23 @@
 	</head>
 	<body>
 		<div layout:fragment="content">
-		<p th:if="${lotlInfo == null}">No info found for this LOTL</p>
-		
-		<div th:if="${lotlInfo != null}">
-
-			<div class="lotl" th:with="downloadResult=${lotlInfo.downloadCacheInfo}, parsingResult=${lotlInfo.parsingCacheInfo}, validationResult=${lotlInfo.validationCacheInfo}">
-				<h2>
-					<a th:href="@{/tl-info/lotl/} + ${lotlInfo.getIdentifier().asXmlId()}">
-						<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
-						th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
-					</a>
-					<span th:text="#{label.summary.lotl}"></span>&nbsp;
-					<a class="h5 font-weight-bold" th:href="${lotlInfo.url}" th:text="'(' + ${lotlInfo.url} + ')'" target="_blank"></a>
-				</h2>
-				
-				<!-- LOTL Info -->
-				<div th:replace="fragment/lotl-info-fragments :: lotl-info-summary(downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult})"></div>
+			<p th:if="${lotlInfo == null}">No info found for this LOTL</p>
+			
+			<div th:if="${lotlInfo != null}">
+	
+				<div class="lotl" th:with="downloadResult=${lotlInfo.downloadCacheInfo}, parsingResult=${lotlInfo.parsingCacheInfo}, validationResult=${lotlInfo.validationCacheInfo}">
+					<h2>
+						<a th:href="@{/tl-info/lotl/} + ${lotlInfo.getIdentifier().asXmlId()}">
+							<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
+							th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
+						</a>
+						<span th:text="#{label.summary.lotl}"></span>&nbsp;
+						<a class="h5 font-weight-bold" th:href="${lotlInfo.url}" th:text="'(' + ${lotlInfo.url} + ')'" target="_blank"></a>
+					</h2>
+					
+					<!-- LOTL Info -->
+					<div th:replace="fragment/lotl-info-fragments :: lotl-info-summary(downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult})"></div>
+				</div>
 			</div>
 		</div>
 	</body>

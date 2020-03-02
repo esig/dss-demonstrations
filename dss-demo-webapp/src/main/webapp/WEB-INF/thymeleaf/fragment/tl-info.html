@@ -5,7 +5,7 @@
 	<tr class="text-center">
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.country}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.seq.num}"></th>
-		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.last.download.attempt}"></th>
+		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.last.succ.download.short}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.download.result}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.parsing.result}"></th>
 		<th class="align-middle" scope="col" th:text="#{label.summary.tl.info.validation.result}"></th>
@@ -28,9 +28,9 @@
 	
 	<!-- Seq num -->
 	<td class="align-middle" th:text="${parsingResult.sequenceNumber}?:'-'"></td>
-	
-	<!-- Last download attempt date -->
-    <td class="align-middle" th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}"></td>
+	    
+	<!-- Last success (download) synchronization date -->
+    <td class="align-middle" th:text="${#dates.format(downloadResult.lastSuccessSynchronizationTime, 'dd-MMM-yyyy HH:mm:ss')}?:'-'"></td>
 
 	<!-- Download result -->
 	<td class="align-middle">
@@ -43,12 +43,14 @@
 	</td>
 	
 	<!-- Validation result -->
-	<td class="align-middle">
-		<span th:replace="fragment/tl-info-fragments :: tl-global-validation-status(parsingResult=${parsingResult}, validationResult=${validationResult})"></span>
+	<td class="align-middle">        
+		<span th:replace="fragment/tl-info-fragments :: validation-status(validationResult=${validationResult})"></span>
 	</td>
 	
 	<!-- Next update -->
-	<td class="align-middle" th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}?:'-'"></td>
+	<td class="align-middle">
+        <th:block th:replace="fragment/tl-info-fragments :: next-update(parsingResult=${parsingResult})"></th:block>
+    </td>
 	
 	<!-- TSP number -->
 	<td class="align-middle" th:text="${parsingResult.getTSPNumber()}"></td>
@@ -85,24 +87,18 @@
 			<p class="m-0" th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
 		</div>
 	</div>
-	<div class="row" th:if="${downloadResult.lastSuccessDownloadTime != null}">
+	<div class="row" th:if="${downloadResult.lastSuccessSynchronizationTime != null}">
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.last.succ.download.short}"></div>
 		<div class="mb-1 col-xl-9">
-			<p class="m-0" th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
+			<p class="m-0" th:text="${#dates.format(downloadResult.lastSuccessSynchronizationTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
 		</div>
 	</div>
 	
-	<!-- Download status -->
+    <!-- Download result -->
 	<div class="row" th:if="${downloadResult != null}">
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.download.status}"></div>
 		<div class="mb-1 col-xl-9">
 			<span th:replace="fragment/tl-info-fragments :: task-result(result=${downloadResult})"></span>
-		</div>
-	</div>
-	<div class="row" th:if="${downloadResult.isError()}">
-		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.download.exception.first.occurrence}"></div>
-		<div class="mb-1 col-xl-9">
-			<p class="m-0" th:text="${#dates.format(downloadResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
 		</div>
 	</div>
 	<div class="row" th:if="${downloadResult.isError()}">
@@ -112,16 +108,11 @@
 		</div>
 	</div>
 	
+    <!-- Parsing result -->
 	<div class="row" th:if="${parsingResult != null}">
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.parsing.status}"></div>
 		<div class="mb-1 col-xl-9">
 			<span th:replace="fragment/tl-info-fragments :: task-result(result=${parsingResult})"></span>
-		</div>
-	</div>
-	<div class="row" th:if="${parsingResult.isError()}">
-		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.parsing.exception.first.occurrence}"></div>
-		<div class="mb-1 col-xl-9">
-			<p class="m-0" th:text="${#dates.format(parsingResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
 		</div>
 	</div>
 	<div class="row" th:if="${parsingResult.isError()}">
@@ -131,16 +122,11 @@
 		</div>
 	</div>
 	
+    <!-- Validation result -->
 	<div class="row" th:if="${validationResult != null}">
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.validation.status}"></div>
 		<div class="mb-1 col-xl-9">
 			<span th:replace="fragment/tl-info-fragments :: task-result(result=${validationResult})"></span>
-		</div>
-	</div>
-	<div class="row" th:if="${validationResult.isError()}">
-		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.validation.exception.first.occurrence}"></div>
-		<div class="mb-1 col-xl-9">
-			<p class="m-0" th:text="${#dates.format(validationResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></p>
 		</div>
 	</div>
 	<div class="row" th:if="${validationResult.isError()}">
@@ -168,7 +154,7 @@
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="${url == 'lotl'}?#{label.summary.lotl.info.next.update} : #{label.summary.tl.info.next.update}"></div>
 		<div class="mb-1 col-xl-9">
 			<p class="m-0 next-update" th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></p>
-			<span class="badge badge-danger" th:if="${parsingResult.nextUpdateDate.before(#dates.createNow())}" th:text="${'EXPIRED'}"></span>
+            <span class="badge badge-danger" th:if="${parsingResult.nextUpdateDate.before(#dates.createNow())}" th:text="#{label.summary.tl.info}"></span>
 		</div>
 	</div>
 	<div class="row" th:if="${parsingResult.isResultExist()}">
@@ -231,7 +217,7 @@
         <div class="card-body tl-content collapse animate" th:id="'countryProviders' + ${sp.index}">
 			<div class="attributes">
 	      		<div class="row">
-	           		<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.name} + ' :'"></div>
+	           		<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.name} + ' :'"></div>
 	           		<div class="col-sm-12">
 	            		<ul>
 	             			<th:block th:each="name : ${serviceProvider.names}">
@@ -243,7 +229,7 @@
 		    		</div>
 	    		</div>
 	            <div class="row">
-	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.trade.name} + ' :'"></div>
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.trade.name} + ' :'"></div>
 	    			<div class="col-sm-12">
 	                  	<ul>
 	                   		<th:block th:each="tradeName : ${serviceProvider.tradeNames}">
@@ -255,7 +241,7 @@
 	    			</div>
 	            </div>
 	            <div class="row">
-	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.postal.address} + ' :'"></div>
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.postal.address} + ' :'"></div>
 	    			<div class="col-sm-12">
 						<ul>
 							<li th:each="postalAddress : ${serviceProvider.postalAddresses}">
@@ -265,7 +251,7 @@
 	    			</div>
 	            </div>
 	            <div class="row">
-	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.electronic.address} + ' :'"></div>
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.electronic.address} + ' :'"></div>
 		    		<div class="col-sm-12">
 	                	<ul>
 	                    	<th:block th:each="electronicAddress : ${serviceProvider.electronicAddresses}">
@@ -297,7 +283,7 @@
 		</div>
 		<div class="card-body tl-content collapse animate" th:id="'countryServices' + ${ser.index}">
            	<div class="row">
-                   	<div class="col-sm-12 font-weight-bold" th:text="#{label.certificate.electronic.address} + ' :'"></div>
+                   	<div class="col-sm-12 font-weight-bold" th:text="#{label.tsp.name} + ' :'"></div>
                    	<div class="col-sm-12">
                    		<ul>
                    			<th:block th:each="name : ${serviceStatus.names}">
