@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import eu.europa.esig.dss.detailedreport.DetailedReportFacade;
+import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
 import eu.europa.esig.dss.simplereport.SimpleReportFacade;
 
@@ -58,5 +60,16 @@ public class XSLTService {
 			return null;
 		}
 	}
+
+    public String generateSVG(String diagnosticDataXml) {
+        try (Writer writer = new StringWriter()) {
+            XmlDiagnosticData diagnosticData = DiagnosticDataFacade.newFacade().unmarshall(diagnosticDataXml);
+            DiagnosticDataFacade.newFacade().generateSVG(diagnosticData, new StreamResult(writer));
+            return writer.toString();
+        } catch (Exception e) {
+            LOG.error("Error while generating the SVG : " + e.getMessage(), e);
+            return null;
+        }
+    }
 
 }

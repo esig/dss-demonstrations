@@ -124,6 +124,32 @@
 						</div>
 					</div>
 				</div>
+                <div class="card mb-2">
+                    <div class="card-header collapsed cursor-pointer" data-toggle="collapse"
+                        data-target="#svg-card" aria-expanded='false'>
+                        <h3 th:text="#{label.validation.visualrepresentation}" th:remove="tag"></h3>
+                    </div>
+                    <div class="card-body collapse in" id="svg-card">
+                        <div class="row">
+                            <object th:data="@{/validation/diag-data.svg}" type="image/svg+xml" width="800" height="150" id="svg-diag-data" class="mx-auto">
+                                Your browser does not support SVGs
+                            </object>
+                        </div>
+                        <div class="form-group row">
+                               <label for="select-visualrepresentation" class="col-sm-3 col-form-label">Display :</label>
+                               <div class="col-sm-9">            
+                                <select  class="form-control" id="select-visualrepresentation">
+                                    <optgroup th:label="#{label.signatures.and.timestamps}" id="select-visualrepresentation-sigs">
+                                    
+                                    </optgroup>
+                                    <optgroup th:label="#{label.certificate.chains}"  id="select-visualrepresentation-chains">
+                                    
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 				<pre class="prettyprint lang-xml" th:text="${diagnosticDataXml}"></pre>
 			</div>
 			<div th:if="${etsiValidationReport} != null" role="tabcard" class="tab-pane fade report" id="etsi-validation-report">
@@ -131,8 +157,9 @@
 			</div>
 		</div>
 	</div>
-	<div layout:fragment="scripts">
-		<script type="text/javascript">
+	<div layout:fragment="scripts">            
+		<script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
 			$('#tabsResult a').click(function(e) {
 				e.preventDefault();
 				$(this).tab('show');
@@ -142,6 +169,78 @@
 			
 			/* Collapsed Bootstrap plugin, show all cards */
 			$(".tab-pane .card > .card-body.collapse").addClass("show");
+            
+            var currentCertificateId = /*[[${currentCertificate}]]*/;
+            var mySVG = document.getElementById("svg-diag-data");
+            var svgWidth = parseInt(mySVG.width);
+            var svgHeight = parseInt(mySVG.height);
+            var padding = 40;
+
+            mySVG.addEventListener("load",function() {
+                var representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
+                
+                if (currentCertificateId == null) {
+                    representation.displayFirstSignature();
+                } else {
+                    representation.displayCertificateChainById(currentCertificateId);
+                }
+                
+                var signatureIds = mySVG.contentDocument.getSignatureIds();
+                initSignatureSelect(signatureIds);
+                
+                var certificateIds = mySVG.contentDocument.getCertificateIds();
+                initCertChainSelect(certificateIds);
+            });
+
+            function initSignatureSelect(signatureIds) {
+                var optgroup = document.getElementById("select-visualrepresentation-sigs");
+                if (signatureIds == null || signatureIds.length == 0) {
+                    optgroup.style.display="none";
+                } else {
+                    optgroup.style.display="";
+                    for (var elementIdx = 0;  elementIdx < signatureIds.length; elementIdx++) {
+                        var sigId = signatureIds[elementIdx];
+                        var option = document.createElement("option");
+                        option.text = sigId;
+                        option.className = "sig";
+                        optgroup.appendChild(option);
+                    }
+                }
+            }
+
+            function initCertChainSelect(certificateIds) {
+                var optgroup = document.getElementById("select-visualrepresentation-chains");
+                if (certificateIds == null || certificateIds.length == 0) {
+                    optgroup.style.display="none";
+                } else {
+                    optgroup.style.display="";
+                    for (var elementIdx = 0;  elementIdx < certificateIds.length; elementIdx++) {
+                        var certificateId = certificateIds[elementIdx];
+                        var option = document.createElement("option");
+                        option.text = certificateId;
+                        option.className = "chain";
+                        optgroup.appendChild(option);
+                    }
+                }
+            }
+            
+            var selectVisual = document.getElementById("select-visualrepresentation");
+            
+            selectVisual.addEventListener("change", function() {
+                if (this.selectedOptions == null || this.selectedOptions.length != 1) {
+                    return;
+                }
+                var option = this.selectedOptions[0];
+                var representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
+                if ("sig" == option.className) {
+                    representation.displaySignatureById(option.value);
+                } else {
+                    representation.displayCertificateChainById(option.value);
+                }
+                
+            });
+
+            /*]]>*/
 		</script>
 	</div>
 </body>

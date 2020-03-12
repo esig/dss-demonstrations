@@ -112,7 +112,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 		CertificateReports reports = certificateValidator.validate();
 
 		// reports.print();
-
+		
+        model.addAttribute("currentCertificate", certificate.getDSSIdAsString());
 		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
