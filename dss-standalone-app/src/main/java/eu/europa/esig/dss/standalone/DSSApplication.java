@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.standalone.controller.SignatureController;
-import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
