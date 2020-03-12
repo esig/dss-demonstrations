@@ -15,7 +15,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import eu.europa.esig.dss.diagnostic.jaxb.XmlAbstractToken;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
-import eu.europa.esig.dss.diagnostic.jaxb.XmlOrphanToken;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlOrphanCertificateToken;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlOrphanRevocationToken;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlRevocation;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlSignature;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlSignerData;
@@ -62,8 +63,11 @@ public abstract class AbstractRestIT extends AbstractIT {
 			case SIGNED_DATA:
 				token = new XmlSignerData();
 				break;
-			case ORPHAN:
-				token = new XmlOrphanToken();
+			case ORPHAN_CERTIFICATE:
+				token = new XmlOrphanCertificateToken();
+				break;
+			case ORPHAN_REVOCATION:
+				token = new XmlOrphanRevocationToken();
 				break;
 			default:
 				throw new InvalidFormatException(jp, "Unsupported category value " + category, category, TimestampedObjectType.class);
