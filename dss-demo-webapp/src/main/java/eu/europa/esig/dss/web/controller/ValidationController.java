@@ -65,7 +65,7 @@ public class ValidationController extends AbstractValidationController {
 	private static final Logger LOG = LoggerFactory.getLogger(ValidationController.class);
 
 	private static final String VALIDATION_TILE = "validation";
-	private static final String VALIDATION_RESULT_TILE = "validation_result";
+	private static final String VALIDATION_RESULT_TILE = "validation-result";
 
 	@Autowired
 	private FOPService fopService;

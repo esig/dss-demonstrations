@@ -43,7 +43,7 @@ public class ReplayDiagController extends AbstractValidationController {
 	private static final Logger LOG = LoggerFactory.getLogger(ReplayDiagController.class);
 	
 	private static final String REPLAY_TILE = "replay-diagnostic-data";
-	private static final String VALIDATION_RESULT_TILE = "validation_result";
+	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String showReplayDiagForm(Model model, HttpServletRequest request) {

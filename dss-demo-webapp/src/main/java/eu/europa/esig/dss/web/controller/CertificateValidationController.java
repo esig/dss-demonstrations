@@ -45,8 +45,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 	private static final Logger LOG = LoggerFactory.getLogger(CertificateValidationController.class);
 
-	private static final String VALIDATION_TILE = "certificate_validation";
-	private static final String VALIDATION_RESULT_TILE = "validation_result";
+	private static final String VALIDATION_TILE = "certificate-validation";
+	private static final String VALIDATION_RESULT_TILE = "validation-result";
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {

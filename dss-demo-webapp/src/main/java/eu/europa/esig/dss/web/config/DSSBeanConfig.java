@@ -30,6 +30,8 @@ import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
+import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
+import eu.europa.esig.dss.service.http.commons.strategy.AcceptAllTrustStrategy;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
@@ -132,6 +134,14 @@ public class DSSBeanConfig {
 		dataLoader.setProxyConfig(proxyConfig);
 		return dataLoader;
 	}
+	
+	@Bean
+    public CommonsDataLoader trustAllDataLoader() {
+        CommonsDataLoader dataLoader = new CommonsDataLoader();
+		dataLoader.setProxyConfig(proxyConfig);
+		dataLoader.setTrustStrategy(new AcceptAllTrustStrategy());
+        return dataLoader;
+    }
 
 	@Bean
 	public OCSPDataLoader ocspDataLoader() {
@@ -351,5 +361,14 @@ public class DSSBeanConfig {
 		}
 		return tslCache;
 	}
+	
+    /* QWAC Validation */
+
+    @Bean
+    public SSLCertificateLoader sslCertificateLoader() {
+        SSLCertificateLoader sslCertificateLoader = new SSLCertificateLoader();
+        sslCertificateLoader.setCommonsDataLoader(trustAllDataLoader());
+        return sslCertificateLoader;
+    }
 
 }
