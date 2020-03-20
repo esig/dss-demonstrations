@@ -81,7 +81,7 @@ public class MOCCAPrivateKeyEntry implements DSSPrivateKeyEntry {
 	private void initialise(final byte[] signingCertBinary, final KeyboxName keyboxName, final byte[] atr) {
 
 		this.signingCert = DSSUtils.loadCertificate(signingCertBinary);
-		LOG.info(">>>Signing certificate subject name/serial number:  {} / {}", signingCert.getSubjectX500Principal().getName(), signingCert.getSerialNumber());
+		LOG.info(">>>Signing certificate subject name/serial number:  {} / {}", signingCert.getSubject().getRFC2253(), signingCert.getSerialNumber());
 		this.keyboxName = keyboxName;
 		if (keyboxName == null) {
 
