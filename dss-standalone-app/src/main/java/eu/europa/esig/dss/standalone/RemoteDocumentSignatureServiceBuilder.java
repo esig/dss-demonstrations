@@ -7,6 +7,7 @@ import java.security.KeyStore.PasswordProtection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.europa.esig.dss.alert.DSSExceptionAlert;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
@@ -83,7 +84,7 @@ public class RemoteDocumentSignatureServiceBuilder {
 		certificateVerifier.setTrustedCertSource(tslCertificateSource);
 
 		// Default configs
-		certificateVerifier.setExceptionOnMissingRevocationData(true);
+		certificateVerifier.setAlertOnMissingRevocationData(new DSSExceptionAlert());
 		certificateVerifier.setCheckRevocationForUntrustedChains(false);
 
 		return certificateVerifier;
