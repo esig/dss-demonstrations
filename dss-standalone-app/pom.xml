@@ -9,7 +9,7 @@
 	<name>DSS Standalone application</name>
 	
 	<properties>
-		<javafx.version>13.0.2</javafx.version>
+		<javafx.version>14</javafx.version>
 	</properties>
 
 	<build>
