@@ -1,7 +1,8 @@
 package eu.europa.esig.dss.web.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -11,13 +12,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import eu.europa.esig.dss.detailedreport.jaxb.XmlDetailedReport;
@@ -27,7 +28,7 @@ import eu.europa.esig.dss.web.config.DSSBeanConfig;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = { DSSBeanConfig.class })
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class XSLTServiceTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(XSLTServiceTest.class);

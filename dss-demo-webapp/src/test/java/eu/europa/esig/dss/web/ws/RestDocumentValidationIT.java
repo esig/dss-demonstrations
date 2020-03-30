@@ -1,7 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,8 +10,8 @@ import java.util.List;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.Indication;
@@ -29,7 +30,7 @@ public class RestDocumentValidationIT extends AbstractRestIT {
 
 	private RestDocumentValidationService validationService;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 

@@ -1,8 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,8 +15,8 @@ import javax.xml.crypto.dsig.CanonicalizationMethod;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
@@ -56,7 +56,7 @@ public class RestTimestampServiceIT extends AbstractRestIT {
 	
 	private RestTimestampService timestampService;
 	
-	@Before
+	@BeforeEach
 	public void init() {
 		JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 

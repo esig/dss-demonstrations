@@ -1,6 +1,6 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,8 +15,8 @@ import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
@@ -50,7 +50,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 	private SoapDocumentSignatureService soapClient;
 	private SoapMultipleDocumentsSignatureService soapMultiDocsClient;
 
-	@Before
+	@BeforeEach
 	public void init() {
 
 		JAXBDataBinding dataBinding = new JAXBDataBinding();

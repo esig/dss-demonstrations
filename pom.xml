@@ -66,8 +66,8 @@
 		<hikaricp.version>3.4.2</hikaricp.version>
 		<hsqldb.version>2.5.0</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
-
-		<junit.version>4.12</junit.version>
+		
+		<junit.jupiter.version>5.6.1</junit.jupiter.version>
 	</properties>
 
 	<licenses>
@@ -556,17 +556,11 @@
 				<artifactId>logback-classic</artifactId>
 				<version>${logback-classic.version}</version>
 			</dependency>
-
+			
 			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-test</artifactId>
-				<scope>test</scope>
-				<version>${dss.framework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.version}</version>
+			    <groupId>org.junit.jupiter</groupId>
+			    <artifactId>junit-jupiter-engine</artifactId>
+			    <version>${junit.jupiter.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>nz.net.ultraq.thymeleaf</groupId>

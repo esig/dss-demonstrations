@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.ws;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -18,10 +19,11 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.restdocs.JUnitRestDocumentation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
@@ -46,16 +48,13 @@ import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
 import io.restassured.specification.RequestSpecification;
 
+@ExtendWith(RestDocumentationExtension.class)
 public class RestDocumentationApp {
-
-	@Rule
-	public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("target/generated-snippets");
 
 	private RestDocumentationFilter documentationFilter;
 
@@ -65,23 +64,22 @@ public class RestDocumentationApp {
 
 	private Date signingDate;
 
-	@Before
-	public void setUp() throws IOException {
+	@BeforeEach
+	public void setUp(RestDocumentationContextProvider restDocumentation) throws Exception {
 		this.documentationFilter = document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
-		this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(this.restDocumentation)).addFilter(this.documentationFilter).build();
+		this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)).addFilter(this.documentationFilter).build();
 		this.token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"), new PasswordProtection("password".toCharArray()));
 		this.signingDate = new Date();
 	}
 
 	@Test
 	public void getKeys() throws Exception {
-		RestAssured.given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/keys").then().assertThat().statusCode(equalTo(200));
+		given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/keys").then().assertThat().statusCode(equalTo(200));
 	}
 
 	@Test
 	public void getKey() throws Exception {
-		RestAssured.given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate").then().assertThat()
-				.statusCode(equalTo(200));
+		given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate").then().assertThat().statusCode(equalTo(200));
 	}
 
 	@Test
@@ -89,14 +87,15 @@ public class RestDocumentationApp {
 		DigestAlgorithm digestAlgorithm = DigestAlgorithm.SHA256;
 		ToBeSigned tbs = new ToBeSigned(new byte[] { 1, 2, 3 });
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(tbs)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(
+				tbs)
 				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}", "certificate", digestAlgorithm).then().assertThat().statusCode(equalTo(200));
 	}
 
 	@Test
 	public void getDataToSignOneDocument() throws Exception {
 
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);	
+		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
 
 		DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
 
@@ -115,7 +114,8 @@ public class RestDocumentationApp {
 		toSignDocument.setBytes("Hello".getBytes("UTF-8"));
 		dataToSign.setToSignDocument(toSignDocument);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/getDataToSign").then().assertThat().statusCode(equalTo(200));
 
 	}
@@ -144,7 +144,8 @@ public class RestDocumentationApp {
 
 		signOneDoc.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/signDocument").then().assertThat().statusCode(equalTo(200));
 	}
 
@@ -172,7 +173,8 @@ public class RestDocumentationApp {
 		toExtendDocument.setName(signature.getName());
 		extendOneDoc.setToExtendDocument(toExtendDocument);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(extendOneDoc, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(extendOneDoc,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/extendDocument").then().assertThat().statusCode(equalTo(200));
 	}
 
@@ -207,7 +209,8 @@ public class RestDocumentationApp {
 		toSignDocuments.add(doc2);
 		dataToSignMultiDocs.setToSignDocuments(toSignDocuments);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSignMultiDocs, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSignMultiDocs,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/multiple-documents/getDataToSignMultiple").then().assertThat().statusCode(equalTo(200));
 	}
 
@@ -244,7 +247,8 @@ public class RestDocumentationApp {
 
 		signMultiDocsDto.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signMultiDocsDto, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signMultiDocsDto,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/multiple-documents/signDocument").then().assertThat().statusCode(equalTo(200));
 	}
 
@@ -266,7 +270,8 @@ public class RestDocumentationApp {
 
 		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));
 
 	}
@@ -282,7 +287,8 @@ public class RestDocumentationApp {
 		dataToValidateDTO.setCertificateChain(Arrays.asList(new RemoteCertificate(Base64.getDecoder().decode(
 				"MIIC6jCCAdKgAwIBAgIGLtYU17tXMA0GCSqGSIb3DQEBCwUAMDAxGzAZBgNVBAMMElJvb3RTZWxmU2lnbmVkRmFrZTERMA8GA1UECgwIRFNTLXRlc3QwHhcNMTcwNjA4MTEyNjAxWhcNNDcwNzA0MDc1NzI0WjAoMRMwEQYDVQQDDApTaWduZXJGYWtlMREwDwYDVQQKDAhEU1MtdGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMI3kZhtnipn+iiZHZ9ax8FlfE5Ow/cFwBTfAEb3R1ZQUp6/BQnBt7Oo0JWBtc9qkv7JUDdcBJXPV5QWS5AyMPHpqQ75Hitjsq/Fzu8eHtkKpFizcxGa9BZdkQjh4rSrtO1Kjs0Rd5DQtWSgkeVCCN09kN0ZsZ0ENY+Ip8QxSmyztsStkYXdULqpwz4JEXW9vz64eTbde4vQJ6pjHGarJf1gQNEc2XzhmI/prXLysWNqC7lZg7PUZUTrdegABTUzYCRJ1kWBRPm4qo0LN405c94QQd45a5kTgowHzEgLnAQI28x0M3A59TKC+ieNc6VF1PsTLpUw7PNI2VstX5jAuasCAwEAAaMSMBAwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQCK6LGA01TR+rmU8p6yhAi4OkDN2b1dbIL8l8iCMYopLCxx8xqq3ubZCOxqh1X2j6pgWzarb0b/MUix00IoUvNbFOxAW7PBZIKDLnm6LsckRxs1U32sC9d1LOHe3WKBNB6GZALT1ewjh7hSbWjftlmcovq+6eVGA5cvf2u/2+TkKkyHV/NR394nXrdsdpvygwypEtXjetzD7UT93Nuw3xcV8VIftIvHf9LjU7h+UjGmKXG9c15eYr3SzUmv6kyOI0Bvw14PWtsWGl0QdOSRvIBBrP4adCnGTgjgjk9LTcO8B8FKrr+8lHGuc0bp4lIUToiUkGILXsiEeEg9WAqm+XqO"))));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/certificate-validation/validateCertificate").then().assertThat().statusCode(equalTo(200));
 
 	}
@@ -312,7 +318,8 @@ public class RestDocumentationApp {
 		toSignDocument.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, doc));
 		dataToSign.setToSignDocument(toSignDocument);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/getDataToSign").then().assertThat().statusCode(equalTo(200));
 
 	}
@@ -344,7 +351,8 @@ public class RestDocumentationApp {
 
 		signOneDoc.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/signature/one-document/signDocument").then().assertThat().statusCode(equalTo(200));
 	}
 
@@ -367,7 +375,8 @@ public class RestDocumentationApp {
 
 		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));
 
 	}
@@ -387,7 +396,8 @@ public class RestDocumentationApp {
 
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO,
+				ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/getOriginalDocuments").then().assertThat().statusCode(equalTo(200));
 
 	}
