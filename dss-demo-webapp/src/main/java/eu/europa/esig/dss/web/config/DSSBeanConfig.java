@@ -327,11 +327,11 @@ public class DSSBeanConfig {
 
 	@Bean
 	public DSSFileLoader onlineLoader() {
-		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
-		offlineFileLoader.setCacheExpirationTime(0);
-		offlineFileLoader.setDataLoader(dataLoader());
-		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
-		return offlineFileLoader;
+		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
+		onlineFileLoader.setCacheExpirationTime(0);
+		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
+		return onlineFileLoader;
 	}
 
 	@Bean(name = "european-lotl-source")
