@@ -515,8 +515,10 @@ public class SignatureController implements Initializable {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(signedDocument.getName());
 		MimeType mimeType = signedDocument.getMimeType();
-		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(),
-				"*." + MimeType.getExtension(mimeType));
+		
+		String extension = MimeType.getExtension(mimeType);
+		String filterPattern = extension != null ? "*." + extension : "*";
+		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(), filterPattern);
 		fileChooser.getExtensionFilters().add(extFilter);
 		File fileToSave = fileChooser.showSaveDialog(stage);
 
