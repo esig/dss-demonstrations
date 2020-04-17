@@ -17,6 +17,16 @@
 	<dependencies>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-utils-google-guava</artifactId>
+		</dependency>
+	
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>				
+			<artifactId>dss-common-remote-converter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-signature-rest-client</artifactId>
 			<scope>test</scope>
 		</dependency>
