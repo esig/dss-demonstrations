@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import eu.europa.esig.dss.alert.DSSExceptionAlert;
+import eu.europa.esig.dss.alert.ExceptionOnStatusAlert;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
@@ -206,7 +206,7 @@ public class DSSBeanConfig {
 		certificateVerifier.setTrustedCertSources(trustedListSource());
 
 		// Default configs
-		certificateVerifier.setAlertOnMissingRevocationData(new DSSExceptionAlert());
+		certificateVerifier.setAlertOnMissingRevocationData(new ExceptionOnStatusAlert());
 		certificateVerifier.setCheckRevocationForUntrustedChains(false);
 
 		return certificateVerifier;
