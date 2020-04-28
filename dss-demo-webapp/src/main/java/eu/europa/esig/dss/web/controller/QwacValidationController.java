@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import eu.europa.esig.dss.CertificateReorderer;
+import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
@@ -25,6 +26,7 @@ import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.model.QwacValidationForm;
 
@@ -71,18 +73,18 @@ public class QwacValidationController extends AbstractValidationController {
 			List<CertificateToken> certificateChain = certificateReorderer.getOrderedCertificates();
 			CertificateToken qwacCertificate = certificateChain.iterator().next();
 			
-			CertificateVerifier cv = certificateVerifier;
-	        cv.setIncludeCertificateTokenValues(qwacValidationForm.isIncludeCertificateTokens());
-	        cv.setIncludeCertificateRevocationValues(qwacValidationForm.isIncludeRevocationTokens());
+			CertificateVerifier cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
 	        
-	        CommonCertificateSource commonCertificateSource = new CommonCertificateSource();
+	        CommonCertificateSource adjunctCertificateSource = new CommonCertificateSource();
 	        for (CertificateToken certificateToken : certificateChain) {
-	        	commonCertificateSource.addCertificate(certificateToken);
+	        	adjunctCertificateSource.addCertificate(certificateToken);
 	        }
-	        cv.setAdjunctCertSource(commonCertificateSource);
+	        cv.setAdjunctCertSource(adjunctCertificateSource);
 			
 			CertificateValidator certificateValidator = CertificateValidator.fromCertificate(qwacCertificate);
-			certificateValidator.setCertificateVerifier(certificateVerifier);
+			certificateValidator.setCertificateVerifier(cv);
+			certificateValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
+					qwacValidationForm.isIncludeRevocationTokens()));
 
 			CertificateReports reports = certificateValidator.validate();
 			

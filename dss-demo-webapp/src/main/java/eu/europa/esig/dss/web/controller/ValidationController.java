@@ -43,11 +43,11 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
+import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
@@ -103,12 +103,9 @@ public class ValidationController extends AbstractValidationController {
 
 		SignedDocumentValidator documentValidator = SignedDocumentValidator
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
-
-		CertificateVerifier cv = certificateVerifier;
-		cv.setIncludeCertificateTokenValues(validationForm.isIncludeCertificateTokens());
-		cv.setIncludeCertificateRevocationValues(validationForm.isIncludeRevocationTokens());
-		cv.setIncludeTimestampTokenValues(validationForm.isIncludeTimestampTokens());
-		documentValidator.setCertificateVerifier(cv);
+		documentValidator.setCertificateVerifier(certificateVerifier);
+		documentValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(validationForm.isIncludeCertificateTokens(),
+				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);

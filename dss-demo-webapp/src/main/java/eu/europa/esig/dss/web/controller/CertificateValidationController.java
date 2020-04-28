@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -33,6 +34,7 @@ import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.model.CertificateForm;
@@ -79,9 +81,10 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		CertificateToken certificate = getCertificate(certValidationForm.getCertificateForm());
 
+		CertificateSource adjunctCertSource = null;
 		List<MultipartFile> certificateChainFiles = certValidationForm.getCertificateChainFiles();
 		if (Utils.isCollectionNotEmpty(certificateChainFiles)) {
-			CertificateSource adjunctCertSource = new CommonCertificateSource();
+			adjunctCertSource = new CommonCertificateSource();
 			for (MultipartFile file : certificateChainFiles) {
 				CertificateToken certificateChainItem = getCertificate(file);
 				if (certificateChainItem != null) {
@@ -93,12 +96,19 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		LOG.trace("Start certificate validation");
 
-		CertificateVerifier cv = certificateVerifier;
-		cv.setIncludeCertificateTokenValues(certValidationForm.isIncludeCertificateTokens());
-		cv.setIncludeCertificateRevocationValues(certValidationForm.isIncludeRevocationTokens());
-		
+		CertificateVerifier cv = null;
+		if (adjunctCertSource == null) {
+			// reuse the default one
+			cv = certificateVerifier;
+		} else {
+			cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
+			cv.setAdjunctCertSource(adjunctCertSource);
+		}
+
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(cv);
+		certificateValidator.setTokenExtractionStategy(
+				TokenExtractionStategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
 
 		Locale locale = request.getLocale();
