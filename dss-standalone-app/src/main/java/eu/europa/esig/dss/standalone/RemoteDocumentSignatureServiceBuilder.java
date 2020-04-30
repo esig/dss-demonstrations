@@ -81,7 +81,7 @@ public class RemoteDocumentSignatureServiceBuilder {
 		certificateVerifier.setCrlSource(onlineCRLSource());
 		certificateVerifier.setOcspSource(onlineOcspSource());
 		certificateVerifier.setDataLoader(crlDataLoader());
-		certificateVerifier.setTrustedCertSource(tslCertificateSource);
+		certificateVerifier.setTrustedCertSources(tslCertificateSource);
 
 		// Default configs
 		certificateVerifier.setAlertOnMissingRevocationData(new ExceptionOnStatusAlert());

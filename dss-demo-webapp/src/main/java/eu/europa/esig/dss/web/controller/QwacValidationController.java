@@ -79,7 +79,7 @@ public class QwacValidationController extends AbstractValidationController {
 	        for (CertificateToken certificateToken : certificateChain) {
 	        	adjunctCertificateSource.addCertificate(certificateToken);
 	        }
-	        cv.setAdjunctCertSource(adjunctCertificateSource);
+	        cv.addAdjunctCertSources(adjunctCertificateSource);
 			
 			CertificateValidator certificateValidator = CertificateValidator.fromCertificate(qwacCertificate);
 			certificateValidator.setCertificateVerifier(cv);

@@ -91,7 +91,6 @@ public class CertificateValidationController extends AbstractValidationControlle
 					adjunctCertSource.addCertificate(certificateChainItem);
 				}
 			}
-			certificateVerifier.setAdjunctCertSource(adjunctCertSource);
 		}
 
 		LOG.trace("Start certificate validation");
@@ -102,7 +101,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 			cv = certificateVerifier;
 		} else {
 			cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
-			cv.setAdjunctCertSource(adjunctCertSource);
+			cv.addAdjunctCertSources(adjunctCertSource);
 		}
 
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
