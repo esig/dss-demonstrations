@@ -90,6 +90,8 @@ public class QwacValidationController extends AbstractValidationController {
 			
 			setAttributesModels(model, reports);
 
+			model.addAttribute("currentCertificate", qwacCertificate.getDSSIdAsString());
+
 			LOG.info("End certificate validation");
 
 			return VALIDATION_RESULT_TILE;
