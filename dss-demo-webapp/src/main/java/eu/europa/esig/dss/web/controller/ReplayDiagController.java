@@ -100,6 +100,7 @@ public class ReplayDiagController extends AbstractValidationController {
 		
 		// Set validation date
 		Date validationDate = (replayDiagForm.isResetDate()) ? new Date() : dd.getValidationDate();
+		dd.setValidationDate(validationDate);
 		executor.setCurrentTime(validationDate);
 		
 		// Set policy
