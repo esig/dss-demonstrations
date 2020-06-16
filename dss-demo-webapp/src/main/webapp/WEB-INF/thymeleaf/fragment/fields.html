@@ -303,7 +303,7 @@
 <div class="form-group row" th:fragment="field-detached-original-files">
     <label class="col-sm-3 col-form-label" for="originalFiles" th:text="#{label.original.files}"></label>
     <div class="col-sm-5">
-        <input type="file" class="form-control-file" id="detachedOriginalFiles" multiple="multiple" />
+        <input type="file" class="form-control-file" id="detachedOriginalFiles" name="detachedOriginalFiles" multiple="multiple" />
     </div>
     <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>

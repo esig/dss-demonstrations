@@ -66,6 +66,9 @@ public class ValidationController extends AbstractValidationController {
 
 	private static final String VALIDATION_TILE = "validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
+	
+	private static final String[] ALLOWED_FIELDS = { "signedFile", "detachedOriginalFiles", "digestToSend", "validationLevel", 
+			"includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens" };
 
 	@Autowired
 	private FOPService fopService;
@@ -74,8 +77,13 @@ public class ValidationController extends AbstractValidationController {
 	private Resource defaultPolicy;
 
 	@InitBinder
-	public void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
+	public void initBinder(WebDataBinder webDataBinder) {
+		webDataBinder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
+	}
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

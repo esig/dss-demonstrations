@@ -49,6 +49,9 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 	private static final String VALIDATION_TILE = "certificate-validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
+	
+	private static final String[] ALLOWED_FIELDS = { "certificateForm.certificateFile", "certificateForm.certificateBase64", "certificateChainFiles",
+			"validationTime", "includeCertificateTokens", "includeRevocationTokens" };
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -56,6 +59,11 @@ public class CertificateValidationController extends AbstractValidationControlle
 		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 		dateFormat.setLenient(false);
 		webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+	}
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
