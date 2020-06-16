@@ -47,7 +47,7 @@ public class ReplayDiagController extends AbstractValidationController {
 	private static final String REPLAY_TILE = "replay-diagnostic-data";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
-	private static final String[] ALLOWED_FIELDS = { "diagnosticFile", "resetDate", "validationLevel", "defaultPolicy" };
+	private static final String[] ALLOWED_FIELDS = { "diagnosticFile", "resetDate", "validationLevel", "defaultPolicy", "policyFile" };
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {

@@ -67,8 +67,8 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_TILE = "validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
-	private static final String[] ALLOWED_FIELDS = { "signedFile", "detachedOriginalFiles", "digestToSend", "validationLevel", 
-			"includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens" };
+	private static final String[] ALLOWED_FIELDS = { "signedFile", "detachedOriginalFiles", "digestToSend", "validationLevel", "defaultPolicy",
+			"policyFile", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens" };
 
 	@Autowired
 	private FOPService fopService;
