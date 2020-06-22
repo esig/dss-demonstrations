@@ -125,3 +125,7 @@ form#sign-pdf-form p#filename {
 	opacity: 0.6;
 }
 /* End TL-Loading */
+
+.tooltip-inner {
+   max-width: 400px;
+}

@@ -68,7 +68,8 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
 	private static final String[] ALLOWED_FIELDS = { "signedFile", "detachedOriginalFiles", "digestToSend", "validationLevel", "defaultPolicy",
-			"policyFile", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens" };
+			"policyFile", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
+			"includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -114,6 +115,7 @@ public class ValidationController extends AbstractValidationController {
 		documentValidator.setCertificateVerifier(certificateVerifier);
 		documentValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(validationForm.isIncludeCertificateTokens(),
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
+		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);
