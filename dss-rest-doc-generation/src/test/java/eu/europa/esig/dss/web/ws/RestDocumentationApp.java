@@ -34,6 +34,7 @@ import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
+import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -43,6 +44,7 @@ import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
 import eu.europa.esig.dss.ws.converter.ColorConverter;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
 import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
+import eu.europa.esig.dss.ws.dto.DigestDTO;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
@@ -53,9 +55,13 @@ import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
+import eu.europa.esig.dss.ws.timestamp.dto.TimestampResponseDTO;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -420,6 +426,50 @@ public class RestDocumentationApp {
 		List<RemoteDocument> originals = response.andReturn().as(List.class);
 		assertNotNull(originals);
 		assertEquals(1, originals.size());
+	}
+
+	@Test
+	public void getTimestampResponse() {
+
+		DigestDTO digestToTimestamp = new DigestDTO(DigestAlgorithm.SHA256, DSSUtils.digest(DigestAlgorithm.SHA256, "Hello world".getBytes()));
+
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestToTimestamp, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/timestamp-service/getTimestampResponse");
+		response.then().assertThat().statusCode(equalTo(200));
+		TimestampResponseDTO timestampResponse = response.andReturn().as(TimestampResponseDTO.class);
+		assertNotNull(timestampResponse);
+		assertNotNull(timestampResponse.getBinaries());
+	}
+
+	@Test
+	public void timestampOneDocument() {
+		RemoteDocument pdfToTimestamp = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.pdf"));
+
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.PDF, DigestAlgorithm.SHA256);
+		TimestampOneDocumentDTO dto = new TimestampOneDocumentDTO(pdfToTimestamp, timestampParameters);
+
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dto, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/signature/one-document/timestampDocument");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteDocument timestampResponse = response.andReturn().as(RemoteDocument.class);
+		assertNotNull(timestampResponse);
+		assertNotNull(timestampResponse.getBytes());
+	}
+
+	@Test
+	public void timestampMultipleDocuments() {
+		RemoteDocument pdfToTimestamp = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.pdf"));
+		RemoteDocument xmlToTimestamp = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
+
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_E, DigestAlgorithm.SHA256);
+		TimestampMultipleDocumentDTO dto = new TimestampMultipleDocumentDTO(Arrays.asList(pdfToTimestamp, xmlToTimestamp), timestampParameters);
+
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dto, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/signature/multiple-documents/timestampDocument");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteDocument timestampResponse = response.andReturn().as(RemoteDocument.class);
+		assertNotNull(timestampResponse);
+		assertNotNull(timestampResponse.getBytes());
 	}
 
 	private byte[] toByteArray(File file) throws IOException {

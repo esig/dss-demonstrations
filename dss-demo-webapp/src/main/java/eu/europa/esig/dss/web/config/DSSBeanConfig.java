@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
 import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
-import eu.europa.esig.dss.service.http.commons.strategy.AcceptAllTrustStrategy;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
@@ -140,7 +140,7 @@ public class DSSBeanConfig {
     public CommonsDataLoader trustAllDataLoader() {
         CommonsDataLoader dataLoader = new CommonsDataLoader();
 		dataLoader.setProxyConfig(proxyConfig);
-		dataLoader.setTrustStrategy(new AcceptAllTrustStrategy());
+		dataLoader.setTrustStrategy(TrustAllStrategy.INSTANCE);
         return dataLoader;
     }
 
