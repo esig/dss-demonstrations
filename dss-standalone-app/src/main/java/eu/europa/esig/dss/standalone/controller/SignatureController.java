@@ -248,7 +248,9 @@ public class SignatureController implements Initializable {
 			}
 		});
 		
-		List<DigestAlgorithm> skipAlgos = Arrays.asList(DigestAlgorithm.MD2, DigestAlgorithm.MD5, DigestAlgorithm.RIPEMD160);
+		List<DigestAlgorithm> skipAlgos = Arrays.asList(DigestAlgorithm.MD2, DigestAlgorithm.MD5,
+				DigestAlgorithm.RIPEMD160, DigestAlgorithm.SHAKE128, DigestAlgorithm.SHAKE256,
+				DigestAlgorithm.SHAKE256_512);
 		for (DigestAlgorithm digestAlgo : DigestAlgorithm.values()) {
 			if (skipAlgos.contains(digestAlgo)) {
 				continue;
