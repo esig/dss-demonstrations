@@ -19,9 +19,9 @@
 	
 	<repositories>
 		<repository>
-            <id>E-Government Innovationszentrum - EGIZ</id>
-            <url>https://apps.egiz.gv.at/maven/</url>
-        </repository>
+    		<id>local-repo</id>
+    		<url>file://${maven.multiModuleProjectDirectory}/maven-repo</url>
+    	</repository>
 	</repositories>
 
 	<dependencies>
