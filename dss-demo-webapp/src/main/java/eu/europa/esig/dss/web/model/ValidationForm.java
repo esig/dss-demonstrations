@@ -27,6 +27,8 @@ public class ValidationForm {
 	
 	private boolean includeTimestampTokens;
 
+	private boolean includeSemantics;
+
 	public MultipartFile getSignedFile() {
 		return signedFile;
 	}
@@ -89,6 +91,14 @@ public class ValidationForm {
 
 	public void setIncludeTimestampTokens(boolean includeTimestampTokens) {
 		this.includeTimestampTokens = includeTimestampTokens;
+	}
+
+	public boolean isIncludeSemantics() {
+		return includeSemantics;
+	}
+
+	public void setIncludeSemantics(boolean includeSemantics) {
+		this.includeSemantics = includeSemantics;
 	}
 
 	@AssertTrue(message = "{error.signed.file.mandatory}")

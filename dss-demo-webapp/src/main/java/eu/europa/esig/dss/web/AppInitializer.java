@@ -37,6 +37,9 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 		// avoid urls with jsessionid param
 		servletContext.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+		
+		// avoid Cross-site Scripting (XSS)
+		servletContext.setInitParameter("defaultHtmlEscape", "true");
 	}
 	
 	@Override

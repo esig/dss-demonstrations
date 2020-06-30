@@ -1,8 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -15,8 +15,8 @@ import javax.ws.rs.InternalServerErrorException;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
@@ -35,7 +35,7 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 
 	private RestCertificateValidationService validationService;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 
@@ -155,22 +155,11 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		assertNotNull(diagnosticData.getValidationDate());
 	}
 	
-	@Test(expected = InternalServerErrorException.class)
+	@Test
 	public void testWithNoCertificateProvided() {
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(null);
 		
-		CertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
-
-		assertNotNull(reportsDTO.getDiagnosticData());
-		assertNotNull(reportsDTO.getSimpleCertificateReport());
-		assertNotNull(reportsDTO.getDetailedReport());
-		
-		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = diagnosticData.getUsedCertificates();
-		assertEquals(0, usedCertificates);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertEquals(0, chain.size());
-		assertNotNull(diagnosticData.getValidationDate());
+		assertThrows(InternalServerErrorException.class, () -> validationService.validateCertificate(certificateToValidateDTO));
 	}
 
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +45,14 @@ public class ReplayDiagController extends AbstractValidationController {
 	private static final Logger LOG = LoggerFactory.getLogger(ReplayDiagController.class);
 	
 	private static final String REPLAY_TILE = "replay-diagnostic-data";
-	private static final String VALIDATION_RESULT_TILE = "validation_result";
+	private static final String VALIDATION_RESULT_TILE = "validation-result";
+	
+	private static final String[] ALLOWED_FIELDS = { "diagnosticFile", "resetDate", "validationLevel", "defaultPolicy", "policyFile" };
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
+	}
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String showReplayDiagForm(Model model, HttpServletRequest request) {
@@ -91,6 +100,7 @@ public class ReplayDiagController extends AbstractValidationController {
 		
 		// Set validation date
 		Date validationDate = (replayDiagForm.isResetDate()) ? new Date() : dd.getValidationDate();
+		dd.setValidationDate(validationDate);
 		executor.setCurrentTime(validationDate);
 		
 		// Set policy

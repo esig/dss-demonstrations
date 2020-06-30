@@ -216,7 +216,7 @@
         </div>
         <div class="card-body tl-content collapse animate" th:id="'countryProviders' + ${sp.index}">
 			<div class="attributes">
-	      		<div class="row">
+	      		<div class="row" th:if="${serviceProvider.names != null && !serviceProvider.names.isEmpty()}">
 	           		<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.name} + ' :'"></div>
 	           		<div class="col-sm-12">
 	            		<ul>
@@ -228,7 +228,7 @@
 			    		</ul>
 		    		</div>
 	    		</div>
-	            <div class="row">
+	            <div class="row" th:if="${serviceProvider.tradeNames != null && !serviceProvider.tradeNames.isEmpty()}">
 	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.trade.name} + ' :'"></div>
 	    			<div class="col-sm-12">
 	                  	<ul>
@@ -237,6 +237,16 @@
 	                   				<p class="m-0" th:text="'(' + ${tradeName.key} + ')' + ' - ' + ${n}"></p>
 	                   			</li>
 	                   		</th:block>
+		    			</ul>
+	    			</div>
+	            </div>
+	            <div class="row" th:if="${not #lists.isEmpty(serviceProvider.registrationIdentifiers)}">
+	            	<div class="col-sm-12 font-weight-bold" th:text="#{label.service.provider.registration.identifier} + ' :'"></div>
+	    			<div class="col-sm-12">
+	                  	<ul>
+							<li th:each="registrationIdentifier : ${serviceProvider.registrationIdentifiers}">
+								<p class="m-0" th:text="${registrationIdentifier}"></p> 
+							</li>
 		    			</ul>
 	    			</div>
 	            </div>

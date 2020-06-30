@@ -1,12 +1,16 @@
 package eu.europa.esig.dss.web.ws;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,237 +19,326 @@ import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.restdocs.JUnitRestDocumentation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
+import eu.europa.esig.dss.enumerations.SignerTextPosition;
+import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.model.FileDocument;
-import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
+import eu.europa.esig.dss.ws.converter.ColorConverter;
+import eu.europa.esig.dss.ws.converter.DTOConverter;
+import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
+import eu.europa.esig.dss.ws.dto.DigestDTO;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
+import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
+import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
-import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
+import eu.europa.esig.dss.ws.timestamp.dto.TimestampResponseDTO;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+@ExtendWith(RestDocumentationExtension.class)
 public class RestDocumentationApp {
-
-	@Rule
-	public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("target/generated-snippets");
 
 	private RestDocumentationFilter documentationFilter;
 
 	private RequestSpecification spec;
 
-	private Pkcs12SignatureToken token;
-
-	private Date signingDate;
-
-	@Before
-	public void setUp() throws IOException {
-		this.documentationFilter = document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
-		this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(this.restDocumentation)).addFilter(this.documentationFilter).build();
-		this.token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"), new PasswordProtection("password".toCharArray()));
-		this.signingDate = new Date();
+	@BeforeEach
+	public void setUp(RestDocumentationContextProvider restDocumentation) throws Exception {
+		this.documentationFilter = document("{method-name}/{step}/", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+		this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)).addFilter(this.documentationFilter).build();
 	}
 
 	@Test
 	public void getKeys() throws Exception {
-		RestAssured.given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/keys").then().assertThat().statusCode(equalTo(200));
+		given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/keys").then().assertThat().statusCode(equalTo(200));
 	}
 
 	@Test
 	public void getKey() throws Exception {
-		RestAssured.given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate").then().assertThat()
-				.statusCode(equalTo(200));
+		Response response = given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteKeyEntry entry = response.andReturn().as(RemoteKeyEntry.class);
+		assertNotNull(entry);
+		assertNotNull(entry.getCertificate());
+		assertNotNull(entry.getEncryptionAlgo());
+		assertEquals("certificate", entry.getAlias());
 	}
 
 	@Test
-	public void sign() throws Exception {
-		DigestAlgorithm digestAlgorithm = DigestAlgorithm.SHA256;
-		ToBeSigned tbs = new ToBeSigned(new byte[] { 1, 2, 3 });
+	public void signAndExtendOneDocument() throws Exception {
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(tbs)
-				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}", "certificate", digestAlgorithm).then().assertThat().statusCode(equalTo(200));
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
+
+			DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
+			dataToSign.setParameters(parameters);
+
+			RemoteDocument toSignDocument = new RemoteDocument();
+			toSignDocument.setBytes("Hello".getBytes("UTF-8"));
+			dataToSign.setToSignDocument(toSignDocument);
+
+			// get data to sign
+
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).accept(
+					ContentType.JSON)
+					.body(dataToSign, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/one-document/getDataToSign");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(toBeSignedDTO);
+
+			// sign locally
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(toBeSignedDTO), parameters.getDigestAlgorithm(), dssPrivateKeyEntry);
+			assertNotNull(signatureValue);
+
+			SignOneDocumentDTO signOneDoc = new SignOneDocumentDTO();
+			signOneDoc.setToSignDocument(toSignDocument);
+			signOneDoc.setParameters(parameters);
+			signOneDoc.setSignatureValue(DTOConverter.toSignatureValueDTO(signatureValue));
+
+			// sign document
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).accept(ContentType.JSON)
+					.accept(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2).post("/services/rest/signature/one-document/signDocument");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertNotNull(signedDocument.getBytes());
+
+			ExtendDocumentDTO extendOneDoc = new ExtendDocumentDTO();
+			parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_T);
+			extendOneDoc.setParameters(parameters);
+			extendOneDoc.setToExtendDocument(signedDocument);
+
+			// extend signed document
+			Response extendResponse = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).accept(ContentType.JSON)
+					.body(extendOneDoc, ObjectMapperType.JACKSON_2).post("/services/rest/signature/one-document/extendDocument");
+			extendResponse.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument extendedDocument = extendResponse.andReturn().as(RemoteDocument.class);
+			assertNotNull(extendedDocument);
+			assertNotNull(extendedDocument.getBytes());
+
+		}
 	}
 
 	@Test
-	public void getDataToSignOneDocument() throws Exception {
+	public void signPdfVisible() throws Exception {
 
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);	
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
+
+			DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
+
+			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
+			imageParameters.setPage(1);
+			imageParameters.setxAxis(200.F);
+			imageParameters.setyAxis(100.F);
+			imageParameters.setWidth(130);
+			imageParameters.setHeight(50);
+
+			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
+			textParameters.setText("Signature");
+			textParameters.setSignerTextPosition(SignerTextPosition.TOP);
+			textParameters.setSignerTextHorizontalAlignment(SignerTextHorizontalAlignment.CENTER);
+			textParameters.setTextColor(ColorConverter.toRemoteColor(Color.BLUE));
+			textParameters.setBackgroundColor(ColorConverter.toRemoteColor(Color.WHITE));
+			imageParameters.setTextParameters(textParameters);
+			parameters.setImageParameters(imageParameters);
+			dataToSign.setParameters(parameters);
+
+			RemoteDocument toSignDocument = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.pdf"));
+			dataToSign.setToSignDocument(toSignDocument);
+
+			// get data to sign
+
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).accept(ContentType.JSON)
+					.body(dataToSign, ObjectMapperType.JACKSON_2).post("/services/rest/signature/one-document/getDataToSign");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(toBeSignedDTO);
+
+			// sign locally
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(toBeSignedDTO), parameters.getDigestAlgorithm(), dssPrivateKeyEntry);
+			assertNotNull(signatureValue);
+
+			SignOneDocumentDTO signOneDoc = new SignOneDocumentDTO();
+			signOneDoc.setToSignDocument(toSignDocument);
+			signOneDoc.setParameters(parameters);
+			signOneDoc.setSignatureValue(DTOConverter.toSignatureValueDTO(signatureValue));
+
+			// sign document
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).accept(ContentType.JSON)
+					.accept(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2).post("/services/rest/signature/one-document/signDocument");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertNotNull(signedDocument.getBytes());
+		}
+	}
+
+	@Test
+	public void signDigestDocumentRemotely() throws Exception {
+
+		// retrieve key to be used on server A
+		Response response = given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteKeyEntry entry = response.andReturn().as(RemoteKeyEntry.class);
+		assertNotNull(entry);
+		assertNotNull(entry.getCertificate());
+		assertNotNull(entry.getEncryptionAlgo());
+		assertEquals("certificate", entry.getAlias());
 
 		DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
-
 		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
 		parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_B);
-		parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
 		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
-
-		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
-		bLevelParams.setSigningDate(signingDate);
-		parameters.setBLevelParams(bLevelParams);
+		parameters.setSigningCertificate(entry.getCertificate());
+		parameters.setCertificateChain(Arrays.asList(entry.getCertificateChain()));
 		dataToSign.setParameters(parameters);
 
+		FileDocument doc = new FileDocument("src/test/resources/sample.xml");
+
 		RemoteDocument toSignDocument = new RemoteDocument();
-		toSignDocument.setBytes("Hello".getBytes("UTF-8"));
+		toSignDocument.setDigestAlgorithm(DigestAlgorithm.SHA256);
+		toSignDocument.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, doc));
 		dataToSign.setToSignDocument(toSignDocument);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/one-document/getDataToSign").then().assertThat().statusCode(equalTo(200));
+		// get data to sign on server B
+		Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/signature/one-document/getDataToSign");
+		responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+		ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+		assertNotNull(toBeSignedDTO);
 
-	}
+		// sign on server A
+		Response responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(toBeSignedDTO)
+				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}", "certificate", parameters.getDigestAlgorithm());
 
-	@Test
-	public void signDocumentOneDocument() throws Exception {
-
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+		SignatureValueDTO signatureValue = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue);
+		assertNotNull(signatureValue.getAlgorithm());
+		assertNotNull(signatureValue.getValue());
 
 		SignOneDocumentDTO signOneDoc = new SignOneDocumentDTO();
-
-		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-		parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_B);
-		parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
-		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
-
-		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
-		bLevelParams.setSigningDate(signingDate);
-		parameters.setBLevelParams(bLevelParams);
 		signOneDoc.setParameters(parameters);
-
-		RemoteDocument toSignDocument = new RemoteDocument();
-		toSignDocument.setBytes("Hello".getBytes("UTF-8"));
 		signOneDoc.setToSignDocument(toSignDocument);
+		signOneDoc.setSignatureValue(signatureValue);
 
-		signOneDoc.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
-
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/one-document/signDocument").then().assertThat().statusCode(equalTo(200));
+		// sign document on server B
+		Response respondeSignDocuments = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/signature/one-document/signDocument");
+		respondeSignDocuments.then().assertThat().statusCode(equalTo(200));
+		RemoteDocument signedDocument = respondeSignDocuments.andReturn().as(RemoteDocument.class);
+		assertNotNull(signedDocument);
+		assertNotNull(signedDocument.getBytes());
 	}
 
 	@Test
-	public void extendOneDocument() throws Exception {
-		ExtendDocumentDTO extendOneDoc = new ExtendDocumentDTO();
-		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-		parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_T);
+	public void signMultipleDocuments() throws Exception {
 
-		List<RemoteDocument> detachedContents = new ArrayList<RemoteDocument>();
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
 
-		File detached = new File("src/test/resources/sample.xml");
-		RemoteDocument detachedDoc = new RemoteDocument();
-		detachedDoc.setBytes(toByteArray(detached));
-		detachedDoc.setName(detached.getName());
-		detachedContents.add(detachedDoc);
+			DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
 
-		parameters.setDetachedContents(detachedContents);
-		extendOneDoc.setParameters(parameters);
+			DataToSignMultipleDocumentsDTO dataToSignMultiDocs = new DataToSignMultipleDocumentsDTO();
 
-		File signature = new File("src/test/resources/xades-detached.xml");
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setAsicContainerType(ASiCContainerType.ASiC_E);
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
+			dataToSignMultiDocs.setParameters(parameters);
 
-		RemoteDocument toExtendDocument = new RemoteDocument();
-		toExtendDocument.setBytes(toByteArray(signature));
-		toExtendDocument.setName(signature.getName());
-		extendOneDoc.setToExtendDocument(toExtendDocument);
+			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			RemoteDocument doc1 = new RemoteDocument();
+			doc1.setBytes("Hello".getBytes("UTF-8"));
+			doc1.setName("test1.bin");
+			toSignDocuments.add(doc1);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(extendOneDoc, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/one-document/extendDocument").then().assertThat().statusCode(equalTo(200));
-	}
+			RemoteDocument doc2 = new RemoteDocument();
+			doc2.setBytes("World".getBytes("UTF-8"));
+			doc2.setName("test2.bin");
+			toSignDocuments.add(doc2);
+			dataToSignMultiDocs.setToSignDocuments(toSignDocuments);
 
-	@Test
-	public void getDataToSignMultiDocuments() throws Exception {
+			// get data to sign
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.body(dataToSignMultiDocs, ObjectMapperType.JACKSON_2).post("/services/rest/signature/multiple-documents/getDataToSignMultiple");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(toBeSignedDTO);
 
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
+			// sign locally
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(toBeSignedDTO), parameters.getDigestAlgorithm(), dssPrivateKeyEntry);
+			assertNotNull(signatureValue);
 
-		DataToSignMultipleDocumentsDTO dataToSignMultiDocs = new DataToSignMultipleDocumentsDTO();
+			SignMultipleDocumentDTO signMultiDocsDto = new SignMultipleDocumentDTO();
+			signMultiDocsDto.setToSignDocuments(toSignDocuments);
+			signMultiDocsDto.setParameters(parameters);
+			signMultiDocsDto.setSignatureValue(DTOConverter.toSignatureValueDTO(signatureValue));
 
-		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-		parameters.setAsicContainerType(ASiCContainerType.ASiC_E);
-		parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
-		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
-		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
-
-		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
-		bLevelParams.setSigningDate(signingDate);
-		parameters.setBLevelParams(bLevelParams);
-		dataToSignMultiDocs.setParameters(parameters);
-
-		List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
-		RemoteDocument doc1 = new RemoteDocument();
-		doc1.setBytes("Hello".getBytes("UTF-8"));
-		doc1.setName("test1.bin");
-		toSignDocuments.add(doc1);
-
-		RemoteDocument doc2 = new RemoteDocument();
-		doc2.setBytes("World".getBytes("UTF-8"));
-		doc2.setName("test2.bin");
-		toSignDocuments.add(doc2);
-		dataToSignMultiDocs.setToSignDocuments(toSignDocuments);
-
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSignMultiDocs, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/multiple-documents/getDataToSignMultiple").then().assertThat().statusCode(equalTo(200));
-	}
-
-	@Test
-	public void signDocumentMultiDocuments() throws Exception {
-
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
-
-		SignMultipleDocumentDTO signMultiDocsDto = new SignMultipleDocumentDTO();
-
-		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-		parameters.setAsicContainerType(ASiCContainerType.ASiC_E);
-		parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
-		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
-		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
-
-		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
-		bLevelParams.setSigningDate(signingDate);
-		parameters.setBLevelParams(bLevelParams);
-		signMultiDocsDto.setParameters(parameters);
-
-		List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
-		RemoteDocument doc1 = new RemoteDocument();
-		doc1.setBytes("Hello".getBytes("UTF-8"));
-		doc1.setName("test1.bin");
-		toSignDocuments.add(doc1);
-
-		RemoteDocument doc2 = new RemoteDocument();
-		doc2.setBytes("World".getBytes("UTF-8"));
-		doc2.setName("test2.bin");
-		toSignDocuments.add(doc2);
-		signMultiDocsDto.setToSignDocuments(toSignDocuments);
-
-		signMultiDocsDto.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
-
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signMultiDocsDto, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/multiple-documents/signDocument").then().assertThat().statusCode(equalTo(200));
+			// sign documents
+			Response respondeSignDocuments = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.body(signMultiDocsDto, ObjectMapperType.JACKSON_2).post("/services/rest/signature/multiple-documents/signDocument");
+			respondeSignDocuments.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument signedDocument = respondeSignDocuments.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertNotNull(signedDocument.getBytes());
+		}
 	}
 
 	@Test
@@ -266,7 +359,7 @@ public class RestDocumentationApp {
 
 		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));
 
 	}
@@ -282,70 +375,9 @@ public class RestDocumentationApp {
 		dataToValidateDTO.setCertificateChain(Arrays.asList(new RemoteCertificate(Base64.getDecoder().decode(
 				"MIIC6jCCAdKgAwIBAgIGLtYU17tXMA0GCSqGSIb3DQEBCwUAMDAxGzAZBgNVBAMMElJvb3RTZWxmU2lnbmVkRmFrZTERMA8GA1UECgwIRFNTLXRlc3QwHhcNMTcwNjA4MTEyNjAxWhcNNDcwNzA0MDc1NzI0WjAoMRMwEQYDVQQDDApTaWduZXJGYWtlMREwDwYDVQQKDAhEU1MtdGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMI3kZhtnipn+iiZHZ9ax8FlfE5Ow/cFwBTfAEb3R1ZQUp6/BQnBt7Oo0JWBtc9qkv7JUDdcBJXPV5QWS5AyMPHpqQ75Hitjsq/Fzu8eHtkKpFizcxGa9BZdkQjh4rSrtO1Kjs0Rd5DQtWSgkeVCCN09kN0ZsZ0ENY+Ip8QxSmyztsStkYXdULqpwz4JEXW9vz64eTbde4vQJ6pjHGarJf1gQNEc2XzhmI/prXLysWNqC7lZg7PUZUTrdegABTUzYCRJ1kWBRPm4qo0LN405c94QQd45a5kTgowHzEgLnAQI28x0M3A59TKC+ieNc6VF1PsTLpUw7PNI2VstX5jAuasCAwEAAaMSMBAwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQCK6LGA01TR+rmU8p6yhAi4OkDN2b1dbIL8l8iCMYopLCxx8xqq3ubZCOxqh1X2j6pgWzarb0b/MUix00IoUvNbFOxAW7PBZIKDLnm6LsckRxs1U32sC9d1LOHe3WKBNB6GZALT1ewjh7hSbWjftlmcovq+6eVGA5cvf2u/2+TkKkyHV/NR394nXrdsdpvygwypEtXjetzD7UT93Nuw3xcV8VIftIvHf9LjU7h+UjGmKXG9c15eYr3SzUmv6kyOI0Bvw14PWtsWGl0QdOSRvIBBrP4adCnGTgjgjk9LTcO8B8FKrr+8lHGuc0bp4lIUToiUkGILXsiEeEg9WAqm+XqO"))));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/certificate-validation/validateCertificate").then().assertThat().statusCode(equalTo(200));
 
-	}
-
-	@Test
-	public void getDataToSignDigestDocument() throws Exception {
-
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
-
-		DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
-
-		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-		parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_B);
-		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
-		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
-
-		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
-		bLevelParams.setSigningDate(signingDate);
-		parameters.setBLevelParams(bLevelParams);
-		dataToSign.setParameters(parameters);
-
-		FileDocument doc = new FileDocument("src/test/resources/sample.xml");
-
-		RemoteDocument toSignDocument = new RemoteDocument();
-		toSignDocument.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		toSignDocument.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, doc));
-		dataToSign.setToSignDocument(toSignDocument);
-
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToSign, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/one-document/getDataToSign").then().assertThat().statusCode(equalTo(200));
-
-	}
-
-	@Test
-	public void signDocumentDigestDocument() throws Exception {
-
-		DSSPrivateKeyEntry dssPrivateKeyEntry = token.getKeys().get(0);
-
-		SignOneDocumentDTO signOneDoc = new SignOneDocumentDTO();
-
-		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-		parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_B);
-		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
-		parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
-
-		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
-		bLevelParams.setSigningDate(signingDate);
-		parameters.setBLevelParams(bLevelParams);
-		signOneDoc.setParameters(parameters);
-
-		FileDocument doc = new FileDocument("src/test/resources/sample.xml");
-
-		RemoteDocument toSignDocument = new RemoteDocument();
-		toSignDocument.setDigestAlgorithm(DigestAlgorithm.SHA256);
-		toSignDocument.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, doc));
-		signOneDoc.setToSignDocument(toSignDocument);
-
-		signOneDoc.setSignatureValue(new SignatureValueDTO(SignatureAlgorithm.RSA_SHA256, new byte[] { 1, 2, 3, 4 }));
-
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(signOneDoc, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/signature/one-document/signDocument").then().assertThat().statusCode(equalTo(200));
 	}
 
 	@Test
@@ -367,12 +399,13 @@ public class RestDocumentationApp {
 
 		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));
 
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void getOriginalDocuments() throws IOException {
 
 		DataToValidateDTO dataToValidateDTO = new DataToValidateDTO();
@@ -383,13 +416,60 @@ public class RestDocumentationApp {
 		signedDoc.setName(signature.getName());
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
-		dataToValidateDTO.setSignatureId("id-ea10a0517cbc7f549ea3e685867ac95e");
+//		dataToValidateDTO.setSignatureId("id-signature");
 
 		dataToValidateDTO.setSignedDocument(signedDoc);
 
-		RestAssured.given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/validation/getOriginalDocuments").then().assertThat().statusCode(equalTo(200));
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/validation/getOriginalDocuments");
+		response.then().assertThat().statusCode(equalTo(200));
+		List<RemoteDocument> originals = response.andReturn().as(List.class);
+		assertNotNull(originals);
+		assertEquals(1, originals.size());
+	}
 
+	@Test
+	public void getTimestampResponse() {
+
+		DigestDTO digestToTimestamp = new DigestDTO(DigestAlgorithm.SHA256, DSSUtils.digest(DigestAlgorithm.SHA256, "Hello world".getBytes()));
+
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestToTimestamp, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/timestamp-service/getTimestampResponse");
+		response.then().assertThat().statusCode(equalTo(200));
+		TimestampResponseDTO timestampResponse = response.andReturn().as(TimestampResponseDTO.class);
+		assertNotNull(timestampResponse);
+		assertNotNull(timestampResponse.getBinaries());
+	}
+
+	@Test
+	public void timestampOneDocument() {
+		RemoteDocument pdfToTimestamp = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.pdf"));
+
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.PDF, DigestAlgorithm.SHA256);
+		TimestampOneDocumentDTO dto = new TimestampOneDocumentDTO(pdfToTimestamp, timestampParameters);
+
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dto, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/signature/one-document/timestampDocument");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteDocument timestampResponse = response.andReturn().as(RemoteDocument.class);
+		assertNotNull(timestampResponse);
+		assertNotNull(timestampResponse.getBytes());
+	}
+
+	@Test
+	public void timestampMultipleDocuments() {
+		RemoteDocument pdfToTimestamp = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.pdf"));
+		RemoteDocument xmlToTimestamp = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
+
+		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_E, DigestAlgorithm.SHA256);
+		TimestampMultipleDocumentDTO dto = new TimestampMultipleDocumentDTO(Arrays.asList(pdfToTimestamp, xmlToTimestamp), timestampParameters);
+
+		Response response = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dto, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/signature/multiple-documents/timestampDocument");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteDocument timestampResponse = response.andReturn().as(RemoteDocument.class);
+		assertNotNull(timestampResponse);
+		assertNotNull(timestampResponse.getBytes());
 	}
 
 	private byte[] toByteArray(File file) throws IOException {

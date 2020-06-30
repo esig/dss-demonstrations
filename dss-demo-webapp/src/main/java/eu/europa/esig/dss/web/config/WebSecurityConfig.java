@@ -23,12 +23,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// javadoc uses frames
 		http.headers().addHeaderWriter(javadocHeaderWriter());
+		http.headers().addHeaderWriter(svgHeaderWriter());
+		
 		http.headers().addHeaderWriter(serverEsigDSS());
+		
 	}
 
 	@Bean
 	public HeaderWriter javadocHeaderWriter() {
 		final AntPathRequestMatcher javadocAntPathRequestMatcher = new AntPathRequestMatcher("/apidocs/**");
+		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
+		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);
+	}
+
+	@Bean
+	public  HeaderWriter svgHeaderWriter() {
+		final AntPathRequestMatcher javadocAntPathRequestMatcher = new AntPathRequestMatcher("/validation/diag-data.svg");
 		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
 		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);
 	}

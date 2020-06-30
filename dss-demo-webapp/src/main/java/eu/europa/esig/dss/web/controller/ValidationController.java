@@ -17,6 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
@@ -38,11 +43,11 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
+import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
@@ -60,7 +65,11 @@ public class ValidationController extends AbstractValidationController {
 	private static final Logger LOG = LoggerFactory.getLogger(ValidationController.class);
 
 	private static final String VALIDATION_TILE = "validation";
-	private static final String VALIDATION_RESULT_TILE = "validation_result";
+	private static final String VALIDATION_RESULT_TILE = "validation-result";
+	
+	private static final String[] ALLOWED_FIELDS = { "signedFile", "detachedOriginalFiles", "digestToSend", "validationLevel", "defaultPolicy",
+			"policyFile", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
+			"includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -69,8 +78,13 @@ public class ValidationController extends AbstractValidationController {
 	private Resource defaultPolicy;
 
 	@InitBinder
-	public void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
+	public void initBinder(WebDataBinder webDataBinder) {
+		webDataBinder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
+	}
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -98,12 +112,10 @@ public class ValidationController extends AbstractValidationController {
 
 		SignedDocumentValidator documentValidator = SignedDocumentValidator
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
-
-		CertificateVerifier cv = certificateVerifier;
-		cv.setIncludeCertificateTokenValues(validationForm.isIncludeCertificateTokens());
-		cv.setIncludeCertificateRevocationValues(validationForm.isIncludeRevocationTokens());
-		cv.setIncludeTimestampTokenValues(validationForm.isIncludeTimestampTokens());
-		documentValidator.setCertificateVerifier(cv);
+		documentValidator.setCertificateVerifier(certificateVerifier);
+		documentValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(validationForm.isIncludeCertificateTokens(),
+				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
+		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);
@@ -185,6 +197,17 @@ public class ValidationController extends AbstractValidationController {
 			LOG.error("An error occured while outputing diagnostic data : " + e.getMessage(), e);
 		}
 	}
+	
+    @RequestMapping(value = "/diag-data.svg")
+    public @ResponseBody ResponseEntity<String> downloadSVG(HttpSession session, HttpServletResponse response) {
+        String report = (String) session.getAttribute(XML_DIAGNOSTIC_DATA_ATTRIBUTE);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf(MimeType.SVG.getMimeTypeString()));
+        ResponseEntity<String> svgEntity = new ResponseEntity<String>(xsltService.generateSVG(report), headers,
+                HttpStatus.OK);
+        return svgEntity;
+    }
 
 	@RequestMapping(value = "/download-certificate")
 	public void downloadCertificate(@RequestParam(value = "id") String id, HttpSession session, HttpServletResponse response) {

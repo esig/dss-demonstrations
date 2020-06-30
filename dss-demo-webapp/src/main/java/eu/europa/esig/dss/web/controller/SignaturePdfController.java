@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +53,8 @@ public class SignaturePdfController {
 
 	private static final String SIGNATURE_PDF_PARAMETERS = "signature-pdf";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
+	
+	private static final String[] ALLOWED_FIELDS = { "documentToSign" };
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
@@ -60,6 +64,11 @@ public class SignaturePdfController {
 
 	@Autowired
 	private SigningService signingService;
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
+	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String showSignatureParameters(Model model, HttpServletRequest request) {

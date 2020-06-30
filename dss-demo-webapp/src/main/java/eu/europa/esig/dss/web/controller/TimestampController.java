@@ -34,13 +34,20 @@ public class TimestampController {
 	private static final Logger LOG = LoggerFactory.getLogger(TimestampController.class);
 
 	private static final String TIMESTAMP_TILE = "timestamp";
+	
+	private static final String[] ALLOWED_FIELDS = { "originalFiles", "containerType" };
 
 	@Autowired
 	private SigningService signingService;
 
 	@InitBinder
-	public void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
+	public void initBinder(WebDataBinder webDataBinder) {
+		webDataBinder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
+	}
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

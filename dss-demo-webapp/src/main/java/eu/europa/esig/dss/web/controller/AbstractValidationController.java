@@ -35,7 +35,7 @@ public abstract class AbstractValidationController {
 	protected CertificateVerifier certificateVerifier;
 
 	@Autowired
-	private XSLTService xsltService;
+	protected XSLTService xsltService;
 
 	public void setAttributesModels(Model model, AbstractReports reports) {
 		String xmlSimpleReport = reports.getXmlSimpleReport();

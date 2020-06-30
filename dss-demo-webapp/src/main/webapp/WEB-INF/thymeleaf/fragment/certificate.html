@@ -4,10 +4,10 @@
 <!-- Certificate Token -->
 <dl class="row mb-0 text-break" th:fragment="certificate(certificateToken)">
 	<dt class="col-sm-3 m-0" th:text="#{label.subject.name}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSubjectX500Principal().getName()}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSubject().getPrettyPrintRFC2253()}"></dd>
 	
 	<dt class="col-sm-3 m-0" th:text="#{label.issuer.name}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateToken.getIssuerX500Principal().getName()}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getIssuer().getPrettyPrintRFC2253()}"></dd>
 	
 	<dt class="col-sm-3 m-0" th:text="#{label.ser.num}"></dt>
 	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSerialNumber()}"></dd>

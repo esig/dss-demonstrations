@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +19,13 @@ import eu.europa.esig.dss.utils.Utils;
 @Controller
 @RequestMapping(value = "/data")
 public class DataController {
+	
+	private static final String[] ALLOWED_FIELDS = { "form", "isSign" };
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
+	}
 
 	@RequestMapping(value = "/packagingsByForm", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody

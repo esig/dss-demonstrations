@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.qwac.validate}">
+	<body>		
+		<div layout:fragment="content">
+			<form method="post"
+				enctype="multipart/form-data"
+				th:action="@{/qwac-validation}"
+				th:object="${qwacValidationForm}">
+
+				<div th:replace="fragment/fields::field-qwac-url"></div>
+				<div th:replace="fragment/fields::field-certificate-tokens"></div>
+				<div th:replace="fragment/fields::field-revocation-data-tokens"></div>
+
+				<div th:replace="fragment/fields::submit-reset"></div>
+			</form>
+		</div>
+	</body>
+</html>

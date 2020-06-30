@@ -60,11 +60,11 @@ public class JobBuilder {
 	}
 
 	private DSSFileLoader onlineLoader() {
-		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
-		offlineFileLoader.setCacheExpirationTime(0);
-		offlineFileLoader.setDataLoader(dataLoader());
-		offlineFileLoader.setFileCacheDirectory(cacheDirectory);
-		return offlineFileLoader;
+		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
+		onlineFileLoader.setCacheExpirationTime(0);
+		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setFileCacheDirectory(cacheDirectory);
+		return onlineFileLoader;
 	}
 
 	private DSSFileLoader offlineLoader() {

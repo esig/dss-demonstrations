@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.6</version>
+		<version>5.7.RC1</version>
 	</parent>
 
 	<name>DSS Package: OOTB Web-Application</name>
@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jre_x64_windows_hotspot_8u242b08.zip</jre.download.link>
-		<jre.root.folder>jdk8u242-b08-jre</jre.root.folder>
-		<tomcat.version>8.5.50</tomcat.version>
+		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u252-b09.1/OpenJDK8U-jre_x86-32_windows_hotspot_8u252b09.zip</jre.download.link>
+		<jre.root.folder>jdk8u252-b09-jre</jre.root.folder>
+		<tomcat.version>8.5.56</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -104,11 +104,11 @@
 	
 	<profiles>
 		<profile>
-			<id>java13</id>
+			<id>java14</id>
 			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.2%2B8/OpenJDK13U-jre_x64_windows_hotspot_13.0.2_8.zip</jre.download.link>
-				<jre.root.folder>jdk-13.0.2+8-jre</jre.root.folder>
-				<tomcat.version>9.0.30</tomcat.version>
+				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk14-binaries/releases/download/jdk-14.0.1%2B7.1/OpenJDK14U-jre_x86-32_windows_hotspot_14.0.1_7.zip</jre.download.link>
+				<jre.root.folder>jdk-14.0.1+7-jre</jre.root.folder>
+				<tomcat.version>9.0.36</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>

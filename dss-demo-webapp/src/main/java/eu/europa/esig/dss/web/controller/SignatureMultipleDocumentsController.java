@@ -56,6 +56,9 @@ public class SignatureMultipleDocumentsController {
 
 	private static final String SIGNATURE_PARAMETERS = "signature-multiple-documents";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
+	
+	private static final String[] ALLOWED_FIELDS = { "documentsToSign", "containerType", "signatureForm", 
+			"signatureLevel", "digestAlgorithm", "signWithExpiredCertificate", "addContentTimestamp" };
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
@@ -70,12 +73,17 @@ public class SignatureMultipleDocumentsController {
 	private SigningService signingService;
 
 	@InitBinder
-	public void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(SignatureForm.class, new EnumPropertyEditor(SignatureForm.class));
-		binder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
-		binder.registerCustomEditor(SignatureLevel.class, new EnumPropertyEditor(SignatureLevel.class));
-		binder.registerCustomEditor(DigestAlgorithm.class, new EnumPropertyEditor(DigestAlgorithm.class));
-		binder.registerCustomEditor(EncryptionAlgorithm.class, new EnumPropertyEditor(EncryptionAlgorithm.class));
+	public void initBinder(WebDataBinder webDataBinder) {
+		webDataBinder.registerCustomEditor(SignatureForm.class, new EnumPropertyEditor(SignatureForm.class));
+		webDataBinder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
+		webDataBinder.registerCustomEditor(SignatureLevel.class, new EnumPropertyEditor(SignatureLevel.class));
+		webDataBinder.registerCustomEditor(DigestAlgorithm.class, new EnumPropertyEditor(DigestAlgorithm.class));
+		webDataBinder.registerCustomEditor(EncryptionAlgorithm.class, new EnumPropertyEditor(EncryptionAlgorithm.class));
+	}
+	
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -177,7 +185,7 @@ public class SignatureMultipleDocumentsController {
 
 	@ModelAttribute("digestAlgos")
 	public DigestAlgorithm[] getDigestAlgorithms() {
-		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
+		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
 				DigestAlgorithm.SHA512 };
 		return algos;
 	}

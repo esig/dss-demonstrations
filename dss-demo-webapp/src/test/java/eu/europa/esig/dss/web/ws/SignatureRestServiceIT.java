@@ -1,9 +1,10 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore.PasswordProtection;
@@ -14,8 +15,8 @@ import java.util.List;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestParser;
@@ -25,6 +26,8 @@ import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
+import eu.europa.esig.dss.enumerations.SignerTextPosition;
 import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
@@ -37,7 +40,9 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.ManifestEntry;
 import eu.europa.esig.dss.validation.ManifestFile;
 import eu.europa.esig.dss.web.config.CXFConfig;
+import eu.europa.esig.dss.ws.converter.ColorConverter;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
+import eu.europa.esig.dss.ws.converter.RemoteCertificateConverter;
 import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
@@ -50,6 +55,8 @@ import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
@@ -60,7 +67,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 	private RestDocumentSignatureService restClient;
 	private RestMultipleDocumentSignatureService restMultiDocsClient;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 
@@ -218,6 +225,54 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 		}
 	}
 	
+	@Test
+	public void testVisibleSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			parameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(dssPrivateKeyEntry.getCertificate()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
+			imageParameters.setPage(1);
+			imageParameters.setxAxis(200.F);
+			imageParameters.setyAxis(100.F);
+			imageParameters.setWidth(130);
+			imageParameters.setHeight(50);
+
+			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
+			textParameters.setText("Signature");
+			textParameters.setSignerTextPosition(SignerTextPosition.TOP);
+			textParameters.setSignerTextHorizontalAlignment(SignerTextHorizontalAlignment.CENTER);
+			textParameters.setTextColor(ColorConverter.toRemoteColor(Color.BLUE));
+			textParameters.setBackgroundColor(ColorConverter.toRemoteColor(Color.WHITE));
+			imageParameters.setTextParameters(textParameters);
+			parameters.setImageParameters(imageParameters);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.pdf"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+
+			DataToSignOneDocumentDTO dataToSignDTO = new DataToSignOneDocumentDTO(toSignDocument, parameters);
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(dataToSignDTO);
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signOneDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signOneDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			iMD.save("target/pades-rest-visible.pdf");
+		}
+	}
+
 	@Test
 	public void testTimestamping() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.PDF, DigestAlgorithm.SHA512);

@@ -248,7 +248,9 @@ public class SignatureController implements Initializable {
 			}
 		});
 		
-		List<DigestAlgorithm> skipAlgos = Arrays.asList(DigestAlgorithm.MD2, DigestAlgorithm.MD5, DigestAlgorithm.RIPEMD160);
+		List<DigestAlgorithm> skipAlgos = Arrays.asList(DigestAlgorithm.MD2, DigestAlgorithm.MD5,
+				DigestAlgorithm.RIPEMD160, DigestAlgorithm.SHAKE128, DigestAlgorithm.SHAKE256,
+				DigestAlgorithm.SHAKE256_512);
 		for (DigestAlgorithm digestAlgo : DigestAlgorithm.values()) {
 			if (skipAlgos.contains(digestAlgo)) {
 				continue;
@@ -515,8 +517,10 @@ public class SignatureController implements Initializable {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(signedDocument.getName());
 		MimeType mimeType = signedDocument.getMimeType();
-		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(),
-				"*." + MimeType.getExtension(mimeType));
+		
+		String extension = MimeType.getExtension(mimeType);
+		String filterPattern = extension != null ? "*." + extension : "*";
+		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(), filterPattern);
 		fileChooser.getExtensionFilters().add(extFilter);
 		File fileToSave = fileChooser.showSaveDialog(stage);
 
