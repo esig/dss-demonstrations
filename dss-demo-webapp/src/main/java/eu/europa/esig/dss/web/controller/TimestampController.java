@@ -23,7 +23,7 @@ import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.editor.ASiCContainerTypePropertyEditor;
 import eu.europa.esig.dss.web.model.TimestampForm;
 import eu.europa.esig.dss.web.service.SigningService;
 
@@ -42,7 +42,7 @@ public class TimestampController {
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
-		webDataBinder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
+		webDataBinder.registerCustomEditor(ASiCContainerType.class, new ASiCContainerTypePropertyEditor());
 	}
 	
 	@InitBinder
