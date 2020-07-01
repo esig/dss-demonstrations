@@ -35,18 +35,15 @@ public class SignatureMultipleDocumentsForm extends AbstractSignatureForm {
 
 	@AssertTrue(message = "{error.to.sign.files.mandatory}")
 	public boolean isDocumentsToSign() {
-		boolean valid = Utils.isCollectionNotEmpty(documentsToSign);
-		if (valid) {
-			boolean atLeastOneNotEmptyFile = false;
+		if (Utils.isCollectionNotEmpty(documentsToSign)) {
 			for (MultipartFile multipartFile : documentsToSign) {
 				if (multipartFile != null && !multipartFile.isEmpty()) {
-					atLeastOneNotEmptyFile = true;
-					break;
+					// return true if at least one file is not empty
+					return true;
 				}
 			}
-			valid = atLeastOneNotEmptyFile;
 		}
-		return valid;
+		return false;
 	}
 
 }
