@@ -40,6 +40,7 @@ import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.editor.ASiCContainerTypePropertyEditor;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
@@ -76,7 +77,7 @@ public class SignatureController {
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
 		webDataBinder.registerCustomEditor(SignatureForm.class, new EnumPropertyEditor(SignatureForm.class));
-		webDataBinder.registerCustomEditor(ASiCContainerType.class, new EnumPropertyEditor(ASiCContainerType.class));
+		webDataBinder.registerCustomEditor(ASiCContainerType.class, new ASiCContainerTypePropertyEditor());
 		webDataBinder.registerCustomEditor(SignaturePackaging.class, new EnumPropertyEditor(SignaturePackaging.class));
 		webDataBinder.registerCustomEditor(SignatureLevel.class, new EnumPropertyEditor(SignatureLevel.class));
 		webDataBinder.registerCustomEditor(DigestAlgorithm.class, new EnumPropertyEditor(DigestAlgorithm.class));
