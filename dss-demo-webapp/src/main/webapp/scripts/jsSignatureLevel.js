@@ -1,6 +1,8 @@
 
 $('input[name="signaturePackaging"]:radio').attr("disabled", true);
 
+$('input[name="containerType"]:radio').filter('[value="none"]').attr('checked', true);
+
 $('#selectSignatureLevel').empty();
 
 function isAsicContainer() {
