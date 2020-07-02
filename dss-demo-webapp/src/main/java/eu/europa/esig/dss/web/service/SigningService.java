@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.jades.JAdESSignatureParameters;
+import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.DigestDocument;
@@ -41,6 +45,7 @@ import eu.europa.esig.dss.web.model.AbstractSignatureForm;
 import eu.europa.esig.dss.web.model.ExtensionForm;
 import eu.europa.esig.dss.web.model.SignatureDigestForm;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
+import eu.europa.esig.dss.web.model.SignatureJAdESForm;
 import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
 import eu.europa.esig.dss.web.model.TimestampForm;
 import eu.europa.esig.dss.x509.tsp.MockTSPSource;
@@ -60,6 +65,9 @@ public class SigningService {
 
 	@Autowired
 	private XAdESService xadesService;
+
+	@Autowired
+	private JAdESService jadesService;
 
 	@Autowired
 	private ASiCWithCAdESService asicWithCAdESService;
@@ -138,6 +146,24 @@ public class SigningService {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public ToBeSigned getDataToSign(SignatureJAdESForm form) {
+		LOG.info("Start getDataToSign with one JAdES");
+		
+		MultipleDocumentsSignatureService service = jadesService;
+		JAdESSignatureParameters parameters = fillParameters(form);
+
+		ToBeSigned toBeSigned = null;
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			toBeSigned = service.getDataToSign(toSignDocuments, parameters);
+		} catch (Exception e) {
+			LOG.error("Unable to execute getDataToSign : " + e.getMessage(), e);
+		}
+		LOG.info("End getDataToSign with one JAdES");
+		return toBeSigned;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public TimestampToken getContentTimestamp(SignatureDocumentForm form) {
 		LOG.info("Start getContentTimestamp with one document");
 
@@ -175,6 +201,20 @@ public class SigningService {
 		TimestampToken contentTimestamp = service.getContentTimestamp(WebAppUtils.toDSSDocuments(form.getDocumentsToSign()), parameters);
 
 		LOG.info("End getContentTimestamp with  multiple documents");
+		return contentTimestamp;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public TimestampToken getContentTimestamp(SignatureJAdESForm form) {
+		LOG.info("Start getContentTimestamp with JAdES");
+
+		MultipleDocumentsSignatureService service = jadesService;
+		JAdESSignatureParameters parameters = fillParameters(form);
+		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+
+		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocuments, parameters);
+
+		LOG.info("End getContentTimestamp with JAdES");
 		return contentTimestamp;
 	}
 
@@ -224,6 +264,18 @@ public class SigningService {
 
 		fillParameters(parameters, form);
 
+		return parameters;
+	}
+	
+	private JAdESSignatureParameters fillParameters(SignatureJAdESForm form) {
+		JAdESSignatureParameters parameters = new JAdESSignatureParameters();
+		parameters.setSignaturePackaging(form.getSignaturePackaging());
+		parameters.setJwsSerializationType(form.getJwsSerializationType());
+		parameters.setSigDMechanism(form.getSigDMechanism());
+		parameters.setBase64UrlEncodedPayload(form.isBase64UrlEncodedPayload());
+		
+		fillParameters(parameters, form);
+		
 		return parameters;
 	}
 
@@ -297,6 +349,26 @@ public class SigningService {
 		return signedDocument;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public DSSDocument signDocument(SignatureJAdESForm form) {
+		LOG.info("Start signDocument with JAdES");
+		
+		MultipleDocumentsSignatureService service = jadesService;
+		JAdESSignatureParameters parameters = fillParameters(form);
+
+		DSSDocument signedDocument = null;
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+			signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
+		} catch (Exception e) {
+			LOG.error("Unable to execute signDocument : " + e.getMessage(), e);
+		}
+		LOG.info("End signDocument with JAdES");
+		return signedDocument;
+	}
+
 	@SuppressWarnings("rawtypes")
 	private DocumentSignatureService getSignatureService(ASiCContainerType containerType, SignatureForm signatureForm) {
 		DocumentSignatureService service = null;
@@ -312,6 +384,9 @@ public class SigningService {
 				break;
 			case XAdES:
 				service = xadesService;
+				break;
+			case JAdES:
+				service = jadesService;
 				break;
 			default:
 				LOG.error("Unknow signature form : " + signatureForm);
@@ -336,6 +411,9 @@ public class SigningService {
 				break;
 			case XAdES:
 				parameters = new XAdESSignatureParameters();
+				break;
+			case JAdES:
+				parameters = new JAdESSignatureParameters();
 				break;
 			default:
 				LOG.error("Unknow signature form : " + signatureForm);

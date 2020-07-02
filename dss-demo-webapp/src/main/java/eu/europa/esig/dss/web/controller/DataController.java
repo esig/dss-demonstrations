@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
@@ -46,6 +47,9 @@ public class DataController {
 				packagings.add(SignaturePackaging.DETACHED);
 				packagings.add(SignaturePackaging.INTERNALLY_DETACHED);
 				break;
+			case JAdES:
+				packagings.add(SignaturePackaging.ENVELOPING);
+				packagings.add(SignaturePackaging.DETACHED);
 			default:
 				break;
 			}
@@ -83,10 +87,44 @@ public class DataController {
 				levels.add(SignatureLevel.XAdES_BASELINE_LT);
 				levels.add(SignatureLevel.XAdES_BASELINE_LTA);
 				break;
+			case JAdES:
+				if (Utils.isTrue(isSign)) {
+					levels.add(SignatureLevel.JAdES_BASELINE_B);
+				}
+				// not available so far
+//				levels.add(SignatureLevel.JAdES_BASELINE_T);
+//				levels.add(SignatureLevel.JAdES_BASELINE_LT);
+//				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				break;
 			default:
 				break;
 			}
 		}
 		return levels;
 	}
+
+	@RequestMapping(value = "/levelsBySerialization", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<SignatureLevel> getAllowedLevelsByJWSSerialization(@RequestParam("serializationType") JWSSerializationType jwsSerializationType) {
+		List<SignatureLevel> levels = new ArrayList<SignatureLevel>();
+		if (jwsSerializationType != null) {
+			switch (jwsSerializationType) {
+			case COMPACT_SERIALIZATION:
+				levels.add(SignatureLevel.JAdES_BASELINE_B);
+				break;
+			case JSON_SERIALIZATION:
+			case FLATTENED_JSON_SERIALIZATION:
+				levels.add(SignatureLevel.JAdES_BASELINE_B);
+				// not supported so far
+//				levels.add(SignatureLevel.JAdES_BASELINE_T);
+//				levels.add(SignatureLevel.JAdES_BASELINE_LT);
+//				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				break;
+			default:
+				break;
+			}
+		}
+		return levels;
+	}
+	
 }

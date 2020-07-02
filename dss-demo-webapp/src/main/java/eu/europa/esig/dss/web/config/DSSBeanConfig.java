@@ -25,6 +25,7 @@ import eu.europa.esig.dss.alert.ExceptionOnStatusAlert;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
+import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
@@ -234,6 +235,13 @@ public class DSSBeanConfig {
 	@Bean
 	public PAdESService padesService() throws Exception {
 		PAdESService service = new PAdESService(certificateVerifier());
+		service.setTspSource(tspSource);
+		return service;
+	}
+
+	@Bean
+	public JAdESService jadesService() throws Exception {
+		JAdESService service = new JAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}

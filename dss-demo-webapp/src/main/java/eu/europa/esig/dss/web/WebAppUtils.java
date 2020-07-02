@@ -76,5 +76,17 @@ public final class WebAppUtils {
 		LOG.debug("OriginalDocumentsLoaded : {}", dssDocuments.size());
 		return dssDocuments;
 	}
+	
+	public static boolean isCollectionNotEmpty(List<MultipartFile> documents) {
+		if (Utils.isCollectionNotEmpty(documents)) {
+			for (MultipartFile multipartFile : documents) {
+				if (multipartFile != null && !multipartFile.isEmpty()) {
+					// return true if at least one file is not empty
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 }

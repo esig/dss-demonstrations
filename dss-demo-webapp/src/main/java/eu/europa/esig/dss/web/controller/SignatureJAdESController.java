@@ -27,9 +27,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
+import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
@@ -40,46 +41,45 @@ import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
-import eu.europa.esig.dss.web.editor.ASiCContainerTypePropertyEditor;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
-import eu.europa.esig.dss.web.model.SignatureDocumentForm;
+import eu.europa.esig.dss.web.model.SignatureJAdESForm;
 import eu.europa.esig.dss.web.model.SignatureValueAsString;
 import eu.europa.esig.dss.web.service.SigningService;
 
 @Controller
-@SessionAttributes(value = { "signatureDocumentForm", "signedDocument" })
-@RequestMapping(value = "/sign-a-document")
-public class SignatureController {
+@SessionAttributes(value = { "signatureJAdESForm", "signedJAdESDocument" })
+@RequestMapping(value = "/sign-with-jades")
+public class SignatureJAdESController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SignatureJAdESController.class);
 
-	private static final String SIGNATURE_PARAMETERS = "signature";
+	private static final String SIGNATURE_JAdES = "signature-jades";
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
-	private static final String[] ALLOWED_FIELDS = { "documentToSign", "containerType", "signatureForm", "signaturePackaging",
-			"signatureLevel", "digestAlgorithm", "signWithExpiredCertificate", "addContentTimestamp" };
+	private static final String[] ALLOWED_FIELDS = { "documentsToSign", "jwsSerializationType", "signaturePackaging",
+			"signatureLevel", "sigDMechanism", "base64UrlEncodedPayload", "digestAlgorithm", "signWithExpiredCertificate", "addContentTimestamp" };
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
 
 	@Value("${nexuDownloadUrl}")
-	private String downloadNexuUrl;
-	
-    @Value("${default.digest.algo}")
-    private String defaultDigestAlgo;
+	private String nexuDownloadUrl;
+
+	@Value("${default.digest.algo}")
+	private String defaultDigestAlgo;
 
 	@Autowired
 	private SigningService signingService;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
-		webDataBinder.registerCustomEditor(SignatureForm.class, new EnumPropertyEditor(SignatureForm.class));
-		webDataBinder.registerCustomEditor(ASiCContainerType.class, new ASiCContainerTypePropertyEditor());
-		webDataBinder.registerCustomEditor(SignaturePackaging.class, new EnumPropertyEditor(SignaturePackaging.class));
+		webDataBinder.registerCustomEditor(JWSSerializationType.class, new EnumPropertyEditor(JWSSerializationType.class));
+		webDataBinder.registerCustomEditor(SigDMechanism.class, new EnumPropertyEditor(SigDMechanism.class));
 		webDataBinder.registerCustomEditor(SignatureLevel.class, new EnumPropertyEditor(SignatureLevel.class));
+		webDataBinder.registerCustomEditor(SignaturePackaging.class, new EnumPropertyEditor(SignaturePackaging.class));
 		webDataBinder.registerCustomEditor(DigestAlgorithm.class, new EnumPropertyEditor(DigestAlgorithm.class));
 		webDataBinder.registerCustomEditor(EncryptionAlgorithm.class, new EnumPropertyEditor(EncryptionAlgorithm.class));
 	}
@@ -91,28 +91,36 @@ public class SignatureController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String showSignatureParameters(Model model, HttpServletRequest request) {
-		SignatureDocumentForm signatureDocumentForm = new SignatureDocumentForm();
-		signatureDocumentForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
-		model.addAttribute("signatureDocumentForm", signatureDocumentForm);
-		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
-		return SIGNATURE_PARAMETERS;
+		SignatureJAdESForm signatureJAdESForm = new SignatureJAdESForm();
+
+		// Pre-configure for JAdES
+		signatureJAdESForm.setSignatureForm(SignatureForm.JAdES);
+		signatureJAdESForm.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
+		signatureJAdESForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
+		signatureJAdESForm.setJwsSerializationType(JWSSerializationType.COMPACT_SERIALIZATION);
+
+		model.addAttribute("signatureJAdESForm", signatureJAdESForm);
+		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
+		return SIGNATURE_JAdES;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
-			@ModelAttribute("signatureDocumentForm") @Valid SignatureDocumentForm signatureDocumentForm, BindingResult result) {
+			@ModelAttribute("signatureJAdESForm") @Valid SignatureJAdESForm signatureJAdESForm, BindingResult result) {
 		if (result.hasErrors()) {
-			if (LOG.isDebugEnabled()) {
+//			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();
 				for (ObjectError error : allErrors) {
-					LOG.debug(error.getDefaultMessage());
+					LOG.warn(error.getDefaultMessage());
 				}
-			}
-			return SIGNATURE_PARAMETERS;
+//			}
+			return SIGNATURE_JAdES;
 		}
-		model.addAttribute("signatureDocumentForm", signatureDocumentForm);
-		model.addAttribute("digestAlgorithm", signatureDocumentForm.getDigestAlgorithm());
-		model.addAttribute("rootUrl", "sign-a-document");
+
+		model.addAttribute("signatureJAdESForm", signatureJAdESForm);
+		model.addAttribute("digestAlgorithm", signatureJAdESForm.getDigestAlgorithm());
+		model.addAttribute("rootUrl", "sign-with-jades");
+		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
 		model.addAttribute("nexuUrl", nexuUrl);
 		return SIGNATURE_PROCESS;
 	}
@@ -120,19 +128,26 @@ public class SignatureController {
 	@RequestMapping(value = "/get-data-to-sign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public GetDataToSignResponse getDataToSign(Model model, @RequestBody @Valid DataToSignParams params,
-			@ModelAttribute("signatureDocumentForm") @Valid SignatureDocumentForm signatureDocumentForm, BindingResult result) {
-		signatureDocumentForm.setBase64Certificate(params.getSigningCertificate());
-		signatureDocumentForm.setBase64CertificateChain(params.getCertificateChain());
-		signatureDocumentForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
-		signatureDocumentForm.setSigningDate(new Date());
+			@ModelAttribute("signatureJAdESForm") @Valid SignatureJAdESForm signatureJAdESForm, BindingResult result) {
 
-		if (signatureDocumentForm.isAddContentTimestamp()) {
-			signatureDocumentForm.setContentTimestamp(WebAppUtils.fromTimestampToken(signingService.getContentTimestamp(signatureDocumentForm)));
+		LOG.info("Serialization : {}", signatureJAdESForm.getJwsSerializationType());
+		LOG.info("SigD : {}", signatureJAdESForm.getSigDMechanism());
+		LOG.info("Level : {}", signatureJAdESForm.getSignatureLevel());
+		LOG.info("Form : {}", signatureJAdESForm.getSignatureForm());
+		LOG.info("Packaging : {}", signatureJAdESForm.getSignaturePackaging());
+		
+		signatureJAdESForm.setBase64Certificate(params.getSigningCertificate());
+		signatureJAdESForm.setBase64CertificateChain(params.getCertificateChain());
+		signatureJAdESForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
+		signatureJAdESForm.setSigningDate(new Date());
+
+		if (signatureJAdESForm.isAddContentTimestamp()) {
+			signatureJAdESForm.setContentTimestamp(WebAppUtils.fromTimestampToken(signingService.getContentTimestamp(signatureJAdESForm)));
 		}
 
-		model.addAttribute("signatureDocumentForm", signatureDocumentForm);
+		model.addAttribute("signatureJAdESForm", signatureJAdESForm);
 
-		ToBeSigned dataToSign = signingService.getDataToSign(signatureDocumentForm);
+		ToBeSigned dataToSign = signingService.getDataToSign(signatureJAdESForm);
 		if (dataToSign == null) {
 			return null;
 		}
@@ -145,13 +160,13 @@ public class SignatureController {
 	@RequestMapping(value = "/sign-document", method = RequestMethod.POST)
 	@ResponseBody
 	public SignDocumentResponse signDocument(Model model, @RequestBody @Valid SignatureValueAsString signatureValue,
-			@ModelAttribute("signatureDocumentForm") @Valid SignatureDocumentForm signatureDocumentForm, BindingResult result) {
+			@ModelAttribute("signatureJAdESForm") @Valid SignatureJAdESForm signatureJAdESForm, BindingResult result) {
 
-		signatureDocumentForm.setBase64SignatureValue(signatureValue.getSignatureValue());
+		signatureJAdESForm.setBase64SignatureValue(signatureValue.getSignatureValue());
 
-		DSSDocument document = signingService.signDocument(signatureDocumentForm);
-		InMemoryDocument signedDocument = new InMemoryDocument(DSSUtils.toByteArray(document), document.getName(), document.getMimeType());
-		model.addAttribute("signedDocument", signedDocument);
+		DSSDocument document = signingService.signDocument(signatureJAdESForm);
+		InMemoryDocument signedJAdESDocument = new InMemoryDocument(DSSUtils.toByteArray(document), document.getName(), document.getMimeType());
+		model.addAttribute("signedJAdESDocument", signedJAdESDocument);
 
 		SignDocumentResponse signedDocumentResponse = new SignDocumentResponse();
 		signedDocumentResponse.setUrlToDownload("download");
@@ -159,7 +174,7 @@ public class SignatureController {
 	}
 
 	@RequestMapping(value = "/download", method = RequestMethod.GET)
-	public String downloadSignedFile(@ModelAttribute("signedDocument") InMemoryDocument signedDocument, HttpServletResponse response) {
+	public String downloadSignedFile(@ModelAttribute("signedJAdESDocument") InMemoryDocument signedDocument, HttpServletResponse response) {
 		try {
 			MimeType mimeType = signedDocument.getMimeType();
 			if (mimeType != null) {
@@ -175,31 +190,25 @@ public class SignatureController {
 		return null;
 	}
 
-	@ModelAttribute("asicContainerTypes")
-	public ASiCContainerType[] getASiCContainerTypes() {
-		return ASiCContainerType.values();
-	}
-
-	@ModelAttribute("signatureForms")
-	public SignatureForm[] getSignatureForms() {
-		return new SignatureForm[] { SignatureForm.CAdES, SignatureForm.PAdES, SignatureForm.XAdES, SignatureForm.JAdES};
+	@ModelAttribute("jwsSerializationTypes")
+	public JWSSerializationType[] getJwsSerializationTypes() {
+		return JWSSerializationType.values();
 	}
 
 	@ModelAttribute("signaturePackagings")
 	public SignaturePackaging[] getSignaturePackagings() {
-		return SignaturePackaging.values();
+		return new SignaturePackaging[] { SignaturePackaging.ENVELOPING, SignaturePackaging.DETACHED };
+	}
+
+	@ModelAttribute("sigDMechanisms")
+	public SigDMechanism[] getSigdMechanisms() {
+		return new SigDMechanism[] { SigDMechanism.HTTP_HEADERS, SigDMechanism.OBJECT_ID_BY_URI, SigDMechanism.OBJECT_ID_BY_URI_HASH };
 	}
 
 	@ModelAttribute("digestAlgos")
 	public DigestAlgorithm[] getDigestAlgorithms() {
-		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
-				DigestAlgorithm.SHA512 };
+		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512 };
 		return algos;
-	}
-
-	@ModelAttribute("isMockUsed")
-	public boolean isMockUsed() {
-		return signingService.isMockTSPSourceUsed();
 	}
 
 }
