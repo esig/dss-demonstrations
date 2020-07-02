@@ -649,5 +649,12 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>quick</id>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+		</profile>
 	</profiles>
 </project>
