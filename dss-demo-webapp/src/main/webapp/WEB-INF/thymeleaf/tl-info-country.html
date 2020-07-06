@@ -17,6 +17,7 @@
 							th:text="${#lists.size(tlInfo.parsingCacheInfo.trustServiceProviders)}" title="Number of Trust Service Providers"></span>
 					<th:block th:if="${tlInfo.parsingCacheInfo != null}" th:with="country=${tlInfo.parsingCacheInfo.isResultExist()}?${tlInfo.parsingCacheInfo.territory}:'no_country'">
 						<span th:class="'small_flag flag_' + ${country}" th:title="${country != 'no_country'}?${tlInfo.parsingCacheInfo.territory}:'?'"></span>
+						<span th:if="${country != 'no_country'}" th:text="#{${'label.country.code.'+country}}" class="tl-card-country-name"></span>
 					</th:block>
 					<h3 th:if="${tlInfo.parsingCacheInfo == null}" class="card-title" th:text="Country Not Found"></h3>
 				</div>

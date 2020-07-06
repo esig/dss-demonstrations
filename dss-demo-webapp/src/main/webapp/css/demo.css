@@ -124,6 +124,25 @@ form#sign-pdf-form p#filename {
 .tl-info-preview:hover td:last-child:after {
 	opacity: 0.6;
 }
+.tl-info-country {
+    display: table-row;
+    text-align: center;
+    vertical-align: middle;
+}
+.tl-info-country > * {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+.tl-info-country > .tl-info-country-name-td {
+    width: 100%;
+    margin-left: 4px;
+}
+.tl-card-country-name {
+    color: #fff;
+    font-size: 18px;
+    margin-left: 10px;
+}
 /* End TL-Loading */
 
 .tooltip-inner {

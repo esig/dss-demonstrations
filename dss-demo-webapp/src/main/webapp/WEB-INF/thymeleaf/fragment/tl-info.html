@@ -21,9 +21,14 @@
 
 	<!-- Country -->
 	<td class="align-middle">
-		<a th:href="@{/tl-info/tl/} + ${id}">
-			<span th:class="${'small_flag flag_' + country}" th:title="${country != 'no_country'}?${country}:'?'"></span>
-		</a>
+		<a th:href="@{/tl-info/tl/} + ${id}" class="tl-info-country" th:title="${country != 'no_country'}?${country}:'?'">
+            <span>
+                <span th:class="${'small_flag flag_' + country}"></span>
+            </span>
+            <span class="tl-info-country-name-td">
+                <span th:text="#{${'label.country.code.'+country}}"></span>
+            </span>
+        </a>
 	</td>
 	
 	<!-- Seq num -->
