@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,12 +17,14 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestMatcher;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlSignature;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -35,11 +39,14 @@ import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.server.signing.rest.client.RestSignatureTokenConnection;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import eu.europa.esig.dss.ws.validation.dto.WSReportsDTO;
 import eu.europa.esig.dss.ws.validation.rest.client.RestDocumentValidationService;
@@ -47,6 +54,7 @@ import eu.europa.esig.dss.ws.validation.rest.client.RestDocumentValidationServic
 public class RestCompleteSignatureProcessIT extends AbstractRestIT {
 
 	private RestDocumentSignatureService restClient;
+	private RestMultipleDocumentSignatureService restMultiDocsClient;
 	private RestSignatureTokenConnection restServerSigning;
 	private RestDocumentValidationService restValidationService;
 
@@ -67,6 +75,21 @@ public class RestCompleteSignatureProcessIT extends AbstractRestIT {
 		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
 		restClient = factory.create(RestDocumentSignatureService.class);
+
+		
+		factory = new JAXRSClientFactoryBean();
+
+		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_MULTIPLE_DOCUMENTS);
+		factory.setServiceClass(RestMultipleDocumentSignatureService.class);
+		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		restMultiDocsClient = factory.create(RestMultipleDocumentSignatureService.class);
 		
 		
 		factory = new JAXRSClientFactoryBean();
@@ -210,7 +233,60 @@ public class RestCompleteSignatureProcessIT extends AbstractRestIT {
 		assertEquals(DSSUtils.loadCertificate(remoteKeyEntry.getCertificate().getEncodedCertificate()).getDSSIdAsString(), 
 				xmlSignature.getSigningCertificate().getCertificate().getId());
 		assertEquals(result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication(), Indication.INDETERMINATE);
-		
+	}
+
+	@Test
+	public void jadesSignMultipleAndValidateTest() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			toSignDocuments.add(toSignDocument);
+			toSignDocuments.add(toSignDoc2);
+			ToBeSignedDTO dataToSign = restMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restMultiDocsClient.signDocument(signDocument);
+
+			assertNotNull(signedDocument);
+
+			DataToValidateDTO toValidate = new DataToValidateDTO(signedDocument, toSignDocuments, null);
+
+			WSReportsDTO result = restValidationService.validateSignature(toValidate);
+
+			assertNotNull(result.getDiagnosticData());
+			assertNotNull(result.getDetailedReport());
+			assertNotNull(result.getSimpleReport());
+			assertNotNull(result.getValidationReport());
+
+			assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+			
+			XmlSignature signature = result.getDiagnosticData().getSignatures().get(0);
+			assertEquals(SignatureLevel.JAdES_BASELINE_B, signature.getSignatureFormat());
+			assertEquals(result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication(), Indication.INDETERMINATE);
+			
+			List<XmlDigestMatcher> digestMatchers = signature.getDigestMatchers();
+			assertEquals(3, digestMatchers.size());
+			
+			for (XmlDigestMatcher digestMatcher : digestMatchers) {
+				assertTrue(digestMatcher.isDataFound());
+				assertTrue(digestMatcher.isDataIntact());
+			}
+		}
 	}
 
 }

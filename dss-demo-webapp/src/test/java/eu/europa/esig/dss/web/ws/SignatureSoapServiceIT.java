@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.ws;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.awt.Color;
 import java.io.File;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
@@ -136,7 +138,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(extendedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
-			iMD.save("target/test.xml");
+			// iMD.save("target/test.xml");
+			assertNotNull(iMD);
 		}
 	}
 
@@ -177,7 +180,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(extendedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
-			iMD.save("target/test-digest.xml");
+			// iMD.save("target/test-digest.xml");
+			assertNotNull(iMD);
 		}
 	}
 
@@ -220,7 +224,8 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(extendedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
-			iMD.save("target/test.asice");
+			// iMD.save("target/test.asice");
+			assertNotNull(iMD);
 		}
 	}
 
@@ -268,7 +273,120 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			assertNotNull(signedDocument);
 
 			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
-			iMD.save("target/pades-soap-visible.pdf");
+			// iMD.save("target/pades-soap-visible.pdf");
+			assertNotNull(iMD);
+		}
+	}
+	
+	@Test
+	public void jadesParallelSigningTest() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = soapClient.signDocument(signDocument);
+			assertNotNull(signedDocument);
+
+			parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION);
+			
+			dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(signedDocument, parameters));
+			assertNotNull(dataToSign);
+
+			signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			signDocument = new SignOneDocumentDTO(signedDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument doubleSignedDocument = soapClient.signDocument(signDocument);
+
+			assertNotNull(doubleSignedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(doubleSignedDocument.getBytes());
+			// iMD.save("target/test.json");
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	public void jadesMultiDocumentsSignTest() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION);
+			parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			toSignDocuments.add(toSignDocument);
+			toSignDocuments.add(toSignDoc2);
+			ToBeSignedDTO dataToSign = soapMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = soapMultiDocsClient.signDocument(signDocument);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			// iMD.save("target/test.json");
+			assertNotNull(iMD);
+		}
+	}
+	
+	@Test
+	public void jadesMultiDocsEnvelopingSignTest() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+			new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+	
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION);
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+	
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			toSignDocuments.add(toSignDocument);
+			toSignDocuments.add(toSignDoc2);
+			
+			assertThrows(Exception.class, () -> soapMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters)));
 		}
 	}
 

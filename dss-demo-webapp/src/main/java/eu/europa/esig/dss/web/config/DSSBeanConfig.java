@@ -268,6 +268,7 @@ public class DSSBeanConfig {
 		service.setCadesService(cadesService());
 		service.setXadesService(xadesService());
 		service.setPadesService(padesService());
+		service.setJadesService(jadesService());
 		return service;
 	}
 
@@ -277,6 +278,7 @@ public class DSSBeanConfig {
 		service.setAsicWithCAdESService(asicWithCadesService());
 		service.setAsicWithXAdESService(asicWithXadesService());
 		service.setXadesService(xadesService());
+		service.setJadesService(jadesService());
 		return service;
 	}
 
