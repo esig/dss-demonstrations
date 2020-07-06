@@ -50,6 +50,7 @@
                </toggleGroup></RadioButton>
 				<RadioButton fx:id="padesRadio" mnemonicParsing="false" text="PAdES" toggleGroup="$toogleSigFormat" />
 				<RadioButton mnemonicParsing="false" text="XAdES" toggleGroup="$toogleSigFormat" fx:id="xadesRadio" />
+				<RadioButton mnemonicParsing="false" text="JAdES" toggleGroup="$toogleSigFormat" fx:id="jadesRadio" />
 			</children>
 		</HBox>
 		
