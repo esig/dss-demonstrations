@@ -251,6 +251,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 
 			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
 			textParameters.setText("Signature");
+			textParameters.setSize(24);
 			textParameters.setSignerTextPosition(SignerTextPosition.TOP);
 			textParameters.setSignerTextHorizontalAlignment(SignerTextHorizontalAlignment.CENTER);
 			textParameters.setTextColor(ColorConverter.toRemoteColor(Color.BLUE));

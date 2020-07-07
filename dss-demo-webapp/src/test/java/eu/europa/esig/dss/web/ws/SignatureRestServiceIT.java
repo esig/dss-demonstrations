@@ -250,6 +250,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 
 			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
 			textParameters.setText("Signature");
+			textParameters.setSize(24);
 			textParameters.setSignerTextPosition(SignerTextPosition.TOP);
 			textParameters.setSignerTextHorizontalAlignment(SignerTextHorizontalAlignment.CENTER);
 			textParameters.setTextColor(ColorConverter.toRemoteColor(Color.BLUE));
