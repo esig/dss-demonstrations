@@ -49,7 +49,7 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.7.RC1</dss.framework.version>
+		<dss.framework.version>5.7-SNAPSHOT</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>1.7.30</slf4j.version>
