@@ -20,6 +20,7 @@ import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.CAdESSignatureParameters;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
@@ -413,7 +414,9 @@ public class SigningService {
 				parameters = new XAdESSignatureParameters();
 				break;
 			case JAdES:
-				parameters = new JAdESSignatureParameters();
+				JAdESSignatureParameters jadesParameters = new JAdESSignatureParameters();
+				jadesParameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION); // to allow T+ levels
+				parameters = jadesParameters;
 				break;
 			default:
 				LOG.error("Unknow signature form : " + signatureForm);
