@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,8 +47,14 @@ import eu.europa.esig.dss.enumerations.TimestampType;
 import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.x509.CertificateSource;
+import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
+import eu.europa.esig.dss.validation.DocumentValidator;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
@@ -68,7 +75,7 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
 	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationLevel", "defaultPolicy",
-			"policyFile", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
+			"policyFile", "signingCertificate", "adjunctCertificates", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
 			"includeSemantics" };
 
 	@Autowired
@@ -112,10 +119,13 @@ public class ValidationController extends AbstractValidationController {
 
 		SignedDocumentValidator documentValidator = SignedDocumentValidator
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
-		documentValidator.setCertificateVerifier(certificateVerifier);
+		documentValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
 		documentValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(validationForm.isIncludeCertificateTokens(),
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
+
+		setSigningCertificate(documentValidator, validationForm);
+		setDetachedContents(documentValidator, validationForm);
 		
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);
@@ -125,36 +135,70 @@ public class ValidationController extends AbstractValidationController {
 		}
 		documentValidator.setLocale(locale);
 
+		Reports reports = validate(documentValidator, validationForm);
+		setAttributesModels(model, reports);
+
+		return VALIDATION_RESULT_TILE;
+	}
+	
+	private void setDetachedContents(DocumentValidator documentValidator, ValidationForm validationForm) {
 		List<DSSDocument> originalFiles = WebAppUtils.originalFilesToDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
 			documentValidator.setDetachedContents(originalFiles);
 		}
 		documentValidator.setValidationLevel(validationForm.getValidationLevel());
-
+	}
+	
+	private void setSigningCertificate(DocumentValidator documentValidator, ValidationForm validationForm) {
+		CertificateToken signingCertificate = WebAppUtils.toCertificateToken(validationForm.getSigningCertificate());
+		if (signingCertificate != null) {
+			CertificateSource signingCertificateSource = new CommonCertificateSource();
+			signingCertificateSource.addCertificate(signingCertificate);
+			documentValidator.setSigningCertificateSource(signingCertificateSource);
+		}
+	}
+	
+	private CertificateVerifier getCertificateVerifier(ValidationForm certValidationForm) {
+		CertificateSource adjunctCertSource = WebAppUtils.toCertificateSource(certValidationForm.getAdjunctCertificates());
+	
+		CertificateVerifier cv;
+		if (adjunctCertSource == null) {
+			// reuse the default one
+			cv = certificateVerifier;
+		} else {
+			cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
+			cv.setAdjunctCertSources(adjunctCertSource);
+		}
+		
+		return cv;
+	}
+	
+	private Reports validate(DocumentValidator documentValidator, ValidationForm validationForm) {
 		Reports reports = null;
 
+		Date start = new Date();
 		DSSDocument policyFile = WebAppUtils.toDSSDocument(validationForm.getPolicyFile());
-		if (!validationForm.isDefaultPolicy() && (policyFile != null)) {
-			try (InputStream is = policyFile.openStream()) {
-				reports = documentValidator.validateDocument(is);
+        if (!validationForm.isDefaultPolicy() && (policyFile != null)) {
+            try (InputStream is = policyFile.openStream()) {
+                reports = documentValidator.validateDocument(is);
 			} catch (IOException e) {
 				LOG.error(e.getMessage(), e);
 			}
 		} else if (defaultPolicy != null) {
-			try (InputStream is = defaultPolicy.getInputStream()) {
-				reports = documentValidator.validateDocument(is);
-			} catch (IOException e) {
-				LOG.error("Unable to parse policy : " + e.getMessage(), e);
-			}
+            try (InputStream is = defaultPolicy.getInputStream()) {
+                reports = documentValidator.validateDocument(is);
+            } catch (IOException e) {
+                LOG.error("Unable to parse policy : " + e.getMessage(), e);
+            }
 		} else {
 			LOG.error("Not correctly initialized");
 		}
-
-		// reports.print();
-
-		setAttributesModels(model, reports);
-
-		return VALIDATION_RESULT_TILE;
+		
+		Date end = new Date();
+	    long duration = end.getTime() - start.getTime();
+		LOG.info("Validation process duration : {}ms", duration);
+		
+		return reports;
 	}
 
 	@RequestMapping(value = "/download-simple-report")

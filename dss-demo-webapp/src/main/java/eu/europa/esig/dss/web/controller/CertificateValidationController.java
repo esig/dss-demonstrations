@@ -1,6 +1,5 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,20 +22,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
-import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
-import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.web.exception.BadRequestException;
+import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.CertificateForm;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 
@@ -89,31 +85,10 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		CertificateToken certificate = getCertificate(certValidationForm.getCertificateForm());
 
-		CertificateSource adjunctCertSource = null;
-		List<MultipartFile> certificateChainFiles = certValidationForm.getCertificateChainFiles();
-		if (Utils.isCollectionNotEmpty(certificateChainFiles)) {
-			adjunctCertSource = new CommonCertificateSource();
-			for (MultipartFile file : certificateChainFiles) {
-				CertificateToken certificateChainItem = getCertificate(file);
-				if (certificateChainItem != null) {
-					adjunctCertSource.addCertificate(certificateChainItem);
-				}
-			}
-		}
-
 		LOG.trace("Start certificate validation");
 
-		CertificateVerifier cv = null;
-		if (adjunctCertSource == null) {
-			// reuse the default one
-			cv = certificateVerifier;
-		} else {
-			cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
-			cv.addAdjunctCertSources(adjunctCertSource);
-		}
-
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
-		certificateValidator.setCertificateVerifier(cv);
+		certificateValidator.setCertificateVerifier(getCertificateVerifier(certValidationForm));
 		certificateValidator.setTokenExtractionStategy(
 				TokenExtractionStategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
@@ -137,7 +112,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 	}
 	
 	private CertificateToken getCertificate(CertificateForm certificateForm) {
-		CertificateToken certificateToken = getCertificate(certificateForm.getCertificateFile());
+		CertificateToken certificateToken = WebAppUtils.toCertificateToken(certificateForm.getCertificateFile());
 		if (certificateToken == null) {
 			certificateToken = DSSUtils.loadCertificateFromBase64EncodedString(certificateForm.getCertificateBase64());
 			if (certificateToken == null) {
@@ -146,17 +121,20 @@ public class CertificateValidationController extends AbstractValidationControlle
 		}
 		return certificateToken;
 	}
-
-	private CertificateToken getCertificate(MultipartFile file) {
-		try {
-			if (file != null && !file.isEmpty()) {
-				return DSSUtils.loadCertificate(file.getBytes());
-			}
-		} catch (DSSException | IOException e) {
-			LOG.warn("Cannot convert file to X509 Certificate", e);
-			throw new BadRequestException("Unsupported certificate format for file '" + file.getOriginalFilename() + "'");
+	
+	private CertificateVerifier getCertificateVerifier(CertificateValidationForm certValidationForm) {
+		CertificateSource adjunctCertSource = WebAppUtils.toCertificateSource(certValidationForm.getCertificateChainFiles());
+	
+		CertificateVerifier cv;
+		if (adjunctCertSource == null) {
+			// reuse the default one
+			cv = certificateVerifier;
+		} else {
+			cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
+			cv.setAdjunctCertSources(adjunctCertSource);
 		}
-		return null;
+		
+		return cv;
 	}
 	
 	@ModelAttribute("displayDownloadPdf")

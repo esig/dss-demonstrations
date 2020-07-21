@@ -21,6 +21,10 @@ public class ValidationForm {
 
 	private MultipartFile policyFile;
 	
+	private MultipartFile signingCertificate;
+
+	private List<MultipartFile> adjunctCertificates;
+	
 	private boolean includeCertificateTokens;
 	
 	private boolean includeRevocationTokens;
@@ -67,6 +71,22 @@ public class ValidationForm {
 
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
+	}
+
+	public MultipartFile getSigningCertificate() {
+		return signingCertificate;
+	}
+
+	public void setSigningCertificate(MultipartFile signingCertificate) {
+		this.signingCertificate = signingCertificate;
+	}
+
+	public List<MultipartFile> getAdjunctCertificates() {
+		return adjunctCertificates;
+	}
+
+	public void setAdjunctCertificates(List<MultipartFile> adjunctCertificates) {
+		this.adjunctCertificates = adjunctCertificates;
 	}
 	
 	public boolean isIncludeCertificateTokens() {

@@ -9,8 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.DigestDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.x509.CertificateSource;
+import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.timestamp.TimestampToken;
 import eu.europa.esig.dss.web.model.OriginalFile;
@@ -88,5 +93,31 @@ public final class WebAppUtils {
 		}
 		return false;
 	}
+    
+    public static CertificateToken toCertificateToken(MultipartFile certificateFile) {
+        try {
+            if (certificateFile != null && !certificateFile.isEmpty()) {
+                return DSSUtils.loadCertificate(certificateFile.getBytes());
+            }
+        } catch (DSSException | IOException e) {
+            LOG.warn("Cannot convert file to X509 Certificate", e);
+            throw new DSSException("Unsupported certificate format for file '" + certificateFile.getOriginalFilename() + "'");
+        }
+        return null;
+    }
+    
+    public static CertificateSource toCertificateSource(List<MultipartFile> certificateFiles) {
+        CertificateSource certSource = null;
+        if (Utils.isCollectionNotEmpty(certificateFiles)) {
+            certSource = new CommonCertificateSource();
+            for (MultipartFile file : certificateFiles) {
+                CertificateToken certificateChainItem = WebAppUtils.toCertificateToken(file);
+                if (certificateChainItem != null) {
+                    certSource.addCertificate(certificateChainItem);
+                }
+            }
+        }
+        return certSource;
+    }
 
 }

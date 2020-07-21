@@ -343,6 +343,30 @@
 	</div>
 </div>
 
+<div class="form-group row" th:fragment="field-signing-certificate">
+    <label class="col-sm-3 col-form-label" for="signingCertificate" th:text="#{label.signing.certificate}"></label>
+    <div class="col-sm-6">
+        <input type="file" class="form-control-file" name="signingCertificate" accept=".cer,.der,.pem,.crt" />
+        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+            data-placement="top" th:title="#{label.validation.signing.certificate.tooltip}"></i>
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('signingCertificate')}" th:errors="*{signingCertificate}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-adjunct-certificates">
+    <label class="col-sm-3 col-form-label" for="adjunctCertificates" th:text="#{label.adjunct.certificates}"></label>
+    <div class="col-sm-6">
+        <input type="file" class="form-control-file" name="adjunctCertificates" multiple="multiple" accept=".cer,.der,.pem,.crt" />
+        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+            data-placement="top" th:title="#{label.validation.adjunct.certificates.tooltip}"></i>
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('adjunctCertificates')}" th:errors="adjunctCertificates" class="text-danger">Error</p>
+    </div>
+</div>
+
 <div class="form-group row" th:fragment="field-certificate-tokens">
     <label class="col-sm-3 col-form-label" th:text="#{label.validation.certificates.used}"></label>
     <div class="col-sm-9">

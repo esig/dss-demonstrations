@@ -17,6 +17,13 @@
 }
 /* End Main */
 
+/* Validation */
+.form-control-file {
+    display: inline-block;
+    width: auto;
+}
+/* End Validation */
+
 /* Digest parameters */
 
 #spinner {
