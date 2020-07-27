@@ -219,7 +219,7 @@ public class ValidationController extends AbstractValidationController {
             throw new SourceNotFoundException(message);
         }
         String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
-        String filename = certificate.getReadableCertificateName().replace(" ", "_") + ".cer";
+		String filename = DSSUtils.getNormalizedString(certificate.getReadableCertificateName()) + ".cer";
         
         addTokenToResponse(response, filename, MimeType.CER, pemCert.getBytes());
 	}
