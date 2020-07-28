@@ -172,7 +172,7 @@ public class DigestController {
 
 	@ModelAttribute("signatureForms")
 	public SignatureForm[] getSignatureForms() {
-		return new SignatureForm[] { SignatureForm.CAdES, SignatureForm.XAdES };
+		return new SignatureForm[] { SignatureForm.CAdES, SignatureForm.XAdES, SignatureForm.JAdES };
 	}
 
 	@ModelAttribute("digestAlgos")

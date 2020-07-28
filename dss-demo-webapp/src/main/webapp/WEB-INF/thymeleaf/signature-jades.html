@@ -7,7 +7,7 @@
 
             <form method="post" enctype="multipart/form-data" th:action="@{/sign-with-jades}" th:object="${signatureJAdESForm}">
 
-                <input type="hidden" id="isSign" value="true" />
+                <input type="hidden" id="process" value="SIGNATURE" />
 
                 <div th:replace="fragment/fields::field-documents-to-sign"></div>
 

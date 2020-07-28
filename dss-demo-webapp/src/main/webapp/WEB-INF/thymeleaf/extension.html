@@ -6,7 +6,7 @@
             
             <form method="post" th:action="@{/extension}" th:object="${extensionForm}" enctype="multipart/form-data">
 
-                <input type="hidden" id="isSign" value="false" />
+                <input type="hidden" id="process" value="EXTENSION" />
 
                 <div th:replace="fragment/fields::field-signed-file"></div>
 

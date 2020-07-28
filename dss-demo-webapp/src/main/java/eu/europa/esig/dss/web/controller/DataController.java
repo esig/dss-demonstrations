@@ -15,13 +15,13 @@ import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
-import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.model.ProcessEnum;
 
 @Controller
 @RequestMapping(value = "/data")
 public class DataController {
-	
-	private static final String[] ALLOWED_FIELDS = { "form", "isSign" };
+
+	private static final String[] ALLOWED_FIELDS = { "form", "process" };
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -59,12 +59,12 @@ public class DataController {
 
 	@RequestMapping(value = "/levelsByForm", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<SignatureLevel> getAllowedLevelsByForm(@RequestParam("form") SignatureForm signatureForm, @RequestParam("isSign") Boolean isSign) {
+	public List<SignatureLevel> getAllowedLevelsByForm(@RequestParam("form") SignatureForm signatureForm, @RequestParam("process") ProcessEnum process) {
 		List<SignatureLevel> levels = new ArrayList<SignatureLevel>();
 		if (signatureForm != null) {
 			switch (signatureForm) {
 			case CAdES:
-				if (Utils.isTrue(isSign)) {
+				if (ProcessEnum.SIGNATURE.equals(process)) {
 					levels.add(SignatureLevel.CAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.CAdES_BASELINE_T);
@@ -72,7 +72,7 @@ public class DataController {
 				levels.add(SignatureLevel.CAdES_BASELINE_LTA);
 				break;
 			case PAdES:
-				if (Utils.isTrue(isSign)) {
+				if (ProcessEnum.SIGNATURE.equals(process)) {
 					levels.add(SignatureLevel.PAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.PAdES_BASELINE_T);
@@ -80,21 +80,24 @@ public class DataController {
 				levels.add(SignatureLevel.PAdES_BASELINE_LTA);
 				break;
 			case XAdES:
-				if (Utils.isTrue(isSign)) {
+				if (ProcessEnum.SIGNATURE.equals(process)) {
 					levels.add(SignatureLevel.XAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.XAdES_BASELINE_T);
 				levels.add(SignatureLevel.XAdES_BASELINE_LT);
-				levels.add(SignatureLevel.XAdES_BASELINE_LTA);
+				if (!ProcessEnum.DIGEST_SIGN.equals(process)) {
+					levels.add(SignatureLevel.XAdES_BASELINE_LTA);
+				}
 				break;
 			case JAdES:
-				if (Utils.isTrue(isSign)) {
+				if (ProcessEnum.SIGNATURE.equals(process)) {
 					levels.add(SignatureLevel.JAdES_BASELINE_B);
 				}
-				// not available so far
-//				levels.add(SignatureLevel.JAdES_BASELINE_T);
-//				levels.add(SignatureLevel.JAdES_BASELINE_LT);
-//				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				levels.add(SignatureLevel.JAdES_BASELINE_T);
+				levels.add(SignatureLevel.JAdES_BASELINE_LT);
+				if (!ProcessEnum.DIGEST_SIGN.equals(process)) {
+					levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				}
 				break;
 			default:
 				break;

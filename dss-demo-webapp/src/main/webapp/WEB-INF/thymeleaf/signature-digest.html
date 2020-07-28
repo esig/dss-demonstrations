@@ -6,7 +6,7 @@
               
             <form id="digest-sign-form" method="post" th:action="@{/sign-a-digest}" th:object="${signatureDigestForm}">
 
-                <input type="hidden" id="isSign" value="true" />
+                <input type="hidden" id="process" value="DIGEST_SIGN" />
 
                 <div th:replace="fragment/fields::field-signature-form"></div>
 

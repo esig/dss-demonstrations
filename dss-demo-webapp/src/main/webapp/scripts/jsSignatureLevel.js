@@ -44,7 +44,7 @@ $('input[name="signatureForm"]:radio').change(
 
             $('#selectSignatureLevel').empty();
 
-            var isSign = $('#isSign').val();
+            var process = $('#process').val();
 
             if (!isAsicContainer()) {
             	$('input[name="signaturePackaging"]:radio').attr("disabled", true).prop("checked", false);
@@ -69,7 +69,7 @@ $('input[name="signatureForm"]:radio').change(
 
             $.ajax({
                 type : "GET",
-                url : "data/levelsByForm?form=" + this.value+"&isSign="+isSign,
+                url : "data/levelsByForm?form=" + this.value+"&process="+process,
                 dataType : "json",
                 error : function(msg) {
                     alert("Error !: " + msg);
