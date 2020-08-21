@@ -25,6 +25,7 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestMatcher;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlSignature;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.Indication;
+import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -265,6 +266,7 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
 			parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
+			parameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH);
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 			
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));

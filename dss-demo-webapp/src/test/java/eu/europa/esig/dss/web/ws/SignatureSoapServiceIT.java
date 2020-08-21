@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
+import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
@@ -342,6 +343,7 @@ public class SignatureSoapServiceIT extends AbstractIT {
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 			parameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION);
 			parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
+			parameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH);
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
