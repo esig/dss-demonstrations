@@ -17,6 +17,8 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import eu.europa.esig.dss.diagnostic.DiagnosticData;
+import eu.europa.esig.dss.diagnostic.SignatureWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestMatcher;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlSignature;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
@@ -286,6 +288,43 @@ public class RestCompleteSignatureProcessIT extends AbstractRestIT {
 				assertTrue(digestMatcher.isDataFound());
 				assertTrue(digestMatcher.isDataIntact());
 			}
+		}
+	}
+	
+	@Test
+	public void testWithSignatureFieldId() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setSignatureFieldId("signature-test");
+	
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample-with-empty-signature-fields.pdf"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+	
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters, 
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signDocument);
+			assertNotNull(signedDocument);
+			
+			DataToValidateDTO dataToValidateDTO = new DataToValidateDTO();
+			dataToValidateDTO.setSignedDocument(signedDocument);
+			WSReportsDTO wsReports = restValidationService.validateSignature(dataToValidateDTO);
+			
+			DiagnosticData diagnosticData = new DiagnosticData(wsReports.getDiagnosticData());
+			
+			SignatureWrapper signature = diagnosticData.getSignatureById(diagnosticData.getFirstSignatureId());
+			assertEquals(1, signature.getSignatureFieldNames().size());
+			assertEquals("signature-test", signature.getSignatureFieldNames().get(0));
 		}
 	}
 
