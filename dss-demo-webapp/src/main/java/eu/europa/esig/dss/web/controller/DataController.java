@@ -63,8 +63,8 @@ public class DataController {
 		List<SignatureLevel> levels = new ArrayList<SignatureLevel>();
 		if (signatureForm != null) {
 			switch (signatureForm) {
-			case CAdES:
-				if (ProcessEnum.SIGNATURE.equals(process)) {
+			case CAdES:                
+				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
 					levels.add(SignatureLevel.CAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.CAdES_BASELINE_T);
@@ -72,7 +72,7 @@ public class DataController {
 				levels.add(SignatureLevel.CAdES_BASELINE_LTA);
 				break;
 			case PAdES:
-				if (ProcessEnum.SIGNATURE.equals(process)) {
+				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
 					levels.add(SignatureLevel.PAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.PAdES_BASELINE_T);
@@ -80,7 +80,7 @@ public class DataController {
 				levels.add(SignatureLevel.PAdES_BASELINE_LTA);
 				break;
 			case XAdES:
-				if (ProcessEnum.SIGNATURE.equals(process)) {
+				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
 					levels.add(SignatureLevel.XAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.XAdES_BASELINE_T);
@@ -90,7 +90,7 @@ public class DataController {
 				}
 				break;
 			case JAdES:
-				if (ProcessEnum.SIGNATURE.equals(process)) {
+				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
 					levels.add(SignatureLevel.JAdES_BASELINE_B);
 				}
 				levels.add(SignatureLevel.JAdES_BASELINE_T);

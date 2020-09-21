@@ -95,7 +95,7 @@ public class ExtensionController {
 
 	@ModelAttribute("signatureForms")
 	public SignatureForm[] getSignatureForms() {
-		return new SignatureForm[] { SignatureForm.CAdES, SignatureForm.PAdES, SignatureForm.XAdES /*, SignatureForm.JAdES */ };
+		return new SignatureForm[] { SignatureForm.CAdES, SignatureForm.PAdES, SignatureForm.XAdES, SignatureForm.JAdES };
 	}
 
 	@ModelAttribute("signaturePackagings")
