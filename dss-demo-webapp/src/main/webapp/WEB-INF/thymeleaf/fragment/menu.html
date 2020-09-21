@@ -8,6 +8,7 @@
 			<a th:href="@{/sign-a-pdf}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-pdf' ? 'active' : ''}" th:text="#{label.signAPDF}">Sign a PDF</a>
             <a th:href="@{/sign-with-jades}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-with-jades' ? 'active' : ''}" th:text="#{label.signWithJAdES}">Sign with JAdES</a>
             <a th:href="@{/sign-multiple-documents}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-multiple-documents' ? 'active' : ''}" th:text="#{label.signMultiDocuments}">Sign multi documents</a>
+            <a th:href="@{/counter-sign}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/counter-sign' ? 'active' : ''}" th:text="#{label.counterSignature}">Counter signature</a>
             <a th:href="@{/signature-standalone}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-standalone' ? 'active' : ''}" th:text="#{label.standalone.application}">Standalone application</a>
             <a th:href="@{/signature-rest}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-rest' ? 'active' : ''}" th:text="#{label.rest.soap.services}">REST/SOAP WebServices</a>
         </div>

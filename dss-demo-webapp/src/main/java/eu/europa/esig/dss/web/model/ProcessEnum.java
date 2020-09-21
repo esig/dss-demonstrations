@@ -6,6 +6,8 @@ public enum ProcessEnum {
 	
 	EXTENSION,
 	
-	DIGEST_SIGN;
+	DIGEST_SIGN,
+	
+    COUNTER_SIGN;
 
 }

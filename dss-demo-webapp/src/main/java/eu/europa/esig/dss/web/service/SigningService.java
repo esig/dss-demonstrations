@@ -15,26 +15,32 @@ import eu.europa.esig.dss.AbstractSignatureParameters;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESSignatureParameters;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESTimestampParameters;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
+import eu.europa.esig.dss.asic.common.ASiCUtils;
 import eu.europa.esig.dss.asic.xades.ASiCWithXAdESSignatureParameters;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.CAdESSignatureParameters;
+import eu.europa.esig.dss.cades.signature.CAdESCounterSignatureParameters;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
+import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.jades.JAdESSignatureParameters;
+import eu.europa.esig.dss.jades.signature.JAdESCounterSignatureParameters;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.DigestDocument;
+import eu.europa.esig.dss.model.SerializableCounterSignatureParameters;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.pades.PAdESSignatureParameters;
 import eu.europa.esig.dss.pades.PAdESTimestampParameters;
 import eu.europa.esig.dss.pades.signature.PAdESService;
+import eu.europa.esig.dss.signature.CounterSignatureService;
 import eu.europa.esig.dss.signature.DocumentSignatureService;
 import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -43,6 +49,7 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.timestamp.TimestampToken;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.AbstractSignatureForm;
+import eu.europa.esig.dss.web.model.CounterSignatureForm;
 import eu.europa.esig.dss.web.model.ExtensionForm;
 import eu.europa.esig.dss.web.model.SignatureDigestForm;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
@@ -51,6 +58,7 @@ import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
 import eu.europa.esig.dss.web.model.TimestampForm;
 import eu.europa.esig.dss.x509.tsp.MockTSPSource;
 import eu.europa.esig.dss.xades.XAdESSignatureParameters;
+import eu.europa.esig.dss.xades.signature.XAdESCounterSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 
 @Component
@@ -162,7 +170,27 @@ public class SigningService {
 		}
 		LOG.info("End getDataToSign with one JAdES");
 		return toBeSigned;
-	}
+	}    
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+    public ToBeSigned getDataToCounterSign(CounterSignatureForm form) {
+        LOG.info("Start getDataToSign with one document");
+
+        ToBeSigned toBeSigned = null;
+        try {
+            DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
+            boolean asic = ASiCUtils.isAsic(signatureDocument);
+            
+            CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+            SerializableCounterSignatureParameters parameters = fillParameters(form);
+    
+            toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
+        } catch (Exception e) {
+            LOG.error("Unable to execute getDataToSign : " + e.getMessage(), e);
+        }
+        LOG.info("End getDataToSign with one document");
+        return toBeSigned;
+    }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public TimestampToken getContentTimestamp(SignatureDocumentForm form) {
@@ -279,6 +307,17 @@ public class SigningService {
 		
 		return parameters;
 	}
+	
+    private SerializableCounterSignatureParameters fillParameters(CounterSignatureForm form) {
+        SerializableCounterSignatureParameters parameters = getCounterSignatureParameters(form.getSignatureForm());
+        parameters.setSignatureIdToCounterSign(form.getSignatureIdToCounterSign());
+
+        if (parameters instanceof AbstractSignatureParameters) {
+            fillParameters((AbstractSignatureParameters) parameters, form);
+        }
+
+        return parameters;
+    }
 
 	private void fillParameters(AbstractSignatureParameters parameters, AbstractSignatureForm form) {
 		parameters.setSignatureLevel(form.getSignatureLevel());
@@ -369,6 +408,28 @@ public class SigningService {
 		LOG.info("End signDocument with JAdES");
 		return signedDocument;
 	}
+	
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public DSSDocument counterSignSignature(CounterSignatureForm form) {
+        LOG.info("Start signDigest with one digest");
+
+        DSSDocument signedDocument = null;
+        try {
+            DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
+            boolean asic = ASiCUtils.isAsic(signatureDocument);
+            
+            CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+            SerializableCounterSignatureParameters parameters = fillParameters(form);
+
+            SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+            SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+            signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
+        } catch (Exception e) {
+            LOG.error("Unable to execute signDocument : " + e.getMessage(), e);
+        }
+        LOG.info("End signDocument with one document");
+        return signedDocument;
+    }
 
 	@SuppressWarnings("rawtypes")
 	private DocumentSignatureService getSignatureService(ASiCContainerType containerType, SignatureForm signatureForm) {
@@ -395,6 +456,29 @@ public class SigningService {
 		}
 		return service;
 	}
+	
+    @SuppressWarnings("rawtypes")
+    private CounterSignatureService getCounterSignatureService(boolean isAsicContainer, SignatureForm signatureForm) {
+        CounterSignatureService service = null;
+        if (isAsicContainer) {
+            service = (CounterSignatureService) getASiCSignatureService(signatureForm);
+        } else {
+            switch (signatureForm) {
+            case CAdES:
+                service = cadesService;
+                break;
+            case XAdES:
+                service = xadesService;
+                break;
+            case JAdES:
+                service = jadesService;
+                break;
+            default:
+                throw new DSSException("Not supported signature form for a counter signature : " + signatureForm);
+            }
+        }
+        return service;
+    }
 
 	private AbstractSignatureParameters getSignatureParameters(ASiCContainerType containerType, SignatureForm signatureForm) {
 		AbstractSignatureParameters parameters = null;
@@ -416,6 +500,7 @@ public class SigningService {
 			case JAdES:
 				JAdESSignatureParameters jadesParameters = new JAdESSignatureParameters();
 				jadesParameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION); // to allow T+ levels
+	            jadesParameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH); // to use by default
 				parameters = jadesParameters;
 				break;
 			default:
@@ -424,6 +509,26 @@ public class SigningService {
 		}
 		return parameters;
 	}
+	
+    private SerializableCounterSignatureParameters getCounterSignatureParameters(SignatureForm signatureForm) {
+        SerializableCounterSignatureParameters parameters = null;
+        switch (signatureForm) {
+            case CAdES:
+                parameters = new CAdESCounterSignatureParameters();
+                break;
+            case XAdES:
+                parameters = new XAdESCounterSignatureParameters();
+                break;
+            case JAdES:
+            	JAdESCounterSignatureParameters jadesCounterSignatureParameters = new JAdESCounterSignatureParameters();
+	            jadesCounterSignatureParameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION);
+	            parameters = jadesCounterSignatureParameters;
+                break;
+            default:
+                LOG.error("Not supported form for a counter signature : " + signatureForm);
+        }
+        return parameters;
+    }
 
 	@SuppressWarnings("rawtypes")
 	private MultipleDocumentsSignatureService getASiCSignatureService(SignatureForm signatureForm) {

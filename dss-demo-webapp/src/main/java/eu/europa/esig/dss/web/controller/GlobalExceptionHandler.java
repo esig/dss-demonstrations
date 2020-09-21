@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.web.exception.ApplicationJsonRequestException;
 import eu.europa.esig.dss.web.exception.BadRequestException;
 import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
@@ -79,5 +81,14 @@ public class GlobalExceptionHandler {
 		mav.setViewName(viewName);
 		return mav;
 	}
+	
+    @ExceptionHandler(ApplicationJsonRequestException.class)
+    public ResponseEntity<String> ApplicationJsonRequestExceptionHandler(HttpServletRequest req, Exception e) throws Exception {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("An error occurred during a JSON request : uri = '{}', message = '{}'", req.getRequestURI(), e.getMessage());
+        }
+        return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+	
 
 }

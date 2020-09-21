@@ -134,7 +134,7 @@
 		<input type="text" class="form-control input-sm" th:field="*{digestToSign}" />
 		<input type="hidden" class="form-control input-sm" th:field="*{documentName}" />
     </div>
-    <div class="loader" id="spinner"></div>
+    <div class="loader d-none" id="spinner"></div>
 	<div class="offset-sm-3 col-sm-5">
 		<div class="position-relative">
 		  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}"></label>	
@@ -154,6 +154,29 @@
     <div class="alert alert-warning m-0" role="alert">
          The digest computation is not available in your browser! More information is available by the 
          <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest" target="_blank">link</a>.
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-document-to-counter-sign">
+    <label class="col-sm-3 col-form-label" for="documentToCounterSign" th:text="#{label.to.counter.sign.file}"></label>
+    <div class="col-sm-5">
+           <input type="file" class="form-control-file" name="documentToCounterSign" id="documentToCounterSign" /> 
+    </div>
+    <div class="loader d-none" id="spinner"></div>
+    <div class="col-sm-4" id="documentToCounterSignError">
+       <p th:if="${#fields.hasErrors('documentToCounterSign')}" 
+                th:errors="*{documentToCounterSign}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-id">
+    <label class="col-sm-3 col-form-label" for="signatureIdToCounterSign" th:text="#{label.signature.id}"></label>
+    <div class="col-sm-5">
+        <select name="signatureIdToCounterSign" class="custom-select" id="selectSignatureId">
+        </select>
+    </div>
+    <div class="col-xs-3 col-md-offset-1">     
+           <p th:if="${#fields.hasErrors('signatureIdToCounterSign')}" th:errors="*{signatureIdToCounterSign}" class="text-danger">Error</p>
     </div>
 </div>
 
