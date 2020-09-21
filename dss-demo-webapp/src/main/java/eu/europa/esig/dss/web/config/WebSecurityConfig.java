@@ -18,15 +18,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
-		http.csrf().disable();
-
 		// javadoc uses frames
 		http.headers().addHeaderWriter(javadocHeaderWriter());
 		http.headers().addHeaderWriter(svgHeaderWriter());
-		
 		http.headers().addHeaderWriter(serverEsigDSS());
-		
 	}
 
 	@Bean
