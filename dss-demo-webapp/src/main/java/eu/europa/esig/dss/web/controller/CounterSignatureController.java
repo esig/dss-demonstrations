@@ -108,14 +108,13 @@ public class CounterSignatureController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
 			@ModelAttribute("counterSignatureForm") @Valid CounterSignatureForm counterSignatureForm, BindingResult result) {
-		LOG.info("here");
 		if (result.hasErrors()) {
-//			if (LOG.isDebugEnabled()) {
+			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();
 				for (ObjectError error : allErrors) {
-					LOG.warn(error.getDefaultMessage());
+					LOG.debug(error.getDefaultMessage());
 				}
-//			}
+			}
 			return COUNTER_SIGN;
 		}
 		model.addAttribute("counterSignatureForm", counterSignatureForm);

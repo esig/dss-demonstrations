@@ -83,10 +83,17 @@
 		            
 		            function error(error) {
 		                $('#bar').removeClass('bg-success progress-bar-striped progress-bar-animated active').addClass('bg-danger');
-		                if (error!= null) {
-		                	var errorMessage = error.responseText;
-		                    if (errorMessage != null){
-		                        $("#errorcontent").html(errorMessage);
+		                if (error != null) {
+		                	var message = error.responseJSON;
+		                	if (message == null) {
+		                		message = error.responseText;
+		                	}
+		                	if (message.errorMessage != null) {
+		                		message = message.errorMessage;
+		                	}
+		                	console.log(message);
+		                    if (message != null){
+		                        $("#errorcontent").html(message);
 		                    }
 		                }
 		                $("#error").show();

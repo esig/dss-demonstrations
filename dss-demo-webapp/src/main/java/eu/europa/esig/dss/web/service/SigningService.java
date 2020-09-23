@@ -48,6 +48,7 @@ import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.timestamp.TimestampToken;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.exception.ApplicationJsonRequestException;
 import eu.europa.esig.dss.web.model.AbstractSignatureForm;
 import eu.europa.esig.dss.web.model.CounterSignatureForm;
 import eu.europa.esig.dss.web.model.ExtensionForm;
@@ -122,10 +123,14 @@ public class SigningService {
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
-		ToBeSigned toBeSigned = service.getDataToSign(toSignDocument, parameters);
-		LOG.info("End getDataToSign with one document");
-		return toBeSigned;
+		try {
+			DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
+			ToBeSigned toBeSigned = service.getDataToSign(toSignDocument, parameters);
+			LOG.info("End getDataToSign with one document");
+			return toBeSigned;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -135,10 +140,14 @@ public class SigningService {
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
-		ToBeSigned toBeSigned = service.getDataToSign(toSignDigest, parameters);
-		LOG.info("End getDataToSign with one digest");
-		return toBeSigned;
+		try {
+			DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
+			ToBeSigned toBeSigned = service.getDataToSign(toSignDigest, parameters);
+			LOG.info("End getDataToSign with one digest");
+			return toBeSigned;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -148,10 +157,14 @@ public class SigningService {
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
-		ToBeSigned toBeSigned = service.getDataToSign(toSignDocuments, parameters);
-		LOG.info("End getDataToSign with multiple documents");
-		return toBeSigned;
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			ToBeSigned toBeSigned = service.getDataToSign(toSignDocuments, parameters);
+			LOG.info("End getDataToSign with multiple documents");
+			return toBeSigned;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -161,27 +174,35 @@ public class SigningService {
 		MultipleDocumentsSignatureService service = jadesService;
 		JAdESSignatureParameters parameters = fillParameters(form);
 
-		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
-		ToBeSigned toBeSigned = service.getDataToSign(toSignDocuments, parameters);
-			
-		LOG.info("End getDataToSign with one JAdES");
-		return toBeSigned;
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			ToBeSigned toBeSigned = service.getDataToSign(toSignDocuments, parameters);
+				
+			LOG.info("End getDataToSign with one JAdES");
+			return toBeSigned;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}    
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
     public ToBeSigned getDataToCounterSign(CounterSignatureForm form) {
         LOG.info("Start getDataToSign with one document");
 
-        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
-        boolean asic = ASiCUtils.isAsic(signatureDocument);
-        
-        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
-        SerializableCounterSignatureParameters parameters = fillParameters(form);
-
-        ToBeSigned toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
-
-        LOG.info("End getDataToSign with one document");
-        return toBeSigned;
+        try {
+	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
+	        boolean asic = ASiCUtils.isAsic(signatureDocument);
+	        
+	        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+	        SerializableCounterSignatureParameters parameters = fillParameters(form);
+	
+	        ToBeSigned toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
+	
+	        LOG.info("End getDataToSign with one document");
+	        return toBeSigned;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
     }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -190,8 +211,8 @@ public class SigningService {
 
 		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm());
 		AbstractSignatureParameters parameters = fillParameters(form);
+		
 		DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
-
 		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocument, parameters);
 
 		LOG.info("End getContentTimestamp with one document");
@@ -343,12 +364,16 @@ public class SigningService {
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
-		SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-		SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
-		DSSDocument signedDocument = service.signDocument(toSignDocument, parameters, signatureValue);
-		LOG.info("End signDocument with one document");
-		return signedDocument;
+		try {
+			DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
+			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			DSSDocument signedDocument = service.signDocument(toSignDocument, parameters, signatureValue);
+			LOG.info("End signDocument with one document");
+			return signedDocument;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -358,12 +383,16 @@ public class SigningService {
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
-		SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-		SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
-		DSSDocument signedDocument = service.signDocument(toSignDigest, parameters, signatureValue);
-		LOG.info("End signDigest with one digest");
-		return signedDocument;
+		try {
+			DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
+			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			DSSDocument signedDocument = service.signDocument(toSignDigest, parameters, signatureValue);
+			LOG.info("End signDigest with one digest");
+			return signedDocument;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -373,12 +402,16 @@ public class SigningService {
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
-		SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-		SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
-		DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
-		LOG.info("End signDocument with multiple documents");
-		return signedDocument;
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
+			LOG.info("End signDocument with multiple documents");
+			return signedDocument;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -388,31 +421,39 @@ public class SigningService {
 		MultipleDocumentsSignatureService service = jadesService;
 		JAdESSignatureParameters parameters = fillParameters(form);
 
-		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
-		SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-		SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
-		DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
-
-		LOG.info("End signDocument with JAdES");
-		return signedDocument;
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+			DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
+	
+			LOG.info("End signDocument with JAdES");
+			return signedDocument;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
 	}
 	
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public DSSDocument counterSignSignature(CounterSignatureForm form) {
         LOG.info("Start signDigest with one digest");
 
-        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
-        boolean asic = ASiCUtils.isAsic(signatureDocument);
-        
-        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
-        SerializableCounterSignatureParameters parameters = fillParameters(form);
-
-        SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-        SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
-        DSSDocument signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
-
-        LOG.info("End signDocument with one document");
-        return signedDocument;
+        try {
+	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
+	        boolean asic = ASiCUtils.isAsic(signatureDocument);
+	        
+	        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+	        SerializableCounterSignatureParameters parameters = fillParameters(form);
+	
+	        SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+	        SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+	        DSSDocument signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
+	
+	        LOG.info("End signDocument with one document");
+	        return signedDocument;
+		} catch (Exception e) {
+			throw new ApplicationJsonRequestException(e);
+		}
     }
 
 	@SuppressWarnings("rawtypes")
