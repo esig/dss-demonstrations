@@ -83,13 +83,10 @@
 		            
 		            function error(error) {
 		                $('#bar').removeClass('bg-success progress-bar-striped progress-bar-animated active').addClass('bg-danger');
-		                if (error!= null && error.responseJSON !=null) {
-		                    var jsonResp = error.responseJSON;
-		                    if (jsonResp.errorMessage != null){
-		                        $("#errorcontent").html(jsonResp.errorMessage);
-		                    }
-		                    else if (jsonResp.error != null){
-		                        $("#errorcontent").html(jsonResp.error);
+		                if (error!= null) {
+		                	var errorMessage = error.responseText;
+		                    if (errorMessage != null){
+		                        $("#errorcontent").html(errorMessage);
 		                    }
 		                }
 		                $("#error").show();
@@ -116,7 +113,7 @@
 		                          success_callback.call(this, result);
 		                      }
 		                    }).fail(function (error, textStatus ) {
-		                        console.log(url + " : KO " + textStatus);
+		                        console.log(url + " : NOT OK " + textStatus);
 		                        error_callback.call(this, error);
 		                    });
 		            } 

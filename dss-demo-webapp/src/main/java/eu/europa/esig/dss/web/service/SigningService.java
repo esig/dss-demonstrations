@@ -161,13 +161,9 @@ public class SigningService {
 		MultipleDocumentsSignatureService service = jadesService;
 		JAdESSignatureParameters parameters = fillParameters(form);
 
-		ToBeSigned toBeSigned = null;
-		try {
-			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
-			toBeSigned = service.getDataToSign(toSignDocuments, parameters);
-		} catch (Exception e) {
-			LOG.error("Unable to execute getDataToSign : " + e.getMessage(), e);
-		}
+		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+		ToBeSigned toBeSigned = service.getDataToSign(toSignDocuments, parameters);
+			
 		LOG.info("End getDataToSign with one JAdES");
 		return toBeSigned;
 	}    
@@ -176,18 +172,14 @@ public class SigningService {
     public ToBeSigned getDataToCounterSign(CounterSignatureForm form) {
         LOG.info("Start getDataToSign with one document");
 
-        ToBeSigned toBeSigned = null;
-        try {
-            DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
-            boolean asic = ASiCUtils.isAsic(signatureDocument);
-            
-            CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
-            SerializableCounterSignatureParameters parameters = fillParameters(form);
-    
-            toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
-        } catch (Exception e) {
-            LOG.error("Unable to execute getDataToSign : " + e.getMessage(), e);
-        }
+        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
+        boolean asic = ASiCUtils.isAsic(signatureDocument);
+        
+        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+        SerializableCounterSignatureParameters parameters = fillParameters(form);
+
+        ToBeSigned toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
+
         LOG.info("End getDataToSign with one document");
         return toBeSigned;
     }
@@ -396,15 +388,11 @@ public class SigningService {
 		MultipleDocumentsSignatureService service = jadesService;
 		JAdESSignatureParameters parameters = fillParameters(form);
 
-		DSSDocument signedDocument = null;
-		try {
-			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
-			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
-			signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
-		} catch (Exception e) {
-			LOG.error("Unable to execute signDocument : " + e.getMessage(), e);
-		}
+		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+		SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+		SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+		DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
+
 		LOG.info("End signDocument with JAdES");
 		return signedDocument;
 	}
@@ -413,20 +401,16 @@ public class SigningService {
     public DSSDocument counterSignSignature(CounterSignatureForm form) {
         LOG.info("Start signDigest with one digest");
 
-        DSSDocument signedDocument = null;
-        try {
-            DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
-            boolean asic = ASiCUtils.isAsic(signatureDocument);
-            
-            CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
-            SerializableCounterSignatureParameters parameters = fillParameters(form);
+        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
+        boolean asic = ASiCUtils.isAsic(signatureDocument);
+        
+        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+        SerializableCounterSignatureParameters parameters = fillParameters(form);
 
-            SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-            SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
-            signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
-        } catch (Exception e) {
-            LOG.error("Unable to execute signDocument : " + e.getMessage(), e);
-        }
+        SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
+        SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+        DSSDocument signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
+
         LOG.info("End signDocument with one document");
         return signedDocument;
     }

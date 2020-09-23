@@ -26,7 +26,7 @@
      <div class="col-sm-5">
     	<input type="file" class="form-control-file" name="documentsToSign" id="documentsToSign" multiple="multiple" /> 
      </div>
-     <div class="col-sm-4">
+     <div class="col-sm-4 p-0">
         <p th:if="${#fields.hasErrors('documentsToSign*')}" th:errors="*{documentsToSign*}" class="text-danger">Error</p>
      </div>
 </div>
@@ -163,7 +163,7 @@
            <input type="file" class="form-control-file" name="documentToCounterSign" id="documentToCounterSign" /> 
     </div>
     <div class="loader d-none" id="spinner"></div>
-    <div class="col-sm-4" id="documentToCounterSignError">
+    <div class="col-sm-4 p-0" id="documentToCounterSignError">
        <p th:if="${#fields.hasErrors('documentToCounterSign')}" 
                 th:errors="*{documentToCounterSign}" class="text-danger">Error</p>
     </div>

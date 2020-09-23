@@ -15,9 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.web.exception.ApplicationJsonRequestException;
-import eu.europa.esig.dss.web.exception.BadRequestException;
-import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 
 @ControllerAdvice
@@ -28,8 +25,8 @@ public class GlobalExceptionHandler {
 	public static final String DEFAULT_ERROR_VIEW = "error";
 	public static final String PAGE_NOT_FOUND_ERROR_VIEW = "404_error";
 
-	@ExceptionHandler(value = Exception.class)
-	public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
 		// If the exception is annotated with @ResponseStatus rethrow it and let
 		// the framework handle it (for personal and annotated Exception)
 		if (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class) != null) {
@@ -37,8 +34,8 @@ public class GlobalExceptionHandler {
 		}
 
 		LOG.error("Unhandled exception occurred : " + e.getMessage(), e);
-
-		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR, DEFAULT_ERROR_VIEW);
+		
+		return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(NoHandlerFoundException.class)
@@ -62,16 +59,6 @@ public class GlobalExceptionHandler {
 		return getMAV(req, new DSSException("Bad Request"), HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
 	}
 
-	@ExceptionHandler(BadRequestException.class)
-	public ModelAndView badRequest(HttpServletRequest req, Exception e) {
-		return getMAV(req, e, HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
-	}
-	
-	@ExceptionHandler(InternalServerException.class)
-	public ModelAndView internalServer(HttpServletRequest req, Exception e) {
-		return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR, DEFAULT_ERROR_VIEW);
-	}
-
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("error", status.getReasonPhrase());
@@ -81,14 +68,5 @@ public class GlobalExceptionHandler {
 		mav.setViewName(viewName);
 		return mav;
 	}
-	
-    @ExceptionHandler(ApplicationJsonRequestException.class)
-    public ResponseEntity<String> ApplicationJsonRequestExceptionHandler(HttpServletRequest req, Exception e) throws Exception {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("An error occurred during a JSON request : uri = '{}', message = '{}'", req.getRequestURI(), e.getMessage());
-        }
-        return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-	
 
 }
