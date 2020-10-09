@@ -57,6 +57,7 @@ import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
@@ -180,11 +181,14 @@ public class RestDocumentationApp {
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
 			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
-			imageParameters.setPage(1);
-			imageParameters.setxAxis(200.F);
-			imageParameters.setyAxis(100.F);
-			imageParameters.setWidth(130);
-			imageParameters.setHeight(50);
+			
+			RemoteSignatureFieldParameters fieldParameters = new RemoteSignatureFieldParameters();
+			fieldParameters.setPage(1);
+			fieldParameters.setOriginX(200.F);
+			fieldParameters.setOriginY(100.F);
+			fieldParameters.setWidth(130.F);
+			fieldParameters.setHeight(50.F);
+			imageParameters.setFieldParameters(fieldParameters);
 
 			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
 			textParameters.setText("Signature");
@@ -193,6 +197,7 @@ public class RestDocumentationApp {
 			textParameters.setTextColor(ColorConverter.toRemoteColor(Color.BLUE));
 			textParameters.setBackgroundColor(ColorConverter.toRemoteColor(Color.WHITE));
 			imageParameters.setTextParameters(textParameters);
+			
 			parameters.setImageParameters(imageParameters);
 			dataToSign.setParameters(parameters);
 

@@ -49,6 +49,8 @@ import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
@@ -321,7 +323,12 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-			parameters.setSignatureFieldId("signature-test");
+			
+			RemoteSignatureFieldParameters fieldParameters = new RemoteSignatureFieldParameters();
+			fieldParameters.setFieldId("signature-test");
+			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
+			imageParameters.setFieldParameters(fieldParameters);
+			parameters.setImageParameters(imageParameters);
 	
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample-with-empty-signature-fields.pdf"));
 			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
