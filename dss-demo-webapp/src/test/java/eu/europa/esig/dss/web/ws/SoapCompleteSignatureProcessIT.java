@@ -38,12 +38,15 @@ import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
+import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.server.signing.soap.client.SoapSignatureTokenConnection;
+import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
@@ -72,7 +75,7 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 		JAXBDataBinding dataBinding = new JAXBDataBinding();
 		dataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
 
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
@@ -274,7 +277,7 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
 			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
-			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
 			ToBeSignedDTO dataToSign = soapMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
@@ -350,6 +353,74 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			SignatureWrapper signature = diagnosticData.getSignatureById(diagnosticData.getFirstSignatureId());
 			assertEquals(1, signature.getSignatureFieldNames().size());
 			assertEquals("signature-test", signature.getSignatureFieldNames().get(0));
+		}
+	}
+
+	@Test
+	public void testSignAndCounterSign() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = RemoteDocumentConverter.toRemoteDocument(fileToSign);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_T);
+			parameters.setSigningCertificate(
+					new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			ToBeSignedDTO dataToSign = soapClient
+					.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256,
+					dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = soapClient.signDocument(signDocument);
+			assertNotNull(signedDocument);
+
+			DataToValidateDTO dataToValidateDTO = new DataToValidateDTO();
+			dataToValidateDTO.setSignedDocument(signedDocument);
+			WSReportsDTO wsReports = soapValidationService.validateSignature(dataToValidateDTO);
+
+			DiagnosticData diagnosticData = new DiagnosticData(wsReports.getDiagnosticData());
+			assertEquals(1, diagnosticData.getAllSignatures().size());
+			assertEquals(0, diagnosticData.getAllCounterSignatures().size());
+
+			parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.CAdES_BASELINE_B);
+			parameters.setSigningCertificate(
+					new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA512);
+			parameters.setSignatureIdToCounterSign(diagnosticData.getFirstSignatureId());
+
+			DataToBeCounterSignedDTO dataToBeCounterSignedDTO = new DataToBeCounterSignedDTO(signedDocument,
+					parameters);
+			ToBeSignedDTO dataToBeCounterSigned = soapClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO);
+			assertNotNull(dataToBeCounterSigned);
+
+			signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeCounterSigned), DigestAlgorithm.SHA256,
+					dssPrivateKeyEntry);
+
+			CounterSignSignatureDTO counterSignSignatureDTO = new CounterSignSignatureDTO(signedDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument counterSignedDocument = soapClient.counterSignSignature(counterSignSignatureDTO);
+			assertNotNull(counterSignedDocument);
+
+			assertNotNull(counterSignedDocument);
+
+			dataToValidateDTO.setSignedDocument(counterSignedDocument);
+			wsReports = soapValidationService.validateSignature(dataToValidateDTO);
+
+			diagnosticData = new DiagnosticData(wsReports.getDiagnosticData());
+			assertEquals(1, diagnosticData.getAllSignatures().size());
+			assertEquals(1, diagnosticData.getAllCounterSignatures().size());
 		}
 	}
 

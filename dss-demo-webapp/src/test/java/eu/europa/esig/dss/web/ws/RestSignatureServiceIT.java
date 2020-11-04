@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.ServerErrorException;
+
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -52,6 +54,8 @@ import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
+import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
@@ -67,7 +71,7 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 
-public class SignatureRestServiceIT extends AbstractRestIT {
+public class RestSignatureServiceIT extends AbstractRestIT {
 
 	private RestDocumentSignatureService restClient;
 	private RestMultipleDocumentSignatureService restMultiDocsClient;
@@ -203,7 +207,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
 			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
-			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
 			ToBeSignedDTO dataToSign = restMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
@@ -357,7 +361,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
 			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
-			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
 			ToBeSignedDTO dataToSign = restMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
@@ -394,7 +398,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
 			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
-			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
 			
@@ -423,7 +427,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 	public void timestampMultipleDocumentsTest() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_E, DigestAlgorithm.SHA512);
 		
-		List<DSSDocument> documentsToSign = new ArrayList<DSSDocument>(Arrays.asList(
+		List<DSSDocument> documentsToSign = new ArrayList<>(Arrays.asList(
 				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
 		
 		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
@@ -466,7 +470,7 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 	public void timestampASiCSTest() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_S, DigestAlgorithm.SHA512);
 		
-		List<DSSDocument> documentsToSign = new ArrayList<DSSDocument>(Arrays.asList(
+		List<DSSDocument> documentsToSign = new ArrayList<>(Arrays.asList(
 				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
 		
 		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
@@ -499,6 +503,63 @@ public class SignatureRestServiceIT extends AbstractRestIT {
 				}
 			}
 			assertTrue(signedDocFound);
+		}
+	}
+
+	@Test
+	public void testCounterSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument fileToCounterSign = new FileDocument(new File("src/test/resources/xades-detached.xml"));
+			RemoteDocument signatureDocument = RemoteDocumentConverter.toRemoteDocument(fileToCounterSign);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSigningCertificate(
+					new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setSignatureIdToCounterSign("id-3fcf6164656fd9b93f2ddbd81c1c4b4d");
+
+			DataToBeCounterSignedDTO dataToBeCounterSignedDTO = new DataToBeCounterSignedDTO(signatureDocument,
+					parameters);
+			ToBeSignedDTO dataToBeCounterSigned = restClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO);
+			assertNotNull(dataToBeCounterSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeCounterSigned),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			CounterSignSignatureDTO counterSignSignatureDTO = new CounterSignSignatureDTO(signatureDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument counterSignedDocument = restClient.counterSignSignature(counterSignSignatureDTO);
+			assertNotNull(counterSignedDocument);
+		}
+	}
+
+	@Test
+	public void testPAdESCounterSign() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			FileDocument fileToCounterSign = new FileDocument(new File("src/test/resources/sample.pdf"));
+			RemoteDocument signatureDocument = RemoteDocumentConverter.toRemoteDocument(fileToCounterSign);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			parameters.setSigningCertificate(
+					new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			final DataToBeCounterSignedDTO dataToBeCounterSignedDTO = new DataToBeCounterSignedDTO(signatureDocument,
+					parameters);
+			assertThrows(ServerErrorException.class,
+					() -> restClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
 		}
 	}
 
