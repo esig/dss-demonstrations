@@ -18,6 +18,7 @@ public class MultipartFormDataFilter extends MultipartFilter {
 			multipartResolver = new CommonsMultipartResolver();
 			multipartResolver.setMaxInMemorySize(52428800);
 			multipartResolver.setMaxUploadSize(52428800);
+			multipartResolver.setResolveLazily(true);
 		}
 		return multipartResolver;
 	}
