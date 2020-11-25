@@ -191,9 +191,9 @@ public class SigningService {
 
         try {
 	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
-	        boolean asic = ASiCUtils.isAsic(signatureDocument);
+			boolean zip = ASiCUtils.isZip(signatureDocument);
 	        
-	        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+			CounterSignatureService service = getCounterSignatureService(zip, form.getSignatureForm());
 	        SerializableCounterSignatureParameters parameters = fillParameters(form);
 	
 	        ToBeSigned toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
@@ -349,7 +349,7 @@ public class SigningService {
 
 		List<String> base64CertificateChain = form.getBase64CertificateChain();
 		if (Utils.isCollectionNotEmpty(base64CertificateChain)) {
-			List<CertificateToken> certificateChain = new LinkedList<CertificateToken>();
+			List<CertificateToken> certificateChain = new LinkedList<>();
 			for (String base64Certificate : base64CertificateChain) {
 				certificateChain.add(DSSUtils.loadCertificateFromBase64EncodedString(base64Certificate));
 			}
@@ -440,9 +440,9 @@ public class SigningService {
 
         try {
 	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
-	        boolean asic = ASiCUtils.isAsic(signatureDocument);
+			boolean zip = ASiCUtils.isZip(signatureDocument);
 	        
-	        CounterSignatureService service = getCounterSignatureService(asic, form.getSignatureForm());
+			CounterSignatureService service = getCounterSignatureService(zip, form.getSignatureForm());
 	        SerializableCounterSignatureParameters parameters = fillParameters(form);
 	
 	        SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
@@ -483,9 +483,9 @@ public class SigningService {
 	}
 	
     @SuppressWarnings("rawtypes")
-    private CounterSignatureService getCounterSignatureService(boolean isAsicContainer, SignatureForm signatureForm) {
+	private CounterSignatureService getCounterSignatureService(boolean isZipContainer, SignatureForm signatureForm) {
         CounterSignatureService service = null;
-        if (isAsicContainer) {
+		if (isZipContainer) {
             service = (CounterSignatureService) getASiCSignatureService(signatureForm);
         } else {
             switch (signatureForm) {
