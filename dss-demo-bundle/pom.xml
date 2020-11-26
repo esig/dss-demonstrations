@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u252-b09.1/OpenJDK8U-jre_x86-32_windows_hotspot_8u252b09.zip</jre.download.link>
-		<jre.root.folder>jdk8u252-b09-jre</jre.root.folder>
-		<tomcat.version>8.5.56</tomcat.version>
+		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u275-b01/OpenJDK8U-jre_x86-32_windows_hotspot_8u275b01.zip</jre.download.link>
+		<jre.root.folder>jdk8u275-b01-jre</jre.root.folder>
+		<tomcat.version>8.5.60</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -104,11 +104,11 @@
 	
 	<profiles>
 		<profile>
-			<id>java14</id>
+			<id>java15</id>
 			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk14-binaries/releases/download/jdk-14.0.1%2B7.1/OpenJDK14U-jre_x86-32_windows_hotspot_14.0.1_7.zip</jre.download.link>
-				<jre.root.folder>jdk-14.0.1+7-jre</jre.root.folder>
-				<tomcat.version>9.0.36</tomcat.version>
+				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.1%2B9/OpenJDK15U-jre_x86-32_windows_hotspot_15.0.1_9.zip</jre.download.link>
+				<jre.root.folder>jdk-15.0.1+9-jre</jre.root.folder>
+				<tomcat.version>9.0.40</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>
