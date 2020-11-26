@@ -207,8 +207,7 @@ public class SignatureJAdESController {
 
 	@ModelAttribute("digestAlgos")
 	public DigestAlgorithm[] getDigestAlgorithms() {
-		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512 };
-		return algos;
+		return new DigestAlgorithm[] { DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512 };
 	}
 
 }

@@ -31,7 +31,7 @@ public class DataController {
 	@RequestMapping(value = "/packagingsByForm", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<SignaturePackaging> getAllowedPackagingsByForm(@RequestParam("form") SignatureForm signatureForm) {
-		List<SignaturePackaging> packagings = new ArrayList<SignaturePackaging>();
+		List<SignaturePackaging> packagings = new ArrayList<>();
 		if (signatureForm != null) {
 			switch (signatureForm) {
 			case CAdES:
@@ -60,7 +60,7 @@ public class DataController {
 	@RequestMapping(value = "/levelsByForm", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<SignatureLevel> getAllowedLevelsByForm(@RequestParam("form") SignatureForm signatureForm, @RequestParam("process") ProcessEnum process) {
-		List<SignatureLevel> levels = new ArrayList<SignatureLevel>();
+		List<SignatureLevel> levels = new ArrayList<>();
 		if (signatureForm != null) {
 			switch (signatureForm) {
 			case CAdES:                
@@ -109,7 +109,7 @@ public class DataController {
 	@RequestMapping(value = "/levelsBySerialization", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<SignatureLevel> getAllowedLevelsByJWSSerialization(@RequestParam("serializationType") JWSSerializationType jwsSerializationType) {
-		List<SignatureLevel> levels = new ArrayList<SignatureLevel>();
+		List<SignatureLevel> levels = new ArrayList<>();
 		if (jwsSerializationType != null) {
 			switch (jwsSerializationType) {
 			case COMPACT_SERIALIZATION:
@@ -118,10 +118,9 @@ public class DataController {
 			case JSON_SERIALIZATION:
 			case FLATTENED_JSON_SERIALIZATION:
 				levels.add(SignatureLevel.JAdES_BASELINE_B);
-				// not supported so far
-//				levels.add(SignatureLevel.JAdES_BASELINE_T);
-//				levels.add(SignatureLevel.JAdES_BASELINE_LT);
-//				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				levels.add(SignatureLevel.JAdES_BASELINE_T);
+				levels.add(SignatureLevel.JAdES_BASELINE_LT);
+				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
 				break;
 			default:
 				break;
