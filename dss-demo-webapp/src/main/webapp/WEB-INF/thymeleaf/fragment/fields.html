@@ -227,7 +227,7 @@
 <!-- JAdES specific -->
 
 <div class="form-group row" th:fragment="field-jws-serialization-type">
-    <label class="col-sm-3 col-form-label font-weight-bold" for="jwsSerializationType" th:text="#{label.signature.jws.serialization.type}"></label>
+    <label class="col-sm-3 col-form-label" for="jwsSerializationType" th:text="#{label.signature.jws.serialization.type}"></label>
     <div class="col-sm-5">
 		<th:block th:each="serializationType : ${jwsSerializationTypes}">
 			<div class="form-check form-check-inline">
@@ -243,7 +243,7 @@
 </div>
 
 <div class="form-group row" th:fragment="field-sigd-mechanism">
-    <label class="col-sm-3 col-form-label font-weight-bold" for="sigDMechanism" th:text="#{label.signature.sigd.mechanism}"></label>
+    <label class="col-sm-3 col-form-label" for="sigDMechanism" th:text="#{label.signature.sigd.mechanism}"></label>
     <div class="col-sm-5">
 		<th:block th:each="mechanism : ${sigDMechanisms}">
 			<div class="form-check form-check-inline">
@@ -267,7 +267,7 @@
 </div>
 
 <div class="form-group row" id="base64url-payload" th:fragment="field-base64url-payload">
-	<label class="col-sm-3 col-form-label font-weight-bold" for="base64UrlEncodedPayload" th:text="#{label.signature.jws.base64url}"></label>
+	<label class="col-sm-3 col-form-label" for="base64UrlEncodedPayload" th:text="#{label.signature.jws.base64url}"></label>
 	<div class="col-sm-5">
 		<div class="form-check">
 			<input class="form-check-input position-static" type="checkbox" name="base64UrlEncodedPayload" th:aria-label="#{label.signature.jws.base64url}" checked />
@@ -276,7 +276,7 @@
 </div>
 
 <div class="form-group row" th:fragment="field-jades-signature-packaging">
-    <label class="col-sm-3 col-form-label font-weight-bold" for="signaturePackaging" th:text="#{label.signature.packaging}"></label>
+    <label class="col-sm-3 col-form-label" for="signaturePackaging" th:text="#{label.signature.packaging}"></label>
     <div class="col-sm-5">
 		<th:block th:each="sigPack : ${signaturePackagings}">
        		<div class="form-check form-check-inline">
