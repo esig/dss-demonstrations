@@ -1,16 +1,5 @@
 package eu.europa.esig.dss.web.service;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import eu.europa.esig.dss.AbstractSignatureParameters;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESSignatureParameters;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESTimestampParameters;
@@ -61,6 +50,15 @@ import eu.europa.esig.dss.x509.tsp.MockTSPSource;
 import eu.europa.esig.dss.xades.XAdESSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESCounterSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.xml.bind.DatatypeConverter;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 @Component
 public class SigningService {
@@ -315,7 +313,8 @@ public class SigningService {
 		parameters.setJwsSerializationType(form.getJwsSerializationType());
 		parameters.setSigDMechanism(form.getSigDMechanism());
 		parameters.setBase64UrlEncodedPayload(form.isBase64UrlEncodedPayload());
-		
+		parameters.setBase64UrlEncodedEtsiUComponents(form.isBase64UrlEncodedEtsiU());
+
 		fillParameters(parameters, form);
 		
 		return parameters;

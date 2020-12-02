@@ -1,32 +1,5 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.ByteArrayInputStream;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
@@ -48,6 +21,31 @@ import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignatureJAdESForm;
 import eu.europa.esig.dss.web.model.SignatureValueAsString;
 import eu.europa.esig.dss.web.service.SigningService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayInputStream;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 @SessionAttributes(value = { "signatureJAdESForm", "signedJAdESDocument" })
@@ -60,7 +58,8 @@ public class SignatureJAdESController {
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "documentsToSign", "jwsSerializationType", "signaturePackaging",
-			"signatureLevel", "sigDMechanism", "base64UrlEncodedPayload", "digestAlgorithm", "signWithExpiredCertificate", "addContentTimestamp" };
+			"signatureLevel", "sigDMechanism", "base64UrlEncodedPayload", "base64UrlEncodedEtsiU", "digestAlgorithm",
+			"signWithExpiredCertificate", "addContentTimestamp" };
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
@@ -108,12 +107,12 @@ public class SignatureJAdESController {
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
 			@ModelAttribute("signatureJAdESForm") @Valid SignatureJAdESForm signatureJAdESForm, BindingResult result) {
 		if (result.hasErrors()) {
-//			if (LOG.isDebugEnabled()) {
+			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();
 				for (ObjectError error : allErrors) {
-					LOG.warn(error.getDefaultMessage());
+					LOG.debug(error.getDefaultMessage());
 				}
-//			}
+			}
 			return SIGNATURE_JAdES;
 		}
 
@@ -129,12 +128,6 @@ public class SignatureJAdESController {
 	@ResponseBody
 	public GetDataToSignResponse getDataToSign(Model model, @RequestBody @Valid DataToSignParams params,
 			@ModelAttribute("signatureJAdESForm") @Valid SignatureJAdESForm signatureJAdESForm, BindingResult result) {
-
-		LOG.info("Serialization : {}", signatureJAdESForm.getJwsSerializationType());
-		LOG.info("SigD : {}", signatureJAdESForm.getSigDMechanism());
-		LOG.info("Level : {}", signatureJAdESForm.getSignatureLevel());
-		LOG.info("Form : {}", signatureJAdESForm.getSignatureForm());
-		LOG.info("Packaging : {}", signatureJAdESForm.getSignaturePackaging());
 		
 		signatureJAdESForm.setBase64Certificate(params.getSigningCertificate());
 		signatureJAdESForm.setBase64CertificateChain(params.getCertificateChain());

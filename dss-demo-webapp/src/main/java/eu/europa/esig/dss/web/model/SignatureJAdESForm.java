@@ -1,17 +1,15 @@
 package eu.europa.esig.dss.web.model;
 
-import java.util.List;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.web.WebAppUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class SignatureJAdESForm extends AbstractSignatureForm {
 
@@ -26,6 +24,8 @@ public class SignatureJAdESForm extends AbstractSignatureForm {
 	private SigDMechanism sigDMechanism;
 	
 	private boolean base64UrlEncodedPayload;
+
+	private boolean base64UrlEncodedEtsiU;
 	
 	public SignatureJAdESForm() {
 		setSignatureForm(SignatureForm.JAdES);
@@ -69,6 +69,14 @@ public class SignatureJAdESForm extends AbstractSignatureForm {
 
 	public void setBase64UrlEncodedPayload(boolean base64UrlEncodedPayload) {
 		this.base64UrlEncodedPayload = base64UrlEncodedPayload;
+	}
+
+	public boolean isBase64UrlEncodedEtsiU() {
+		return base64UrlEncodedEtsiU;
+	}
+
+	public void setBase64UrlEncodedEtsiU(boolean base64UrlEncodedEtsiU) {
+		this.base64UrlEncodedEtsiU = base64UrlEncodedEtsiU;
 	}
 
 	@AssertTrue(message = "{error.to.sign.files.mandatory}")
