@@ -127,7 +127,7 @@ public class SigningService {
 			LOG.info("End getDataToSign with one document");
 			return toBeSigned;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 
@@ -144,7 +144,7 @@ public class SigningService {
 			LOG.info("End getDataToSign with one digest");
 			return toBeSigned;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 
@@ -161,7 +161,7 @@ public class SigningService {
 			LOG.info("End getDataToSign with multiple documents");
 			return toBeSigned;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 
@@ -179,7 +179,7 @@ public class SigningService {
 			LOG.info("End getDataToSign with one JAdES");
 			return toBeSigned;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}    
 	
@@ -199,7 +199,7 @@ public class SigningService {
 	        LOG.info("End getDataToSign with one document");
 	        return toBeSigned;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
     }
 
@@ -371,7 +371,7 @@ public class SigningService {
 			LOG.info("End signDocument with one document");
 			return signedDocument;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 
@@ -390,7 +390,7 @@ public class SigningService {
 			LOG.info("End signDigest with one digest");
 			return signedDocument;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 
@@ -409,7 +409,7 @@ public class SigningService {
 			LOG.info("End signDocument with multiple documents");
 			return signedDocument;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 
@@ -429,7 +429,7 @@ public class SigningService {
 			LOG.info("End signDocument with JAdES");
 			return signedDocument;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
 	}
 	
@@ -451,7 +451,7 @@ public class SigningService {
 	        LOG.info("End signDocument with one document");
 	        return signedDocument;
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e);
+			throw new ApplicationJsonRequestException(e.getMessage());
 		}
     }
 

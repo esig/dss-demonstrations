@@ -12,8 +12,4 @@ public class ApplicationJsonRequestException extends RuntimeException {
 		super(message);
 	}
 	
-	public ApplicationJsonRequestException(Exception e) {
-		super(e);
-	}
-
 }
