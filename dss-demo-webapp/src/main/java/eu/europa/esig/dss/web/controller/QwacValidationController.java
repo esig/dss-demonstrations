@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
@@ -89,7 +89,7 @@ public class QwacValidationController extends AbstractValidationController {
 			CertificateToken qwacCertificate = certificates.iterator().next();
 			CertificateValidator certificateValidator = CertificateValidator.fromCertificate(qwacCertificate);
 			certificateValidator.setCertificateVerifier(cv);
-			certificateValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
+			certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
 					qwacValidationForm.isIncludeRevocationTokens()));
 
 			CertificateReports reports = certificateValidator.validate();

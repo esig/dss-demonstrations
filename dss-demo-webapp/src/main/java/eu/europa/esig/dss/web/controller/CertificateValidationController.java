@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -89,8 +89,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(getCertificateVerifier(certValidationForm));
-		certificateValidator.setTokenExtractionStategy(
-				TokenExtractionStategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
+		certificateValidator.setTokenExtractionStrategy(
+				TokenExtractionStrategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
 
 		Locale locale = request.getLocale();

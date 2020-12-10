@@ -44,7 +44,7 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
-import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.x509.CertificateToken;
@@ -120,7 +120,7 @@ public class ValidationController extends AbstractValidationController {
 		SignedDocumentValidator documentValidator = SignedDocumentValidator
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
 		documentValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
-		documentValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(validationForm.isIncludeCertificateTokens(),
+		documentValidator.setTokenExtractionStategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 
