@@ -46,6 +46,8 @@ $('input[type=file][name=documentToCounterSign]').change(function() {
                 }));
             });
         	
+            getDigestAlgorithms(signatureForm);
+
         	disable(false);
         },
         error : function(msg) {

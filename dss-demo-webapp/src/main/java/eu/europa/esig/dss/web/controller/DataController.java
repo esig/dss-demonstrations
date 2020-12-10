@@ -1,8 +1,11 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
+import eu.europa.esig.dss.enumerations.SignatureForm;
+import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.web.model.ProcessEnum;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -11,11 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import eu.europa.esig.dss.enumerations.JWSSerializationType;
-import eu.europa.esig.dss.enumerations.SignatureForm;
-import eu.europa.esig.dss.enumerations.SignatureLevel;
-import eu.europa.esig.dss.enumerations.SignaturePackaging;
-import eu.europa.esig.dss.web.model.ProcessEnum;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/data")
@@ -104,6 +105,16 @@ public class DataController {
 			}
 		}
 		return levels;
+	}
+
+	@RequestMapping(value = "/digestAlgosByForm", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<DigestAlgorithm> getAllowedDigestAlgorithmsBySignatureForm(@RequestParam("form") SignatureForm signatureForm) {
+		if (SignatureForm.JAdES.equals(signatureForm)) {
+			return Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+		} else {
+			return Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+		}
 	}
 
 	@RequestMapping(value = "/levelsBySerialization", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -203,4 +203,9 @@ public class SignatureJAdESController {
 		return new DigestAlgorithm[] { DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512 };
 	}
 
+	@ModelAttribute("isMockUsed")
+	public boolean isMockUsed() {
+		return signingService.isMockTSPSourceUsed();
+	}
+
 }
