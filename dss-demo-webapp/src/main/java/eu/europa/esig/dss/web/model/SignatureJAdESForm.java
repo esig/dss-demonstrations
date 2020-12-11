@@ -89,4 +89,9 @@ public class SignatureJAdESForm extends AbstractSignatureForm {
 		return !SignaturePackaging.ENVELOPING.equals(signaturePackaging) || (documentsToSign != null && documentsToSign.size() == 1);
 	}
 
+	@AssertTrue(message = "{error.jades.sigDMechanism.mandatory}")
+	public boolean isSigDMechanismValid() {
+		return !SignaturePackaging.DETACHED.equals(signaturePackaging) || sigDMechanism != null;
+	}
+
 }

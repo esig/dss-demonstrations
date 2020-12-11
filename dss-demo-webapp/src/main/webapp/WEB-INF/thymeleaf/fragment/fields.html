@@ -261,8 +261,8 @@
            	</div>
 		</th:block>
     </div>
-    <div class="col-xs-3 col-md-offset-1"> 	
-    	<p th:if="${#fields.hasErrors('sigDMechanism')}" th:errors="*{sigDMechanism}" class="text-danger">Error</p>
+    <div class="col-sm-4 p-0">
+    	<p th:if="${#fields.hasErrors('sigDMechanism*')}" th:errors="*{sigDMechanism*}" class="text-danger">Error</p>
     </div>
 </div>
 
