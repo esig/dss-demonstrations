@@ -505,7 +505,7 @@ public class RestDocumentationApp {
 					parameters);
 			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.accept(ContentType.JSON).body(dataToBeCounterSignedDTO, ObjectMapperType.JACKSON_2)
-					.post("/dss-demo-webapp/services/rest/signature/one-document/getDataToBeCounterSigned");
+					.post("/services/rest/signature/one-document/getDataToBeCounterSigned");
 			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
 			ToBeSignedDTO toBeCounterSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
 			assertNotNull(toBeCounterSignedDTO);
@@ -524,7 +524,7 @@ public class RestDocumentationApp {
 			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.accept(ContentType.JSON).accept(ContentType.JSON)
 					.body(counterSignSignatureDTO, ObjectMapperType.JACKSON_2)
-					.post("/dss-demo-webapp/services/rest/signature/one-document/counterSignSignature");
+					.post("/services/rest/signature/one-document/counterSignSignature");
 			responseSignDocument.then().assertThat().statusCode(equalTo(200));
 
 			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
