@@ -523,12 +523,12 @@ public class SigningService {
 				break;
 			case JAdES:
 				JAdESSignatureParameters jadesParameters = new JAdESSignatureParameters();
-				jadesParameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION); // to allow T+ levels
+				jadesParameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION); // to allow T+ levels + parallel signing
 	            jadesParameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH); // to use by default
 				parameters = jadesParameters;
 				break;
 			default:
-				LOG.error("Unknow signature form : " + signatureForm);
+				LOG.error("Unknown signature form : " + signatureForm);
 			}
 		}
 		return parameters;
