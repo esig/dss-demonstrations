@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
-import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.WebAppUtils;
 
 public class SignatureMultipleDocumentsForm extends AbstractSignatureForm {
 
@@ -35,15 +35,7 @@ public class SignatureMultipleDocumentsForm extends AbstractSignatureForm {
 
 	@AssertTrue(message = "{error.to.sign.files.mandatory}")
 	public boolean isDocumentsToSign() {
-		if (Utils.isCollectionNotEmpty(documentsToSign)) {
-			for (MultipartFile multipartFile : documentsToSign) {
-				if (multipartFile != null && !multipartFile.isEmpty()) {
-					// return true if at least one file is not empty
-					return true;
-				}
-			}
-		}
-		return false;
+		return WebAppUtils.isCollectionNotEmpty(documentsToSign);
 	}
 
 }

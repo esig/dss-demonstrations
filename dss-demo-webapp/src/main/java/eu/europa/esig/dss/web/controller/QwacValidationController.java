@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.CertificateReorderer;
-import eu.europa.esig.dss.enumerations.TokenExtractionStategy;
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
@@ -78,21 +77,19 @@ public class QwacValidationController extends AbstractValidationController {
 		List<CertificateToken> certificates = sslCertificateLoader.getCertificates(url);
 		
 		if (Utils.isCollectionNotEmpty(certificates)) {
-			CertificateReorderer certificateReorderer = new CertificateReorderer(certificates);
-			List<CertificateToken> certificateChain = certificateReorderer.getOrderedCertificates();
-			CertificateToken qwacCertificate = certificateChain.iterator().next();
-			
 			CertificateVerifier cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
 	        
 	        CommonCertificateSource adjunctCertificateSource = new CommonCertificateSource();
-	        for (CertificateToken certificateToken : certificateChain) {
+	        for (CertificateToken certificateToken : certificates) {
 	        	adjunctCertificateSource.addCertificate(certificateToken);
 	        }
 	        cv.addAdjunctCertSources(adjunctCertificateSource);
 			
+			// first certificate shall be the peer's own certificate
+			CertificateToken qwacCertificate = certificates.iterator().next();
 			CertificateValidator certificateValidator = CertificateValidator.fromCertificate(qwacCertificate);
 			certificateValidator.setCertificateVerifier(cv);
-			certificateValidator.setTokenExtractionStategy(TokenExtractionStategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
+			certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
 					qwacValidationForm.isIncludeRevocationTokens()));
 
 			CertificateReports reports = certificateValidator.validate();

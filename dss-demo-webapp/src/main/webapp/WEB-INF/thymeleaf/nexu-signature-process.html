@@ -19,6 +19,12 @@
 		            var tokenId;
 		            var keyId;
 		            
+	                var csrf_token = $("meta[name='_csrf']").attr("content");
+	                var csrf_header = $("meta[name='_csrf_header']").attr("content");
+	                
+	                var headers = new Array();
+	                headers[csrf_header] = csrf_token; 
+		            
 		            window.onload = function() {
 		                getCertificates();
 		            };
@@ -42,7 +48,7 @@
 		                    tokenId = certificateData.response.tokenId.id;
 		                    keyId = certificateData.response.keyId;
 		                    var toSend = { signingCertificate: signingCertificate, certificateChain: certificateChain, encryptionAlgorithm: encryptionAlgorithm };
-		                    callUrl(/*[[${rootUrl+'/get-data-to-sign'}]]*/, "POST",  JSON.stringify(toSend), sign, error);
+		                    call(/*[[${rootUrl+'/get-data-to-sign'}]]*/, "POST",  JSON.stringify(toSend), headers, sign, error);
 		                }
 		            }
 		            
@@ -63,7 +69,7 @@
 		                updateProgressBar("Signing the document...", "75%");
 		                var signatureValue = signatureData.response.signatureValue;
 		                var toSend = {signatureValue:signatureValue};
-		                callUrl(/*[[${rootUrl}+'/sign-document']]*/, "POST", JSON.stringify(toSend), downloadSignedDocument, error);
+		                call(/*[[${rootUrl}+'/sign-document']]*/, "POST", JSON.stringify(toSend), headers, downloadSignedDocument, error);
 		            }
 		            
 		            function downloadSignedDocument(signDocumentResponse) {
@@ -77,13 +83,17 @@
 		            
 		            function error(error) {
 		                $('#bar').removeClass('bg-success progress-bar-striped progress-bar-animated active').addClass('bg-danger');
-		                if (error!= null && error.responseJSON !=null) {
-		                    var jsonResp = error.responseJSON;
-		                    if (jsonResp.errorMessage != null){
-		                        $("#errorcontent").html(jsonResp.errorMessage);
-		                    }
-		                    else if (jsonResp.error != null){
-		                        $("#errorcontent").html(jsonResp.error);
+		                if (error != null) {
+		                	var message = error.responseJSON;
+		                	if (message == null) {
+		                		message = error.responseText;
+		                	}
+		                	if (message.errorMessage != null) {
+		                		message = message.errorMessage;
+		                	}
+		                	console.log(message);
+		                    if (message != null){
+		                        $("#errorcontent").html(message);
 		                    }
 		                }
 		                $("#error").show();
@@ -94,6 +104,26 @@
 		                $('#bar-text').html(action);
 		                $('#bar').width(percent);
 		            }
+		            
+		            function call(url, type, data, headers, success_callback, error_callback) {
+		            	console.log(headers);
+		                $.ajax({
+		                      type: type,
+		                      url: url,
+		                      data: data,
+		                      crossDomain: true, 
+		                      contentType: "application/json; charset=utf-8",
+		                      dataType: "json",
+		                      headers : headers,
+		                      success: function (result) {
+		                          console.log(url + " : OK");
+		                          success_callback.call(this, result);
+		                      }
+		                    }).fail(function (error, textStatus ) {
+		                        console.log(url + " : NOT OK " + textStatus);
+		                        error_callback.call(this, error);
+		                    });
+		            } 
 		
 		            /*]]>*/
 		    </script>

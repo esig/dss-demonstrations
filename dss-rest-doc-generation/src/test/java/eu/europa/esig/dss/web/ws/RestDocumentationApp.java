@@ -35,6 +35,7 @@ import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
 import eu.europa.esig.dss.enumerations.TimestampContainerForm;
+import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -50,6 +51,8 @@ import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
+import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
@@ -57,6 +60,7 @@ import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
@@ -180,11 +184,14 @@ public class RestDocumentationApp {
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 
 			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
-			imageParameters.setPage(1);
-			imageParameters.setxAxis(200.F);
-			imageParameters.setyAxis(100.F);
-			imageParameters.setWidth(130);
-			imageParameters.setHeight(50);
+			
+			RemoteSignatureFieldParameters fieldParameters = new RemoteSignatureFieldParameters();
+			fieldParameters.setPage(1);
+			fieldParameters.setOriginX(200.F);
+			fieldParameters.setOriginY(100.F);
+			fieldParameters.setWidth(130.F);
+			fieldParameters.setHeight(50.F);
+			imageParameters.setFieldParameters(fieldParameters);
 
 			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
 			textParameters.setText("Signature");
@@ -193,6 +200,7 @@ public class RestDocumentationApp {
 			textParameters.setTextColor(ColorConverter.toRemoteColor(Color.BLUE));
 			textParameters.setBackgroundColor(ColorConverter.toRemoteColor(Color.WHITE));
 			imageParameters.setTextParameters(textParameters);
+			
 			parameters.setImageParameters(imageParameters);
 			dataToSign.setParameters(parameters);
 
@@ -303,7 +311,7 @@ public class RestDocumentationApp {
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
 			dataToSignMultiDocs.setParameters(parameters);
 
-			List<RemoteDocument> toSignDocuments = new ArrayList<RemoteDocument>();
+			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			RemoteDocument doc1 = new RemoteDocument();
 			doc1.setBytes("Hello".getBytes("UTF-8"));
 			doc1.setName("test1.bin");
@@ -470,6 +478,59 @@ public class RestDocumentationApp {
 		RemoteDocument timestampResponse = response.andReturn().as(RemoteDocument.class);
 		assertNotNull(timestampResponse);
 		assertNotNull(timestampResponse.getBytes());
+	}
+
+	@Test
+	public void counterSignSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument fileToCounterSign = new FileDocument(new File("src/test/resources/xades-detached.xml"));
+			RemoteDocument signatureDocument = RemoteDocumentConverter.toRemoteDocument(fileToCounterSign);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSigningCertificate(
+					new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setSignatureIdToCounterSign("id-afde782436468dd74eeb181f7ce110e1");
+
+			// get data to be counter signed
+
+			DataToBeCounterSignedDTO dataToBeCounterSignedDTO = new DataToBeCounterSignedDTO(signatureDocument,
+					parameters);
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(dataToBeCounterSignedDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/one-document/getDataToBeCounterSigned");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO toBeCounterSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(toBeCounterSignedDTO);
+
+			// sign locally
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(toBeCounterSignedDTO),
+					parameters.getDigestAlgorithm(), dssPrivateKeyEntry);
+			assertNotNull(signatureValue);
+
+			// sign document
+
+			CounterSignSignatureDTO counterSignSignatureDTO = new CounterSignSignatureDTO(signatureDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).accept(ContentType.JSON)
+					.body(counterSignSignatureDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/one-document/counterSignSignature");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertNotNull(signedDocument.getBytes());
+		}
 	}
 
 	private byte[] toByteArray(File file) throws IOException {

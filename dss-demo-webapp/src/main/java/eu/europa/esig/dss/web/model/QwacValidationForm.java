@@ -3,6 +3,7 @@ package eu.europa.esig.dss.web.model;
 import javax.validation.constraints.AssertTrue;
 
 import eu.europa.esig.dss.spi.client.http.Protocol;
+import eu.europa.esig.dss.utils.Utils;
 
 public class QwacValidationForm {
 	
@@ -39,7 +40,7 @@ public class QwacValidationForm {
 
 	@AssertTrue(message = "{error.url.invalid}")
 	public boolean isUrlValid() {
-		return Protocol.isHttpUrl(url);
+		return Protocol.isHttpUrl(Utils.trim(url));
 	}
 
 }

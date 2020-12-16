@@ -26,8 +26,8 @@
      <div class="col-sm-5">
     	<input type="file" class="form-control-file" name="documentsToSign" id="documentsToSign" multiple="multiple" /> 
      </div>
-     <div class="col-xs-4">
-     	<p th:if="${#fields.hasErrors('documentsToSign')}" th:errors="*{documentsToSign}" class="text-danger">Error</p>
+     <div class="col-sm-4 p-0">
+        <p th:if="${#fields.hasErrors('documentsToSign*')}" th:errors="*{documentsToSign*}" class="text-danger">Error</p>
      </div>
 </div>
 
@@ -134,7 +134,7 @@
 		<input type="text" class="form-control input-sm" th:field="*{digestToSign}" />
 		<input type="hidden" class="form-control input-sm" th:field="*{documentName}" />
     </div>
-    <div class="loader" id="spinner"></div>
+    <div class="loader d-none" id="spinner"></div>
 	<div class="offset-sm-3 col-sm-5">
 		<div class="position-relative">
 		  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}"></label>	
@@ -154,6 +154,29 @@
     <div class="alert alert-warning m-0" role="alert">
          The digest computation is not available in your browser! More information is available by the 
          <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest" target="_blank">link</a>.
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-document-to-counter-sign">
+    <label class="col-sm-3 col-form-label" for="documentToCounterSign" th:text="#{label.to.counter.sign.file}"></label>
+    <div class="col-sm-5">
+           <input type="file" class="form-control-file" name="documentToCounterSign" id="documentToCounterSign" /> 
+    </div>
+    <div class="loader d-none" id="spinner"></div>
+    <div class="col-sm-4 p-0" id="documentToCounterSignError">
+       <p th:if="${#fields.hasErrors('documentToCounterSign')}" 
+                th:errors="*{documentToCounterSign}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-id">
+    <label class="col-sm-3 col-form-label" for="signatureIdToCounterSign" th:text="#{label.signature.id}"></label>
+    <div class="col-sm-5">
+        <select name="signatureIdToCounterSign" class="custom-select" id="selectSignatureId">
+        </select>
+    </div>
+    <div class="col-xs-3 col-md-offset-1">     
+           <p th:if="${#fields.hasErrors('signatureIdToCounterSign')}" th:errors="*{signatureIdToCounterSign}" class="text-danger">Error</p>
     </div>
 </div>
 
@@ -200,6 +223,98 @@
     	<p th:if="${#fields.hasErrors('digestAlgorithm')}" th:errors="*{digestAlgorithm}" class="text-danger">Error</p>
     </div>
 </div>
+
+<!-- JAdES specific -->
+
+<div class="form-group row" th:fragment="field-jws-serialization-type">
+    <label class="col-sm-3 col-form-label" for="jwsSerializationType" th:text="#{label.signature.jws.serialization.type}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="serializationType : ${jwsSerializationTypes}">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" th:field="*{jwsSerializationType}" 
+           				th:value="${serializationType}" th:id="serialization+${serializationType}" />
+           		<label class="form-check-label" th:for="serialization+${serializationType}" th:text="#{${'label.'+serializationType}}"></label>
+           	</div>
+		</th:block>
+    </div>
+    <div class="col-xs-3 col-md-offset-1"> 	
+    	<p th:if="${#fields.hasErrors('jwsSerializationType')}" th:errors="*{jwsSerializationType}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-sigd-mechanism">
+    <label class="col-sm-3 col-form-label" for="sigDMechanism" th:text="#{label.signature.sigd.mechanism}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="mechanism : ${sigDMechanisms}">
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="radio" th:field="*{sigDMechanism}" th:value="${mechanism}" 
+						th:id="mechanism+${mechanism}" />
+				<th:block th:with="httpHeaders = ${mechanism == T(eu.europa.esig.dss.enumerations.SigDMechanism).HTTP_HEADERS}">
+					<th:block th:if="${httpHeaders}">
+           				<label class="form-check-label" th:for="mechanism+${mechanism}" th:text="#{${'label.'+mechanism}}"
+           						data-toggle="tooltip" data-placement="top" th:title="#{label.sigD.http.headers.tooltip}"></label>
+					</th:block>
+					<th:block th:unless="${httpHeaders}">
+           				<label class="form-check-label" th:for="mechanism+${mechanism}" th:text="#{${'label.'+mechanism}}"></label>
+					</th:block>
+				</th:block>
+           	</div>
+		</th:block>
+    </div>
+    <div class="col-sm-4 p-0">
+    	<p th:if="${#fields.hasErrors('sigDMechanism*')}" th:errors="*{sigDMechanism*}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" id="base64url-payload" th:fragment="field-base64url-payload">
+	<label class="col-sm-3 col-form-label" for="base64UrlEncodedPayload" th:text="#{label.signature.jws.base64url}"></label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="base64UrlEncodedPayload"
+				   th:aria-label="#{label.signature.jws.base64url}" checked />
+			<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+			   data-placement="top" th:title="#{label.signature.jws.base64url.tooltip}"></i>
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" id="base64url-etsiU" th:fragment="field-base64url-etsiU">
+	<label class="col-sm-3 col-form-label" for="base64UrlEncodedEtsiU" th:text="#{label.signature.jws.etsiu.base64url}"></label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="base64UrlEncodedEtsiU"
+				   th:aria-label="#{label.signature.jws.etsiu.base64url}" checked />
+			<input type="hidden" name="base64UrlEncodedEtsiU" value="true" />
+			<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+			   data-placement="top" th:title="#{label.signature.jws.etsiu.base64url.tooltip}"></i>
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-jades-signature-packaging">
+    <label class="col-sm-3 col-form-label" for="signaturePackaging" th:text="#{label.signature.packaging}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="sigPack : ${signaturePackagings}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{signaturePackaging}" th:value="${sigPack}" th:id="${'signaturePackaging-'+sigPack}" />
+            	<th:block th:with="enveloping = ${sigPack == T(eu.europa.esig.dss.enumerations.SignaturePackaging).ENVELOPING}">
+					<th:block th:if="${enveloping}">
+            			<label class="form-check-label" th:for="${'signaturePackaging-'+sigPack}" th:text="#{${'label.'+sigPack}}"
+           						data-toggle="tooltip" data-placement="top" th:title="#{label.jades.enveloping.tooltip}"></label>
+					</th:block>
+					<th:block th:unless="${enveloping}">
+            			<label class="form-check-label" th:for="${'signaturePackaging-'+sigPack}" th:text="#{${'label.'+sigPack}}"></label>
+					</th:block>
+				</th:block>
+            </div>
+		</th:block>
+    </div>
+    <div class="col-xs-3">
+    	<p th:if="${#fields.hasErrors('signaturePackaging')}" th:errors="*{signaturePackaging}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<!-- END JAdES specific -->
 
 <div class="form-group row" id="sign-expired-block" th:fragment="field-sign-expired">
 	<label class="col-sm-3 col-form-label" for="signWithExpiredCertificate" th:text="#{label.allow.expired.certificate}">Accept expired certificate</label>
@@ -265,6 +380,30 @@
 	<div class="col-sm-9 offset-sm-3 align-self-center">
 		<p th:if="${#fields.hasErrors('validationTime')}" th:errors="*{validationTime}" class="text-danger">Error</p>
 	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-signing-certificate">
+    <label class="col-sm-3 col-form-label" for="signingCertificate" th:text="#{label.signing.certificate}"></label>
+    <div class="col-sm-6">
+        <input type="file" class="form-control-file" name="signingCertificate" accept=".cer,.der,.pem,.crt" />
+        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+            data-placement="top" th:title="#{label.validation.signing.certificate.tooltip}"></i>
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('signingCertificate')}" th:errors="*{signingCertificate}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-adjunct-certificates">
+    <label class="col-sm-3 col-form-label" for="adjunctCertificates" th:text="#{label.adjunct.certificates}"></label>
+    <div class="col-sm-6">
+        <input type="file" class="form-control-file" name="adjunctCertificates" multiple="multiple" accept=".cer,.der,.pem,.crt" />
+        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+            data-placement="top" th:title="#{label.validation.adjunct.certificates.tooltip}"></i>
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('adjunctCertificates')}" th:errors="adjunctCertificates" class="text-danger">Error</p>
+    </div>
 </div>
 
 <div class="form-group row" th:fragment="field-certificate-tokens">

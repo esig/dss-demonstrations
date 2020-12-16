@@ -3,6 +3,7 @@ package eu.europa.esig.dss.standalone.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -35,6 +36,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -56,6 +58,15 @@ public class SignatureController implements Initializable {
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
 	
 	private final String nbCertificatesTest = "Number of Trusted Certificates : ";
+	
+	private final List<DigestAlgorithm> supportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
+			DigestAlgorithm.SHA384, DigestAlgorithm.SHA512, DigestAlgorithm.SHA3_224, DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512);
+	
+	/** A list of DigestAlgorithms supported by the current chosen SignatureFormat */
+	private List<DigestAlgorithm> sigFormSupportedDigestAlgorithms;
+
+	/** A list of DigestAlgorithms supported by the current chosen SignatureTokenType */
+	private List<DigestAlgorithm> sigTokenTypeSupportedDigestAlgorithms;
 
 	@FXML
 	private Button fileSelectButton;
@@ -83,6 +94,9 @@ public class SignatureController implements Initializable {
 
 	@FXML
 	private RadioButton xadesRadio;
+
+	@FXML
+	private RadioButton jadesRadio;
 
 	@FXML
 	private HBox hSignaturePackaging;
@@ -220,6 +234,7 @@ public class SignatureController implements Initializable {
 		cadesRadio.setUserData(SignatureForm.CAdES);
 		xadesRadio.setUserData(SignatureForm.XAdES);
 		padesRadio.setUserData(SignatureForm.PAdES);
+		jadesRadio.setUserData(SignatureForm.JAdES);
 		toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -248,13 +263,7 @@ public class SignatureController implements Initializable {
 			}
 		});
 		
-		List<DigestAlgorithm> skipAlgos = Arrays.asList(DigestAlgorithm.MD2, DigestAlgorithm.MD5,
-				DigestAlgorithm.RIPEMD160, DigestAlgorithm.SHAKE128, DigestAlgorithm.SHAKE256,
-				DigestAlgorithm.SHAKE256_512);
-		for (DigestAlgorithm digestAlgo : DigestAlgorithm.values()) {
-			if (skipAlgos.contains(digestAlgo)) {
-				continue;
-			}
+		for (DigestAlgorithm digestAlgo : supportedDigestAlgorithms) {
 			RadioButton rb = new RadioButton(digestAlgo.getName());
 			rb.setUserData(digestAlgo);
 			rb.setToggleGroup(toggleDigestAlgo);
@@ -287,6 +296,8 @@ public class SignatureController implements Initializable {
 				}
 				model.setPkcsFile(null);
 				model.setPassword(null);
+				
+				updateSigTokenType(newValue);
 			}
 		});
 		
@@ -443,6 +454,7 @@ public class SignatureController implements Initializable {
 			cadesRadio.setDisable(false);
 			padesRadio.setDisable(false);
 			xadesRadio.setDisable(false);
+			jadesRadio.setDisable(false);
 			hSignaturePackaging.setVisible(true);
 		}
 
@@ -452,6 +464,8 @@ public class SignatureController implements Initializable {
 		model.setSignatureForm(signatureForm);
 
 		reinitSignaturePackagings();
+		
+		sigFormSupportedDigestAlgorithms = supportedDigestAlgorithms;
 
 		comboLevel.setDisable(false);
 		comboLevel.getItems().removeAll(comboLevel.getItems());
@@ -480,25 +494,57 @@ public class SignatureController implements Initializable {
 				envelopedRadio.setDisable(false);
 				detachedRadio.setDisable(false);
 				internallyDetachedRadio.setDisable(false);
+				
+				sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
+						DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 
 				comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
 						SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
 				comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
 				break;
+			case JAdES:
+				envelopingRadio.setDisable(false);
+				detachedRadio.setDisable(false);
+				
+				sigFormSupportedDigestAlgorithms =  Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+
+				comboLevel.getItems().addAll(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
+						SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
+				comboLevel.setValue(SignatureLevel.JAdES_BASELINE_B);
 			default:
 				break;
 			}
 		}
+		
+		reinitDigestAlgos();
+	}
+	
+	private void updateSigTokenType(Toggle newValue) {
+		SignatureTokenType tokenType = (SignatureTokenType) newValue.getUserData();
+		
+		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<DigestAlgorithm>(supportedDigestAlgorithms);
+		
+		switch (tokenType) {
+			case MSCAPI:
+				// SHA224 not supported
+				sigTokenTypeSupportedDigestAlgorithms.remove(DigestAlgorithm.SHA224);
+			default:
+				break;
+		}
+		
+		reinitDigestAlgos();
 	}
 
 	private void reinitSignatureFormats() {
 		cadesRadio.setDisable(true);
 		padesRadio.setDisable(true);
 		xadesRadio.setDisable(true);
+		jadesRadio.setDisable(true);
 
 		cadesRadio.setSelected(false);
 		padesRadio.setSelected(false);
 		xadesRadio.setSelected(false);
+		jadesRadio.setSelected(false);
 	}
 
 	private void reinitSignaturePackagings() {
@@ -511,6 +557,31 @@ public class SignatureController implements Initializable {
 		envelopedRadio.setSelected(false);
 		detachedRadio.setSelected(false);
 		internallyDetachedRadio.setSelected(false);
+	}
+	
+	private void reinitDigestAlgos() {
+		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(supportedDigestAlgorithms);
+		if (sigFormSupportedDigestAlgorithms != null) {
+			digestAlgos.retainAll(sigFormSupportedDigestAlgorithms);
+		}
+		if (sigTokenTypeSupportedDigestAlgorithms != null) {
+			digestAlgos.retainAll(sigTokenTypeSupportedDigestAlgorithms);
+		}
+		
+		for (Node daButton : hBoxDigestAlgos.getChildren()) {
+			DigestAlgorithm digestAlgorithm = (DigestAlgorithm) daButton.getUserData();
+			if (digestAlgorithm == null) {
+				continue; // nothing chosen case
+			} else if (digestAlgos.contains(digestAlgorithm)) {
+				daButton.setDisable(false);
+			} else {
+				daButton.setDisable(true);
+				Toggle selectedToggle = toggleDigestAlgo.getSelectedToggle();
+				if (selectedToggle != null && digestAlgorithm.equals(selectedToggle.getUserData())) {
+					selectedToggle.setSelected(false);
+				}
+			}
+		}
 	}
 
 	private void save(DSSDocument signedDocument) {

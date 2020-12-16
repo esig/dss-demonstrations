@@ -19,6 +19,8 @@
                 </div>
                 <div id="advancedOptions" class="card-body collapse in">
 					<div th:replace="fragment/fields::validation-level-policy"></div>
+					<div th:replace="fragment/fields::field-signing-certificate"></div>
+                    <div th:replace="fragment/fields::field-adjunct-certificates"></div>
 					<div th:replace="fragment/fields::field-certificate-tokens"></div>
 					<div th:replace="fragment/fields::field-timestamp-tokens"></div>
 					<div th:replace="fragment/fields::field-revocation-data-tokens"></div>

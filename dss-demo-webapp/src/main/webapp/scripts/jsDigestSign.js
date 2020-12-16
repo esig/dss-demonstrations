@@ -1,6 +1,6 @@
 $('[data-toggle="tooltip"]').tooltip();
 
-var spinner = document.getElementById("spinner");
+var $spinner = $('#spinner');
 
 async function digestMessage(message) {
 	const digestElement = document.getElementById('digestToSign');
@@ -8,7 +8,9 @@ async function digestMessage(message) {
 	var digestAlgo = "SHA-" + inputRadio.value.substring(3);
 	const digestValue = await crypto.subtle.digest(digestAlgo, message);           // hash the message
 	digestElement.value = arrayBufferToBase64(digestValue);
-	spinner.style.visibility = "hidden";
+	
+	$spinner.removeClass('d-block');
+    $spinner.addClass('d-none');
 }
 
 async function readFile(e){
@@ -23,10 +25,11 @@ async function readFile(e){
 	};
 
 	if(e.files.length > 0){
-		spinner.style.visibility = "visible";
+        $spinner.removeClass('d-none');
+        $spinner.addClass('d-block');
+        
 		var currentFile = e.files[0];
 		reader.readAsArrayBuffer(currentFile);
-		const documentNameElement = document.getElementById('documentName');
 		documentName.value = currentFile.name;
 	}
 }

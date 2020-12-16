@@ -2,22 +2,27 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.signADocument}">
 	<body>		
 		<div layout:fragment="content">
+            <p>This page provides a demonstration of JAdES Signature creation tools as in draft ETSI TS 119 182-1 v0.0.6.</p>
 		
 			<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
 
-            <form method="post" enctype="multipart/form-data" th:action="@{/sign-a-document}" th:object="${signatureDocumentForm}">
+            <form method="post" enctype="multipart/form-data" th:action="@{/sign-with-jades}" th:object="${signatureJAdESForm}">
 
                 <input type="hidden" id="process" value="SIGNATURE" />
 
-                <div th:replace="fragment/fields::field-document-to-sign"></div>
+                <div th:replace="fragment/fields::field-documents-to-sign"></div>
 
-                <div th:replace="fragment/fields::field-container-type-form"></div>
+                <div th:replace="fragment/fields::field-jws-serialization-type"></div>
 
-                <div th:replace="fragment/fields::field-signature-form"></div>
+                <div th:replace="fragment/fields::field-jades-signature-packaging"></div>
 
-                <div th:replace="fragment/fields::field-signature-packaging"></div>
+                <div th:replace="fragment/fields::field-sigd-mechanism"></div>
+
+                <div th:replace="fragment/fields::field-base64url-payload"></div>
 
                 <div th:replace="fragment/fields::field-signature-level"></div>
+
+                <div th:replace="fragment/fields::field-base64url-etsiU"></div>
 
                 <div th:replace="fragment/fields::field-digest-algo"></div>
 
@@ -43,8 +48,8 @@
             </form>
 		</div>
 		<div layout:fragment="scripts">
-            <script type="text/javascript" th:src="@{/scripts/jsDigestAlgorithm.js}"></script>
-            <script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+			<script type="text/javascript" th:src="@{/scripts/jsSigDMechanism.js}"></script>
+			<script type="text/javascript" th:src="@{/scripts/jsSignatureLevelJAdES.js}"></script>
             <script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
             <script type="text/javascript">
 				$('[data-toggle="tooltip"]').tooltip();

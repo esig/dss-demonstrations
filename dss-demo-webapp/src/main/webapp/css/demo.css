@@ -17,12 +17,26 @@
 }
 /* End Main */
 
+/* Forms */
+
+.form-control-file {
+    display: inline-block;
+    width: auto;
+    overflow: hidden;
+}
+
+.form-group p.text-danger {
+    margin-bottom: 0;
+}
+
+/* End Forms */
+
 /* Digest parameters */
 
 #spinner {
-	float: left; 
-	visibility: hidden; 
+	float: left;
 	margin-left: 10px;
+    margin-top: 5px;
 }
 
 .loader {

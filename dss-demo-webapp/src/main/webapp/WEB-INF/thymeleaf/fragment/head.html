@@ -2,12 +2,15 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 	
 	<link rel="icon" type="image/png" th:href="@{/images/favicon.ico}" sizes="16x16">
 	<title th:text="#{application.title}">Digital Signature Services</title>
 	
 	<!-- Bootstrap -->
-	<link type="text/css" rel="stylesheet" th:href="@{/webjars/bootstrap/4.5.0/css/bootstrap.min.css}" />
+	<link type="text/css" rel="stylesheet" th:href="@{/webjars/bootstrap/4.5.3/css/bootstrap.min.css}" />
 	<link type="text/css" rel="stylesheet" th:href="@{/webjars/font-awesome/4.7.0/css/font-awesome.min.css}" />
 	
 	<link type="text/css" rel="stylesheet" th:href="@{/css/layout.css}" />
@@ -17,7 +20,7 @@
 	<script type="text/javascript" th:src="@{/webjars/jquery/3.5.1/jquery.min.js}"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script type="text/javascript" th:src="@{/webjars/popper.js/1.16.0/umd/popper.min.js}"></script> <!-- Bootstrap 4 dependency -->
-	<script type="text/javascript" th:src="@{/webjars/bootstrap/4.5.0/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/4.5.3/js/bootstrap.min.js}"></script>
 	
 	<script type="text/javascript" src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 </head>

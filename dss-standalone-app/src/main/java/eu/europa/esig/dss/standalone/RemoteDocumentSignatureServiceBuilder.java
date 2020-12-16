@@ -11,6 +11,7 @@ import eu.europa.esig.dss.alert.ExceptionOnStatusAlert;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
+import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
@@ -44,6 +45,7 @@ public class RemoteDocumentSignatureServiceBuilder {
 		service.setCadesService(cadesService());
 		service.setXadesService(xadesService());
 		service.setPadesService(padesService());
+		service.setJadesService(jadesService());
 		return service;
 	}
 
@@ -127,6 +129,12 @@ public class RemoteDocumentSignatureServiceBuilder {
 
 	private PAdESService padesService() {
 		PAdESService service = new PAdESService(certificateVerifier());
+		service.setTspSource(tspSource());
+		return service;
+	}
+
+	private JAdESService jadesService() {
+		JAdESService service = new JAdESService(certificateVerifier());
 		service.setTspSource(tspSource());
 		return service;
 	}
