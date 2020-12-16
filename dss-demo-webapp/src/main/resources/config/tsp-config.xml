@@ -6,11 +6,11 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
 	<bean id="passwordProtection" class="java.security.KeyStore.PasswordProtection">
-		<constructor-arg name="password" value="ks-password" />
+		<constructor-arg name="password" value="whrmbQRp2nZHx7T5" />
 	</bean>
 
 	<bean id="tsa-token" class="eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection">
-		<constructor-arg name="ksFile" type="java.io.File" value="classpath:self-signed-tsa.p12" />
+		<constructor-arg name="ksFile" type="java.io.File" value="classpath:self_signed_tsa.p12" />
 		<constructor-arg name="ksType" value="PKCS12" />
 		<constructor-arg name="ksPassword" ref="passwordProtection" />
 	</bean>
