@@ -111,23 +111,11 @@ public class DSSBeanConfig {
 		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
 		jdbcCacheCRLSource.initTable();
 	}
-	
-	@PostConstruct
-	public void cachedOCSPSourceInitialization() throws SQLException {
-		JdbcCacheOCSPSource jdbcCacheOCSPSource = cachedOCSPSource();
-		jdbcCacheOCSPSource.initTable();
-	}
-	
+
 	@PreDestroy
 	public void cachedCRLSourceClean() throws SQLException {
 		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
 		jdbcCacheCRLSource.destroyTable();
-	}
-	
-	@PreDestroy
-	public void cachedOCSPSourceClean() throws SQLException {
-		JdbcCacheOCSPSource jdbcCacheOCSPSource = cachedOCSPSource();
-		jdbcCacheOCSPSource.destroyTable();
 	}
 
 	@Bean
@@ -173,7 +161,7 @@ public class DSSBeanConfig {
 		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
 		jdbcCacheCRLSource.setDataSource(dataSource);
 		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
-		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (60 * 3)); // 3 minutes
+		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (60 * 10)); // 10 minutes
 		return jdbcCacheCRLSource;
 	}
 
@@ -184,25 +172,16 @@ public class DSSBeanConfig {
 		return onlineOCSPSource;
 	}
 
-	@Bean
-	public JdbcCacheOCSPSource cachedOCSPSource() {
-		JdbcCacheOCSPSource jdbcCacheOCSPSource = new JdbcCacheOCSPSource();
-		jdbcCacheOCSPSource.setDataSource(dataSource);
-		jdbcCacheOCSPSource.setProxySource(onlineOcspSource());
-		jdbcCacheOCSPSource.setDefaultNextUpdateDelay((long) (1000 * 60 * 3)); // 3 minutes
-		return jdbcCacheOCSPSource;
-	}
-
 	@Bean(name = "european-trusted-list-certificate-source")
 	public TrustedListsCertificateSource trustedListSource() {
 		return new TrustedListsCertificateSource();
 	}
 
 	@Bean
-	public CertificateVerifier certificateVerifier() throws Exception {
+	public CertificateVerifier certificateVerifier() {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setCrlSource(cachedCRLSource());
-		certificateVerifier.setOcspSource(cachedOCSPSource());
+		certificateVerifier.setOcspSource(onlineOcspSource());
 		certificateVerifier.setDataLoader(dataLoader());
 		certificateVerifier.setTrustedCertSources(trustedListSource());
 
@@ -219,49 +198,49 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public CAdESService cadesService() throws Exception {
+	public CAdESService cadesService() {
 		CAdESService service = new CAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
-	public XAdESService xadesService() throws Exception {
+	public XAdESService xadesService() {
 		XAdESService service = new XAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
-	public PAdESService padesService() throws Exception {
+	public PAdESService padesService() {
 		PAdESService service = new PAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
-	public JAdESService jadesService() throws Exception {
+	public JAdESService jadesService() {
 		JAdESService service = new JAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
-	public ASiCWithCAdESService asicWithCadesService() throws Exception {
+	public ASiCWithCAdESService asicWithCadesService() {
 		ASiCWithCAdESService service = new ASiCWithCAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
-	public ASiCWithXAdESService asicWithXadesService() throws Exception {
+	public ASiCWithXAdESService asicWithXadesService() {
 		ASiCWithXAdESService service = new ASiCWithXAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
 		return service;
 	}
 
 	@Bean
-	public RemoteDocumentSignatureServiceImpl remoteSignatureService() throws Exception {
+	public RemoteDocumentSignatureServiceImpl remoteSignatureService() {
 		RemoteDocumentSignatureServiceImpl service = new RemoteDocumentSignatureServiceImpl();
 		service.setAsicWithCAdESService(asicWithCadesService());
 		service.setAsicWithXAdESService(asicWithXadesService());
@@ -273,7 +252,7 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public RemoteMultipleDocumentsSignatureServiceImpl remoteMultipleDocumentsSignatureService() throws Exception {
+	public RemoteMultipleDocumentsSignatureServiceImpl remoteMultipleDocumentsSignatureService() {
 		RemoteMultipleDocumentsSignatureServiceImpl service = new RemoteMultipleDocumentsSignatureServiceImpl();
 		service.setAsicWithCAdESService(asicWithCadesService());
 		service.setAsicWithXAdESService(asicWithXadesService());
@@ -283,14 +262,14 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public RemoteDocumentValidationService remoteValidationService() throws Exception {
+	public RemoteDocumentValidationService remoteValidationService() {
 		RemoteDocumentValidationService service = new RemoteDocumentValidationService();
 		service.setVerifier(certificateVerifier());
 		return service;
 	}
 	
 	@Bean
-	public RemoteCertificateValidationService RemoteCertificateValidationService() throws Exception {
+	public RemoteCertificateValidationService RemoteCertificateValidationService() {
 		RemoteCertificateValidationService service = new RemoteCertificateValidationService();
 		service.setVerifier(certificateVerifier());
 		return service;
