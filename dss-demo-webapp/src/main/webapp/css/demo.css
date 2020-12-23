@@ -162,3 +162,22 @@ form#sign-pdf-form p#filename {
 .tooltip-inner {
    max-width: 400px;
 }
+
+/* Print settings */
+
+@media print {
+	.dss-main {
+		max-width: 100%;
+        flex: 0 0 100%;
+        margin-left: 0;
+	}
+	.card-header.bg-primary {
+        color: black!important;
+    }
+	.badge {
+		color:inherit!important;
+		filter: none!important;
+	}
+}
+
+/* End Print settings */
