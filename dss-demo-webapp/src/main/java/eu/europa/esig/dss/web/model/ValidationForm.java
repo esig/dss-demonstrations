@@ -1,13 +1,11 @@
 package eu.europa.esig.dss.web.model;
 
-import java.util.List;
-
-import javax.validation.constraints.AssertTrue;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.AssertTrue;
+import java.util.List;
 
 public class ValidationForm {
 
@@ -32,6 +30,8 @@ public class ValidationForm {
 	private boolean includeTimestampTokens;
 
 	private boolean includeSemantics;
+
+	private boolean includeUserFriendlyIdentifiers = true;
 
 	public MultipartFile getSignedFile() {
 		return signedFile;
@@ -119,6 +119,14 @@ public class ValidationForm {
 
 	public void setIncludeSemantics(boolean includeSemantics) {
 		this.includeSemantics = includeSemantics;
+	}
+
+	public boolean isIncludeUserFriendlyIdentifiers() {
+		return includeUserFriendlyIdentifiers;
+	}
+
+	public void setIncludeUserFriendlyIdentifiers(boolean includeUserFriendlyIdentifiers) {
+		this.includeUserFriendlyIdentifiers = includeUserFriendlyIdentifiers;
 	}
 
 	@AssertTrue(message = "{error.signed.file.mandatory}")

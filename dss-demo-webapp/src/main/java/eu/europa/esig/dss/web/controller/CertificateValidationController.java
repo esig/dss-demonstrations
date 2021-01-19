@@ -1,14 +1,20 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
+import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.x509.CertificateSource;
+import eu.europa.esig.dss.validation.CertificateValidator;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
+import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
+import eu.europa.esig.dss.validation.TokenIdentifierProvider;
+import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.reports.CertificateReports;
+import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.model.CertificateForm;
+import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -23,18 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
-import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.model.x509.CertificateToken;
-import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.spi.x509.CertificateSource;
-import eu.europa.esig.dss.validation.CertificateValidator;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
-import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.web.WebAppUtils;
-import eu.europa.esig.dss.web.model.CertificateForm;
-import eu.europa.esig.dss.web.model.CertificateValidationForm;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
@@ -47,7 +48,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
 	private static final String[] ALLOWED_FIELDS = { "certificateForm.certificateFile", "certificateForm.certificateBase64", "certificateChainFiles",
-			"validationTime", "includeCertificateTokens", "includeRevocationTokens" };
+			"validationTime", "includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -93,6 +94,10 @@ public class CertificateValidationController extends AbstractValidationControlle
 				TokenExtractionStrategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
 		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
 
+		TokenIdentifierProvider identifierProvider = certValidationForm.isIncludeUserFriendlyIdentifiers() ?
+				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
+		certificateValidator.setTokenIdentifierProvider(identifierProvider);
+
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", request.getLocale());
 		if (locale == null) {
@@ -104,8 +109,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 		CertificateReports reports = certificateValidator.validate();
 
 		// reports.print();
-		
-        model.addAttribute("currentCertificate", certificate.getDSSIdAsString());
+
+		model.addAttribute("currentCertificate", identifierProvider.getIdAsString(certificate));
 		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;

@@ -1,19 +1,36 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-
+import eu.europa.esig.dss.diagnostic.CertificateWrapper;
+import eu.europa.esig.dss.diagnostic.DiagnosticData;
+import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
+import eu.europa.esig.dss.diagnostic.RevocationWrapper;
+import eu.europa.esig.dss.diagnostic.TimestampWrapper;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.RevocationType;
+import eu.europa.esig.dss.enumerations.TimestampType;
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
+import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.x509.CertificateSource;
+import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
+import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
+import eu.europa.esig.dss.validation.DocumentValidator;
+import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
+import eu.europa.esig.dss.validation.SignedDocumentValidator;
+import eu.europa.esig.dss.validation.TokenIdentifierProvider;
+import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.validation.reports.Reports;
+import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.exception.SourceNotFoundException;
+import eu.europa.esig.dss.web.model.ValidationForm;
+import eu.europa.esig.dss.web.service.FOPService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,34 +52,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.diagnostic.CertificateWrapper;
-import eu.europa.esig.dss.diagnostic.DiagnosticData;
-import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
-import eu.europa.esig.dss.diagnostic.RevocationWrapper;
-import eu.europa.esig.dss.diagnostic.TimestampWrapper;
-import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
-import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.RevocationType;
-import eu.europa.esig.dss.enumerations.TimestampType;
-import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
-import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
-import eu.europa.esig.dss.model.x509.CertificateToken;
-import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.spi.x509.CertificateSource;
-import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
-import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
-import eu.europa.esig.dss.validation.DocumentValidator;
-import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
-import eu.europa.esig.dss.validation.reports.Reports;
-import eu.europa.esig.dss.web.WebAppUtils;
-import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
-import eu.europa.esig.dss.web.exception.SourceNotFoundException;
-import eu.europa.esig.dss.web.model.ValidationForm;
-import eu.europa.esig.dss.web.service.FOPService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
@@ -76,7 +77,7 @@ public class ValidationController extends AbstractValidationController {
 	
 	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationLevel", "defaultPolicy",
 			"policyFile", "signingCertificate", "adjunctCertificates", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
-			"includeSemantics" };
+			"includeUserFriendlyIdentifiers", "includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -123,6 +124,10 @@ public class ValidationController extends AbstractValidationController {
 		documentValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
+
+		TokenIdentifierProvider identifierProvider = validationForm.isIncludeUserFriendlyIdentifiers() ?
+				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
+		documentValidator.setTokenIdentifierProvider(identifierProvider);
 
 		setSigningCertificate(documentValidator, validationForm);
 		setDetachedContents(documentValidator, validationForm);

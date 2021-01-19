@@ -1,11 +1,10 @@
 package eu.europa.esig.dss.web.model;
 
-import java.util.Date;
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.AssertTrue;
-
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Date;
+import java.util.List;
 
 public class CertificateValidationForm {
 
@@ -18,6 +17,8 @@ public class CertificateValidationForm {
 	private boolean includeCertificateTokens;
 	
 	private boolean includeRevocationTokens;
+
+	private boolean includeUserFriendlyIdentifiers = true;
 
 	public Date getValidationTime() {
 		return validationTime;
@@ -57,6 +58,14 @@ public class CertificateValidationForm {
 
 	public void setIncludeRevocationTokens(boolean includeRevocationTokens) {
 		this.includeRevocationTokens = includeRevocationTokens;
+	}
+
+	public boolean isIncludeUserFriendlyIdentifiers() {
+		return includeUserFriendlyIdentifiers;
+	}
+
+	public void setIncludeUserFriendlyIdentifiers(boolean includeUserFriendlyIdentifiers) {
+		this.includeUserFriendlyIdentifiers = includeUserFriendlyIdentifiers;
 	}
 
 	@AssertTrue(message = "{error.certificate.invalid}")
