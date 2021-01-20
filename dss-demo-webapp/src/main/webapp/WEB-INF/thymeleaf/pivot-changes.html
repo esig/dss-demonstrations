@@ -54,7 +54,7 @@
 			
 			<!-- Pivot certificate source changes -->
 			<div th:if="${not #lists.isEmpty(lotl.pivotInfos)}" class="certificates-container original-certificates" th:each="pivot,iterPivot : ${lotl.pivotInfos}"
-					th:with="pivotId=${pivot.getIdentifier().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
+					th:with="pivotId=${pivot.getDSSId().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
 					lotlLocation=${pivot.getLOTLLocation()}">
 					
 				<div class="card bg-primary mb-3">

@@ -15,7 +15,7 @@
 									
 					<!-- LOTL -->
 					<h2>
-						<a th:href="@{/tl-info/lotl/} + ${lotl.getIdentifier().asXmlId()}">
+						<a th:href="@{/tl-info/lotl/} + ${lotl.getDSSId().asXmlId()}">
 							<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
 									th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
 						</a>
@@ -30,7 +30,7 @@
 					<div class="table-container row" th:if="${not #lists.isEmpty(lotl.pivotInfos)}">
 						<h4>
 							<span th:text=#{label.summary.pivot.loaded.header}></span>&nbsp;
-							<a class="h6 font-weight-bold" th:href="@{/tl-info/pivot-changes/} + ${lotl.getIdentifier().asXmlId()}" 
+							<a class="h6 font-weight-bold" th:href="@{/tl-info/pivot-changes/} + ${lotl.getDSSId().asXmlId()}"
 									th:text="#{label.summary.pivot.check.text}"></a>
 						</h4>
 						<table class="pivot-summary summary-table table">
@@ -43,7 +43,7 @@
 									<th scope="col" th:text="#{label.summary.tl.info.validation.result}"></th>
 								</tr>
 							</thead>
-							<tbody th:each="pivot,iterTL : ${lotl.pivotInfos}" th:with="id=${pivot.getIdentifier().asXmlId()},
+							<tbody th:each="pivot,iterTL : ${lotl.pivotInfos}" th:with="id=${pivot.getDSSId().asXmlId()},
 									downloadResult=${pivot.downloadCacheInfo},
 									parsingResult=${pivot.parsingCacheInfo},
 									validationResult=${pivot.validationCacheInfo}">
@@ -83,7 +83,7 @@
 						<table class="tl-summary summary-table table accordion">
 							<thead th:replace="fragment/tl-info :: tl-info-header()"></thead>
 							
-							<tbody th:each="tl,iterTL : ${lotl.getTLInfos()}" th:with="id=${tl.getIdentifier().asXmlId()},
+							<tbody th:each="tl,iterTL : ${lotl.getTLInfos()}" th:with="id=${tl.getDSSId().asXmlId()},
 									country=${tl.parsingCacheInfo.isResultExist()}?${tl.parsingCacheInfo.territory}:'no_country',
 									downloadResult=${tl.downloadCacheInfo},
 									parsingResult=${tl.parsingCacheInfo},
@@ -108,7 +108,7 @@
 					<table class="tl-summary summary-table table accordion">
 						<thead th:replace="fragment/tl-info :: tl-info-header()"></thead>
 						
-						<tbody th:each="tl,iterTL : ${summary.otherTLInfos}" th:with="id=${tl.getIdentifier().asXmlId()},
+						<tbody th:each="tl,iterTL : ${summary.otherTLInfos}" th:with="id=${tl.getDSSId().asXmlId()},
 								country=${tl.parsingCacheInfo.isResultExist()}?${tl.parsingCacheInfo.territory}:'no_country',
 								downloadResult=${tl.downloadCacheInfo},
 								parsingResult=${tl.parsingCacheInfo},

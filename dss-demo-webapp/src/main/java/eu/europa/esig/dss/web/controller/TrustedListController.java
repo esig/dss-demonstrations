@@ -76,7 +76,7 @@ public class TrustedListController {
 		TLValidationJobSummary summary = trustedCertificateSource.getSummary();
 		List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
 		for (LOTLInfo lotlInfo : lotlInfos) {
-			if (lotlInfo.getIdentifier().asXmlId().equals(lotlId)) {
+			if (lotlInfo.getDSSId().asXmlId().equals(lotlId)) {
 				return lotlInfo;
 			}
 		}
@@ -102,7 +102,7 @@ public class TrustedListController {
 	
 	private TLInfo getTLInfoByIdFromList(String tlId, List<TLInfo> tlInfos) {
 		for (TLInfo tlInfo: tlInfos) {
-			if (tlInfo.getIdentifier().asXmlId().equals(tlId)) {
+			if (tlInfo.getDSSId().asXmlId().equals(tlId)) {
 				return tlInfo;
 			}
 		}
