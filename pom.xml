@@ -159,6 +159,7 @@
 						<nonFilteredFileExtensions><!-- Avoid to modify keystore -->
 							<nonFilteredFileExtension>jks</nonFilteredFileExtension>
 							<nonFilteredFileExtension>p12</nonFilteredFileExtension>
+							<nonFilteredFileExtension>ttf</nonFilteredFileExtension>
 						</nonFilteredFileExtensions>
 					</configuration>
 				</plugin>

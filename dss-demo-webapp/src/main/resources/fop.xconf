@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ <fop>
+   <renderers>
+    <renderer mime="application/pdf">
+     <fonts>
+       <font kerning="yes" embed-url="classpath:fonts/OpenSans-Regular.ttf">
+         <font-triplet name="sans-serif" style="normal" weight="normal"/>
+       </font>
+       <font kerning="yes" embed-url="classpath:fonts/OpenSans-Bold.ttf">
+         <font-triplet name="sans-serif" style="normal" weight="bold"/>
+       </font>
+     </fonts>
+    </renderer>
+  </renderers>
+ </fop>
