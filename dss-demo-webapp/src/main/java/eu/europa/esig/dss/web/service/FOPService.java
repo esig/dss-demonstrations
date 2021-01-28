@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.xml.transform.Result;
 import javax.xml.transform.sax.SAXResult;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 
 
 @Component
@@ -31,7 +31,7 @@ public class FOPService {
 	@PostConstruct
 	public void init() throws Exception {
 
-		FopFactoryBuilder builder = new FopFactoryBuilder(URI.create("."));
+		FopFactoryBuilder builder = new FopFactoryBuilder(new File(".").toURI());
 		builder.setAccessibility(true);
 
 		try (InputStream is = new ClassPathResource(FOP_CONFIG).getInputStream()) {
