@@ -61,7 +61,7 @@ public class DigestController {
 	private String nexuUrl;
 
 	@Value("${nexuDownloadUrl}")
-	private String downloadNexuUrl;
+	private String nexuDownloadUrl;
 	
     @Value("${default.digest.algo}")
     private String defaultDigestAlgo;
@@ -87,7 +87,7 @@ public class DigestController {
 		SignatureDigestForm signatureDigestForm = new SignatureDigestForm();
         signatureDigestForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("signatureDigestForm", signatureDigestForm);
-		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
+		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
 		return SIGN_DIGEST;
 	}
 
