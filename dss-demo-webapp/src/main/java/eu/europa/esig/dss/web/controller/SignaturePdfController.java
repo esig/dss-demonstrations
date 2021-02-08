@@ -1,14 +1,21 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.ByteArrayInputStream;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
-
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.SignatureForm;
+import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.InMemoryDocument;
+import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.model.DataToSignParams;
+import eu.europa.esig.dss.web.model.GetDataToSignResponse;
+import eu.europa.esig.dss.web.model.SignDocumentResponse;
+import eu.europa.esig.dss.web.model.SignatureDocumentForm;
+import eu.europa.esig.dss.web.model.SignatureValueAsString;
+import eu.europa.esig.dss.web.service.SigningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,22 +34,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.SignatureForm;
-import eu.europa.esig.dss.enumerations.SignatureLevel;
-import eu.europa.esig.dss.enumerations.SignaturePackaging;
-import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.model.MimeType;
-import eu.europa.esig.dss.model.ToBeSigned;
-import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.web.model.DataToSignParams;
-import eu.europa.esig.dss.web.model.GetDataToSignResponse;
-import eu.europa.esig.dss.web.model.SignDocumentResponse;
-import eu.europa.esig.dss.web.model.SignatureDocumentForm;
-import eu.europa.esig.dss.web.model.SignatureValueAsString;
-import eu.europa.esig.dss.web.service.SigningService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayInputStream;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 @SessionAttributes(value = { "signaturePdfForm", "signedPdfDocument" })
@@ -60,7 +58,7 @@ public class SignaturePdfController {
 	private String nexuUrl;
 
 	@Value("${nexuDownloadUrl}")
-	private String downloadNexuUrl;
+	private String nexuDownloadUrl;
 
 	@Autowired
 	private SigningService signingService;
@@ -81,7 +79,7 @@ public class SignaturePdfController {
 		signaturePdfForm.setSignaturePackaging(SignaturePackaging.ENVELOPED);
 
 		model.addAttribute("signaturePdfForm", signaturePdfForm);
-		model.addAttribute("downloadNexuUrl", downloadNexuUrl);
+		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
 		return SIGNATURE_PDF_PARAMETERS;
 	}
 

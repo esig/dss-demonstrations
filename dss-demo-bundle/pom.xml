@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.8.RC1</version>
+		<version>5.8</version>
 	</parent>
 
 	<name>DSS Package: OOTB Web-Application</name>
@@ -16,8 +16,8 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u275-b01/OpenJDK8U-jre_x86-32_windows_hotspot_8u275b01.zip</jre.download.link>
-		<jre.root.folder>jdk8u275-b01-jre</jre.root.folder>
+		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u282-b08/OpenJDK8U-jre_x86-32_windows_hotspot_8u282b08.zip</jre.download.link>
+		<jre.root.folder>jdk8u282-b08-jre</jre.root.folder>
 		<tomcat.version>8.5.61</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
@@ -106,8 +106,8 @@
 		<profile>
 			<id>java15</id>
 			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.1%2B9/OpenJDK15U-jre_x86-32_windows_hotspot_15.0.1_9.zip</jre.download.link>
-				<jre.root.folder>jdk-15.0.1+9-jre</jre.root.folder>
+				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.2%2B7/OpenJDK15U-jre_x86-32_windows_hotspot_15.0.2_7.zip</jre.download.link>
+				<jre.root.folder>jdk-15.0.2+7-jre</jre.root.folder>
 				<tomcat.version>9.0.41</tomcat.version>
 			</properties>
 		</profile>

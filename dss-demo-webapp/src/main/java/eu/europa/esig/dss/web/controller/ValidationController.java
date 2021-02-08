@@ -238,7 +238,7 @@ public class ValidationController extends AbstractValidationController {
 		try {
 			Utils.write(report.getBytes(StandardCharsets.UTF_8), response.getOutputStream());
 		} catch (IOException e) {
-			LOG.error("An error occured while outputing diagnostic data : " + e.getMessage(), e);
+			LOG.error("An error occurred while downloading diagnostic data : " + e.getMessage(), e);
 		}
 	}
 
@@ -335,7 +335,7 @@ public class ValidationController extends AbstractValidationController {
 			XmlDiagnosticData xmlDiagData = DiagnosticDataFacade.newFacade().unmarshall(diagnosticDataXml);
 			return new DiagnosticData(xmlDiagData);
 		} catch (Exception e) {
-			LOG.error("An error occured while generating DiagnosticData from XML : " + e.getMessage(), e);
+			LOG.error("An error occurred while generating DiagnosticData from XML : " + e.getMessage(), e);
 		}
 		return null;
 	}
