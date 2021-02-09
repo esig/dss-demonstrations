@@ -65,7 +65,7 @@
 						<h3 th:text="#{label.validation.download}" th:remove="tag"></h3>
 					</div>
 
-					<div class="card-body collapse in" id="downloads">
+					<div class="card-body collapse show" id="downloads">
 						<div class="row">
 							<div class="col-sm-3">
 								<p th:text="#{label.report}"></p>
@@ -129,7 +129,7 @@
                         data-target="#svg-card" aria-expanded='false'>
                         <h3 th:text="#{label.validation.visualrepresentation}" th:remove="tag"></h3>
                     </div>
-                    <div class="card-body collapse in" id="svg-card">
+                    <div class="card-body collapse show" id="svg-card">
                         <div class="row">
                             <object th:data="@{/validation/diag-data.svg}" type="image/svg+xml" width="800" height="150" id="svg-diag-data" class="mx-auto">
                                 Your browser does not support SVGs
@@ -166,9 +166,6 @@
 			});
 
 			$('[data-toggle="tooltip"]').tooltip();
-			
-			/* Collapsed Bootstrap plugin, show all cards */
-			$(".tab-pane .card > .card-body.collapse").addClass("show");
             
             var currentCertificateId = /*[[${currentCertificate}]]*/;
             var mySVG = document.getElementById("svg-diag-data");
