@@ -64,7 +64,7 @@ public class TrustedListController {
 		LOTLInfo lotlInfo = getLOTLInfoById(lotlId);
 		if (lotlInfo != null) {
 			model.addAttribute("lotl", lotlInfo);
-			model.addAttribute("originalKeystore", lotlInfo.getValidationCacheInfo().isResultExist() ? 
+			model.addAttribute("potentialSigners", lotlInfo.getValidationCacheInfo().isResultExist() ?
 					lotlInfo.getValidationCacheInfo().getPotentialSigners() : Collections.emptyList());
 			return PIVOT_CHANGES;
 		} else {

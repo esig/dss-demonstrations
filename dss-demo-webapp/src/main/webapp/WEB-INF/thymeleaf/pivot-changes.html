@@ -12,12 +12,13 @@
 					
 				<p>This page contains the information about evolution of the original keystore by provided pivots.</p>
 				<p>The following notations are used:</p>
-				<ul class="list-unstyled m-0">
+				<ul class="list-unstyled ml-0">
 					<li><i class="fa fa-circle text-secondary" aria-hidden="true"></i>&nbsp;<span>Copied certificate from the previous source;</span></li>
 					<li><i class="fa fa-circle text-success" aria-hidden="true"></i>&nbsp;<span>Added certificate to the source by the pivot;</span></li>
 					<li><i class="fa fa-circle text-danger" aria-hidden="true"></i>&nbsp;<span>Removed certificate from the source by the pivot;</span></li>
 					<li><i class="fa fa-circle text-info" aria-hidden="true"></i>&nbsp;<span>The signing certificate of the LOTL.</span></li>
 				</ul>
+				<p>The initial LOTL-signing certificates can be found on the <a href="/oj-certificates" th:text="#{label.eu.oj.certificates.page}"></a> page.</p>
 				</div>
 			</div>
 		
@@ -34,9 +35,9 @@
 			<!-- Original certificates -->
 			<div class="certificates-container original-certificates">
 				<div class="card bg-primary mb-3">
-					<div class="card-header text-white" th:text="#{label.summary.lotl.original.keystore}"></div>
+					<div class="card-header text-white" th:text="#{label.summary.lotl.potential.signers}"></div>
 					<div class="card-body bg-white rounded-bottom">
-						<div th:each="certificate,iterCert : ${originalKeystore}" th:with="certId=${certificate.getDSSIdAsString()}"
+						<div th:each="certificate,iterCert : ${potentialSigners}" th:with="certId=${certificate.getDSSIdAsString()}"
 								th:class="${'card mb-2 bg-' + ((certId == lotlSigningCertId)?'info text-white':'default')}">
 							<div class="card-header cursor-pointer" th:data-target="${'#' + certId}" data-toggle="collapse" 
 									th:title="${(certId == lotlSigningCertId)?'Signing certificate':'Original keystore certificate'}">
@@ -58,12 +59,15 @@
 					lotlLocation=${pivot.getLOTLLocation()}">
 					
 				<div class="card bg-primary mb-3">
-					<div class="card-header text-white" th:text="#{label.summary.pivot.url(${pivotUrl})}"></div>
+					<div class="card-header">
+						<span class="text-white" th:text="#{label.summary.pivot.url}"></span>
+						<a class="text-white" th:href="${pivotUrl}" th:text="'(' + ${pivotUrl} + ')'" target="_blank"></a>
+					</div>
 					
 					<div class="card-body bg-white rounded-bottom">
 						<!-- LOTL location -->
 						<div class="lotl-location mb-2" th:if="${lotlLocation != null}">
-							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>&nbsp;
+							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>
 							<a class="lotl-url h6 font-weight-bold" th:href="${lotlLocation}" th:text="'(' + ${lotlLocation} + ')'" target="_blank"></a>
 							<span class="lotl-change-warning" th:if="${lotl.url != lotlLocation}">
 								<i class="fa fa-exclamation-circle text-warning" title="Updated LOTL location"></i>

@@ -50,12 +50,11 @@
 								<tr class="pivot-info-preview">
 									<!-- URL -->
 									<td>
-										<span th:text="${pivot.url}"></span>
+										<a th:text="${pivot.url}" th:href="${pivot.url}" target="_blank"></a>
 									</td>
 									<!-- Last Download Attempt date -->
 									<td>
-										<span th:text="${#dates.format(downloadResult.lastSuccessDownloadTime, 'dd-MMM-yyyy HH:mm:ss')}?:
-												${#dates.format(downloadResult.exceptionLastOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+										<span th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}?:'-'"></span>
 									</td>
 									
 									<!-- Download result -->
