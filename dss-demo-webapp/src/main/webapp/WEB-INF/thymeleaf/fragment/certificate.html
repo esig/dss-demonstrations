@@ -4,44 +4,48 @@
 <!-- Certificate Token -->
 <dl class="row mb-0 text-break" th:fragment="certificate(certificateToken)">
 	<dt class="col-sm-3 m-0" th:text="#{label.subject.name}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSubject().getPrettyPrintRFC2253()}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSubject()?.getPrettyPrintRFC2253()}?:'-'"></dd>
 	
 	<dt class="col-sm-3 m-0" th:text="#{label.issuer.name}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateToken.getIssuer().getPrettyPrintRFC2253()}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getIssuer()?.getPrettyPrintRFC2253()}?:'-'"></dd>
 	
 	<dt class="col-sm-3 m-0" th:text="#{label.ser.num}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSerialNumber()}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getSerialNumber()}?:'-'"></dd>
 	
 	<dt class="col-sm-3 m-0" th:text="#{label.validity_start}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${#dates.format(certificateToken.getNotBefore(), 'dd-MMM-yyyy HH:mm:ss')}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getNotBefore() != null} ?
+			${#dates.format(certificateToken.getNotBefore(), 'dd-MMM-yyyy HH:mm:ss')} : '-'"></dd>
 	
 	<dt class="col-sm-3 m-0" th:text="#{label.validity_end}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${#dates.format(certificateToken.getNotAfter(), 'dd-MMM-yyyy HH:mm:ss')}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateToken.getNotAfter() != null} ?
+			${#dates.format(certificateToken.getNotAfter(), 'dd-MMM-yyyy HH:mm:ss')} : '-'"></dd>
 </dl>
 
 <!-- Certificate DTO -->
 <dl class="row" th:fragment="certificateDTO(certificateDTO)">
 	<dt class="col-sm-3 m-0" th:text="#{label.subject.name}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateDTO.subjectName}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.subjectName}?:'-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.issuer.name}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateDTO.issuerName}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.issuerName}?:'-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.validity_start}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${#dates.format(certificateDTO.notBefore, 'dd-MMM-yyyy HH:mm:ss')}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.notBefore != null} ?
+			${#dates.format(certificateDTO.notBefore, 'dd-MMM-yyyy HH:mm:ss')} : '-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.validity_end}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${#dates.format(certificateDTO.notAfter, 'dd-MMM-yyyy HH:mm:ss')}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.notAfter != null} ?
+			${#dates.format(certificateDTO.notAfter, 'dd-MMM-yyyy HH:mm:ss')} : '-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.sha256.hex}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha256Hex}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha256Hex}?:'-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.sha1.hex}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha1Hex}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha1Hex}?:'-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.sha256.base64}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha256Base64}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha256Base64}?:'-'"></dd>
 
 	<dt class="col-sm-3 m-0" th:text="#{label.sha1.base64}"></dt>
-	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha1Base64}"></dd>
+	<dd class="col-sm-9 m-0" th:text="${certificateDTO.sha1Base64}?:'-'"></dd>
 </dl>

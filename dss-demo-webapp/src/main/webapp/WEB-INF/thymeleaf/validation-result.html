@@ -3,19 +3,19 @@
 <body>
 	<div layout:fragment="content">
 		<ul class="nav nav-tabs nav-justified d-print-none" id="tabsResult">
-			<li class="nav-item" role="presentation">
+			<li class="nav-item" th:if="${simpleReport} != null" role="presentation">
 				<a class="nav-link active" href="#simple-report" th:text="#{label.simple.report}" data-toggle="tab" role="tab" 
 						aria-controls="simple-report" aria-selected="true"></a>
 			</li>
-			<li class="nav-item" role="presentation">
+			<li class="nav-item" th:if="${detailedReport} != null" role="presentation">
 				<a class="nav-link" href="#detailed-report" th:text="#{label.detailed.report}" data-toggle="tab" role="tab" 
 						aria-controls="detailed-report" aria-selected="false"></a>
 			</li>
-			<li class="nav-item" role="presentation">
+			<li class="nav-item" th:if="${diagnosticDataXml} != null" role="presentation">
 				<a class="nav-link" href="#diagnostic-tree" th:text="#{label.diagnostic.tree}" data-toggle="tab" role="tab" 
 						aria-controls="diagnostic-tree" aria-selected="false"></a>
 			</li>
-			<li th:if="${etsiValidationReport} != null" role="presentation">
+			<li class="nav-item" th:if="${etsiValidationReport} != null" role="presentation">
 				<a class="nav-link" href="#etsi-validation-report" th:text="#{label.etsi.validation.report}" data-toggle="tab" 
 						role="tab" aria-controls="etsi-validation-report" aria-selected="false"></a>
 			</li>
@@ -23,7 +23,7 @@
 
 		<div class="tab-content mt-2">
 		
-			<div role="tabcard" class="tab-pane fade in active show report" id="simple-report">
+			<div th:if="${simpleReport} != null" role="tabcard" class="tab-pane fade in active show report" id="simple-report">
 				<div class="position-relative">
 					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
@@ -41,7 +41,7 @@
 				</div>
 			</div>
 		
-			<div role="tabcard" class="tab-pane fade report" id="detailed-report">
+			<div th:if="${detailedReport} != null" role="tabcard" class="tab-pane fade report" id="detailed-report">
 				<div class="position-relative">
 					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
 						<button type="button" class="btn btn-light"
@@ -58,7 +58,7 @@
 					<div class="w-100" th:utext="${detailedReport}"></div>
 				</div>
 			</div>
-			<div role="tabcard" class="tab-pane fade report" id="diagnostic-tree">
+			<div th:if="${diagnosticDataXml} != null" role="tabcard" class="tab-pane fade report" id="diagnostic-tree">
 				<div class="card mb-2">
 					<div class="card-header collapsed cursor-pointer" data-toggle="collapse"
 						data-target="#downloads" aria-expanded='false'>
