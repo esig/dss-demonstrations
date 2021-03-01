@@ -16,11 +16,11 @@
 					<!-- LOTL -->
 					<h2>
 						<a th:href="@{/tl-info/lotl/} + ${lotl.getDSSId().asXmlId()}">
-							<span th:if="${parsingResult.resultExist and parsingResult.territory != null}" 
+							<span th:if="${parsingResult != null and parsingResult.resultExist and parsingResult.territory != null}"
 									th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
 						</a>
 						<span th:text="#{label.summary.lotl.number(${iterLOTL.count})}"></span>&nbsp;
-						<a class="h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a>
+						<a class="h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url}?:'-' + ')'" target="_blank"></a>
 					</h2>
 					
 					<!-- LOTL Info -->
@@ -50,11 +50,12 @@
 								<tr class="pivot-info-preview">
 									<!-- URL -->
 									<td>
-										<a th:text="${pivot.url}" th:href="${pivot.url}" target="_blank"></a>
+										<a th:text="${pivot.url}?:'-'" th:href="${pivot.url}" target="_blank"></a>
 									</td>
 									<!-- Last Download Attempt date -->
 									<td>
-										<span th:text="${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')}?:'-'"></span>
+										<span th:text="${downloadResult != null and downloadResult.lastDownloadAttemptTime != null} ?
+												${#dates.format(downloadResult.lastDownloadAttemptTime, 'dd-MMM-yyyy HH:mm:ss')} : '-'"></span>
 									</td>
 									
 									<!-- Download result -->
