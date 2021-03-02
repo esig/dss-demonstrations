@@ -46,6 +46,8 @@
 		th:title="${validationResult.indication?:'-' + ' : ' + validationResult.subIndication?:'-'}"></i>
 	<i th:if="${validationResult != null and validationResult.isInvalid()}" class="fa fa-times-circle text-danger"
 		th:title="${validationResult.indication?:'-' + ' : ' + validationResult.subIndication?:'-'}"></i>
+	<i th:if="${validationResult != null and validationResult.isError()}" class="fa fa-times-circle text-danger"
+	   th:title="${validationResult.exceptionMessage}?:'-'"></i>
 </span>
 
 <!-- Next Update -->
