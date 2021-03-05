@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.validation.results}">
 <body>
-	<div layout:fragment="content">
+	<div class="p-0 p-sm-3" layout:fragment="content">
 		<ul class="nav nav-tabs nav-justified d-print-none" id="tabsResult">
 			<li class="nav-item" th:if="${simpleReport} != null" role="presentation">
 				<a class="nav-link active" href="#simple-report" th:text="#{label.simple.report}" data-toggle="tab" role="tab" 
@@ -43,7 +43,12 @@
 		
 			<div th:if="${detailedReport} != null" role="tabcard" class="tab-pane fade report" id="detailed-report">
 				<div class="position-relative">
-					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
+					<div id="detailed-report-buttons" class="btn-group ml-auto align-self-center d-print-none" role="toolbar">
+						<button type="button" class="btn btn-light switch-annotations">
+							<i class="icon fa fa-commenting-o"></i>&nbsp;
+							<span class="label-show" th:text="#{label.annotations.show}"></span>
+							<span class="label-hide d-none" th:text="#{label.annotations.hide}"></span>
+						</button>
 						<button type="button" class="btn btn-light"
 							onclick="window.print();">
 							<i class="fa fa-print"></i>&nbsp;<span th:text="#{label.print}"></span>
@@ -157,7 +162,8 @@
 			</div>
 		</div>
 	</div>
-	<div layout:fragment="scripts">            
+	<div layout:fragment="scripts">
+		<script type="text/javascript" th:src="@{/scripts/jsValidationResult.js}"></script>
 		<script type="text/javascript" th:inline="javascript">
             /*<![CDATA[*/
 			$('#tabsResult a').click(function(e) {

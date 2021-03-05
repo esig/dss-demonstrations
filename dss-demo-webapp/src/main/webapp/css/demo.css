@@ -159,9 +159,62 @@ form#sign-pdf-form p#filename {
 }
 /* End TL-Loading */
 
+/* Validation reports */
+
 .tooltip-inner {
    max-width: 400px;
 }
+
+.constraint {
+     line-height: 1.25;
+ }
+
+.constraint-text {
+    font-size: 0.8rem;
+}
+
+#detailed-report-buttons {
+    margin: 6px;
+    z-index: 3;
+    right: 0;
+    position: absolute;
+}
+
+#detailed-report-buttons.inside-card-header {
+    margin: -6px;
+    right: none;
+    position: relative;
+}
+
+/* End Validation reports */
+
+/* Mobile devices */
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+    #detailed-report-card > .card-header {
+        display: block!important;
+    }
+    #detailed-report-card > .card-header > div, #detailed-report-card .inside-card-header > * {
+        width: 100%;
+        display: inline-block;
+        margin: 6px 0 0 0;
+        text-align: center;
+        border-radius: 2px;
+    }
+    .constraint {
+        display: block;
+        margin: 0;
+    }
+    .constraint > div {
+        display: inline;
+        width: auto;
+        padding: 0;
+    }
+}
+
+/* End Mobile devices */
+
 
 /* Print settings */
 
@@ -178,6 +231,12 @@ form#sign-pdf-form p#filename {
 		color:inherit!important;
 		filter: none!important;
 	}
+    #detailed-report .constraint-text {
+        display: inline-block!important;
+    }
+    #detailed-report .constraint-tooltip {
+        display: none!important;
+    }
 }
 
 /* End Print settings */
