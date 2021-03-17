@@ -10,6 +10,11 @@ $('#detailed-report-buttons .btn').click(function(e) {
     }
 });
 
+$('.id-copy').click(function(e) {
+    e.stopPropagation();
+    copyToClipboard($(this));
+});
+
 function switchAnnotations($this, e) {
     if ($this.hasClass("show")) {
         $('#detailed-report .constraint-text').addClass('d-none');
@@ -30,4 +35,21 @@ function switchAnnotations($this, e) {
         $this.find('.label-hide').removeClass('d-none');
         $this.addClass('show');
     }
+}
+
+function copyToClipboard($this) {
+    var $temp = $('<input>');
+    $("body").append($temp);
+    $temp.val($this.data('id')).select();
+    document.execCommand("copy");
+    $temp.remove();
+
+    var oldValue = $this.data('original-title');
+    var newValue = $this.data('success-text');
+    $this.attr('data-original-title', newValue);
+    $this.tooltip('show');
+
+    $this.mouseout(function() {
+        $this.attr('data-original-title', oldValue);
+    });
 }
