@@ -28,6 +28,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Value("${web.security.cookie.samesite}")
 	private String samesite;
+
+	@Value("${web.security.csp}")
+	private String csp;
 	
 	/** API urls (REST/SOAP webServices) */
 	private static final String[] API_URLS = new String[] {
@@ -42,6 +45,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.headers().addHeaderWriter(serverEsigDSS());
 		
 		http.csrf().ignoringAntMatchers(API_URLS); // disable CSRF for API calls (REST/SOAP webServices)
+
+		if (Utils.isStringNotEmpty(csp)) {
+			http.headers().contentSecurityPolicy(csp);
+		}
 	}
 
 	@Bean
