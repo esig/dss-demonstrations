@@ -27,9 +27,13 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		// valid version
 		// load nexu script 
 		console.log("Loading script...");
-		loadScript();
-	    $("#nexu_ready_alert").slideDown();
-	    $("#submit-button").prop('disabled', false);
+
+		var onSuccess = function() {
+            $("#nexu_ready_alert").slideDown();
+            $("#submit-button").prop('disabled', false);
+        };
+		loadScript(onSuccess);
+
 	} else {
 		// need update
 		$("#submit-button").html("Update NexU");
@@ -52,13 +56,22 @@ $.get("${nexuUrl}/nexu-info", function(data) {
     $("#nexu_missing_alert").slideDown();
 });
 
-function loadScript() {
+function loadScript(onSuccess) {
 	var xhrObj = new XMLHttpRequest();
-	xhrObj.open('GET', "${nexuUrl}/nexu.js", false);
-	xhrObj.send(null);
-	var se = document.createElement('script');
-	se.type = "text/javascript";
-	se.text = xhrObj.responseText;
-	document.getElementsByTagName('head')[0].appendChild(se);
-	console.log("Nexuscript loaded");
+	xhrObj.open('GET', "${nexuUrl}/nexu.js");
+
+    xhrObj.onload = function() {
+      if (xhrObj.status != 200) {
+	    console.log("Unable to load Nexu : " + xhrObj.status + ": " + xhrObj.statusText);
+      } else { // show the result
+        var se = document.createElement('script');
+        se.type = "text/javascript";
+        se.text = xhrObj.responseText;
+        document.getElementsByTagName('head')[0].appendChild(se);
+        console.log("Nexuscript loaded");
+	    onSuccess();
+      }
+    };
+
+	xhrObj.send();
 }
