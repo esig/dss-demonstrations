@@ -204,6 +204,7 @@ form#sign-pdf-form p#filename {
 /* Mobile devices */
 
 /* Extra small devices (portrait phones, less than 576px) */
+
 @media (max-width: 575.98px) {
     #detailed-report-card > .card-header {
         display: block!important;
@@ -223,6 +224,9 @@ form#sign-pdf-form p#filename {
         display: inline;
         width: auto;
         padding: 0;
+    }
+    form#sign-pdf-form p#filename {
+      line-height: 64px;
     }
 }
 

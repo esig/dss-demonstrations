@@ -52,7 +52,7 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		return false;
 	});
 	
-    $("#warning-text").html("NexU not detected or not started ! ");
+    $("#warning-text").html("NexU not detected or not started !");
     $("#nexu_missing_alert").slideDown();
 });
 

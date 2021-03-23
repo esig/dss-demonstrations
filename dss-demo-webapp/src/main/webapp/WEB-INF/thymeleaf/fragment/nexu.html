@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="row" th:fragment="nexu-alert">
+    <div class="col-lg-8">
+    <div id="nexu_missing_alert" style="display: none;" class="alert alert-warning">
+        <span id="warning-text"></span>
+        <a th:href="${nexuDownloadUrl}" th:text="#{label.nexu.download}"></a>
+        (<a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/" th:text=#{label.nexu.more.info}></a>)
+    </div>
+    <div id="nexu_ready_alert" style="display: none;" class="alert alert-info" th:text="#{label.nexu.ready}"></div>
+    </div>
+</div>

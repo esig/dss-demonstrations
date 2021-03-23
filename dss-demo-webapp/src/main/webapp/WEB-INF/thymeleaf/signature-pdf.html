@@ -4,34 +4,20 @@
 	<div layout:fragment="content">
 		<div th:replace="fragment/disclaimer-mock-tsp::mock-tsp-warn"></div>
 
-		<div class="row">
-			<div class="col-lg-8">
-				<form method="post" id="sign-pdf-form"
-					enctype="multipart/form-data" th:action="@{/sign-a-pdf}"
-					th:object="${signaturePdfForm}">
-					
-					<div class="position-relative">
-						<input type="file" class="drag-file cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />
-						<p id="filename" class="drag-file-label" th:text="#{label.sign.pdf.drag.file}"></p>
-					</div>
-		
-					<p th:if="${#fields.hasErrors('documentToSign')}"
-						th:errors="*{documentToSign}" class="text-danger" th:text="#{label.error}"></p>
-		
-					<div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-12">
-	                    <span id="warning-text"></span>&nbsp;
-	                    <a th:href="${nexuDownloadUrl}" th:text="#{label.nexu.download}"></a>&nbsp;
-	                    (<a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/" th:text=#{label.nexu.more.info}></a>)
-	                </div>
+		<form method="post" id="sign-pdf-form"
+			  enctype="multipart/form-data" th:action="@{/sign-a-pdf}"
+			  th:object="${signaturePdfForm}">
 
-                	<div id="nexu_ready_alert" style="display: none;" class="alert alert-info col-lg-12" th:text="#{label.nexu.ready}"></div>
-		
-					<button type="submit" class="btn btn-primary w-100" id="submit-button"
-						th:text="#{label.sign}" disabled="disabled"></button>
-		
-				</form>
-			</div>
-		</div>
+			<div th:replace="fragment/fields::field-sign-pdf"></div>
+
+			<p th:if="${#fields.hasErrors('documentToSign')}"
+			   th:errors="*{documentToSign}" class="text-danger" th:text="#{label.error}"></p>
+
+			<div th:replace="fragment/nexu::nexu-alert"></div>
+
+			<div th:replace="fragment/fields::sign-pdf-submit"></div>
+
+		</form>
 	</div>
 	<div layout:fragment="scripts">
 		<script type="text/javascript">

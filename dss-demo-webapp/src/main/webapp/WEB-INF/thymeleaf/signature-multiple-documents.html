@@ -23,13 +23,7 @@
                 
                 <div th:replace="fragment/fields::field-content-timestamp"></div>
 
-                <div id="nexu_missing_alert" style="display: none;" class="alert alert-warning col-lg-8">
-                    <span id="warning-text"></span>&nbsp;
-                    <a th:href="${nexuDownloadUrl}" th:text="#{label.nexu.download}"></a>&nbsp;
-                    (<a href="http://nowina.lu/solutions/java-less-browser-signing-nexu/" th:text=#{label.nexu.more.info}></a>)
-                </div>
-
-                <div id="nexu_ready_alert" style="display: none;" class="alert alert-info col-lg-8" th:text="#{label.nexu.ready}"></div>
+                <div th:replace="fragment/nexu::nexu-alert"></div>
 
                 <div class="form-group row">
                     <div class="offset-sm-3 col-sm-9">
