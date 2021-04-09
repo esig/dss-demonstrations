@@ -49,14 +49,14 @@
 		<logback-classic.version>1.2.3</logback-classic.version>
 
 		<cxf.version>3.4.1</cxf.version>
-		<spring.version>5.2.11.RELEASE</spring.version>
-		<spring-security.version>5.4.2</spring-security.version>
-		<thymeleaf-spring5.version>3.0.11.RELEASE</thymeleaf-spring5.version>
+		<spring.version>5.3.5</spring.version>
+		<spring-security.version>5.4.5</spring-security.version>
+		<thymeleaf-spring5.version>3.0.12.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>2.5.1</thymeleaf-layout-dialect.version>
 		<jackson-jaxrs-json-provider.version>2.11.3</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
-		<freemarker.version>2.3.30</freemarker.version>
 		<hikaricp.version>3.4.5</hikaricp.version>
+		<freemarker.version>2.3.31</freemarker.version>
 		<hsqldb.version>2.5.1</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
 		
