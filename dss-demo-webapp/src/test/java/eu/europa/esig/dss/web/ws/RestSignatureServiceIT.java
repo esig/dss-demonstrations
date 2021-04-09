@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.ws.rs.ServerErrorException;
 
+import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
-import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestParser;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
 import eu.europa.esig.dss.asic.common.ASiCExtractResult;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
@@ -447,8 +447,8 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
 		
-		DSSDocument timestampManifest = ASiCEWithCAdESManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
-		ManifestFile manifestFile = ASiCEWithCAdESManifestParser.getManifestFile(timestampManifest);
+		DSSDocument timestampManifest = ASiCWithCAdESManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
+		ManifestFile manifestFile = ASiCWithCAdESManifestParser.getManifestFile(timestampManifest);
 		
 		ASiCEWithCAdESManifestValidator manifestValidator = new ASiCEWithCAdESManifestValidator(manifestFile, extractedResult.getSignedDocuments());
 		List<ManifestEntry> manifestEntries = manifestValidator.validateEntries();
