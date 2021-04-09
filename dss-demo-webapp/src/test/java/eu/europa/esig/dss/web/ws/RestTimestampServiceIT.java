@@ -1,23 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestAlgoAndValue;
@@ -50,7 +32,22 @@ import eu.europa.esig.dss.ws.timestamp.remote.rest.client.RestTimestampService;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import eu.europa.esig.dss.ws.validation.dto.WSReportsDTO;
 import eu.europa.esig.dss.ws.validation.rest.client.RestDocumentValidationService;
-import eu.europa.esig.dss.xades.DSSXMLUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RestTimestampServiceIT extends AbstractRestIT {
 	
@@ -108,8 +105,7 @@ public class RestTimestampServiceIT extends AbstractRestIT {
 		/* Create a content timestamp */
 		FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 		
-		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA1, DSSXMLUtils.canonicalize(
-				CanonicalizationMethod.EXCLUSIVE, DSSUtils.toByteArray(fileToSign)));
+		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA1, DSSUtils.toByteArray(fileToSign));
 		DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA1, digestValue);
 		TimestampResponseDTO timeStampResponse = timestampService.getTimestampResponse(digest);
 		

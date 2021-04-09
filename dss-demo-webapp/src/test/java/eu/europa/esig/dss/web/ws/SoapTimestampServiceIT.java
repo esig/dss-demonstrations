@@ -122,8 +122,7 @@ public class SoapTimestampServiceIT extends AbstractIT {
 		/* Create a content timestamp */
 		FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 		
-		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA1, DSSXMLUtils.canonicalize(
-				CanonicalizationMethod.EXCLUSIVE, DSSUtils.toByteArray(fileToSign)));
+		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA1, DSSUtils.toByteArray(fileToSign));
 		DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA1, digestValue);
 		TimestampResponseDTO timeStampResponse = timestampService.getTimestampResponse(digest);
 		
