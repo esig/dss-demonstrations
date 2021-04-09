@@ -55,7 +55,7 @@
 		<thymeleaf-layout-dialect.version>2.5.1</thymeleaf-layout-dialect.version>
 		<jackson-jaxrs-json-provider.version>2.12.2</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
-		<hikaricp.version>3.4.5</hikaricp.version>
+		<hikaricp.version>4.0.3</hikaricp.version>
 		<freemarker.version>2.3.31</freemarker.version>
 		<hsqldb.version>2.5.1</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
