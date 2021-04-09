@@ -23,6 +23,7 @@
 		<AllFilesSigned Level="WARN" />
 	</ContainerConstraints>
 	<SignatureConstraints>
+		<StructuralValidation Level="WARN" />
 		<AcceptablePolicies Level="FAIL">
 			<Id>ANY_POLICY</Id>
 			<Id>NO_POLICY</Id>
@@ -35,8 +36,14 @@
 		<BasicSignatureConstraints>
 			<ReferenceDataExistence Level="FAIL" />
 			<ReferenceDataIntact Level="FAIL" />
+			<ManifestEntryObjectExistence Level="WARN" />
 			<SignatureIntact Level="FAIL" />
+			<SignatureDuplicated Level="FAIL" />
 			<ProspectiveCertificateChain Level="FAIL" />
+			<SignerInformationStore Level="FAIL" />
+			<PdfPageDifference Level="FAIL" />
+			<PdfAnnotationOverlap Level="WARN" />
+			<PdfVisualDifference Level="WARN" />
 <!-- 			<TrustedServiceTypeIdentifier Level="WARN"> -->
 <!-- 				<Id>http://uri.etsi.org/TrstSvc/Svctype/CA/QC</Id> -->
 <!-- 			</TrustedServiceTypeIdentifier> -->
@@ -54,7 +61,7 @@
 				<AuthorityInfoAccessPresent Level="WARN" />
 				<RevocationInfoAccessPresent Level="WARN" />
 				<RevocationDataAvailable Level="FAIL" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
@@ -65,6 +72,7 @@
 				<NotSelfSigned Level="WARN" />
 <!-- 				<Qualification Level="WARN" /> -->
 <!-- 				<SupportedByQSCD Level="WARN" /> -->
+<!-- 				<QcLegislationCountryCodes Level="WARN" /> -->
 <!-- 				<IssuedToNaturalPerson Level="INFORM" /> -->
 <!-- 				<IssuedToLegalPerson Level="INFORM" /> -->
 				<UsePseudonym Level="INFORM" />
@@ -97,7 +105,7 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
@@ -159,6 +167,7 @@
 			<CertDigestMatch Level="FAIL" />
 			<IssuerSerialMatch Level="WARN" />
 			<SigningTime Level="FAIL" />
+			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
 <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" />
 			<ContentHints Level="FAIL" value="*" />
 			<CommitmentTypeIndication Level="FAIL">
@@ -179,6 +188,7 @@
 			<ReferenceDataExistence Level="FAIL" />
 			<ReferenceDataIntact Level="FAIL" />
 			<SignatureIntact Level="FAIL" />
+			<SignatureDuplicated Level="FAIL" />
 			<ProspectiveCertificateChain Level="FAIL" />
 <!-- 			<TrustedServiceTypeIdentifier Level="WARN"> -->
 <!-- 				<Id>http://uri.etsi.org/TrstSvc/Svctype/CA/QC</Id> -->
@@ -197,7 +207,7 @@
 				<AuthorityInfoAccessPresent Level="WARN" />
 				<RevocationInfoAccessPresent Level="WARN" />
 				<RevocationDataAvailable Level="FAIL" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
@@ -240,7 +250,7 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
@@ -300,6 +310,7 @@
 			<CertDigestMatch Level="FAIL" />
 			<IssuerSerialMatch Level="WARN" />
 			<SigningTime Level="FAIL" />
+			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
 <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" />
 			<ContentHints Level="FAIL" value="*" />
 			<CommitmentTypeIndication Level="FAIL">
@@ -313,7 +324,7 @@
 		</SignedAttributes>
 	</CounterSignatureConstraints>
 	<Timestamp>
-		<TimestampDelay Level="FAIL" Unit="DAYS" Value="0" />
+		<TimestampDelay Level="IGNORE" Unit="DAYS" Value="0" />
 		<RevocationTimeAgainstBestSignatureTime	Level="FAIL" />
 		<BestSignatureTimeBeforeExpirationDateOfSigningCertificate Level="FAIL" />
 		<Coherence Level="WARN" />
@@ -327,8 +338,11 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
+				<ExtendedKeyUsage Level="WARN">
+					<Id>timeStamping</Id>
+				</ExtendedKeyUsage>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<NotSelfSigned Level="WARN" />
@@ -361,7 +375,7 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="WARN" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
@@ -415,20 +429,29 @@
 				</AcceptableDigestAlgo>
 			</Cryptographic>
 		</BasicSignatureConstraints>
+		<SignedAttributes>
+			<SigningCertificatePresent Level="WARN" />
+			<!-- <UnicitySigningCertificate Level="WARN" /> RFC 5816 -->
+			<CertDigestPresent Level="WARN" />
+			<AllCertDigestsMatch Level="WARN" />
+			<IssuerSerialMatch Level="WARN" />
+		</SignedAttributes>
 	</Timestamp>
 	<Revocation>
-		<RevocationFreshness Level="FAIL" Unit="DAYS" Value="0" />
+		<RevocationFreshness Level="IGNORE" Unit="DAYS" Value="0" />
+		<UnknownStatus Level="FAIL" />
+		<SelfIssuedOCSP Level="WARN" />
 		<BasicSignatureConstraints>
 			<ReferenceDataExistence Level="FAIL" />
 			<ReferenceDataIntact Level="FAIL" />
 			<SignatureIntact Level="FAIL" />
-			<ProspectiveCertificateChain Level="WARN" />
+			<ProspectiveCertificateChain Level="FAIL" />
 			<SigningCertificate>
 				<Recognition Level="FAIL" />
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
@@ -461,7 +484,7 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="WARN" />
-				<RevocationDataNextUpdatePresent Level="WARN" />
+				<CRLNextUpdatePresent Level="WARN" />
 				<RevocationDataFreshness Level="FAIL" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
