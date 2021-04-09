@@ -53,7 +53,7 @@
 		<spring-security.version>5.4.5</spring-security.version>
 		<thymeleaf-spring5.version>3.0.12.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>2.5.1</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.11.3</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.12.2</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<hikaricp.version>3.4.5</hikaricp.version>
 		<freemarker.version>2.3.31</freemarker.version>
