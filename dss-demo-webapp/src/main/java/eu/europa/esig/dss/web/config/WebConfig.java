@@ -1,5 +1,7 @@
 package eu.europa.esig.dss.web.config;
 
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,13 +16,17 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
-import nz.net.ultraq.thymeleaf.LayoutDialect;
-
 @Configuration
 @EnableWebMvc
 @Import(PropertiesConfig.class)
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.controller" })
 public class WebConfig implements WebMvcConfigurer {
+
+	@Value("${multipart.maxFileSize}")
+	private long maxFileSize;
+
+	@Value("${multipart.maxInMemorySize}")
+	private int maxInMemorySize;
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -36,7 +42,10 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Bean
 	public MultipartResolver multipartResolver() {
-		return new MultipartFormDataFilter().multipartResolver();
+		MultipartResolverProvider multipartResolverProvider = MultipartResolverProvider.getInstance();
+		multipartResolverProvider.setMaxFileSize(maxFileSize);
+		multipartResolverProvider.setMaxInMemorySize(maxInMemorySize);
+		return multipartResolverProvider.getCommonMultipartResolver();
 	}
 
 	@Bean

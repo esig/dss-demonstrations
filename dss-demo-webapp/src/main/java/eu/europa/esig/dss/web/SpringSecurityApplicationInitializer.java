@@ -1,17 +1,30 @@
 package eu.europa.esig.dss.web;
 
-import javax.servlet.ServletContext;
-
+import eu.europa.esig.dss.web.config.MultipartResolverProvider;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.MultipartFilter;
 
-import eu.europa.esig.dss.web.config.MultipartFormDataFilter;
+import javax.servlet.ServletContext;
 
 public class SpringSecurityApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
 	
 	@Override
     protected void beforeSpringSecurityFilterChain(ServletContext servletContext) {
-		// does not work with a default MultipartFilter
-        insertFilters(servletContext, new MultipartFormDataFilter());
+		// initialize all files resolver with lazy loading
+        insertFilters(servletContext, new AcceptAllFilesMultipartFilter());
+    }
+
+    /**
+     * The filter used to accept all files, but load lazily
+     */
+    private class AcceptAllFilesMultipartFilter extends MultipartFilter {
+
+        @Override
+        protected MultipartResolver lookupMultipartResolver() {
+            return MultipartResolverProvider.getInstance().getAcceptAllFilesResolver();
+        }
+
     }
 
 }

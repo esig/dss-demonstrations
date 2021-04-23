@@ -1,13 +1,5 @@
 package eu.europa.esig.dss.web;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.multipart.MultipartFile;
-
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.DigestDocument;
@@ -18,9 +10,18 @@ import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.timestamp.TimestampToken;
+import eu.europa.esig.dss.web.config.MultipartResolverProvider;
 import eu.europa.esig.dss.web.model.OriginalFile;
 import eu.europa.esig.dss.ws.dto.TimestampDTO;
 import eu.europa.esig.dss.ws.signature.common.TimestampTokenConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class WebAppUtils {
 
@@ -32,6 +33,9 @@ public final class WebAppUtils {
 	public static DSSDocument toDSSDocument(MultipartFile multipartFile) {
 		try {
 			if ((multipartFile != null) && !multipartFile.isEmpty()) {
+				if (multipartFile.getSize() > MultipartResolverProvider.getInstance().getMaxFileSize()) {
+					throw new MaxUploadSizeExceededException(MultipartResolverProvider.getInstance().getMaxFileSize());
+				}
 				return new InMemoryDocument(multipartFile.getBytes(), multipartFile.getOriginalFilename());
 			}
 		} catch (IOException e) {
