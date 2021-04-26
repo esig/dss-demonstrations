@@ -340,6 +340,7 @@ public class CXFConfig {
         openApiFeature.setScan(true);
 		openApiFeature.setUseContextBasedConfig(true);
         openApiFeature.setTitle("DSS WebServices");
+		openApiFeature.setVersion("1.0.0");
         return openApiFeature;
     }
 
