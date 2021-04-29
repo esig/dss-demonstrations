@@ -432,10 +432,11 @@
 		<SignedAttributes>
 			<SigningCertificatePresent Level="WARN" />
 			<!-- <UnicitySigningCertificate Level="WARN" /> RFC 5816 -->
+			<SigningCertificateRefersCertificateChain Level="WARN" />
 			<CertDigestPresent Level="WARN" />
-			<AllCertDigestsMatch Level="WARN" />
 			<IssuerSerialMatch Level="WARN" />
 		</SignedAttributes>
+		<TSAGeneralNameContentMatch Level="WARN" />
 	</Timestamp>
 	<Revocation>
 		<RevocationFreshness Level="IGNORE" Unit="DAYS" Value="0" />
