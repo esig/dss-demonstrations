@@ -5,7 +5,7 @@
 	</head>
 	<body>
 		
-		<div layout:fragment="content" th:if="${lotl != null}" th:with="lotlSigningCertId=${lotl.validationCacheInfo?.signingCertificate.getDSSIdAsString()}">
+		<div layout:fragment="content" th:if="${lotl != null}" th:with="lotlSigningCertId=${lotl.validationCacheInfo?.signingCertificate?.getDSSIdAsString()}">
 		
 			<div class="pb-3" th:if="${lotl != null}">
 				<div class="card card-body col-sm-12" layout:fragment="card">
@@ -25,15 +25,15 @@
 			<!-- LOTL Info -->
 			<div class="current-lotl text-break">
 				<h2>
-					<span th:if="${lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}" 
+					<span th:if="${lotl.parsingCacheInfo != null and lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}"
 							th:class="${'lotl-flag small_flag mt-2 flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
 					<span th:text="#{label.summary.lotl}"></span>&nbsp;
-					<a class="lotl-url h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url} + ')'" target="_blank"></a>
+					<a class="lotl-url h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url}?:'-' + ')'" target="_blank"></a>
 				</h2>
 			</div>
 		
 			<!-- Original certificates -->
-			<div class="certificates-container original-certificates">
+			<div class="certificates-container original-certificates" th:if="${not #lists.isEmpty(potentialSigners)}">
 				<div class="card bg-primary mb-3">
 					<div class="card-header text-white" th:text="#{label.summary.lotl.potential.signers}"></div>
 					<div class="card-body bg-white rounded-bottom">
@@ -61,7 +61,7 @@
 				<div class="card bg-primary mb-3">
 					<div class="card-header">
 						<span class="text-white" th:text="#{label.summary.pivot.url}"></span>
-						<a class="text-white" th:href="${pivotUrl}" th:text="'(' + ${pivotUrl} + ')'" target="_blank"></a>
+						<a class="text-white" th:href="${pivotUrl}" th:text="'(' + ${pivotUrl}?:'-' + ')'" target="_blank"></a>
 					</div>
 					
 					<div class="card-body bg-white rounded-bottom">
@@ -76,8 +76,8 @@
 						</div>
 						
 						<!-- Pivot certificate source -->
-						<div th:each="certificateEntry,iterCert : ${pivotCerts}" th:with="certId=${certificateEntry.key.getDSSIdAsString()},
-								certStatus=${certificateEntry.value.name()}">
+						<div th:if="${pivotCerts != null}" th:each="certificateEntry,iterCert : ${pivotCerts}"
+							 th:with="certId=${certificateEntry.key.getDSSIdAsString()}, certStatus=${certificateEntry.value.name()}">
 							<div th:class="${'card mb-2 bg-' + 
 									((certId == lotlSigningCertId)?'info text-white':((certStatus == 'ADDED')?'success text-white':((certStatus == 'REMOVED')?'danger text-white':'default')))}">
 								<div class="card-header cursor-pointer" th:data-target="${'#' + pivotId + '-' + certId}" data-toggle="collapse" 
