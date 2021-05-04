@@ -1,32 +1,10 @@
 package eu.europa.esig.dss.web.config;
 
-import java.util.Arrays;
-
-import javax.annotation.PostConstruct;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
-import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
-import org.apache.cxf.jaxws.EndpointImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
-
 import eu.europa.esig.dss.web.exception.ExceptionRestMapper;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.cert.validation.rest.RestCertificateValidationServiceImpl;
@@ -58,6 +36,25 @@ import eu.europa.esig.dss.ws.validation.rest.RestDocumentValidationServiceImpl;
 import eu.europa.esig.dss.ws.validation.rest.client.RestDocumentValidationService;
 import eu.europa.esig.dss.ws.validation.soap.SoapDocumentValidationServiceImpl;
 import eu.europa.esig.dss.ws.validation.soap.client.SoapDocumentValidationService;
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+
+import javax.annotation.PostConstruct;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
+import java.util.Arrays;
 
 @Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
@@ -82,6 +79,9 @@ public class CXFConfig {
 
 	@Value("${cxf.mtom.enabled:true}")
 	private boolean mtomEnabled;
+
+	@Value("${dssVersion:1.0}")
+	private String dssVersion;
 
 	@Autowired
 	private Bus bus;
@@ -340,7 +340,7 @@ public class CXFConfig {
         openApiFeature.setScan(true);
 		openApiFeature.setUseContextBasedConfig(true);
         openApiFeature.setTitle("DSS WebServices");
-		openApiFeature.setVersion("1.0.0");
+		openApiFeature.setVersion(dssVersion);
         return openApiFeature;
     }
 
