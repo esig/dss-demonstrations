@@ -50,7 +50,7 @@
 
 		<cxf.version>3.4.1</cxf.version>
 		<spring.version>5.2.11.RELEASE</spring.version>
-		<spring-security.version>5.4.2</spring-security.version>
+		<spring-security.version>5.4.4</spring-security.version>
 		<thymeleaf-spring5.version>3.0.11.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>2.5.1</thymeleaf-layout-dialect.version>
 		<jackson-jaxrs-json-provider.version>2.11.3</jackson-jaxrs-json-provider.version>
