@@ -26,32 +26,16 @@
  */
 package eu.europa.esig.dss.token.mocca;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.smartcardio.Card;
-import javax.smartcardio.CardTerminal;
-
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERSequence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import at.gv.egiz.smcc.CardNotSupportedException;
 import at.gv.egiz.smcc.SignatureCard;
 import at.gv.egiz.smcc.SignatureCard.KeyboxName;
 import at.gv.egiz.smcc.SignatureCardFactory;
 import at.gv.egiz.smcc.util.SmartCardIO;
-import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
 import eu.europa.esig.dss.enumerations.MaskGenerationFunction;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
+import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.Digest;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
@@ -59,8 +43,23 @@ import eu.europa.esig.dss.spi.DSSASN1Utils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.DERSequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.smartcardio.Card;
+import javax.smartcardio.CardTerminal;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
+ * MOCCA SignatureTokenConnection
  *
  */
 @SuppressWarnings("restriction")
@@ -85,6 +84,11 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 		this.callback = new PINGUIAdapter(callback);
 	}
 
+	/**
+	 * Sets a signature cards list
+	 *
+	 * @param _signatureCards a list of {@link SignatureCard}s
+	 */
 	public void set_signatureCards(List<SignatureCard> _signatureCards) {
 		this._signatureCards = _signatureCards;
 	}
@@ -169,21 +173,18 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 
 	@Override
 	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
-
 		final InputStream inputStream = new ByteArrayInputStream(toBeSigned.getBytes());
 		if (!(keyEntry instanceof MOCCAPrivateKeyEntry)) {
-
 			throw new DSSException("Unsupported DSSPrivateKeyEntry instance " + keyEntry.getClass() + " / Must be MOCCAPrivateKeyEntry.");
 		}
+
 		final MOCCAPrivateKeyEntry moccaKey = (MOCCAPrivateKeyEntry) keyEntry;
 		if (_signatureCards == null) {
-
 			throw new IllegalStateException("The cards have not been initialised");
 		}
 		// TODO Bob:20130619 This is not completely true, it is true only for the last card. The signing certificate
 		// should be checked.
 		if (moccaKey.getPos() > (_signatureCards.size() - 1)) {
-
 			throw new IllegalStateException("Card was removed or disconnected " + moccaKey.getPos() + " " + _signatureCards.size());
 		}
 		final SignatureCard signatureCard = _signatureCards.get(moccaKey.getPos());
@@ -192,11 +193,9 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 
 		LOG.info("MOCCA>>>Signature algorithm: {}", signatureAlgorithm.getJCEId());
 		try {
-
 			final KeyboxName keyboxName = moccaKey.getKeyboxName();
 			byte[] signedData = signatureCard.createSignature(inputStream, keyboxName, callback, signatureAlgorithm.getUri());
 			if (EncryptionAlgorithm.ECDSA.equals(encryptionAlgo)) {
-
 				signedData = encode(signedData);
 			}
 
@@ -217,12 +216,23 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 	}
 
 	@Override
+	public SignatureValue sign(ToBeSigned toBeSigned, SignatureAlgorithm signatureAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public SignatureValue signDigest(Digest digest, DSSPrivateKeyEntry keyEntry) throws DSSException {
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public SignatureValue signDigest(Digest digest, MaskGenerationFunction mgf, DSSPrivateKeyEntry keyEntry)
+			throws DSSException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public SignatureValue signDigest(Digest digest, SignatureAlgorithm signatureAlgorithm, DSSPrivateKeyEntry keyEntry)
 			throws DSSException {
 		throw new UnsupportedOperationException();
 	}
