@@ -60,7 +60,7 @@
 		<hsqldb.version>2.5.1</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
 		
-		<junit.jupiter.version>5.7.0</junit.jupiter.version>
+		<junit.jupiter.version>5.7.2</junit.jupiter.version>
 	</properties>
 
 	<licenses>
