@@ -1,22 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.SignatureWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestMatcher;
@@ -58,6 +41,22 @@ import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignature
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import eu.europa.esig.dss.ws.validation.dto.WSReportsDTO;
 import eu.europa.esig.dss.ws.validation.rest.client.RestDocumentValidationService;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RestCompleteSignatureProcessIT extends AbstractRestIT {
 
@@ -389,7 +388,7 @@ public class RestCompleteSignatureProcessIT extends AbstractRestIT {
 			ToBeSignedDTO dataToBeCounterSigned = restClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO);
 			assertNotNull(dataToBeCounterSigned);
 
-			signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeCounterSigned), DigestAlgorithm.SHA256,
+			signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeCounterSigned), DigestAlgorithm.SHA512,
 					dssPrivateKeyEntry);
 
 			CounterSignSignatureDTO counterSignSignatureDTO = new CounterSignSignatureDTO(signedDocument, parameters,

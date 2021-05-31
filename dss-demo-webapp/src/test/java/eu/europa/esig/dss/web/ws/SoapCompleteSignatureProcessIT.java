@@ -1,24 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.SignatureWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestMatcher;
@@ -61,6 +42,24 @@ import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatur
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import eu.europa.esig.dss.ws.validation.dto.WSReportsDTO;
 import eu.europa.esig.dss.ws.validation.soap.client.SoapDocumentValidationService;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SoapCompleteSignatureProcessIT extends AbstractIT {
 
@@ -405,7 +404,7 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			ToBeSignedDTO dataToBeCounterSigned = soapClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO);
 			assertNotNull(dataToBeCounterSigned);
 
-			signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeCounterSigned), DigestAlgorithm.SHA256,
+			signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeCounterSigned), DigestAlgorithm.SHA512,
 					dssPrivateKeyEntry);
 
 			CounterSignSignatureDTO counterSignSignatureDTO = new CounterSignSignatureDTO(signedDocument, parameters,
