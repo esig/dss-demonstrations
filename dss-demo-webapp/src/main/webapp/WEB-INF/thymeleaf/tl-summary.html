@@ -20,7 +20,7 @@
 									th:class="${'lotl-flag small_flag mt-2 flag_' + parsingResult.territory}" th:title="${parsingResult.territory}"></span>
 						</a>
 						<span th:text="#{label.summary.lotl.number(${iterLOTL.count})}"></span>&nbsp;
-						<a class="h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + ${lotl.url}?:'-' + ')'" target="_blank"></a>
+						<a class="h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + (${lotl.url}?:'-') + ')'" target="_blank"></a>
 					</h2>
 					
 					<!-- LOTL Info -->
