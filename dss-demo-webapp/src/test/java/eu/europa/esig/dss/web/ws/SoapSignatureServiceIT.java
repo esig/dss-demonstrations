@@ -1,28 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.ws.soap.SOAPFaultException;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
@@ -62,6 +39,27 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.xml.ws.soap.SOAPFaultException;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SoapSignatureServiceIT extends AbstractIT {
 
@@ -459,7 +457,7 @@ public class SoapSignatureServiceIT extends AbstractIT {
 					parameters);
 			Exception exception = assertThrows(SOAPFaultException.class,
 					() -> soapClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
-			assertEquals("Unsupported signature form for counter singature : PAdES", exception.getMessage());
+			assertEquals("Unsupported signature form for counter signature : PAdES", exception.getMessage());
 		}
 	}
 

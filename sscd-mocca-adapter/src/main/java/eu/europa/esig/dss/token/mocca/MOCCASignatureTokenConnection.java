@@ -175,7 +175,7 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
 		final InputStream inputStream = new ByteArrayInputStream(toBeSigned.getBytes());
 		if (!(keyEntry instanceof MOCCAPrivateKeyEntry)) {
-			throw new DSSException("Unsupported DSSPrivateKeyEntry instance " + keyEntry.getClass() + " / Must be MOCCAPrivateKeyEntry.");
+			throw new UnsupportedOperationException("Unsupported DSSPrivateKeyEntry instance " + keyEntry.getClass() + " / Must be MOCCAPrivateKeyEntry.");
 		}
 
 		final MOCCAPrivateKeyEntry moccaKey = (MOCCAPrivateKeyEntry) keyEntry;
@@ -205,7 +205,7 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 			return value;
 
 		} catch (Exception e) {
-			throw new DSSException(e);
+			throw new DSSException(String.format("An error occurred on signing : %s", e.getMessage()), e);
 		}
 	}
 
