@@ -4,6 +4,7 @@
 		<div layout:fragment="content">
             <div class="alert alert-danger" role="alert">
                 <p><strong>The page "<span th:text="${url}"></span>" is not found ! </strong></p>
+                <p><strong>Exception:</strong> <span th:text="${exception}"></span></p>
             </div>
             <p><a th:href="@{/}">Back to Homepage</a></p>
 		</div>
