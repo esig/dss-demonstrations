@@ -36,7 +36,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(SoapDocumentValidationService.class);
 
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 //		props.put("jaxb.additionalContextClasses", getExtraClasses());
 		factory.setProperties(props);

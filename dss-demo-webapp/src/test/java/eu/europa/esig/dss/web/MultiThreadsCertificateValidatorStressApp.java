@@ -1,7 +1,21 @@
 package eu.europa.esig.dss.web;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import eu.europa.esig.dss.diagnostic.DiagnosticData;
+import eu.europa.esig.dss.enumerations.CertificateQualification;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.validation.CertificateValidator;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.reports.CertificateReports;
+import eu.europa.esig.dss.web.config.DSSBeanConfig;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,23 +26,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-
-import eu.europa.esig.dss.diagnostic.DiagnosticData;
-import eu.europa.esig.dss.enumerations.CertificateQualification;
-import eu.europa.esig.dss.model.x509.CertificateToken;
-import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.validation.CertificateValidator;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.web.config.DSSBeanConfig;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = { DSSBeanConfig.class })
@@ -45,7 +44,7 @@ public class MultiThreadsCertificateValidatorStressApp {
 
 		ExecutorService executor = Executors.newFixedThreadPool(100);
 
-		List<Future<CertificateReports>> futures = new ArrayList<Future<CertificateReports>>();
+		List<Future<CertificateReports>> futures = new ArrayList<>();
 
 		int nbReq = 1000;
 		long startNanoTime = System.nanoTime();

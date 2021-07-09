@@ -1,17 +1,10 @@
 package eu.europa.esig.dss.web.service;
 
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.StringWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
+import eu.europa.esig.dss.detailedreport.jaxb.XmlDetailedReport;
+import eu.europa.esig.dss.simplereport.jaxb.XmlSimpleReport;
+import eu.europa.esig.dss.spi.x509.revocation.crl.ExternalResourcesCRLSource;
+import eu.europa.esig.dss.web.config.DSSBeanConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +12,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import eu.europa.esig.dss.detailedreport.jaxb.XmlDetailedReport;
-import eu.europa.esig.dss.simplereport.jaxb.XmlSimpleReport;
-import eu.europa.esig.dss.web.config.DSSBeanConfig;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.StringWriter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = { DSSBeanConfig.class })

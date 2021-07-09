@@ -109,7 +109,7 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 
 		if (_signatureCards == null) {
 
-			_signatureCards = new ArrayList<SignatureCard>();
+			_signatureCards = new ArrayList<>();
 			SmartCardIO io = new SmartCardIO();
 			SignatureCardFactory factory = SignatureCardFactory.getInstance();
 
@@ -139,7 +139,7 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 
 	private List<DSSPrivateKeyEntry> getKeysSeveralCards() throws DSSException {
 
-		final List<DSSPrivateKeyEntry> list = new ArrayList<DSSPrivateKeyEntry>();
+		final List<DSSPrivateKeyEntry> list = new ArrayList<>();
 		final List<SignatureCard> cardList = getSignatureCards();
 		int index = 0;
 		for (SignatureCard sc : cardList) {
@@ -242,18 +242,17 @@ public class MOCCASignatureTokenConnection implements SignatureTokenConnection {
 	 * 186-2).<br>
 	 * This encoding is not implemented at the level of MOCCA!
 	 *
-	 * @param signedStream
-	 * @return
-	 * @throws eu.europa.esig.dss.model.DSSException
+	 * @param signedData binaries
+	 * @return encoded byte array
 	 */
-	private static byte[] encode(byte[] signedStream) throws DSSException {
+	private static byte[] encode(byte[] signedData) {
 
-		final int half = signedStream.length / 2;
+		final int half = signedData.length / 2;
 		final byte[] firstPart = new byte[half];
 		final byte[] secondPart = new byte[half];
 
-		System.arraycopy(signedStream, 0, firstPart, 0, half);
-		System.arraycopy(signedStream, half, secondPart, 0, half);
+		System.arraycopy(signedData, 0, firstPart, 0, half);
+		System.arraycopy(signedData, half, secondPart, 0, half);
 
 		final BigInteger r = new BigInteger(1, firstPart);
 		final BigInteger s = new BigInteger(1, secondPart);

@@ -18,7 +18,7 @@ public class SpringSecurityApplicationInitializer extends AbstractSecurityWebApp
     /**
      * The filter used to accept all files, but load lazily
      */
-    private class AcceptAllFilesMultipartFilter extends MultipartFilter {
+    private static class AcceptAllFilesMultipartFilter extends MultipartFilter {
 
         @Override
         protected MultipartResolver lookupMultipartResolver() {

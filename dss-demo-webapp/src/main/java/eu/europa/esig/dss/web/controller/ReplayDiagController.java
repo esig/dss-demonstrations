@@ -1,26 +1,5 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
 import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
@@ -35,6 +14,25 @@ import eu.europa.esig.dss.validation.executor.signature.DefaultSignatureProcessE
 import eu.europa.esig.dss.validation.reports.AbstractReports;
 import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.model.ReplayDiagForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
 @Controller
@@ -76,7 +74,7 @@ public class ReplayDiagController extends AbstractValidationController {
 			return REPLAY_TILE;
 		}
 
-		XmlDiagnosticData dd = null;
+		XmlDiagnosticData dd;
 		try (InputStream is = replayDiagForm.getDiagnosticFile().getInputStream()) {
 			dd = DiagnosticDataFacade.newFacade().unmarshall(is);
 		} catch (Exception e) {

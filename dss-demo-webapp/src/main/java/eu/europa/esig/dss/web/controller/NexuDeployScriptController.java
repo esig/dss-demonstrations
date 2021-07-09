@@ -1,10 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class NexuDeployScriptController {
@@ -45,7 +44,7 @@ public class NexuDeployScriptController {
 
 		StringWriter outWriter = new StringWriter();
 
-		Map<String, String> model = new HashMap<String, String>();
+		Map<String, String> model = new HashMap<>();
 
 		model.put("nexuDownloadUrl", nexuDownloadUrl);
 		model.put("nexuVersion", nexuVersion);
@@ -56,6 +55,6 @@ public class NexuDeployScriptController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.parseMediaType("text/javascript"));
 
-		return new ResponseEntity<String>(outWriter.toString(), headers, HttpStatus.ACCEPTED);
+		return new ResponseEntity<>(outWriter.toString(), headers, HttpStatus.ACCEPTED);
 	}
 }

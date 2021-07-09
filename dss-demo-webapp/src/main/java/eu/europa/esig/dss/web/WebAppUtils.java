@@ -45,7 +45,7 @@ public final class WebAppUtils {
 	}
 
 	public static List<DSSDocument> toDSSDocuments(List<MultipartFile> documentsToSign) {
-		List<DSSDocument> dssDocuments = new ArrayList<DSSDocument>();
+		List<DSSDocument> dssDocuments = new ArrayList<>();
 		if (Utils.isCollectionNotEmpty(documentsToSign)) {
 			for (MultipartFile multipartFile : documentsToSign) {
 				DSSDocument dssDocument = toDSSDocument(multipartFile);
@@ -66,11 +66,11 @@ public final class WebAppUtils {
 	}
 
 	public static List<DSSDocument> originalFilesToDSSDocuments(List<OriginalFile> originalFiles) {
-		List<DSSDocument> dssDocuments = new ArrayList<DSSDocument>();
+		List<DSSDocument> dssDocuments = new ArrayList<>();
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
 			for (OriginalFile originalDocument : originalFiles) {
 				if (originalDocument.isNotEmpty()) {
-					DSSDocument dssDocument = null;
+					DSSDocument dssDocument;
 					if (Utils.isStringNotEmpty(originalDocument.getBase64Complete())) {
 						dssDocument = new InMemoryDocument(Utils.fromBase64(originalDocument.getBase64Complete()));
 					} else {

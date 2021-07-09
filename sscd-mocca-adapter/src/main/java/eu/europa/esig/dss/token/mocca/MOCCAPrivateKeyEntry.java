@@ -115,7 +115,7 @@ public class MOCCAPrivateKeyEntry implements DSSPrivateKeyEntry {
 	/**
 	 * Gets the position of this key in the list of all keys
 	 *
-	 * @return
+	 * @return key position
 	 */
 	public int getPos() {
 		return index;

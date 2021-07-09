@@ -82,13 +82,13 @@ public class MockTSPSource implements TSPSource {
 			LOG.info("Timestamping with {}", ksPK.getCertificate());
 
 			X509CertificateHolder certificate = new X509CertificateHolder(ksPK.getCertificate().getEncoded());
-			List<X509Certificate> chain = new ArrayList<X509Certificate>();
+			List<X509Certificate> chain = new ArrayList<>();
 			CertificateToken[] certificateChain = ksPK.getCertificateChain();
 			for (CertificateToken token : certificateChain) {
 				chain.add(token.getCertificate());
 			}
 
-			Set<ASN1ObjectIdentifier> accepted = new HashSet<ASN1ObjectIdentifier>();
+			Set<ASN1ObjectIdentifier> accepted = new HashSet<>();
 			accepted.add(TSPAlgorithms.SHA1);
 			accepted.add(TSPAlgorithms.SHA256);
 			accepted.add(TSPAlgorithms.SHA512);

@@ -1,20 +1,19 @@
 package eu.europa.esig.dss.web.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.model.CertificateDTO;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class KeystoreService {
 
 	public List<CertificateDTO> getCertificatesDTOFromKeyStore(List<CertificateToken> certificatesFromKeyStore) {
-		List<CertificateDTO> list = new ArrayList<CertificateDTO>();
+		List<CertificateDTO> list = new ArrayList<>();
 		for (CertificateToken certificateToken : certificatesFromKeyStore) {
 			list.add(getCertificateDTO(certificateToken));
 		}
@@ -44,8 +43,8 @@ public class KeystoreService {
 	/**
 	 * This method adds space every two characters to the hexadecimal encoded digest
 	 *
-	 * @param digest
-	 * @return
+	 * @param digest byte array
+	 * @return {@link String} hex string
 	 */
 	private String getPrintableHex(byte[] digest) {
 		String hexString = Utils.toHex(digest);

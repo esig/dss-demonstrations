@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.ws;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -88,7 +89,7 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
 			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
 		}
-		assertTrue(validationDate.compareTo(diagnosticData.getValidationDate()) == 0);
+		assertEquals(0, validationDate.compareTo(diagnosticData.getValidationDate()));
 	}
 	
 	@Test

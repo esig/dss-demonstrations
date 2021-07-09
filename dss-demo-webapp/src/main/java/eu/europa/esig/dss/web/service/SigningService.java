@@ -263,7 +263,7 @@ public class SigningService {
 
 		LOG.info("Start timestamp with {} document(s)", dssDocuments.size());
 
-		DSSDocument result = null;
+		DSSDocument result;
 		ASiCContainerType containerType = form.getContainerType();
 		if (containerType == null) {
 			if (dssDocuments.size() > 1) {
@@ -483,7 +483,7 @@ public class SigningService {
 	
     @SuppressWarnings("rawtypes")
 	private CounterSignatureService getCounterSignatureService(boolean isZipContainer, SignatureForm signatureForm) {
-        CounterSignatureService service = null;
+        CounterSignatureService service;
 		if (isZipContainer) {
             service = (CounterSignatureService) getASiCSignatureService(signatureForm);
         } else {

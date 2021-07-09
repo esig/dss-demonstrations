@@ -45,6 +45,7 @@ import java.security.KeyStore.PasswordProtection;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -175,7 +176,7 @@ public class RestTimestampServiceIT extends AbstractRestIT {
 		
 		XmlDigestAlgoAndValue digestAlgoAndValue = timestamp.getDigestAlgoAndValue();
 		assertNotNull(digestAlgoAndValue);
-		assertTrue(Arrays.equals(digestAlgoAndValue.getDigestValue(), DSSUtils.digest(digestAlgoAndValue.getDigestMethod(), timeStampResponse.getBinaries())));
+		assertArrayEquals(digestAlgoAndValue.getDigestValue(), DSSUtils.digest(digestAlgoAndValue.getDigestMethod(), timeStampResponse.getBinaries()));
 		
 		List<XmlDigestMatcher> digestMatchers = timestamp.getDigestMatchers();
 		assertEquals(1, digestMatchers.size());

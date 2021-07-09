@@ -16,15 +16,15 @@ import javafx.beans.property.StringProperty;
 
 public class SignatureModel {
 
-	private ObjectProperty<File> fileToSign = new SimpleObjectProperty<File>();
-	private ObjectProperty<ASiCContainerType> asicContainerType = new SimpleObjectProperty<ASiCContainerType>();
-	private ObjectProperty<SignatureForm> signatureForm = new SimpleObjectProperty<SignatureForm>();
-	private ObjectProperty<SignaturePackaging> signaturePackaging = new SimpleObjectProperty<SignaturePackaging>();
-	private ObjectProperty<SignatureLevel> signatureLevel = new SimpleObjectProperty<SignatureLevel>();
-	private ObjectProperty<DigestAlgorithm> digestAlgorithm = new SimpleObjectProperty<DigestAlgorithm>();
-	private ObjectProperty<SignatureTokenType> tokenType = new SimpleObjectProperty<SignatureTokenType>();
+	private ObjectProperty<File> fileToSign = new SimpleObjectProperty<>();
+	private ObjectProperty<ASiCContainerType> asicContainerType = new SimpleObjectProperty<>();
+	private ObjectProperty<SignatureForm> signatureForm = new SimpleObjectProperty<>();
+	private ObjectProperty<SignaturePackaging> signaturePackaging = new SimpleObjectProperty<>();
+	private ObjectProperty<SignatureLevel> signatureLevel = new SimpleObjectProperty<>();
+	private ObjectProperty<DigestAlgorithm> digestAlgorithm = new SimpleObjectProperty<>();
+	private ObjectProperty<SignatureTokenType> tokenType = new SimpleObjectProperty<>();
 
-	private ObjectProperty<File> pkcsFile = new SimpleObjectProperty<File>();
+	private ObjectProperty<File> pkcsFile = new SimpleObjectProperty<>();
 	private StringProperty password = new SimpleStringProperty();
 
 	public File getFileToSign() {

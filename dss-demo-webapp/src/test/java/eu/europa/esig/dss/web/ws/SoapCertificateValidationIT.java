@@ -1,25 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.ws.soap.SOAPFaultException;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
@@ -32,6 +12,25 @@ import eu.europa.esig.dss.ws.cert.validation.soap.client.SoapCertificateValidati
 import eu.europa.esig.dss.ws.cert.validation.soap.client.WSCertificateReportsDTO;
 import eu.europa.esig.dss.ws.converter.RemoteCertificateConverter;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SoapCertificateValidationIT extends AbstractIT {
 
@@ -42,7 +41,7 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(SoapCertificateValidationService.class);
 
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 //		props.put("jaxb.additionalContextClasses", getExtraClasses());
 		factory.setProperties(props);
@@ -92,7 +91,7 @@ public class SoapCertificateValidationIT extends AbstractIT {
 			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
 			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
 		}
-		assertTrue(validationDate.compareTo(diagnosticData.getValidationDate()) == 0);
+		assertEquals(0, validationDate.compareTo(diagnosticData.getValidationDate()));
 	}
 
 	@Test

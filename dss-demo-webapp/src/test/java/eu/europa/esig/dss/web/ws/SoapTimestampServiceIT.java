@@ -1,26 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDigestAlgoAndValue;
@@ -54,7 +33,26 @@ import eu.europa.esig.dss.ws.timestamp.remote.soap.client.SoapTimestampService;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import eu.europa.esig.dss.ws.validation.dto.WSReportsDTO;
 import eu.europa.esig.dss.ws.validation.soap.client.SoapDocumentValidationService;
-import eu.europa.esig.dss.xades.DSSXMLUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SoapTimestampServiceIT extends AbstractIT {
 
@@ -65,7 +63,7 @@ public class SoapTimestampServiceIT extends AbstractIT {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(SoapTimestampService.class);
 
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 //		props.put("jaxb.additionalContextClasses", getExtraClasses());
 		factory.setProperties(props);
@@ -100,7 +98,7 @@ public class SoapTimestampServiceIT extends AbstractIT {
 		JAXBDataBinding dataBinding = new JAXBDataBinding();
 		dataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
 
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
@@ -160,7 +158,7 @@ public class SoapTimestampServiceIT extends AbstractIT {
 		factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(SoapDocumentValidationService.class);
 
-		props = new HashMap<String, Object>();
+		props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 //		props.put("jaxb.additionalContextClasses", getExtraClasses());
 		factory.setProperties(props);
@@ -196,7 +194,7 @@ public class SoapTimestampServiceIT extends AbstractIT {
 		
 		XmlDigestAlgoAndValue digestAlgoAndValue = timestamp.getDigestAlgoAndValue();
 		assertNotNull(digestAlgoAndValue);
-		assertTrue(Arrays.equals(digestAlgoAndValue.getDigestValue(), DSSUtils.digest(digestAlgoAndValue.getDigestMethod(), timeStampResponse.getBinaries())));
+		assertArrayEquals(digestAlgoAndValue.getDigestValue(), DSSUtils.digest(digestAlgoAndValue.getDigestMethod(), timeStampResponse.getBinaries()));
 		
 		List<XmlDigestMatcher> digestMatchers = timestamp.getDigestMatchers();
 		assertEquals(1, digestMatchers.size());

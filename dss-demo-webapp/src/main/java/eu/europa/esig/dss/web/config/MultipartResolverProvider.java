@@ -66,7 +66,7 @@ public class MultipartResolverProvider {
     /**
      * Sets maximum upload file size
      *
-     * @param maxFileSize
+     * @param maxFileSize maximum file size
      */
     public void setMaxFileSize(long maxFileSize) {
         getCommonMultipartResolver().setMaxUploadSize(maxFileSize);
@@ -77,7 +77,7 @@ public class MultipartResolverProvider {
     /**
      * Sets maximum inMemory file size
      *
-     * @param maxInMemorySize
+     * @param maxInMemorySize maximum in memory file size
      */
     public void setMaxInMemorySize(int maxInMemorySize) {
         getAcceptAllFilesResolver().setMaxInMemorySize(maxInMemorySize);

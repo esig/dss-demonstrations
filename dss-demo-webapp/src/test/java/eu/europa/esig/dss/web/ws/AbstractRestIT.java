@@ -1,7 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -12,7 +10,6 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
 import eu.europa.esig.dss.diagnostic.jaxb.XmlAbstractToken;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlOrphanCertificateToken;
@@ -24,6 +21,8 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlTimestamp;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlTimestampedObject;
 import eu.europa.esig.dss.enumerations.TimestampedObjectType;
 import eu.europa.esig.dss.web.config.CXFConfig;
+
+import java.io.IOException;
 
 public abstract class AbstractRestIT extends AbstractIT {
 
@@ -38,7 +37,7 @@ public abstract class AbstractRestIT extends AbstractIT {
 		@Override
 		public XmlTimestampedObject deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			ObjectMapper mapper = (ObjectMapper) jp.getCodec();
-			ObjectNode root = (ObjectNode) mapper.readTree(jp);
+			ObjectNode root = mapper.readTree(jp);
 			JsonNode categoryNode = root.get("Category");
 			TimestampedObjectType category = TimestampedObjectType.valueOf(categoryNode.textValue());
 			JsonNode tokenNode = root.get("Token");
@@ -46,7 +45,7 @@ public abstract class AbstractRestIT extends AbstractIT {
 			XmlTimestampedObject timestampedObject = new XmlTimestampedObject();
 			timestampedObject.setCategory(category);
 
-			XmlAbstractToken token = null;
+			XmlAbstractToken token;
 			switch (category) {
 			case SIGNATURE:
 				token = new XmlSignature();

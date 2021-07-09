@@ -1,16 +1,5 @@
 package eu.europa.esig.dss.standalone.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
@@ -52,6 +41,16 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class SignatureController implements Initializable {
 
@@ -206,7 +205,7 @@ public class SignatureController implements Initializable {
 		labelPkcs11File.managedProperty().bind(labelPkcs11File.visibleProperty());
 		labelPkcs12File.managedProperty().bind(labelPkcs12File.visibleProperty());
 
-		fileSelectButton.setOnAction(new EventHandler<ActionEvent>() {
+		fileSelectButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
 				FileChooser fileChooser = new FileChooser();
@@ -219,7 +218,7 @@ public class SignatureController implements Initializable {
 
 		asicsRadio.setUserData(ASiCContainerType.ASiC_S);
 		asiceRadio.setUserData(ASiCContainerType.ASiC_E);
-		toggleAsicContainerType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+		toggleAsicContainerType.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				if (newValue != null) {
@@ -235,7 +234,7 @@ public class SignatureController implements Initializable {
 		xadesRadio.setUserData(SignatureForm.XAdES);
 		padesRadio.setUserData(SignatureForm.PAdES);
 		jadesRadio.setUserData(SignatureForm.JAdES);
-		toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+		toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				if (newValue != null) {
@@ -251,7 +250,7 @@ public class SignatureController implements Initializable {
 		envelopingRadio.setUserData(SignaturePackaging.ENVELOPING);
 		detachedRadio.setUserData(SignaturePackaging.DETACHED);
 		internallyDetachedRadio.setUserData(SignaturePackaging.INTERNALLY_DETACHED);
-		toggleSigPackaging.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+		toggleSigPackaging.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				if (newValue != null) {
@@ -270,7 +269,7 @@ public class SignatureController implements Initializable {
 			hBoxDigestAlgos.getChildren().add(rb);
 		}
 		
-		toggleDigestAlgo.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+		toggleDigestAlgo.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				if (newValue != null) {
@@ -287,7 +286,7 @@ public class SignatureController implements Initializable {
 		pkcs11Radio.setUserData(SignatureTokenType.PKCS11);
 		pkcs12Radio.setUserData(SignatureTokenType.PKCS12);
 		mscapiRadio.setUserData(SignatureTokenType.MSCAPI);
-		toggleSigToken.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+		toggleSigToken.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				if (newValue != null) {
@@ -296,12 +295,12 @@ public class SignatureController implements Initializable {
 				}
 				model.setPkcsFile(null);
 				model.setPassword(null);
-				
+
 				updateSigTokenType(newValue);
 			}
 		});
 		
-		pkcsFileButton.setOnAction(new EventHandler<ActionEvent>() {
+		pkcsFileButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
 				FileChooser fileChooser = new FileChooser();
@@ -314,10 +313,10 @@ public class SignatureController implements Initializable {
 					fileChooser.getExtensionFilters().add(
 							new FileChooser.ExtensionFilter("PKCS12 keystore (*.p12, *.pfx)", "*.p12", "*.pfx"));
 				}
-				
+
 				FileChooser.ExtensionFilter allFilesExtensionFilter = new FileChooser.ExtensionFilter("All files", "*");
 				fileChooser.getExtensionFilters().add(allFilesExtensionFilter);
-				
+
 				File pkcsFile = fileChooser.showOpenDialog(stage);
 				model.setPkcsFile(pkcsFile);
 			}
@@ -352,18 +351,18 @@ public class SignatureController implements Initializable {
 
 		signButton.disableProperty().bind(disableSignButton);
 
-		signButton.setOnAction(new EventHandler<ActionEvent>() {
+		signButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
 				progressSign.setDisable(false);
 
-				final Service<DSSDocument> service = new Service<DSSDocument>() {
+				final Service<DSSDocument> service = new Service<>() {
 					@Override
 					protected Task<DSSDocument> createTask() {
 						return new SigningTask(model, jobBuilder.getCertificateSources());
 					}
 				};
-				service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+				service.setOnSucceeded(new EventHandler<>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
 						save(service.getValue());
@@ -371,7 +370,7 @@ public class SignatureController implements Initializable {
 						model.setPassword(null);
 					}
 				});
-				service.setOnFailed(new EventHandler<WorkerStateEvent>() {
+				service.setOnFailed(new EventHandler<>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
 						String errorMessage = "Oops an error occurred : " + service.getMessage();
@@ -390,38 +389,38 @@ public class SignatureController implements Initializable {
 		});
 
 		
-		refreshLOTL.setOnAction(new EventHandler<ActionEvent>() {
+		refreshLOTL.setOnAction(new EventHandler<>() {
 			@Override
-			public void handle(ActionEvent event) {			
-		    	final RefreshLOTLTask task = new RefreshLOTLTask(tlValidationJob);
-		    	task.setOnRunning(new EventHandler<WorkerStateEvent>() {
+			public void handle(ActionEvent event) {
+				final RefreshLOTLTask task = new RefreshLOTLTask(tlValidationJob);
+				task.setOnRunning(new EventHandler<>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
 						warningLabel.setVisible(false);
 						addLoader();
 					}
 				});
-		    	
-		    	task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				task.setOnSucceeded(new EventHandler<>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
 						removeLoader();
 						updateLabelText();
 					}
 				});
-		    	
-		    	task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+
+				task.setOnFailed(new EventHandler<>() {
 					@Override
 					public void handle(WorkerStateEvent event) {
 						removeLoader();
 						warningLabel.setVisible(true);
 					}
 				});
-		    	
-			    //start Task
-		        Thread readValThread = new Thread(task);
-		        readValThread.setDaemon(true);
-		        readValThread.start();
+
+				//start Task
+				Thread readValThread = new Thread(task);
+				readValThread.setDaemon(true);
+				readValThread.start();
 			}
 		});
 	}
@@ -522,7 +521,7 @@ public class SignatureController implements Initializable {
 	private void updateSigTokenType(Toggle newValue) {
 		SignatureTokenType tokenType = (SignatureTokenType) newValue.getUserData();
 		
-		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<DigestAlgorithm>(supportedDigestAlgorithms);
+		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<>(supportedDigestAlgorithms);
 		
 		switch (tokenType) {
 			case MSCAPI:
@@ -571,7 +570,7 @@ public class SignatureController implements Initializable {
 		for (Node daButton : hBoxDigestAlgos.getChildren()) {
 			DigestAlgorithm digestAlgorithm = (DigestAlgorithm) daButton.getUserData();
 			if (digestAlgorithm == null) {
-				continue; // nothing chosen case
+				// nothing chosen case
 			} else if (digestAlgos.contains(digestAlgorithm)) {
 				daButton.setDisable(false);
 			} else {
@@ -601,7 +600,6 @@ public class SignatureController implements Initializable {
 			} catch (Exception e) {
 				Alert alert = new Alert(AlertType.ERROR, "Unable to save file : " + e.getMessage(), ButtonType.CLOSE);
 				alert.showAndWait();
-				return;
 			}
 		}
 	}

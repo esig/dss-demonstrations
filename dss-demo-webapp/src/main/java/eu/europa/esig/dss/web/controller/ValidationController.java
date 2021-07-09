@@ -271,7 +271,7 @@ public class ValidationController extends AbstractValidationController {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.valueOf(MimeType.SVG.getMimeTypeString()));
-		ResponseEntity<String> svgEntity = new ResponseEntity<String>(xsltService.generateSVG(diagnosticData), headers,
+		ResponseEntity<String> svgEntity = new ResponseEntity<>(xsltService.generateSVG(diagnosticData), headers,
 				HttpStatus.OK);
 		return svgEntity;
 	}

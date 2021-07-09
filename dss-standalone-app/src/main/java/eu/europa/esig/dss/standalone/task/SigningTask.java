@@ -85,7 +85,7 @@ public class SigningTask extends Task<DSSDocument> {
 		parameters.setEncryptionAlgorithm(signer.getEncryptionAlgorithm());
 		CertificateToken[] certificateChain = signer.getCertificateChain();
 		if (Utils.isArrayNotEmpty(certificateChain)) {
-			List<RemoteCertificate> certificateChainList = new ArrayList<RemoteCertificate>();
+			List<RemoteCertificate> certificateChainList = new ArrayList<>();
 			for (CertificateToken certificateToken : certificateChain) {
 				certificateChainList.add(new RemoteCertificate(certificateToken.getEncoded()));
 			}
@@ -136,7 +136,7 @@ public class SigningTask extends Task<DSSDocument> {
 		} else if (Utils.collectionSize(keys) == 1) {
 			selectedKey = keys.get(0);
 		} else {
-			FutureTask<DSSPrivateKeyEntry> future = new FutureTask<DSSPrivateKeyEntry>(new SelectCertificateTask(keys));
+			FutureTask<DSSPrivateKeyEntry> future = new FutureTask<>(new SelectCertificateTask(keys));
 			Platform.runLater(future);
 			selectedKey = future.get();
 			if (selectedKey == null) {

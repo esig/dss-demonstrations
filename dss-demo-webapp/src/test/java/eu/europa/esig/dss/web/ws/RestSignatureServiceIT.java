@@ -1,29 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.ServerErrorException;
-
-import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
+import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
 import eu.europa.esig.dss.asic.common.ASiCExtractResult;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
@@ -70,6 +49,25 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.ws.rs.ServerErrorException;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RestSignatureServiceIT extends AbstractRestIT {
 
@@ -427,8 +425,9 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	public void timestampMultipleDocumentsTest() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_E, DigestAlgorithm.SHA512);
 		
-		List<DSSDocument> documentsToSign = new ArrayList<>(Arrays.asList(
-				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
+		List<DSSDocument> documentsToSign = new ArrayList<>(
+				Arrays.asList(new FileDocument(new File("src/test/resources/sample.xml")),
+						new FileDocument(new File("src/test/resources/sample.pdf"))));
 		
 		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
 		
@@ -470,8 +469,9 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	public void timestampASiCSTest() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_S, DigestAlgorithm.SHA512);
 		
-		List<DSSDocument> documentsToSign = new ArrayList<>(Arrays.asList(
-				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
+		List<DSSDocument> documentsToSign = new ArrayList<>(
+				Arrays.asList(new FileDocument(new File("src/test/resources/sample.xml")),
+						new FileDocument(new File("src/test/resources/sample.pdf"))));
 		
 		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
 		

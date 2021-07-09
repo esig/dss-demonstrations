@@ -1,11 +1,5 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
-
 import eu.europa.esig.dss.diagnostic.AbstractTokenProxy;
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
@@ -16,6 +10,11 @@ import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.model.TokenDTO;
 import eu.europa.esig.dss.web.service.XSLTService;
 import eu.europa.esig.validationreport.jaxb.ValidationReportType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class AbstractValidationController {
 
@@ -62,7 +61,7 @@ public abstract class AbstractValidationController {
 		}
 
 		// Get Certificates for which binaries are available
-		Set<CertificateWrapper> usedCertificates = new HashSet<CertificateWrapper>(diagnosticData.getUsedCertificates());
+		Set<CertificateWrapper> usedCertificates = new HashSet<>(diagnosticData.getUsedCertificates());
 		model.addAttribute(ALL_CERTIFICATES_ATTRIBUTE, buildTokenDtos(usedCertificates));
 
 		// Get Revocation data for which binaries are available
@@ -73,7 +72,7 @@ public abstract class AbstractValidationController {
 	}
 
 	private Set<TokenDTO> buildTokenDtos(Set<? extends AbstractTokenProxy> abstractTokens) {
-		Set<TokenDTO> tokenDtos = new HashSet<TokenDTO>();
+		Set<TokenDTO> tokenDtos = new HashSet<>();
 		for (AbstractTokenProxy token : abstractTokens) {
 			if (token.getBinaries() != null) {
 				tokenDtos.add(new TokenDTO(token));
