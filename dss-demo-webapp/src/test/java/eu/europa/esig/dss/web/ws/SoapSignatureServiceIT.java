@@ -8,6 +8,7 @@ import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
+import eu.europa.esig.dss.enumerations.TextWrapping;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
@@ -289,7 +290,60 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			assertNotNull(iMD);
 		}
 	}
-	
+
+
+	@Test
+	public void testVisibleSignatureWithTextLineBreaks() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			parameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(dssPrivateKeyEntry.getCertificate()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
+
+			RemoteSignatureFieldParameters fieldParameters = new RemoteSignatureFieldParameters();
+			fieldParameters.setPage(1);
+			fieldParameters.setOriginX(200.F);
+			fieldParameters.setOriginY(100.F);
+			fieldParameters.setWidth(130.F);
+			fieldParameters.setHeight(50.F);
+			imageParameters.setFieldParameters(fieldParameters);
+
+			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
+			textParameters.setText("Digitally signed by JOHN GEORGE ANTHONY WILLIAMS\n" +
+					"Date: 2021.01.01 01:01:01 WET\n" +
+					"Reason: my-reason\n" +
+					"Location: my-location");
+			textParameters.setTextWrapping(TextWrapping.FILL_BOX_AND_LINEBREAK);
+			imageParameters.setTextParameters(textParameters);
+
+			parameters.setImageParameters(imageParameters);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.pdf"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+
+			DataToSignOneDocumentDTO dataToSignDTO = new DataToSignOneDocumentDTO(toSignDocument, parameters);
+			ToBeSignedDTO dataToSign = soapClient.getDataToSign(dataToSignDTO);
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signOneDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = soapClient.signDocument(signOneDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			// iMD.save("target/pades-soap-text-with-breaks-visible.pdf");
+			assertNotNull(iMD);
+		}
+	}
 	@Test
 	public void jadesParallelSigningTest() throws Exception {
 		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
