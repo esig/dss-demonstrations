@@ -135,26 +135,34 @@
                         <h3 th:text="#{label.validation.visualrepresentation}" th:remove="tag"></h3>
                     </div>
                     <div class="card-body collapse show" id="svg-card">
-                        <div class="row">
-							<div class="col-sm-12 d-flex">
-								<object th:data="@{/validation/diag-data.svg}" type="image/svg+xml" width="100%" id="svg-diag-data" class="mx-auto">
-									Your browser does not support SVGs
-								</object>
+						<div id="svg-content">
+							<div class="row">
+								<div class="col-sm-12 d-flex">
+									<object th:data="@{/validation/diag-data.svg}" th:text="#{label.svg.browser.error}"
+											type="image/svg+xml" width="100%" id="svg-diag-data" class="mx-auto">
+									</object>
+								</div>
 							</div>
-                        </div>
-                        <div class="form-group row">
-                               <label for="select-visualrepresentation" class="col-sm-3 col-form-label">Display :</label>
-                               <div class="col-sm-9">            
-                                <select  class="form-control" id="select-visualrepresentation">
-                                    <optgroup th:label="#{label.signatures.and.timestamps}" id="select-visualrepresentation-sigs">
-                                    
-                                    </optgroup>
-                                    <optgroup th:label="#{label.certificate.chains}"  id="select-visualrepresentation-chains">
-                                    
-                                    </optgroup>
-                                </select>
-                            </div>
-                        </div>
+							<div class="form-group row">
+								<label for="select-visualrepresentation" class="col-sm-3 col-form-label">Display :</label>
+								<div class="col-sm-9">
+									<select  class="form-control" id="select-visualrepresentation">
+										<optgroup th:label="#{label.signatures}" id="select-visualrepresentation-sigs">
+
+										</optgroup>
+										<optgroup th:label="#{label.timestamps}" id="select-visualrepresentation-tsts">
+
+										</optgroup>
+										<optgroup th:label="#{label.certificate.chains}"  id="select-visualrepresentation-chains">
+
+										</optgroup>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div id="svg-empty" class="d-none">
+							<p th:text="#{label.svg.empty}"></p>
+						</div>
                     </div>
                 </div>
 				<pre class="prettyprint lang-xml" th:text="${diagnosticDataXml}"></pre>
@@ -186,10 +194,15 @@
             mySVG.addEventListener("load",function() {
                 var representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
                 
-                if (currentCertificateId == null) {
-                    representation.displayFirstSignature();
-                } else {
+                if (currentCertificateId != null) {
                     representation.displayCertificateChainById(currentCertificateId);
+                } else if (representation.isSignatureOrTimestampPresent()) {
+                    representation.displayFirstSignatureOrTimestamp();
+                } else {
+                	var svgContent = document.getElementById("svg-content");
+                	svgContent.classList.add("d-none");
+                	var svgEmpty = document.getElementById("svg-empty");
+                	svgEmpty.classList.remove("d-none");
                 }
 
 				var svgElement = mySVG.contentDocument.documentElement;
@@ -197,6 +210,9 @@
                 
                 var signatureIds = mySVG.contentDocument.getSignatureIds();
                 initSignatureSelect(signatureIds);
+
+                var timestampIds = mySVG.contentDocument.getTimestampIds();
+                initTimestampSelect(timestampIds);
                 
                 var certificateIds = mySVG.contentDocument.getCertificateIds();
                 initCertChainSelect(certificateIds);
@@ -213,6 +229,22 @@
                         var option = document.createElement("option");
                         option.text = sigId;
                         option.className = "sig";
+                        optgroup.appendChild(option);
+                    }
+                }
+            }
+
+            function initTimestampSelect(timestampIds) {
+                var optgroup = document.getElementById("select-visualrepresentation-tsts");
+                if (timestampIds == null || timestampIds.length == 0) {
+                    optgroup.style.display="none";
+                } else {
+                    optgroup.style.display="";
+                    for (var elementIdx = 0;  elementIdx < timestampIds.length; elementIdx++) {
+                        var tstId = timestampIds[elementIdx];
+                        var option = document.createElement("option");
+                        option.text = tstId;
+                        option.className = "tst";
                         optgroup.appendChild(option);
                     }
                 }
@@ -244,6 +276,8 @@
                 var representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
                 if ("sig" == option.className) {
                     representation.displaySignatureById(option.value);
+                } else if ("tst" == option.className) {
+                    representation.displayTimestampById(option.value);
                 } else {
                     representation.displayCertificateChainById(option.value);
                 }
