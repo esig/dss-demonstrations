@@ -191,8 +191,10 @@
 
 			mySVG.style.maxWidth = svgWidth + "px";
 
+            var representation = null;
+
             mySVG.addEventListener("load",function() {
-                var representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
+            	representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
                 
                 if (currentCertificateId != null) {
                     representation.displayCertificateChainById(currentCertificateId);
@@ -273,7 +275,6 @@
                     return;
                 }
                 var option = this.selectedOptions[0];
-                var representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
                 if ("sig" == option.className) {
                     representation.displaySignatureById(option.value);
                 } else if ("tst" == option.className) {
