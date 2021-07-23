@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.http.proxy.ProxyProperties;
 
+import java.util.Collection;
+
 @Configuration
 public class ProxyConfiguration {
 
@@ -21,7 +23,7 @@ public class ProxyConfiguration {
 	@Value("${proxy.http.password}")
 	private String httpPassword;
 	@Value("${proxy.http.exclude}")
-	private String httpExcludedHosts;
+	private Collection<String> httpExcludedHosts;
 
 	@Value("${proxy.https.enabled}")
 	private boolean httpsEnabled;
@@ -34,7 +36,7 @@ public class ProxyConfiguration {
 	@Value("${proxy.https.password}")
 	private String httpsPassword;
 	@Value("${proxy.https.exclude}")
-	private String httpsExcludedHosts;
+	private Collection<String> httpsExcludedHosts;
 
 	@Bean
 	public ProxyConfig proxyConfig() {
