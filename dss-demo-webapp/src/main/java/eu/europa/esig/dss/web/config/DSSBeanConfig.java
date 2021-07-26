@@ -39,7 +39,7 @@ import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureSe
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.xades.signature.XAdESService;
-import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
