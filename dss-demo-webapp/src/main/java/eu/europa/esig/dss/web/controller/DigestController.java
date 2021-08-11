@@ -8,6 +8,7 @@ import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -116,7 +117,8 @@ public class DigestController {
 			@ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
 		signatureDigestForm.setBase64Certificate(params.getSigningCertificate());
 		signatureDigestForm.setBase64CertificateChain(params.getCertificateChain());
-		signatureDigestForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
+		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		signatureDigestForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		signatureDigestForm.setSigningDate(new Date());
 
 		if (signatureDigestForm.isAddContentTimestamp()) {
