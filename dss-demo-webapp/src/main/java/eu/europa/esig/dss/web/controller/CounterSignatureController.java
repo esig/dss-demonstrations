@@ -9,6 +9,7 @@ import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.AdvancedSignature;
@@ -128,7 +129,8 @@ public class CounterSignatureController {
 			@ModelAttribute("counterSignatureForm") @Valid CounterSignatureForm counterSignatureForm, BindingResult result) {
 		counterSignatureForm.setBase64Certificate(params.getSigningCertificate());
 		counterSignatureForm.setBase64CertificateChain(params.getCertificateChain());
-		counterSignatureForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
+		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		counterSignatureForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		counterSignatureForm.setSigningDate(new Date());
 
 		model.addAttribute("counterSignatureForm", counterSignatureForm);

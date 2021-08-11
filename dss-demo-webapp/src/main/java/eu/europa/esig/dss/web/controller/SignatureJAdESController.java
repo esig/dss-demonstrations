@@ -11,6 +11,7 @@ import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -131,7 +132,8 @@ public class SignatureJAdESController {
 		
 		signatureJAdESForm.setBase64Certificate(params.getSigningCertificate());
 		signatureJAdESForm.setBase64CertificateChain(params.getCertificateChain());
-		signatureJAdESForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
+		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		signatureJAdESForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		signatureJAdESForm.setSigningDate(new Date());
 
 		if (signatureJAdESForm.isAddContentTimestamp()) {
