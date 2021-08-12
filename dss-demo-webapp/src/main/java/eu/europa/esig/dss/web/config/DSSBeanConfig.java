@@ -104,30 +104,32 @@ public class DSSBeanConfig {
 	@Autowired
 	private DataSource dataSource;
 
+	@Value("${dataloader.connection.timeout}")
+	private int connectionTimeout;
+	@Value("${dataloader.connection.request.timeout}")
+	private int connectionRequestTimeout;
+	@Value("${dataloader.redirect.enabled}")
+	private boolean redirectEnabled;
+
 	// can be null
 	@Autowired(required = false)
 	private ProxyConfig proxyConfig;
 
 	@Bean
 	public CommonsDataLoader dataLoader() {
-		CommonsDataLoader dataLoader = new CommonsDataLoader();
-		dataLoader.setProxyConfig(proxyConfig);
-		return dataLoader;
+		return configureCommonsDataLoader(new CommonsDataLoader());
 	}
 	
 	@Bean
     public CommonsDataLoader trustAllDataLoader() {
-        CommonsDataLoader dataLoader = new CommonsDataLoader();
-		dataLoader.setProxyConfig(proxyConfig);
-		dataLoader.setTrustStrategy(TrustAllStrategy.INSTANCE);
-        return dataLoader;
+		CommonsDataLoader trustAllDataLoader = configureCommonsDataLoader(new CommonsDataLoader());
+		trustAllDataLoader.setTrustStrategy(TrustAllStrategy.INSTANCE);
+		return trustAllDataLoader;
     }
 
 	@Bean
 	public OCSPDataLoader ocspDataLoader() {
-		OCSPDataLoader ocspDataLoader = new OCSPDataLoader();
-		ocspDataLoader.setProxyConfig(proxyConfig);
-		return ocspDataLoader;
+		return configureCommonsDataLoader(new OCSPDataLoader());
 	}
 
 	@Bean
@@ -403,5 +405,13 @@ public class DSSBeanConfig {
         sslCertificateLoader.setCommonsDataLoader(trustAllDataLoader());
         return sslCertificateLoader;
     }
+
+	private <C extends CommonsDataLoader> C configureCommonsDataLoader(C dataLoader) {
+		dataLoader.setTimeoutConnection(connectionTimeout);
+		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
+		dataLoader.setRedirectsEnabled(redirectEnabled);
+		dataLoader.setProxyConfig(proxyConfig);
+		return dataLoader;
+	}
 
 }
