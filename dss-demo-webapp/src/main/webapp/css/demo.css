@@ -123,6 +123,11 @@ form#sign-pdf-form p#filename {
 .summary-table tbody:nth-of-type(odd) {
     background-color: rgba(0,0,0,.05);
 }
+.tl-info-body .collapse:not(.show) {
+    display: block;
+    height: 0;
+    overflow: hidden;
+}
 .tl-info-preview td:last-child:after {
     display: inline-block;
     position: absolute;
