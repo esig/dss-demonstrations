@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.web.exception.ApplicationJsonRequestException;
+import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 import org.slf4j.Logger;
@@ -83,13 +83,11 @@ public class GlobalExceptionHandler {
 		mav.setViewName(viewName);
 		return mav;
 	}
-    
-    @ExceptionHandler(ApplicationJsonRequestException.class)
-    public ResponseEntity<String> ApplicationJsonRequestExceptionHandler(HttpServletRequest req, Exception e) throws Exception {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("An error occurred during a JSON request : uri = '{}', message = '{}'", req.getRequestURI(), e.getMessage());
-        }
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
+	@ExceptionHandler(SignatureOperationException.class)
+	public ResponseEntity<String> signatureOperationExceptionHandler(HttpServletRequest req, Exception e) throws Exception {
+		LOG.error("An error occurred on URI call [{}] : {}", req.getRequestURI(), e.getMessage(), e);
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }

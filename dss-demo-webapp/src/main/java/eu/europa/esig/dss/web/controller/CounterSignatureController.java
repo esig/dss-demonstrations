@@ -17,7 +17,7 @@ import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
-import eu.europa.esig.dss.web.exception.ApplicationJsonRequestException;
+import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.model.CounterSignatureForm;
 import eu.europa.esig.dss.web.model.CounterSignatureHelperResponse;
 import eu.europa.esig.dss.web.model.DataToSignParams;
@@ -204,7 +204,7 @@ public class CounterSignatureController {
 			throw new DSSException("The uploaded file does not contain signatures.");
 		
 		} catch (Exception e) {
-			throw new ApplicationJsonRequestException(e.getMessage());
+			throw new SignatureOperationException(e.getMessage(), e);
 		}
 	}
 	
