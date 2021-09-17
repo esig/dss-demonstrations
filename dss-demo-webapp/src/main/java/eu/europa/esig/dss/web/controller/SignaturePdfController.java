@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
@@ -8,6 +9,7 @@ import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.model.DataToSignParams;
@@ -110,7 +112,8 @@ public class SignaturePdfController {
 
 		signaturePdfForm.setBase64Certificate(params.getSigningCertificate());
 		signaturePdfForm.setBase64CertificateChain(params.getCertificateChain());
-		signaturePdfForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
+		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		signaturePdfForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		signaturePdfForm.setSigningDate(new Date());
 
 		model.addAttribute("signaturePdfForm", signaturePdfForm);

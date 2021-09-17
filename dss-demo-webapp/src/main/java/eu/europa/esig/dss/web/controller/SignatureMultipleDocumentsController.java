@@ -9,6 +9,7 @@ import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -119,7 +120,8 @@ public class SignatureMultipleDocumentsController {
 			@ModelAttribute("signatureMultipleDocumentsForm") @Valid SignatureMultipleDocumentsForm signatureMultipleDocumentsForm, BindingResult result) {
 		signatureMultipleDocumentsForm.setBase64Certificate(params.getSigningCertificate());
 		signatureMultipleDocumentsForm.setBase64CertificateChain(params.getCertificateChain());
-		signatureMultipleDocumentsForm.setEncryptionAlgorithm(params.getEncryptionAlgorithm());
+		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		signatureMultipleDocumentsForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		signatureMultipleDocumentsForm.setSigningDate(new Date());
 
 		if (signatureMultipleDocumentsForm.isAddContentTimestamp()) {

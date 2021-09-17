@@ -71,9 +71,11 @@
 
 <tr th:fragment="tl-info-body(id, url, downloadResult, parsingResult, validationResult)">
 	<td class="tl-info-body bg-white text-break p-0" colspan="10">
-		<div th:id="${id}" class="accordian-body collapse animate p-2 pl-3 pr-3">
-			<th:block th:replace="fragment/tl-info :: tl-info-body-content(url=${url}, downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult}, potentialSigners=null)">
-			</th:block>
+		<div th:id="${id}" class="accordian-body collapse animate">
+			<div class="p-2 pl-3 pr-3">
+				<th:block th:replace="fragment/tl-info :: tl-info-body-content(url=${url}, downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult}, potentialSigners=null)">
+				</th:block>
+			</div>
 		</div>
 	</td>
 </tr>
