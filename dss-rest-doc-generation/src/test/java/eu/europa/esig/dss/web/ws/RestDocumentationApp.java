@@ -1,33 +1,5 @@
 package eu.europa.esig.dss.web.ws;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
-
-import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
-
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
@@ -55,16 +27,20 @@ import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.ws.timestamp.dto.TimestampResponseDTO;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 import io.restassured.builder.RequestSpecBuilder;
@@ -72,6 +48,34 @@ import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 @ExtendWith(RestDocumentationExtension.class)
 public class RestDocumentationApp {
@@ -525,6 +529,59 @@ public class RestDocumentationApp {
 					.accept(ContentType.JSON).accept(ContentType.JSON)
 					.body(counterSignSignatureDTO, ObjectMapperType.JACKSON_2)
 					.post("/services/rest/signature/one-document/counterSignSignature");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertNotNull(signedDocument.getBytes());
+		}
+	}
+
+	@Test
+	public void tlSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			documentToSign.setName("tl.xml");
+			RemoteDocument tlToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+
+			RemoteTrustedListSignatureParameters tlSignatureParameters = new RemoteTrustedListSignatureParameters();
+			tlSignatureParameters.setSigningCertificate(signingCertificate);
+			tlSignatureParameters.setReferenceId("tl");
+			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
+
+			Date signingTime = DSSUtils.getUtcDate(2021, 9, 3);
+			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
+			bLevelParameters.setSigningDate(signingTime);
+			tlSignatureParameters.setBLevelParameters(bLevelParameters);
+
+			// get data to be signed
+			DataToSignTrustedListDTO dataToBeSignedDTO = new DataToSignTrustedListDTO(tlToSign, tlSignatureParameters);
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(dataToBeSignedDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/trusted-list/getDataToSign");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO dataToBeSigned = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(dataToBeSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			SignTrustedListDTO signTrustedListDTO = new SignTrustedListDTO(tlToSign, tlSignatureParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).accept(ContentType.JSON)
+					.body(signTrustedListDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/trusted-list/signDocument");
 			responseSignDocument.then().assertThat().statusCode(equalTo(200));
 
 			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);

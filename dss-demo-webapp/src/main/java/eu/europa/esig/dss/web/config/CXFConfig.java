@@ -17,12 +17,16 @@ import eu.europa.esig.dss.ws.server.signing.soap.SoapSignatureTokenConnectionImp
 import eu.europa.esig.dss.ws.server.signing.soap.client.SoapSignatureTokenConnection;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.RestDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestMultipleDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.rest.RestTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.SoapDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.soap.SoapTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
@@ -62,6 +66,7 @@ public class CXFConfig {
 
 	public static final String SOAP_SIGNATURE_ONE_DOCUMENT = "/soap/signature/one-document";
 	public static final String SOAP_SIGNATURE_MULTIPLE_DOCUMENTS = "/soap/signature/multiple-documents";
+	public static final String SOAP_SIGNATURE_TRUSTED_LIST = "/soap/signature/trusted-list";
 	public static final String SOAP_VALIDATION = "/soap/validation";
 	public static final String SOAP_CERTIFICATE_VALIDATION = "/soap/certificate-validation";
 	public static final String SOAP_SERVER_SIGNING = "/soap/server-signing";
@@ -69,6 +74,7 @@ public class CXFConfig {
 
 	public static final String REST_SIGNATURE_ONE_DOCUMENT = "/rest/signature/one-document";
 	public static final String REST_SIGNATURE_MULTIPLE_DOCUMENTS = "/rest/signature/multiple-documents";
+	public static final String REST_SIGNATURE_TRUSTED_LIST = "/rest/signature/trusted-list";
 	public static final String REST_VALIDATION = "/rest/validation";
 	public static final String REST_CERTIFICATE_VALIDATION = "/rest/certificate-validation";
 	public static final String REST_SERVER_SIGNING = "/rest/server-signing";
@@ -91,6 +97,9 @@ public class CXFConfig {
 
 	@Autowired
 	private RemoteMultipleDocumentsSignatureService remoteMultipleDocumentsSignatureService;
+
+	@Autowired
+	private RemoteTrustedListSignatureService remoteTrustedListSignatureService;
 
 	@Autowired
 	private RemoteDocumentValidationService remoteValidationService;
@@ -130,6 +139,13 @@ public class CXFConfig {
 	public SoapMultipleDocumentsSignatureService soapMultipleDocumentsSignatureService() {
 		SoapMultipleDocumentsSignatureServiceImpl service = new SoapMultipleDocumentsSignatureServiceImpl();
 		service.setService(remoteMultipleDocumentsSignatureService);
+		return service;
+	}
+
+	@Bean
+	public SoapTrustedListSignatureServiceImpl soapTrustedListSignatureService() {
+		SoapTrustedListSignatureServiceImpl service = new SoapTrustedListSignatureServiceImpl();
+		service.setService(remoteTrustedListSignatureService);
 		return service;
 	}
 
@@ -174,6 +190,15 @@ public class CXFConfig {
 	public Endpoint createSoapMultipleDocumentsSignatureEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(bus, soapMultipleDocumentsSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
+		addXmlAdapterDate(endpoint);
+		enableMTOM(endpoint);
+		return endpoint;
+	}
+
+	@Bean
+	public Endpoint createSoapTrustedListSignatureEndpoint() {
+		EndpointImpl endpoint = new EndpointImpl(bus, soapTrustedListSignatureService());
+		endpoint.publish(SOAP_SIGNATURE_TRUSTED_LIST);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -235,6 +260,13 @@ public class CXFConfig {
 	public RestMultipleDocumentSignatureService restMultipleDocumentsSignatureService() {
 		RestMultipleDocumentSignatureServiceImpl service = new RestMultipleDocumentSignatureServiceImpl();
 		service.setService(remoteMultipleDocumentsSignatureService);
+		return service;
+	}
+
+	@Bean
+	public RestTrustedListSignatureService restTrustedListSignatureService() {
+		RestTrustedListSignatureServiceImpl service = new RestTrustedListSignatureServiceImpl();
+		service.setService(remoteTrustedListSignatureService);
 		return service;
 	}
 
@@ -331,6 +363,17 @@ public class CXFConfig {
 		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
 		return sfb.create();
 	}
+
+	@Bean
+	public Server createTrustedListRestService() {
+		JAXRSServerFactoryBean sfb = new JAXRSServerFactoryBean();
+		sfb.setServiceBean(restTrustedListSignatureService());
+		sfb.setAddress(REST_SIGNATURE_TRUSTED_LIST);
+		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		return sfb.create();
+	}
 	
     @Bean
     public OpenApiFeature createOpenApiFeature() {
@@ -360,12 +403,13 @@ public class CXFConfig {
     
 	/**
 	 * ObjectMappers configures a proper way for (un)marshalling of json data
+	 *
 	 * @return {@link ObjectMapper}
 	 */
 	@Bean
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		// true value allows to process {@code @IDREF}s cycles
+		// true value allows processing of {@code @IDREF}s cycles
 		JaxbAnnotationIntrospector jai = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
 		objectMapper.setAnnotationIntrospector(jai);
 		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);

@@ -30,16 +30,20 @@ import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
+import eu.europa.esig.dss.ws.signature.soap.client.SoapTrustedListSignatureService;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -66,6 +70,7 @@ public class SoapSignatureServiceIT extends AbstractIT {
 
 	private SoapDocumentSignatureService soapClient;
 	private SoapMultipleDocumentsSignatureService soapMultiDocsClient;
+	private SoapTrustedListSignatureService soapTLSigningClient;
 
 	@BeforeEach
 	public void init() {
@@ -110,6 +115,25 @@ public class SoapSignatureServiceIT extends AbstractIT {
 		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
 		soapMultiDocsClient = factory.create(SoapMultipleDocumentsSignatureService.class);
+
+		dataBinding = new JAXBDataBinding();
+		dataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
+
+		factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapTrustedListSignatureService.class);
+		factory.setProperties(props);
+		factory.setDataBinding(dataBinding);
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_TRUSTED_LIST);
+
+		loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		soapTLSigningClient = factory.create(SoapTrustedListSignatureService.class);
 	}
 
 	@Test
@@ -512,6 +536,39 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			Exception exception = assertThrows(SOAPFaultException.class,
 					() -> soapClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
 			assertEquals("Unsupported signature form for counter signature : PAdES", exception.getMessage());
+		}
+	}
+
+	@Test
+	public void testLotlSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/eu-lotl-no-sig.xml"));
+			RemoteDocument lotlToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+
+			RemoteTrustedListSignatureParameters tlSignatureParameters = new RemoteTrustedListSignatureParameters();
+			tlSignatureParameters.setSigningCertificate(signingCertificate);
+			tlSignatureParameters.setReferenceId("lotl");
+			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
+
+			DataToSignTrustedListDTO dataToBeSignedDTO = new DataToSignTrustedListDTO(lotlToSign, tlSignatureParameters);
+			ToBeSignedDTO dataToBeSigned = soapTLSigningClient.getDataToSign(dataToBeSignedDTO);
+			assertNotNull(dataToBeSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			SignTrustedListDTO signTrustedListDTO = new SignTrustedListDTO(lotlToSign, tlSignatureParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument counterSignedDocument = soapTLSigningClient.signDocument(signTrustedListDTO);
+			assertNotNull(counterSignedDocument);
 		}
 	}
 

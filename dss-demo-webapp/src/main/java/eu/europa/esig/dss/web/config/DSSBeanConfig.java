@@ -36,6 +36,7 @@ import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectio
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.xades.signature.XAdESService;
@@ -275,6 +276,13 @@ public class DSSBeanConfig {
 		service.setAsicWithXAdESService(asicWithXadesService());
 		service.setXadesService(xadesService());
 		service.setJadesService(jadesService());
+		return service;
+	}
+
+	@Bean
+	public RemoteTrustedListSignatureServiceImpl remoteTrustedListSignatureService() {
+		RemoteTrustedListSignatureServiceImpl service = new RemoteTrustedListSignatureServiceImpl();
+		service.setXadesService(xadesService());
 		return service;
 	}
 
