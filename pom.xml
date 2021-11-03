@@ -31,7 +31,6 @@
 				<role>developer</role>
 			</roles>
 		</developer>
-
 	</developers>
 
 	<properties>
@@ -45,25 +44,25 @@
 		<dss.framework.version>5.10-SNAPSHOT</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<slf4j.version>1.7.31</slf4j.version>
-		<logback-classic.version>1.2.3</logback-classic.version>
+		<slf4j.version>1.7.32</slf4j.version>
+		<logback-classic.version>1.2.6</logback-classic.version>
 
-		<cxf.version>3.4.4</cxf.version>
-		<swagger-ui.version>3.50.0</swagger-ui.version>
-		<spring.version>5.3.8</spring.version>
-		<spring-security.version>5.5.1</spring-security.version>
+		<cxf.version>3.4.5</cxf.version>
+		<swagger-ui.version>3.52.5</swagger-ui.version>
+		<spring.version>5.3.12</spring.version>
+		<spring-security.version>5.5.3</spring-security.version>
 		<thymeleaf-spring5.version>3.0.12.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>2.5.3</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.12.3</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.13.0</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
-		<commons-io.version>2.10.0</commons-io.version>
+		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
 		<freemarker.version>2.3.31</freemarker.version>
 		<fop-core.version>2.6</fop-core.version>
 		<hsqldb.version>2.5.2</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
 		
-		<junit.jupiter.version>5.7.2</junit.jupiter.version>
+		<junit.jupiter.version>5.8.1</junit.jupiter.version>
 	</properties>
 
 	<licenses>
@@ -494,7 +493,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>6.2.2</version>
+						<version>6.4.1</version>
 						<executions>
 							<execution>
 								<goals>
