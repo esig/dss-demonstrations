@@ -108,7 +108,7 @@
 			<properties>
 				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk16u-2021-05-08-12-45/OpenJDK16U-jre_x86-32_windows_hotspot_2021-05-08-12-45.zip</jre.download.link>
 				<jre.root.folder>jdk-16.0.1+9-jre</jre.root.folder>
-				<tomcat.version>9.0.48</tomcat.version>
+				<tomcat.version>9.0.54</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>
