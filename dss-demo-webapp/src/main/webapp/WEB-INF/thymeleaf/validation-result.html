@@ -165,15 +165,16 @@
 						</div>
                     </div>
                 </div>
-				<pre class="prettyprint lang-xml" th:text="${diagnosticDataXml}"></pre>
+				<pre class="prettyprint"><code class="language-xml" th:text="${diagnosticDataXml}"></code></pre>
 			</div>
 			<div th:if="${etsiValidationReport} != null" role="tabcard" class="tab-pane fade report" id="etsi-validation-report">
-				<pre class="prettyprint lang-xml" th:text="${etsiValidationReport}"></pre>
+				<pre class="prettyprint"><code class="language-xml" th:text="${etsiValidationReport}"></code></pre>
 			</div>
 		</div>
 	</div>
 	<div layout:fragment="scripts">
 		<script type="text/javascript" th:src="@{/scripts/jsValidationResult.js}"></script>
+		<script type="text/javascript">hljs.initHighlightingOnLoad();</script> <!-- highlight XML code -->
 		<script type="text/javascript" th:inline="javascript">
             /*<![CDATA[*/
 			$('#tabsResult a').click(function(e) {
