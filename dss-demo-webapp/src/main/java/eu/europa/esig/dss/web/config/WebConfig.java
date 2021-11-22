@@ -54,6 +54,7 @@ public class WebConfig implements WebMvcConfigurer {
 		templateResolver.setPrefix("/WEB-INF/thymeleaf/");
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode("HTML");
+		templateResolver.setCharacterEncoding("UTF-8");
 		return templateResolver;
 	}
 
