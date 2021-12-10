@@ -1,10 +1,9 @@
 package eu.europa.esig.dss.web.model;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
 import eu.europa.esig.dss.web.validation.Base64;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class SignatureDigestForm extends AbstractSignatureForm {
 
