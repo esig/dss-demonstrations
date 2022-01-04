@@ -45,7 +45,7 @@
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>1.7.32</slf4j.version>
-		<logback-classic.version>1.2.6</logback-classic.version>
+		<logback-classic.version>1.2.10</logback-classic.version>
 
 		<cxf.version>3.4.5</cxf.version>
 		<swagger-ui.version>3.52.5</swagger-ui.version>
@@ -62,7 +62,7 @@
 		<hsqldb.version>2.5.2</hsqldb.version>
 		<nexu.version>1.22</nexu.version>
 		
-		<junit.jupiter.version>5.8.1</junit.jupiter.version>
+		<junit.jupiter.version>5.8.2</junit.jupiter.version>
 	</properties>
 
 	<licenses>
