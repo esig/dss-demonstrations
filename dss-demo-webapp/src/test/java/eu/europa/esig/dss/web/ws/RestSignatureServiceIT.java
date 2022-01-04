@@ -3,7 +3,7 @@ package eu.europa.esig.dss.web.ws;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
 import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
-import eu.europa.esig.dss.asic.common.ASiCExtractResult;
+import eu.europa.esig.dss.asic.common.ASiCContent;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
@@ -514,7 +514,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertNotNull(iMD);
 		
 		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
-		ASiCExtractResult extractedResult = extractor.extract();
+		ASiCContent extractedResult = extractor.extract();
 		
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
@@ -558,7 +558,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertNotNull(iMD);
 		
 		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
-		ASiCExtractResult extractedResult = extractor.extract();
+		ASiCContent extractedResult = extractor.extract();
 		
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		
