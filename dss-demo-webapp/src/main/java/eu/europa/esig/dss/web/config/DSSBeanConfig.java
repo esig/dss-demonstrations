@@ -52,13 +52,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
-import java.sql.SQLException;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
@@ -376,34 +373,6 @@ public class DSSBeanConfig {
 		}
 		return tslCache;
 	}
-
-	/* JDBC functions */
-
-	@PostConstruct
-	public void cachedAIASourceInitialization() throws SQLException {
-		JdbcCacheAIASource jdbcCacheAIASource = cachedAIASource();
-		jdbcCacheAIASource.initTable();
-	}
-
-	@PostConstruct
-	public void cachedCRLSourceInitialization() throws SQLException {
-		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
-		jdbcCacheCRLSource.initTable();
-	}
-
-	@PreDestroy
-	public void cachedAIASourceClean() throws SQLException {
-		JdbcCacheAIASource jdbcCacheAIASource = cachedAIASource();
-		jdbcCacheAIASource.destroyTable();
-	}
-
-	@PreDestroy
-	public void cachedCRLSourceClean() throws SQLException {
-		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
-		jdbcCacheCRLSource.destroyTable();
-	}
-
-	// Cached OCSPSource is not used
 	
     /* QWAC Validation */
 
