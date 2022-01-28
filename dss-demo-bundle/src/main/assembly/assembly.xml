@@ -7,8 +7,8 @@
 	<id>ootb-webapp</id>
 
 	<formats>
-		<format>tar.gz</format>
 		<format>zip</format>
+		<format>tar.gz</format>
 	</formats>
 
 	<fileSets>

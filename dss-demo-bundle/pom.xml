@@ -104,19 +104,10 @@
 	
 	<profiles>
 		<profile>
-			<id>java16</id>
-			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jre_x86-32_windows_hotspot_16.0.1_9.zip</jre.download.link>
-				<jre.root.folder>jdk-16.0.1+9-jre</jre.root.folder>
-				<tomcat.version>9.0.58</tomcat.version>
-			</properties>
-		</profile>
-		<profile>
-			<!-- NOTE: experimental / Nightly build (pre-release) -->
 			<id>java17</id>
 			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk17-binaries/releases/download/jdk-2021-05-07-13-31/OpenJDK-jre_x86-32_windows_hotspot_2021-05-06-23-30.zip</jre.download.link>
-				<jre.root.folder>jdk-17+20-jre</jre.root.folder>
+				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1%2B12/OpenJDK17U-jre_x86-32_windows_hotspot_17.0.1_12.zip</jre.download.link>
+				<jre.root.folder>jdk-17.0.1+12-jre</jre.root.folder>
 				<tomcat.version>9.0.58</tomcat.version>
 			</properties>
 		</profile>

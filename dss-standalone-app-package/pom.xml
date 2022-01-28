@@ -9,11 +9,11 @@
 	<name>DSS standalone application packager</name>
 	
 	<properties>
-		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jre_x64_windows_hotspot_16.0.1_9.zip</jre.download.link>
-		<jre.root.folder>jdk-16.0.1+9-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jre_x64_windows_hotspot_17.0.2_8.zip</jre.download.link>
+		<jre.root.folder>jdk-17.0.2+8-jre</jre.root.folder>
 		
-		<fx.sdk.download.link>https://download2.gluonhq.com/openjfx/16/openjfx-16_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-16</fx.root.folder>
+		<fx.sdk.download.link>https://download2.gluonhq.com/openjfx/17.0.2/openjfx-17.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-17.0.2</fx.root.folder>
 	</properties>
 
 	<dependencies>
