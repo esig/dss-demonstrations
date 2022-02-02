@@ -546,7 +546,7 @@ public class RestDocumentationApp {
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
 			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
 
-			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/trusted-list.xml"));
 			documentToSign.setName("tl.xml");
 			RemoteDocument tlToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
 
