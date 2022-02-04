@@ -3,8 +3,8 @@ package eu.europa.esig.dss.web.service;
 
 import eu.europa.esig.dss.detailedreport.jaxb.XmlDetailedReport;
 import eu.europa.esig.dss.simplereport.jaxb.XmlSimpleReport;
-import eu.europa.esig.dss.spi.x509.revocation.crl.ExternalResourcesCRLSource;
 import eu.europa.esig.dss.web.config.DSSBeanConfig;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WebAppConfiguration
@@ -33,6 +32,12 @@ public class FOPServiceTest {
 
 	@Autowired
 	private FOPService service;
+
+	@BeforeAll
+	public static void init() {
+		// required to resolve classpath references for unit tests
+		org.apache.catalina.webresources.TomcatURLStreamHandlerFactory.getInstance();
+	}
 
 	@Test
 	@SuppressWarnings("unchecked")

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.9</version>
+		<version>5.10.RC1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -411,30 +411,41 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-    		<version>4.6.0-1</version>
+    		<version>4.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>font-awesome</artifactId>
 			<version>4.7.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>highlightjs</artifactId>
+			<version>10.1.2</version>
+		</dependency>
 
 		<!-- http://tomcat.apache.org/whichversion.html -->
 		<dependency>
 		    <groupId>javax.servlet</groupId>
 		    <artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<version>4.0.1</version>
 		    <scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.0.Final</version>
+			<version>6.2.1.Final</version>
 		</dependency>
 		
 		<dependency>
@@ -447,7 +458,13 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	    
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>9.0.58</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<profiles>

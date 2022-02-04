@@ -3,7 +3,7 @@ package eu.europa.esig.dss.web.ws;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
 import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
-import eu.europa.esig.dss.asic.common.ASiCExtractResult;
+import eu.europa.esig.dss.asic.common.ASiCContent;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
@@ -38,9 +38,11 @@ import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
@@ -48,8 +50,10 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParame
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestTrustedListSignatureService;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -74,6 +78,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 	private RestDocumentSignatureService restClient;
 	private RestMultipleDocumentSignatureService restMultiDocsClient;
+	private RestTrustedListSignatureService restTLSigningClient;
 
 	@BeforeEach
 	public void init() {
@@ -106,6 +111,20 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
 		restMultiDocsClient = factory.create(RestMultipleDocumentSignatureService.class);
+
+		factory = new JAXRSClientFactoryBean();
+
+		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_TRUSTED_LIST);
+		factory.setServiceClass(RestTrustedListSignatureService.class);
+		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		restTLSigningClient = factory.create(RestTrustedListSignatureService.class);
 	}
 
 	@Test
@@ -495,7 +514,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertNotNull(iMD);
 		
 		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
-		ASiCExtractResult extractedResult = extractor.extract();
+		ASiCContent extractedResult = extractor.extract();
 		
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
@@ -539,7 +558,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertNotNull(iMD);
 		
 		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
-		ASiCExtractResult extractedResult = extractor.extract();
+		ASiCContent extractedResult = extractor.extract();
 		
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		
@@ -614,6 +633,39 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 					parameters);
 			assertThrows(ServerErrorException.class,
 					() -> restClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
+		}
+	}
+
+	@Test
+	public void testLotlSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/eu-lotl-no-sig.xml"));
+			RemoteDocument lotlToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+
+			RemoteTrustedListSignatureParameters tlSignatureParameters = new RemoteTrustedListSignatureParameters();
+			tlSignatureParameters.setSigningCertificate(signingCertificate);
+			tlSignatureParameters.setReferenceId("lotl");
+			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
+
+			DataToSignTrustedListDTO dataToBeSignedDTO = new DataToSignTrustedListDTO(lotlToSign, tlSignatureParameters);
+			ToBeSignedDTO dataToBeSigned = restTLSigningClient.getDataToSign(dataToBeSignedDTO);
+			assertNotNull(dataToBeSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			SignTrustedListDTO signTrustedListDTO = new SignTrustedListDTO(lotlToSign, tlSignatureParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument counterSignedDocument = restTLSigningClient.signDocument(signTrustedListDTO);
+			assertNotNull(counterSignedDocument);
 		}
 	}
 

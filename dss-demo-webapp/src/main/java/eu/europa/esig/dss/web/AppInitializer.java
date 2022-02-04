@@ -1,21 +1,20 @@
 package eu.europa.esig.dss.web;
 
-import java.util.Collections;
-
-import javax.servlet.Filter;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.SessionTrackingMode;
-
+import eu.europa.esig.dss.web.config.DSSBeanConfig;
+import eu.europa.esig.dss.web.config.JdbcInitializer;
+import eu.europa.esig.dss.web.config.WebConfig;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-import eu.europa.esig.dss.web.config.DSSBeanConfig;
-import eu.europa.esig.dss.web.config.WebConfig;
+import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+import javax.servlet.SessionTrackingMode;
+import java.util.Collections;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -50,7 +49,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
-		return new Class[] { DSSBeanConfig.class };
+		return new Class[] { DSSBeanConfig.class, JdbcInitializer.class };
 	}
 
 	@Override

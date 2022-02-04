@@ -36,10 +36,11 @@ import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectio
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.xades.signature.XAdESService;
-import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +52,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
-import java.sql.SQLException;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
@@ -279,6 +277,13 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
+	public RemoteTrustedListSignatureServiceImpl remoteTrustedListSignatureService() {
+		RemoteTrustedListSignatureServiceImpl service = new RemoteTrustedListSignatureServiceImpl();
+		service.setXadesService(xadesService());
+		return service;
+	}
+
+	@Bean
 	public RemoteDocumentValidationService remoteValidationService() {
 		RemoteDocumentValidationService service = new RemoteDocumentValidationService();
 		service.setVerifier(certificateVerifier());
@@ -353,7 +358,7 @@ public class DSSBeanConfig {
 	@Bean
 	public DSSFileLoader offlineLoader() {
 		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
-		offlineFileLoader.setCacheExpirationTime(Long.MAX_VALUE);
+		offlineFileLoader.setCacheExpirationTime(-1);
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader());
 		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
 		return offlineFileLoader;
@@ -368,34 +373,6 @@ public class DSSBeanConfig {
 		}
 		return tslCache;
 	}
-
-	/* JDBC functions */
-
-	@PostConstruct
-	public void cachedAIASourceInitialization() throws SQLException {
-		JdbcCacheAIASource jdbcCacheAIASource = cachedAIASource();
-		jdbcCacheAIASource.initTable();
-	}
-
-	@PostConstruct
-	public void cachedCRLSourceInitialization() throws SQLException {
-		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
-		jdbcCacheCRLSource.initTable();
-	}
-
-	@PreDestroy
-	public void cachedAIASourceClean() throws SQLException {
-		JdbcCacheAIASource jdbcCacheAIASource = cachedAIASource();
-		jdbcCacheAIASource.destroyTable();
-	}
-
-	@PreDestroy
-	public void cachedCRLSourceClean() throws SQLException {
-		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
-		jdbcCacheCRLSource.destroyTable();
-	}
-
-	// Cached OCSPSource is not used
 	
     /* QWAC Validation */
 

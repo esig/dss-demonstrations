@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.9</version>
+		<version>5.10.RC1</version>
 	</parent>
 
 	<name>DSS Package: OOTB Web-Application</name>
@@ -18,7 +18,7 @@
 	<properties>
 		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jre_x86-32_windows_hotspot_8u292b10.zip</jre.download.link>
 		<jre.root.folder>jdk8u292-b10-jre</jre.root.folder>
-		<tomcat.version>8.5.68</tomcat.version>
+		<tomcat.version>8.5.75</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -54,7 +54,7 @@
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
 				<artifactId>download-maven-plugin</artifactId>
-				<version>1.3.0</version>
+				<version>1.6.8</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -104,11 +104,11 @@
 	
 	<profiles>
 		<profile>
-			<id>java16</id>
+			<id>java17</id>
 			<properties>
-				<jre.download.link>https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk16u-2021-05-08-12-45/OpenJDK16U-jre_x86-32_windows_hotspot_2021-05-08-12-45.zip</jre.download.link>
-				<jre.root.folder>jdk-16.0.1+9-jre</jre.root.folder>
-				<tomcat.version>9.0.48</tomcat.version>
+				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1%2B12/OpenJDK17U-jre_x86-32_windows_hotspot_17.0.1_12.zip</jre.download.link>
+				<jre.root.folder>jdk-17.0.1+12-jre</jre.root.folder>
+				<tomcat.version>9.0.58</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>

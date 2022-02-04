@@ -1,6 +1,6 @@
 package eu.europa.esig.dss.web.config;
 
-import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +54,7 @@ public class WebConfig implements WebMvcConfigurer {
 		templateResolver.setPrefix("/WEB-INF/thymeleaf/");
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode("HTML");
+		templateResolver.setCharacterEncoding("UTF-8");
 		return templateResolver;
 	}
 

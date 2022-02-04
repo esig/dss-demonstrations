@@ -95,6 +95,7 @@ public class MultipartResolverProvider {
             emptyMultipartResolver = new CommonsMultipartResolver();
             emptyMultipartResolver.setMaxInMemorySize(maxInMemorySize);
             emptyMultipartResolver.setResolveLazily(true);
+            emptyMultipartResolver.setDefaultEncoding("UTF-8");
         }
         return emptyMultipartResolver;
     }
@@ -111,6 +112,7 @@ public class MultipartResolverProvider {
             commonMultipartResolver.setMaxUploadSizePerFile(maxFileSize);
             commonMultipartResolver.setMaxInMemorySize(maxInMemorySize);
             commonMultipartResolver.setResolveLazily(true);
+            commonMultipartResolver.setDefaultEncoding("UTF-8");
         }
         return commonMultipartResolver;
     }

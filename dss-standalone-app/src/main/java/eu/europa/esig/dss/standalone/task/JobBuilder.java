@@ -1,13 +1,5 @@
 package eu.europa.esig.dss.standalone.task;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
@@ -20,6 +12,13 @@ import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.tsl.sync.AcceptAllStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class JobBuilder {
 
@@ -69,7 +68,7 @@ public class JobBuilder {
 
 	private DSSFileLoader offlineLoader() {
 		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
-		offlineFileLoader.setCacheExpirationTime(Long.MAX_VALUE);
+		offlineFileLoader.setCacheExpirationTime(-1);
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader()); // do not download from Internet
 		offlineFileLoader.setFileCacheDirectory(cacheDirectory);
 		return offlineFileLoader;

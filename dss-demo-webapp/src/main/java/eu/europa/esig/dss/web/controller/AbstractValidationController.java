@@ -3,13 +3,17 @@ package eu.europa.esig.dss.web.controller;
 import eu.europa.esig.dss.diagnostic.AbstractTokenProxy;
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.AbstractReports;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.model.TokenDTO;
 import eu.europa.esig.dss.web.service.XSLTService;
+import eu.europa.esig.dss.web.validation.EtsiNamespaceValidationReportFacade;
 import eu.europa.esig.validationreport.jaxb.ValidationReportType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
@@ -17,6 +21,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class AbstractValidationController {
+
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractValidationController.class);
 
 	protected static final String SIMPLE_REPORT_ATTRIBUTE = "simpleReport";
 	protected static final String DETAILED_REPORT_ATTRIBUTE = "detailedReport";
@@ -56,7 +62,7 @@ public abstract class AbstractValidationController {
 			Reports sigReports = (Reports) reports;
 			ValidationReportType etsiValidationReportJaxb = sigReports.getEtsiValidationReportJaxb();
 			if (etsiValidationReportJaxb != null) {
-				model.addAttribute(ETSI_VALIDATION_REPORT_ATTRIBUTE, sigReports.getXmlValidationReport());
+				model.addAttribute(ETSI_VALIDATION_REPORT_ATTRIBUTE, getEtsiValidationReportString(etsiValidationReportJaxb));
 			}
 		}
 
@@ -79,6 +85,15 @@ public abstract class AbstractValidationController {
 			}
 		}
 		return tokenDtos;
+	}
+
+	private String getEtsiValidationReportString(ValidationReportType etsiValidationReportJaxb) {
+		try {
+			return EtsiNamespaceValidationReportFacade.newFacade().marshall(etsiValidationReportJaxb, false);
+		} catch (Exception e) {
+			LOG.error("Unable to marshall ETSI Validation Report. Reason : {}", e.getMessage(), e);
+			return Utils.EMPTY_STRING;
+		}
 	}
 
 }

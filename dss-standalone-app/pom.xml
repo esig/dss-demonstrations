@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.9</version>
+		<version>5.10.RC1</version>
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
@@ -29,7 +29,7 @@
 			<plugin>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.4</version>
+				<version>0.0.8</version>
 				<configuration>
 			        <mainClass>eu.europa.esig.dss.standalone.DSSApplication</mainClass>
 			    </configuration>

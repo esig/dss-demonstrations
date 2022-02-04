@@ -204,6 +204,11 @@ form#sign-pdf-form p#filename {
     background-color: rgba(255,255,255,.35);
 }
 
+pre.prettyprint {
+     border: 1px solid rgba(0,0,0,.125);
+     border-radius: 0.25rem;
+ }
+
 /* End Validation reports */
 
 /* Mobile devices */
