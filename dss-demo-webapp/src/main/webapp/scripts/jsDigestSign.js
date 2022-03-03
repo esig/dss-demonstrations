@@ -2,6 +2,8 @@ $('[data-toggle="tooltip"]').tooltip();
 
 var $spinner = $('#spinner');
 
+disableContentTstField(true);
+
 async function digestMessage(message) {
 	const digestElement = document.getElementById('digestToSign');
 	const inputRadio = document.querySelector('input[name="digestAlgorithm"]:checked');
@@ -46,4 +48,32 @@ function arrayBufferToBase64(buffer) {
         binary += String.fromCharCode(bytes[i]);
     }
     return window.btoa(binary);
+}
+
+$('input[name="signatureForm"]:radio').change(
+    function() {
+    	checkContentTstPossible(this.value);
+    });
+
+
+function checkContentTstPossible(signatureForm) {
+     switch(signatureForm) {
+          case "XAdES":
+          case "JAdES":
+            disableContentTstField(true);
+            break;
+          default:
+            disableContentTstField(false);
+            break;
+     }
+}
+
+function disableContentTstField(disable) {
+    var $addContentTimestamp = $('input[name="addContentTimestamp"][type="checkbox"]');
+    if (disable) {
+        $addContentTimestamp.prop('checked', false);
+        $addContentTimestamp.attr("disabled", true);
+    } else {
+        $addContentTimestamp.attr("disabled", false);
+    }
 }

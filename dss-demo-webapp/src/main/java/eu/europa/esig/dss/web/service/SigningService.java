@@ -10,6 +10,7 @@ import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.CAdESSignatureParameters;
 import eu.europa.esig.dss.cades.signature.CAdESCounterSignatureParameters;
 import eu.europa.esig.dss.cades.signature.CAdESService;
+import eu.europa.esig.dss.cades.signature.CAdESTimestampParameters;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SigDMechanism;
@@ -17,6 +18,7 @@ import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.jades.JAdESSignatureParameters;
+import eu.europa.esig.dss.jades.JAdESTimestampParameters;
 import eu.europa.esig.dss.jades.signature.JAdESCounterSignatureParameters;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -24,6 +26,7 @@ import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.DigestDocument;
 import eu.europa.esig.dss.model.SerializableCounterSignatureParameters;
 import eu.europa.esig.dss.model.SignatureValue;
+import eu.europa.esig.dss.model.TimestampParameters;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.pades.PAdESSignatureParameters;
@@ -39,6 +42,7 @@ import eu.europa.esig.dss.validation.timestamp.TimestampToken;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.model.AbstractSignatureForm;
+import eu.europa.esig.dss.web.model.ContainerDocumentForm;
 import eu.europa.esig.dss.web.model.CounterSignatureForm;
 import eu.europa.esig.dss.web.model.ExtensionForm;
 import eu.europa.esig.dss.web.model.SignatureDigestForm;
@@ -48,6 +52,7 @@ import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
 import eu.europa.esig.dss.web.model.TimestampForm;
 import eu.europa.esig.dss.x509.tsp.MockTSPSource;
 import eu.europa.esig.dss.xades.XAdESSignatureParameters;
+import eu.europa.esig.dss.xades.XAdESTimestampParameters;
 import eu.europa.esig.dss.xades.signature.XAdESCounterSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 import org.slf4j.Logger;
@@ -363,6 +368,7 @@ public class SigningService {
 		}
 
 		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(form.getBase64Certificate());
+
 		parameters.setSigningCertificate(signingCertificate);
 
 		List<String> base64CertificateChain = form.getBase64CertificateChain();
@@ -373,6 +379,24 @@ public class SigningService {
 			}
 			parameters.setCertificateChain(certificateChain);
 		}
+
+		fillTimestampParameters(parameters, form);
+	}
+
+	private void fillTimestampParameters(AbstractSignatureParameters parameters, AbstractSignatureForm form) {
+		SignatureForm signatureForm = form.getSignatureForm();
+
+		ASiCContainerType containerType = null;
+		if (form instanceof ContainerDocumentForm) {
+			containerType = ((ContainerDocumentForm) form).getContainerType();
+		}
+
+		TimestampParameters timestampParameters = getTimestampParameters(containerType, signatureForm);
+		timestampParameters.setDigestAlgorithm(form.getDigestAlgorithm());
+
+		parameters.setContentTimestampParameters(timestampParameters);
+		parameters.setSignatureTimestampParameters(timestampParameters);
+		parameters.setArchiveTimestampParameters(timestampParameters);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -494,7 +518,7 @@ public class SigningService {
 				service = jadesService;
 				break;
 			default:
-				LOG.error("Unknow signature form : " + signatureForm);
+				LOG.error("Unknown signature form : " + signatureForm);
 			}
 		}
 		return service;
@@ -573,6 +597,40 @@ public class SigningService {
         return parameters;
     }
 
+	private TimestampParameters getTimestampParameters(ASiCContainerType containerType, SignatureForm signatureForm) {
+		TimestampParameters parameters = null;
+		if (containerType == null) {
+			switch (signatureForm) {
+				case CAdES:
+					parameters = new CAdESTimestampParameters();
+					break;
+				case XAdES:
+					parameters = new XAdESTimestampParameters();
+					break;
+				case JAdES:
+					parameters = new JAdESTimestampParameters();
+					break;
+				default:
+					LOG.error("Not supported form for a timestamp : " + signatureForm);
+			}
+
+		} else {
+			switch (signatureForm) {
+				case CAdES:
+					ASiCWithCAdESTimestampParameters asicParameters = new ASiCWithCAdESTimestampParameters();
+					asicParameters.aSiC().setContainerType(containerType);
+					parameters = asicParameters;
+					break;
+				case XAdES:
+					parameters = new XAdESTimestampParameters();
+					break;
+				default:
+					LOG.error("Not supported form for an ASiC timestamp : " + signatureForm);
+			}
+		}
+		return parameters;
+	}
+
 	@SuppressWarnings("rawtypes")
 	private MultipleDocumentsSignatureService getASiCSignatureService(SignatureForm signatureForm) {
 		MultipleDocumentsSignatureService service = null;
@@ -584,7 +642,7 @@ public class SigningService {
 			service = asicWithXAdESService;
 			break;
 		default:
-			LOG.error("Unknow signature form : " + signatureForm);
+			LOG.error("Unknown signature form : " + signatureForm);
 		}
 		return service;
 	}
@@ -603,7 +661,7 @@ public class SigningService {
 			parameters = asicXadesParams;
 			break;
 		default:
-			LOG.error("Unknow signature form for ASiC container: " + signatureForm);
+			LOG.error("Unknown signature form for ASiC container: " + signatureForm);
 		}
 		return parameters;
 	}
