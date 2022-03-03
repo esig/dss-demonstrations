@@ -209,12 +209,17 @@ public class SigningService {
 
 		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm());
 		AbstractSignatureParameters parameters = fillParameters(form);
-		
-		DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
-		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocument, parameters);
 
-		LOG.info("End getContentTimestamp with one document");
-		return contentTimestamp;
+		try {
+			DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
+			TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocument, parameters);
+
+			LOG.info("End getContentTimestamp with one document");
+			return contentTimestamp;
+
+		} catch (Exception e) {
+			throw new SignatureOperationException(e.getMessage(), e);
+		}
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -224,11 +229,16 @@ public class SigningService {
 		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
-		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDigest, parameters);
+		try {
+			DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
+			TimestampToken contentTimestamp = service.getContentTimestamp(toSignDigest, parameters);
 
-		LOG.info("End getContentTimestamp with one digest");
-		return contentTimestamp;
+			LOG.info("End getContentTimestamp with one digest");
+			return contentTimestamp;
+
+		} catch (Exception e) {
+			throw new SignatureOperationException(e.getMessage(), e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -238,10 +248,15 @@ public class SigningService {
 		MultipleDocumentsSignatureService service = getASiCSignatureService(form.getSignatureForm());
 		AbstractSignatureParameters parameters = fillParameters(form);
 
-		TimestampToken contentTimestamp = service.getContentTimestamp(WebAppUtils.toDSSDocuments(form.getDocumentsToSign()), parameters);
+		try {
+			TimestampToken contentTimestamp = service.getContentTimestamp(WebAppUtils.toDSSDocuments(form.getDocumentsToSign()), parameters);
 
-		LOG.info("End getContentTimestamp with  multiple documents");
-		return contentTimestamp;
+			LOG.info("End getContentTimestamp with  multiple documents");
+			return contentTimestamp;
+
+		} catch (Exception e) {
+			throw new SignatureOperationException(e.getMessage(), e);
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -250,17 +265,21 @@ public class SigningService {
 
 		MultipleDocumentsSignatureService service = jadesService;
 		JAdESSignatureParameters parameters = fillParameters(form);
-		List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
 
-		TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocuments, parameters);
+		try {
+			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
+			TimestampToken contentTimestamp = service.getContentTimestamp(toSignDocuments, parameters);
 
-		LOG.info("End getContentTimestamp with JAdES");
-		return contentTimestamp;
+			LOG.info("End getContentTimestamp with JAdES");
+			return contentTimestamp;
+
+		} catch (Exception e) {
+			throw new SignatureOperationException(e.getMessage(), e);
+		}
 	}
 
 	public DSSDocument timestamp(TimestampForm form) {
 		List<DSSDocument> dssDocuments = WebAppUtils.toDSSDocuments(form.getOriginalFiles());
-
 		LOG.info("Start timestamp with {} document(s)", dssDocuments.size());
 
 		DSSDocument result;
