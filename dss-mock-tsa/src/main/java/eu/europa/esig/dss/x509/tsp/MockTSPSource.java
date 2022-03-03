@@ -91,6 +91,7 @@ public class MockTSPSource implements TSPSource {
 			Set<ASN1ObjectIdentifier> accepted = new HashSet<>();
 			accepted.add(TSPAlgorithms.SHA1);
 			accepted.add(TSPAlgorithms.SHA256);
+			accepted.add(TSPAlgorithms.SHA384);
 			accepted.add(TSPAlgorithms.SHA512);
 
 			AlgorithmIdentifier digestAlgorithmIdentifier = new AlgorithmIdentifier(new ASN1ObjectIdentifier(digestAlgorithm.getOid()));
