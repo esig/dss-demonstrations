@@ -1,16 +1,16 @@
 ## Demonstrations for DSS : Digital Signature Service
 
-This is the demonstration repository for project DSS : https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eSignature. 
+This is the demonstration repository for project DSS : https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/eSignature. 
 
 # Issue Tracker
 
-Please, use the new JIRA for project is on https://ec.europa.eu/cefdigital/tracker/projects/DSS/issues. 
+Please, use the new JIRA for project is on https://ec.europa.eu/digital-building-blocks/tracker/projects/DSS/issues. 
 
 # Maven repository
 
-The release is published on CEF Digital repository : 
+The release is published on DIGITAL repository : 
 
-https://ec.europa.eu/cefdigital/artifact/#welcome
+https://ec.europa.eu/digital-building-blocks/artifact/#welcome
 
 <pre>
 &lt;repository&gt;
@@ -57,6 +57,6 @@ The JavaDoc is available on https://ec.europa.eu/cefdigital/DSS/webapp-demo/apid
 
 Bundles which contain the above demonstration can be downloaded from the [Maven repository](https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss/eu/europa/ec/joinup/sd-dss/dss-demo-bundle/).
 
-The code of the demonstration can be found on https://ec.europa.eu/cefdigital/code/projects/ESIG/repos/dss-demos/browse
+The code of the demonstration can be found on https://ec.europa.eu/digital-building-blocks/code/projects/ESIG/repos/dss-demos/browse
 
 [![License (LGPL version 2.1)](https://img.shields.io/badge/license-GNU%20LGPL%20version%202.1-blue.svg?style=flat-square)](https://www.gnu.org/licenses/lgpl-2.1.html)
