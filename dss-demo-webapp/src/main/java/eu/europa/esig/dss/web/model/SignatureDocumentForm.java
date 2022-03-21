@@ -1,14 +1,13 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import eu.europa.esig.dss.enumerations.ASiCContainerType;
-import eu.europa.esig.dss.enumerations.SignaturePackaging;
-
-public class SignatureDocumentForm extends AbstractSignatureForm {
+public class SignatureDocumentForm extends AbstractSignatureForm implements ContainerDocumentForm {
 
 	private MultipartFile documentToSign;
 
@@ -33,6 +32,7 @@ public class SignatureDocumentForm extends AbstractSignatureForm {
 		this.signaturePackaging = signaturePackaging;
 	}
 
+	@Override
 	public ASiCContainerType getContainerType() {
 		return containerType;
 	}

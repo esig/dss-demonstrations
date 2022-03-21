@@ -56,7 +56,7 @@ public class DigestController {
 	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "signatureForm", "digestAlgorithm", "digestToSign", "documentName", "fileToCompute", 
-			"signatureLevel", "signWithExpiredCertificate" };
+			"signatureLevel", "signWithExpiredCertificate", "addContentTimestamp" };
 
 	@Value("${nexuUrl}")
 	private String nexuUrl;
