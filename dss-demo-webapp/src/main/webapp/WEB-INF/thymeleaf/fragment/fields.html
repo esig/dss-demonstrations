@@ -539,13 +539,32 @@
 <div class="position-relative form-group row" th:fragment="field-sign-pdf">
 	<div class="col-sm-8">
 		<input type="file" class="drag-file cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />
-		<p id="filename" class="drag-file-label" th:text="#{label.sign.pdf.drag.file}"></p>
+		<p id="filename" class="drag-file-label large-field" th:text="#{label.sign.pdf.drag.file}"></p>
 	</div>
 </div>
 
 <div class="position-relative form-group row" th:fragment="sign-pdf-submit">
 	<div class="col-sm-8">
 		<button type="submit" class="btn btn-primary w-100" id="submit-button" th:text="#{label.sign}" disabled="disabled">
+		</button>
+	</div>
+</div>
+
+<div class="position-relative form-group row" th:fragment="field-merge-containers">
+	<div class="col-sm-9">
+		<input type="file" class="drag-file cursor-pointer" name="documentsToMerge" id="documentsToMerge" multiple="multiple" />
+		<div class="drag-file-label large-field">
+			<p id="filenames" class="drag-file-content" th:text="#{label.merge.containers.drag.files}"></p>
+		</div>
+	</div>
+	<div class="col-sm-9">
+		<p th:if="${#fields.hasErrors('documentsToMerge*')}" th:errors="*{documentsToMerge*}" class="errors text-danger" th:text="#{label.error}"></p>
+	</div>
+</div>
+
+<div class="position-relative form-group row" th:fragment="merge-containers-submit">
+	<div class="col-sm-9">
+		<button type="submit" class="btn btn-primary w-100" id="submit-button" th:text="#{label.merge}">
 		</button>
 	</div>
 </div>
