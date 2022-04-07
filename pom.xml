@@ -44,16 +44,16 @@
 		<dss.framework.version>5.11-SNAPSHOT</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<slf4j.version>1.7.35</slf4j.version>
-		<logback-classic.version>1.2.10</logback-classic.version>
+		<slf4j.version>1.7.36</slf4j.version>
+		<logback-classic.version>1.2.11</logback-classic.version>
 
-		<cxf.version>3.5.0</cxf.version>
-		<swagger-ui.version>4.2.1</swagger-ui.version>
+		<cxf.version>3.5.1</cxf.version>
+		<swagger-ui.version>4.10.3</swagger-ui.version>
 		<spring.version>5.3.18</spring.version>
 		<spring-security.version>5.6.2</spring-security.version>
-		<thymeleaf-spring5.version>3.0.14.RELEASE</thymeleaf-spring5.version>
-		<thymeleaf-layout-dialect.version>3.0.0</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.13.1</jackson-jaxrs-json-provider.version>
+		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
+		<thymeleaf-layout-dialect.version>3.1.0</thymeleaf-layout-dialect.version>
+		<jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
@@ -140,7 +140,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.9.0</version>
+					<version>3.10.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -173,7 +173,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.2.4</version>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -493,7 +493,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>6.5.3</version>
+						<version>7.0.4</version>
 						<executions>
 							<execution>
 								<goals>
