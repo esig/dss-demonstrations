@@ -106,8 +106,8 @@
 		<profile>
 			<id>java17</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1%2B12/OpenJDK17U-jre_x86-32_windows_hotspot_17.0.1_12.zip</jre.download.link>
-				<jre.root.folder>jdk-17.0.1+12-jre</jre.root.folder>
+				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jre_x86-32_windows_hotspot_17.0.2_8.zip</jre.download.link>
+				<jre.root.folder>jdk-17.0.2+8-jre</jre.root.folder>
 				<tomcat.version>9.0.58</tomcat.version>
 			</properties>
 		</profile>
