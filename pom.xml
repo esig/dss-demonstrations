@@ -54,6 +54,7 @@
 		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>3.1.0</thymeleaf-layout-dialect.version>
 		<jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
+		<jackson-databind.version>2.13.2.2</jackson-databind.version> <!-- To be used while jackson is not updated -->
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
@@ -363,7 +364,12 @@
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
 				<artifactId>jackson-jaxrs-json-provider</artifactId>
 				<version>${jackson-jaxrs-json-provider.version}</version>
-			</dependency>	
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson-databind.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.zaxxer</groupId>
