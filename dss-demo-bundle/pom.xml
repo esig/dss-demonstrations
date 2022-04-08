@@ -108,7 +108,7 @@
 			<properties>
 				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jre_x86-32_windows_hotspot_17.0.2_8.zip</jre.download.link>
 				<jre.root.folder>jdk-17.0.2+8-jre</jre.root.folder>
-				<tomcat.version>9.0.58</tomcat.version>
+				<tomcat.version>9.0.62</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>
