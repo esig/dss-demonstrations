@@ -215,9 +215,9 @@
 	</build>
 
 	<scm>
-		<url>https://ec.europa.eu/cefdigital/code/scm/esig/dss-demos.git</url>
-		<connection>scm:git:https://ec.europa.eu/cefdigital/code/scm/esig/dss-demos.git</connection>
-		<developerConnection>scm:git:https://ec.europa.eu/cefdigital/code/scm/esig/dss-demos.git</developerConnection>
+		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
+		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
+		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
 		<tag>5.1.RC1</tag>
 	</scm>
 
@@ -441,18 +441,18 @@
 		<repository>
 		  <id>cefdigital</id>
 		  <name>CEF Digital</name>
-		  <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss/</url>
+		  <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss/</url>
 		</repository>
 	</repositories>
 
 	<distributionManagement>
 		<repository>
 			<id>cefdigital-nexus</id>
-			<url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss</url>
+			<url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss</url>
 		</repository>
 		<snapshotRepository>
 			<id>cefdigital-nexus</id>
-			<url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss-snapshots</url>
+			<url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 
