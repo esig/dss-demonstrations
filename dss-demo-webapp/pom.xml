@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.10</version>
+		<version>5.10.1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -461,7 +461,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
-			<version>9.0.58</version>
+			<version>9.0.62</version>
 			<scope>test</scope>
 		</dependency>
 

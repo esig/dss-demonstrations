@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.10</version>
+	<version>5.10.1</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -41,7 +41,7 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.10</dss.framework.version>
+		<dss.framework.version>5.10.1</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>1.7.35</slf4j.version>
@@ -49,11 +49,12 @@
 
 		<cxf.version>3.5.0</cxf.version>
 		<swagger-ui.version>4.2.1</swagger-ui.version>
-		<spring.version>5.3.15</spring.version>
-		<spring-security.version>5.6.1</spring-security.version>
+		<spring.version>5.3.18</spring.version>
+		<spring-security.version>5.6.2</spring-security.version>
 		<thymeleaf-spring5.version>3.0.14.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>3.0.0</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.13.1</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
+		<jackson-databind.version>2.13.2.2</jackson-databind.version> <!-- To be used while jackson is not updated -->
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
@@ -214,10 +215,10 @@
 	</build>
 
 	<scm>
-		<url>https://ec.europa.eu/cefdigital/code/scm/esig/dss-demos.git</url>
-		<connection>scm:git:https://ec.europa.eu/cefdigital/code/scm/esig/dss-demos.git</connection>
-		<developerConnection>scm:git:https://ec.europa.eu/cefdigital/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>5.1.RC1</tag>
+		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
+		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
+		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
+		<tag>5.10.1</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -363,7 +364,12 @@
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
 				<artifactId>jackson-jaxrs-json-provider</artifactId>
 				<version>${jackson-jaxrs-json-provider.version}</version>
-			</dependency>	
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson-databind.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.zaxxer</groupId>
@@ -435,18 +441,18 @@
 		<repository>
 		  <id>cefdigital</id>
 		  <name>CEF Digital</name>
-		  <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss/</url>
+		  <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss/</url>
 		</repository>
 	</repositories>
 
 	<distributionManagement>
 		<repository>
 			<id>cefdigital-nexus</id>
-			<url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss</url>
+			<url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss</url>
 		</repository>
 		<snapshotRepository>
 			<id>cefdigital-nexus</id>
-			<url>https://ec.europa.eu/cefdigital/artifact/content/repositories/esignaturedss-snapshots</url>
+			<url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 

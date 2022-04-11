@@ -607,6 +607,9 @@ public class SigningService {
 				case XAdES:
 					parameters = new XAdESTimestampParameters();
 					break;
+				case PAdES:
+					parameters = new PAdESTimestampParameters();
+					break;
 				case JAdES:
 					parameters = new JAdESTimestampParameters();
 					break;
