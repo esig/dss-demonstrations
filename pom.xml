@@ -86,6 +86,7 @@
 		<module>dss-demo-bundle</module>        
 		<module>sscd-mocca-adapter</module>
 		<module>dss-rest-doc-generation</module>
+		<module>dss-esig-validation-tests</module>
 	</modules>
 
 	<build>
