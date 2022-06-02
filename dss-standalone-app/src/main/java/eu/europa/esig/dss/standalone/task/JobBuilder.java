@@ -96,8 +96,8 @@ public class JobBuilder {
 	}
 
 	private CertificateSource officialJournalContentKeyStore() {
-		return new KeyStoreCertificateSource(JobBuilder.class.getResourceAsStream((prop.getProperty("keystore.path"))), prop.getProperty("keystore.type"),
-				prop.getProperty("keystore.password"));
+		return new KeyStoreCertificateSource(JobBuilder.class.getResourceAsStream(
+				(prop.getProperty("keystore.path"))), prop.getProperty("keystore.type"), prop.getProperty("keystore.password"));
 	}
 
 	private FileCacheDataLoader getDSSFileLoader() {
