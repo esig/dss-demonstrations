@@ -1,17 +1,18 @@
 package eu.europa.esig.dss.standalone.model;
 
-import java.io.File;
-
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignatureTokenType;
+import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
+import java.io.File;
 
 
 public class SignatureModel {
@@ -20,6 +21,7 @@ public class SignatureModel {
 	private ObjectProperty<ASiCContainerType> asicContainerType = new SimpleObjectProperty<>();
 	private ObjectProperty<SignatureForm> signatureForm = new SimpleObjectProperty<>();
 	private ObjectProperty<SignaturePackaging> signaturePackaging = new SimpleObjectProperty<>();
+	private ObjectProperty<SignatureOption> signatureOption = new SimpleObjectProperty<>();
 	private ObjectProperty<SignatureLevel> signatureLevel = new SimpleObjectProperty<>();
 	private ObjectProperty<DigestAlgorithm> digestAlgorithm = new SimpleObjectProperty<>();
 	private ObjectProperty<SignatureTokenType> tokenType = new SimpleObjectProperty<>();
@@ -73,6 +75,18 @@ public class SignatureModel {
 
 	public ObjectProperty<SignaturePackaging> signaturePackagingProperty() {
 		return signaturePackaging;
+	}
+
+	public SignatureOption getSignatureOption() {
+		return signatureOption.get();
+	}
+
+	public void setSignatureOption(SignatureOption signatureOption) {
+		this.signatureOption.set(signatureOption);
+	}
+
+	public ObjectProperty<SignatureOption> additionalObjectProperty() {
+		return signatureOption;
 	}
 
 	public SignatureLevel getSignatureLevel() {

@@ -33,7 +33,7 @@ public class DSSApplication extends Application {
 			loader.setLocation(DSSApplication.class.getResource("/fxml/screen.fxml"));
 			Pane pane = loader.load();
 			
-			Scene scene = new Scene(pane, 1050, 400);
+			Scene scene = new Scene(pane, 1050, 420);
 			scene.getStylesheets().add("/styles/style.css");
 			stage.setScene(scene);
 			stage.show();
