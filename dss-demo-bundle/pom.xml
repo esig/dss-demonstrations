@@ -18,7 +18,7 @@
 	<properties>
 		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jre_x86-32_windows_hotspot_8u292b10.zip</jre.download.link>
 		<jre.root.folder>jdk8u292-b10-jre</jre.root.folder>
-		<tomcat.version>8.5.78</tomcat.version>
+		<tomcat.version>8.5.81</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -104,11 +104,11 @@
 	
 	<profiles>
 		<profile>
-			<id>java17</id>
+			<id>java18</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jre_x86-32_windows_hotspot_17.0.2_8.zip</jre.download.link>
-				<jre.root.folder>jdk-17.0.2+8-jre</jre.root.folder>
-				<tomcat.version>9.0.62</tomcat.version>
+				<jre.download.link>https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.1%2B10/OpenJDK18U-jre_x86-32_windows_hotspot_18.0.1_10.zip</jre.download.link>
+				<jre.root.folder>jdk-18.0.1+10-jre</jre.root.folder>
+				<tomcat.version>9.0.64</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>

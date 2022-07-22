@@ -445,7 +445,7 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.3.Final</version>
+			<version>6.2.3.Final</version> <!-- 6 version to be used until javax to jakarta update -->
 		</dependency>
 		
 		<dependency>
@@ -461,7 +461,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
-			<version>9.0.62</version>
+			<version>9.0.64</version>
 			<scope>test</scope>
 		</dependency>
 
