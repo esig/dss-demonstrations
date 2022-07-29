@@ -27,8 +27,9 @@
 				<h2>
 					<span th:if="${lotl.parsingCacheInfo != null and lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}"
 							th:class="${'lotl-flag small_flag mt-2 flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
-					<span th:text="#{label.summary.lotl}"></span>&nbsp;
-					<a class="lotl-url h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + (${lotl.url}?:'-') + ')'" target="_blank"></a>
+					<span th:text="#{label.summary.lotl}"></span>
+					<a class="h4" th:if="${lotl.parsingCacheInfo.TSLType != null}" th:text="'(' + (${lotl.parsingCacheInfo.TSLType.label != null ? lotl.parsingCacheInfo.TSLType.label : lotl.parsingCacheInfo.TSLType.uri}) + ')'" th:href="${lotl.parsingCacheInfo.TSLType.uri}" target="_blank"></a>
+					<a class="lotl-url h6" th:href="${lotl.url}" th:text="${lotl.url}?:'-'" target="_blank"></a>
 				</h2>
 			</div>
 		
