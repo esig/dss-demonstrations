@@ -23,8 +23,16 @@
             <a th:href="@{/certificate-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/certificate-validation' ? 'active' : ''}" th:text="#{label.cert.validate}">Certificate Validation</a>
             <a th:href="@{/qwac-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/qwac-validation' ? 'active' : ''}" th:text="#{label.qwac.validate}">QWAC Validation</a>
             <a th:href="@{/replay-diagnostic-data}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/replay-diagnostic-data' ? 'active' : ''}" th:text="#{label.replay.diag}">Replay Diagnostic Data</a>
+            <a th:href="@{/merge-containers}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/merge-containers' ? 'active' : ''}" th:text="#{label.merge.containers}">Merge containers</a>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-primary">EU LOTL</div>
+        <div class="list-group list-group-flush">
             <a th:href="@{/tl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
-      		<a th:href="@{/oj-certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/oj-certificates' ? 'active' : ''}" th:title="#{label.eu.oj.certificates.page}" th:text="#{label.eu.oj.certificates}"></a>
+            <a th:href="@{/oj-certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/oj-certificates' ? 'active' : ''}" th:title="#{label.eu.oj.certificates.page}" th:text="#{label.eu.oj.certificates}"></a>
+            <a href="https://ec.europa.eu/tools/lotl/pivot-lotl-explanation.html" class="list-group-item" target="_blank">Pivot LOTL explanation</a>
         </div>
     </div>
 
@@ -43,7 +51,6 @@
             <a href="https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/eSignature" class="list-group-item" target="_blank">DIGITAL Building Blocks</a>
             <a href="https://ec.europa.eu/eusurvey/runner/BuildingBlocksBulletin" class="list-group-item" target="_blank">DIGITAL Newsletter</a>
             <a href="https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/eSignature+FAQ" class="list-group-item" target="_blank">eSignature FAQ</a>
-            <a href="https://ec.europa.eu/tools/lotl/pivot-lotl-explanation.html" class="list-group-item" target="_blank">Pivot LOTL explanation</a>
             <a href="https://github.com/esig/" class="list-group-item" title="GitHub - Source code" target="_blank">GitHub source code</a>
             <a href="https://ec.europa.eu/digital-building-blocks/code/projects/ESIG/" class="list-group-item" title="Bitbucket - Source code" target="_blank">Bitbucket source code</a>
             <a href="https://ec.europa.eu/digital-building-blocks/tracker/projects/DSS/issues" class="list-group-item" title="Jira - Issue tracker" target="_blank">Report a bug</a>

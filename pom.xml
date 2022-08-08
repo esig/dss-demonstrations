@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.10.1</version>
+	<version>5.11.RC1</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -41,20 +41,20 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.10.1</dss.framework.version>
+		<dss.framework.version>5.11.RC1</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<slf4j.version>1.7.35</slf4j.version>
-		<logback-classic.version>1.2.10</logback-classic.version>
+		<slf4j.version>1.7.36</slf4j.version>
+		<logback-classic.version>1.2.11</logback-classic.version>
 
-		<cxf.version>3.5.0</cxf.version>
-		<swagger-ui.version>4.2.1</swagger-ui.version>
-		<spring.version>5.3.18</spring.version>
-		<spring-security.version>5.6.2</spring-security.version>
-		<thymeleaf-spring5.version>3.0.14.RELEASE</thymeleaf-spring5.version>
-		<thymeleaf-layout-dialect.version>3.0.0</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
-		<jackson-databind.version>2.13.2.2</jackson-databind.version> <!-- To be used while jackson is not updated -->
+		<cxf.version>3.5.3</cxf.version>
+		<swagger-ui.version>4.11.1</swagger-ui.version>
+		<spring.version>5.3.22</spring.version>
+		<spring-security.version>5.7.2</spring-security.version>
+		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
+		<thymeleaf-layout-dialect.version>3.1.0</thymeleaf-layout-dialect.version>
+		<groovy.version>4.0.3</groovy.version> <!-- To be used while thymeleaf-layout-dialect is not updated -->
+		<jackson-jaxrs-json-provider.version>2.13.3</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
@@ -86,6 +86,7 @@
 		<module>dss-demo-bundle</module>        
 		<module>sscd-mocca-adapter</module>
 		<module>dss-rest-doc-generation</module>
+		<module>dss-esig-validation-tests</module>
 	</modules>
 
 	<build>
@@ -102,7 +103,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>enforce</id>
@@ -129,7 +130,7 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -141,7 +142,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.9.0</version>
+					<version>3.10.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -151,7 +152,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>2.5.2</version>
+					<version>3.0.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -174,12 +175,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.2.4</version>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.4.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -198,7 +199,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.8.2</version>
+					<version>3.0.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.tomcat.maven</groupId>
@@ -208,7 +209,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M4</version>
+					<version>3.0.0-M7</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -218,7 +219,7 @@
 		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
 		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
 		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>5.10.1</tag>
+		<tag>5.11.RC1</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -365,11 +366,6 @@
 				<artifactId>jackson-jaxrs-json-provider</artifactId>
 				<version>${jackson-jaxrs-json-provider.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${jackson-databind.version}</version>
-			</dependency>
 
 			<dependency>
 				<groupId>com.zaxxer</groupId>
@@ -433,6 +429,11 @@
 			    <groupId>nz.net.ultraq.thymeleaf</groupId>
 			    <artifactId>thymeleaf-layout-dialect</artifactId>
 				<version>${thymeleaf-layout-dialect.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>${groovy.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -499,7 +500,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>6.5.3</version>
+						<version>7.1.1</version>
 						<executions>
 							<execution>
 								<goals>

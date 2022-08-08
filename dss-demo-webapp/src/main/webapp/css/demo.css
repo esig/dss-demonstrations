@@ -95,11 +95,23 @@ form#digest-sign-form p#filename {
 
 /* PDF signature */
 
-form#sign-pdf-form p#filename {
+.large-field {
   line-height: 200px;
+  height: 200px;
 }
 
 /* End PDF signature */
+
+/* Containers merge */
+
+.drag-file-content {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1em;
+    margin: 0;
+}
+
+/* End Containers merge */
 
 /* Certificate validation */
 
@@ -235,7 +247,7 @@ pre.prettyprint {
         width: auto;
         padding: 0;
     }
-    form#sign-pdf-form p#filename {
+    .large-field {
       line-height: 64px;
     }
 }

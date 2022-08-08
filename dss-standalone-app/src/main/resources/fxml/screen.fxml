@@ -11,7 +11,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+	  xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
+
 	<padding>
 		<Insets bottom="20" left="20" right="20" top="20" />
 	</padding>
@@ -29,10 +31,7 @@
 				<fx:define>
 				  <ToggleGroup fx:id="toggleAsicContainerType" />  
 				</fx:define>
-				<RadioButton mnemonicParsing="false" text="None">
-               <toggleGroup>
-                  <ToggleGroup fx:id="toggleAsicContainerType" />
-               </toggleGroup></RadioButton>
+				<RadioButton mnemonicParsing="false" text="None" toggleGroup="$toggleAsicContainerType" />
 				<RadioButton fx:id="asicsRadio" mnemonicParsing="false" text="ASiC-S" toggleGroup="$toggleAsicContainerType" />
 				<RadioButton fx:id="asiceRadio" mnemonicParsing="false" text="ASiC-E" toggleGroup="$toggleAsicContainerType" />
 			</children>
@@ -44,13 +43,10 @@
 				<fx:define>
 				  <ToggleGroup fx:id="toogleSigFormat" />  
 				</fx:define>
-				<RadioButton fx:id="cadesRadio" mnemonicParsing="false" text="CAdES">
-               <toggleGroup>
-                  <ToggleGroup fx:id="toogleSigFormat" />
-               </toggleGroup></RadioButton>
+				<RadioButton fx:id="xadesRadio" mnemonicParsing="false" text="XAdES" toggleGroup="$toogleSigFormat" />
+				<RadioButton fx:id="cadesRadio" mnemonicParsing="false" text="CAdES" toggleGroup="$toogleSigFormat" />
 				<RadioButton fx:id="padesRadio" mnemonicParsing="false" text="PAdES" toggleGroup="$toogleSigFormat" />
-				<RadioButton mnemonicParsing="false" text="XAdES" toggleGroup="$toogleSigFormat" fx:id="xadesRadio" />
-				<RadioButton mnemonicParsing="false" text="JAdES" toggleGroup="$toogleSigFormat" fx:id="jadesRadio" />
+				<RadioButton fx:id="jadesRadio" mnemonicParsing="false" text="JAdES" toggleGroup="$toogleSigFormat" />
 			</children>
 		</HBox>
 		
@@ -60,13 +56,21 @@
 				<fx:define>
 				  <ToggleGroup fx:id="toggleSigPackaging" />  
 				</fx:define>
-				<RadioButton fx:id="envelopedRadio" disable="true" mnemonicParsing="false" text="Enveloped">
-               <toggleGroup>
-                  <ToggleGroup fx:id="toggleSigPackaging" />
-               </toggleGroup></RadioButton>
+				<RadioButton fx:id="envelopedRadio" disable="true" mnemonicParsing="false" text="Enveloped" toggleGroup="$toggleSigPackaging" />
 				<RadioButton fx:id="envelopingRadio" disable="true" mnemonicParsing="false" text="Enveloping" toggleGroup="$toggleSigPackaging" />
 				<RadioButton fx:id="detachedRadio" disable="true" mnemonicParsing="false" text="Detached" toggleGroup="$toggleSigPackaging" />
 				<RadioButton fx:id="internallyDetachedRadio" disable="true" mnemonicParsing="false" text="Internally detached" toggleGroup="$toggleSigPackaging" />
+			</children>
+		</HBox>
+
+		<HBox fx:id="hSignatureOption" styleClass="hbox-style">
+			<children>
+				<Label styleClass="label-style" text="Optional sign" />
+				<fx:define>
+					<ToggleGroup fx:id="toggleSignatureOption" />
+				</fx:define>
+				<RadioButton fx:id="tlSigning" disable="true" mnemonicParsing="false" text="Trusted List" toggleGroup="$toggleSignatureOption" />
+				<RadioButton fx:id="xmlManifest" disable="true" mnemonicParsing="false" text="XML Manifest" toggleGroup="$toggleSignatureOption" />
 			</children>
 		</HBox>
 		
@@ -92,16 +96,13 @@
 				<fx:define>
 				  <ToggleGroup fx:id="toggleSigToken" />  
 				</fx:define>
-				<RadioButton fx:id="pkcs11Radio" mnemonicParsing="false" text="PKCS #11">
-               <toggleGroup>
-                  <ToggleGroup fx:id="toggleSigToken" />
-               </toggleGroup></RadioButton>
+				<RadioButton fx:id="pkcs11Radio" mnemonicParsing="false" text="PKCS #11" toggleGroup="$toggleSigToken" />
 				<RadioButton fx:id="pkcs12Radio" mnemonicParsing="false" text="PKCS #12" toggleGroup="$toggleSigToken" />
 				<RadioButton fx:id="mscapiRadio" mnemonicParsing="false" text="MS CAPI" toggleGroup="$toggleSigToken" />
 			</children>
 		</HBox>
 		
-		<HBox fx:id="hPkcsFile" styleClass="hbox-style" visible="false">
+		<HBox fx:id="hPkcsFile" styleClass="hbox-style" visible="false"  >
 			<children>
 				<Label fx:id="labelPkcs11File" styleClass="label-style" text="PKCS #11 library" />
 				<Label fx:id="labelPkcs12File" styleClass="label-style" text="Keystore file" />

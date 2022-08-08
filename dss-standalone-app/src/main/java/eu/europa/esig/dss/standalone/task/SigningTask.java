@@ -1,12 +1,7 @@
 package eu.europa.esig.dss.standalone.task;
 
-import java.io.IOException;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.FutureTask;
-
+import eu.europa.esig.dss.DomUtils;
+import eu.europa.esig.dss.definition.xmldsig.XMLDSigElement;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
@@ -14,6 +9,8 @@ import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.standalone.RemoteDocumentSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.RemoteTrustedListSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -28,23 +25,47 @@ import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
+import eu.europa.esig.dss.xades.DSSXMLUtils;
+import eu.europa.esig.dss.xades.definition.XAdESNamespaces;
+import eu.europa.esig.trustedlist.TrustedListUtils;
+import eu.europa.esig.xmldsig.XmlDSigUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import javax.xml.transform.dom.DOMSource;
+import java.io.IOException;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.FutureTask;
 
 public class SigningTask extends Task<DSSDocument> {
+
+	private final static String TRUSTED_LIST_PARENT_ELEMENT = "TrustServiceStatusList";
+
+	private final static String TRUSTED_LIST_NAMESPACE = "http://uri.etsi.org/02231/v2#";
 
 	private final SignatureModel model;
 	private final RemoteDocumentSignatureService service;
 
-	public SigningTask (SignatureModel model, TrustedListsCertificateSource tslCertificateSource) {
-		this.model = model;
-		
+	private final RemoteTrustedListSignatureService trustedListSignatureService;
 
-		RemoteDocumentSignatureServiceBuilder builder = new RemoteDocumentSignatureServiceBuilder();
-		builder.setTslCertificateSource(tslCertificateSource);
-		service = builder.build();
+	public SigningTask(SignatureModel model, TrustedListsCertificateSource tslCertificateSource) {
+		this.model = model;
+
+		RemoteDocumentSignatureServiceBuilder signatureServiceBuilder = new RemoteDocumentSignatureServiceBuilder();
+		signatureServiceBuilder.setTslCertificateSource(tslCertificateSource);
+		this.service = signatureServiceBuilder.build();
+
+		RemoteTrustedListSignatureServiceBuilder trustedListServiceBuilder = new RemoteTrustedListSignatureServiceBuilder();
+		this.trustedListSignatureService = trustedListServiceBuilder.build();
 	}
 
 	@Override
@@ -61,18 +82,31 @@ public class SigningTask extends Task<DSSDocument> {
 
 		FileDocument fileToSign = new FileDocument(model.getFileToSign());
 		RemoteDocument toSignDocument = RemoteDocumentConverter.toRemoteDocument(fileToSign);
-		RemoteSignatureParameters parameters = buildParameters(signer);
 
-		ToBeSigned toBeSigned = getDataToSign(toSignDocument, parameters);
-		SignatureValue signatureValue = signDigest(token, signer, toBeSigned);
-		DSSDocument signDocument = signDocument(toSignDocument, parameters, signatureValue);
+		DSSDocument signedDocument;
+		if (isTLSigning(fileToSign)) {
+			RemoteTrustedListSignatureParameters parameters = buildTrustedListParameters(signer);
+
+			ToBeSigned toBeSigned = getDataToSignTrustedList(toSignDocument, parameters);
+			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
+			signedDocument = signTrustedList(toSignDocument, parameters, signatureValue);
+
+		} else {
+			RemoteSignatureParameters parameters = buildParameters(signer);
+
+			ToBeSigned toBeSigned = getDataToSign(toSignDocument, parameters);
+			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
+			signedDocument = signDocument(toSignDocument, parameters, signatureValue);
+		}
+
 		updateProgress(100, 100);
 
-		return signDocument;
+		return signedDocument;
 	}
 
 	private RemoteSignatureParameters buildParameters(DSSPrivateKeyEntry signer) {
 		updateProgress(20, 100);
+
 		RemoteSignatureParameters parameters = new RemoteSignatureParameters();
 		parameters.setAsicContainerType(model.getAsicContainerType());
 		parameters.setDigestAlgorithm(model.getDigestAlgorithm());
@@ -91,8 +125,74 @@ public class SigningTask extends Task<DSSDocument> {
 			}
 			parameters.setCertificateChain(certificateChainList);
 		}
+		if (isXmlManifestSigning()) {
+			parameters.setManifestSignature(true);
+		}
 
 		return parameters;
+	}
+
+	private RemoteTrustedListSignatureParameters buildTrustedListParameters(DSSPrivateKeyEntry signer) {
+		updateProgress(20, 100);
+
+		RemoteTrustedListSignatureParameters parameters = new RemoteTrustedListSignatureParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
+		bLevelParams.setSigningDate(new Date());
+		parameters.setBLevelParameters(bLevelParams);
+
+		parameters.setSigningCertificate(new RemoteCertificate(signer.getCertificate().getEncoded()));
+		parameters.setReferenceDigestAlgorithm(model.getDigestAlgorithm());
+
+		return parameters;
+	}
+
+	private boolean isTLSigning(FileDocument toBeSigned) {
+		SignatureOption signatureOption = model.getSignatureOption();
+		if (SignatureOption.TL_SIGNING.equals(signatureOption)) {
+			if (DomUtils.isDOM(toBeSigned)) {
+				Document document = DomUtils.buildDOM(toBeSigned);
+				Element documentElement = document.getDocumentElement();
+				if (TRUSTED_LIST_PARENT_ELEMENT.equals(documentElement.getLocalName()) &&
+						TRUSTED_LIST_NAMESPACE.equals(documentElement.getNamespaceURI())) {
+					List<String> errors = DSSXMLUtils.validateAgainstXSD(TrustedListUtils.getInstance(), new DOMSource(document));
+					if (Utils.isCollectionEmpty(errors)) {
+						return true;
+					} else {
+						throwException(String.format("The provided file is not a valid Trusted List! %s", errors.toString()), null);
+					}
+				} else {
+					throwException("The provided file is not a Trusted List!", null);
+				}
+			} else {
+				throwException("The provided file is not an XML!", null);
+			}
+		}
+		return false;
+	}
+
+	private boolean isXmlManifestSigning() {
+		SignatureOption signatureOption = model.getSignatureOption();
+		if (SignatureOption.XML_MANIFEST_SIGNING.equals(signatureOption)) {
+			FileDocument fileToSign = new FileDocument(model.getFileToSign());
+			if (DomUtils.isDOM(fileToSign)) {
+				Element document = DomUtils.buildDOM(fileToSign).getDocumentElement();
+				if (XMLDSigElement.MANIFEST.isSameTagName(document.getLocalName()) &&
+						XAdESNamespaces.XMLDSIG.isSameUri(document.getNamespaceURI())) {
+					List<String> errors = DSSXMLUtils.validateAgainstXSD(XmlDSigUtils.getInstance(), new DOMSource(document));
+					if (Utils.isCollectionEmpty(errors)) {
+						return true;
+					} else {
+						throwException(String.format("The provided file is not a valid XML Manifest! %s", errors.toString()), null);
+					}
+					return true;
+				} else {
+					throwException("The provided file is not an XML Manifest!", null);
+				}
+			} else {
+				throwException("The provided file is not an XML!", null);
+			}
+		}
+		return false;
 	}
 
 	private ToBeSigned getDataToSign(RemoteDocument toSignDocument, RemoteSignatureParameters parameters) {
@@ -106,7 +206,18 @@ public class SigningTask extends Task<DSSDocument> {
 		return toBeSigned;
 	}
 
-	private SignatureValue signDigest(SignatureTokenConnection token, DSSPrivateKeyEntry signer, ToBeSigned toBeSigned) {
+	private ToBeSigned getDataToSignTrustedList(RemoteDocument toSignDocument, RemoteTrustedListSignatureParameters parameters) {
+		updateProgress(25, 100);
+		ToBeSigned toBeSigned = null;
+		try {
+			toBeSigned = DTOConverter.toToBeSigned(trustedListSignatureService.getDataToSign(toSignDocument, parameters));
+		} catch (Exception e) {
+			throwException("Unable to compute the digest to sign", e);
+		}
+		return toBeSigned;
+	}
+
+	private SignatureValueDTO sign(SignatureTokenConnection token, DSSPrivateKeyEntry signer, ToBeSigned toBeSigned) {
 		updateProgress(50, 100);
 		SignatureValue signatureValue = null;
 		try {
@@ -114,15 +225,29 @@ public class SigningTask extends Task<DSSDocument> {
 		} catch (Exception e) {
 			throwException("Unable to sign the digest", e);
 		}
-		return signatureValue;
+		return new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue());
 	}
 
-	private DSSDocument signDocument(RemoteDocument toSignDocument, RemoteSignatureParameters parameters, SignatureValue signatureValue) {
+	private DSSDocument signDocument(RemoteDocument toSignDocument, RemoteSignatureParameters parameters,
+									 SignatureValueDTO signatureValue) {
 		updateProgress(75, 100);
 		DSSDocument signDocument = null;
 		try {
-			signDocument = RemoteDocumentConverter.toDSSDocument(service.signDocument(toSignDocument, parameters, 
-					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue())));
+			signDocument = RemoteDocumentConverter.toDSSDocument(
+					service.signDocument(toSignDocument, parameters, signatureValue));
+		} catch (Exception e) {
+			throwException("Unable to sign the document", e);
+		}
+		return signDocument;
+	}
+
+	private DSSDocument signTrustedList(RemoteDocument toSignDocument, RemoteTrustedListSignatureParameters parameters,
+										SignatureValueDTO signatureValue) {
+		updateProgress(75, 100);
+		DSSDocument signDocument = null;
+		try {
+			signDocument = RemoteDocumentConverter.toDSSDocument(
+					trustedListSignatureService.signDocument(toSignDocument, parameters, signatureValue));
 		} catch (Exception e) {
 			throwException("Unable to sign the document", e);
 		}
@@ -163,6 +288,7 @@ public class SigningTask extends Task<DSSDocument> {
 		String exceptionMessage = message + ((e != null) ? " : " + e.getMessage() : "");
 		updateMessage(exceptionMessage);
 		failed();
+		updateProgress(0, 100);
 		throw new ApplicationException(exceptionMessage, e);
 	}
 

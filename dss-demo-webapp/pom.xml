@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.10.1</version>
+		<version>5.11.RC1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -431,7 +431,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>highlightjs</artifactId>
-			<version>10.1.2</version>
+			<version>11.5.0</version>
 		</dependency>
 
 		<!-- http://tomcat.apache.org/whichversion.html -->
@@ -445,7 +445,7 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.1.Final</version>
+			<version>6.2.3.Final</version> <!-- 6 version to be used until javax to jakarta update -->
 		</dependency>
 		
 		<dependency>
@@ -461,7 +461,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
-			<version>9.0.62</version>
+			<version>9.0.64</version>
 			<scope>test</scope>
 		</dependency>
 
