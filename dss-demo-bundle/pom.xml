@@ -18,7 +18,7 @@
 	<properties>
 		<jre.download.link>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jre_x86-32_windows_hotspot_8u292b10.zip</jre.download.link>
 		<jre.root.folder>jdk8u292-b10-jre</jre.root.folder>
-		<tomcat.version>8.5.81</tomcat.version>
+		<tomcat.version>9.0.65</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
