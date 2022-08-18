@@ -1,12 +1,11 @@
 package eu.europa.esig.dss.web.config;
 
+import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
+import eu.europa.esig.dss.service.http.proxy.ProxyProperties;
 import eu.europa.esig.dss.utils.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
-import eu.europa.esig.dss.service.http.proxy.ProxyProperties;
 
 import java.util.Collection;
 
@@ -25,7 +24,7 @@ public class ProxyConfiguration {
 	private String httpUser;
 	@Value("${proxy.http.password:}")
 	private String httpPassword;
-	@Value("${proxy.http.exclude:}")
+	@Value("#{T(java.util.Arrays).asList('${proxy.http.exclude:}')}")
 	private Collection<String> httpExcludedHosts;
 
 	@Value("${proxy.https.enabled:false}")
@@ -40,7 +39,7 @@ public class ProxyConfiguration {
 	private String httpsUser;
 	@Value("${proxy.https.password:}")
 	private String httpsPassword;
-	@Value("${proxy.https.exclude:}")
+	@Value("#{T(java.util.Arrays).asList('${proxy.https.exclude:}')}")
 	private Collection<String> httpsExcludedHosts;
 
 	@Bean
