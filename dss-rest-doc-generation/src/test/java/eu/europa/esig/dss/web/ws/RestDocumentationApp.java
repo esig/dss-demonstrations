@@ -13,6 +13,7 @@ import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
 import eu.europa.esig.dss.ws.converter.ColorConverter;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
@@ -25,10 +26,14 @@ import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignExternalCmsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.PDFExternalMessageDigestDTO;
+import eu.europa.esig.dss.ws.signature.dto.PDFExternalSignDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignMessageDigestExternalCmsDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
@@ -71,6 +76,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -587,6 +593,80 @@ public class RestDocumentationApp {
 			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
 			assertNotNull(signedDocument);
 			assertNotNull(signedDocument.getBytes());
+		}
+	}
+
+	@Test
+	public void padesWithExternalCms() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/sample.pdf"));
+			RemoteDocument tlToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteSignatureParameters padesParameters = new RemoteSignatureParameters();
+			padesParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+
+			// get message-digest
+			PDFExternalMessageDigestDTO pdfExternalMessageDigestDTO = new PDFExternalMessageDigestDTO(tlToSign, padesParameters);
+			Response responseMessageDigest = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(pdfExternalMessageDigestDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/pades-external-cms/getMessageDigest");
+			responseMessageDigest.then().assertThat().statusCode(equalTo(200));
+			DigestDTO messageDigest = responseMessageDigest.andReturn().as(DigestDTO.class);
+			assertNotNull(messageDigest);
+			assertNotNull(messageDigest.getAlgorithm());
+			assertTrue(Utils.isArrayNotEmpty(messageDigest.getValue()));
+
+			RemoteSignatureParameters cmsParameters = new RemoteSignatureParameters();
+			cmsParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+			cmsParameters.setSigningCertificate(signingCertificate);
+
+			Date signingTime = DSSUtils.getUtcDate(2021, 9, 3);
+			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
+			bLevelParameters.setSigningDate(signingTime);
+			cmsParameters.setBLevelParams(bLevelParameters);
+
+			// get DTBS
+			DataToSignExternalCmsDTO dataToBeSigned = new DataToSignExternalCmsDTO(messageDigest, cmsParameters);
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(dataToBeSigned, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/external-cms/getDataToSign");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(toBeSignedDTO);
+			assertTrue(Utils.isArrayNotEmpty(toBeSignedDTO.getBytes()));
+
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(toBeSignedDTO),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			// sign message-digest
+			SignMessageDigestExternalCmsDTO signMessageDigestExternalCmsDTO = new SignMessageDigestExternalCmsDTO(messageDigest, cmsParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			Response responseSignMessageDigest = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(signMessageDigestExternalCmsDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/external-cms/signMessageDigest");
+			responseSignMessageDigest.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument cmsSignature = responseSignMessageDigest.andReturn().as(RemoteDocument.class);
+			assertNotNull(cmsSignature);
+			assertTrue(Utils.isArrayNotEmpty(cmsSignature.getBytes()));
+
+			// sign document
+			PDFExternalSignDocumentDTO pdfExternalSignDocumentDTO = new PDFExternalSignDocumentDTO(tlToSign, padesParameters, cmsSignature);
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(pdfExternalSignDocumentDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/pades-external-cms/signDocument");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertTrue(Utils.isArrayNotEmpty(signedDocument.getBytes()));
 		}
 	}
 

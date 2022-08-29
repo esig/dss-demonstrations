@@ -6,7 +6,9 @@ import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.pades.signature.ExternalCMSService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
+import eu.europa.esig.dss.pades.signature.PAdESWithExternalCMSService;
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
@@ -35,7 +37,11 @@ import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationS
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSService;
+import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSService;
+import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
@@ -281,6 +287,35 @@ public class DSSBeanConfig {
 		RemoteTrustedListSignatureServiceImpl service = new RemoteTrustedListSignatureServiceImpl();
 		service.setXadesService(xadesService());
 		return service;
+	}
+
+	@Bean
+	public RemotePAdESWithExternalCMSService remotePadesWithExternalCmsService() {
+		RemotePAdESWithExternalCMSServiceImpl service = new RemotePAdESWithExternalCMSServiceImpl();
+		service.setService(padesWithExternalCmsService());
+		return service;
+	}
+
+	@Bean
+	public PAdESWithExternalCMSService padesWithExternalCmsService() {
+		PAdESWithExternalCMSService padesWithExternalCMSService = new PAdESWithExternalCMSService();
+		padesWithExternalCMSService.setCertificateVerifier(certificateVerifier());
+		padesWithExternalCMSService.setTspSource(tspSource);
+		return padesWithExternalCMSService;
+	}
+
+	@Bean
+	public RemoteExternalCMSService remoteExternalCmsService() {
+		RemoteExternalCMSServiceImpl service = new RemoteExternalCMSServiceImpl();
+		service.setService(externalCmsService());
+		return service;
+	}
+
+	@Bean
+	public ExternalCMSService externalCmsService() {
+		ExternalCMSService externalCMSService = new ExternalCMSService(certificateVerifier());
+		externalCMSService.setTspSource(tspSource);
+		return externalCMSService;
 	}
 
 	@Bean

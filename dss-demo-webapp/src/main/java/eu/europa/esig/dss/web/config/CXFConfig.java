@@ -16,20 +16,31 @@ import eu.europa.esig.dss.ws.server.signing.rest.client.RestSignatureTokenConnec
 import eu.europa.esig.dss.ws.server.signing.soap.SoapSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.server.signing.soap.client.SoapSignatureTokenConnection;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSService;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSService;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.RestDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.rest.RestExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestMultipleDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.rest.RestPAdESWithExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestExternalCMSService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestPAdESWithExternalCMSService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.SoapDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.soap.SoapExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.soap.SoapPAdESWithExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.soap.client.SoapExternalCMSService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
+import eu.europa.esig.dss.ws.signature.soap.client.SoapPAdESWithExternalCMSService;
+import eu.europa.esig.dss.ws.signature.soap.client.SoapTrustedListSignatureService;
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.timestamp.remote.rest.RestTimestampServiceImpl;
 import eu.europa.esig.dss.ws.timestamp.remote.rest.client.RestTimestampService;
@@ -67,6 +78,8 @@ public class CXFConfig {
 	public static final String SOAP_SIGNATURE_ONE_DOCUMENT = "/soap/signature/one-document";
 	public static final String SOAP_SIGNATURE_MULTIPLE_DOCUMENTS = "/soap/signature/multiple-documents";
 	public static final String SOAP_SIGNATURE_TRUSTED_LIST = "/soap/signature/trusted-list";
+	public static final String SOAP_SIGNATURE_PAdES_WITH_EXTERNAL_CMS = "/soap/signature/pades-external-cms";
+	public static final String SOAP_SIGNATURE_EXTERNAL_CMS = "/soap/signature/external-cms";
 	public static final String SOAP_VALIDATION = "/soap/validation";
 	public static final String SOAP_CERTIFICATE_VALIDATION = "/soap/certificate-validation";
 	public static final String SOAP_SERVER_SIGNING = "/soap/server-signing";
@@ -75,6 +88,8 @@ public class CXFConfig {
 	public static final String REST_SIGNATURE_ONE_DOCUMENT = "/rest/signature/one-document";
 	public static final String REST_SIGNATURE_MULTIPLE_DOCUMENTS = "/rest/signature/multiple-documents";
 	public static final String REST_SIGNATURE_TRUSTED_LIST = "/rest/signature/trusted-list";
+	public static final String REST_SIGNATURE_PAdES_WITH_EXTERNAL_CMS = "/rest/signature/pades-external-cms";
+	public static final String REST_SIGNATURE_EXTERNAL_CMS = "/rest/signature/external-cms";
 	public static final String REST_VALIDATION = "/rest/validation";
 	public static final String REST_CERTIFICATE_VALIDATION = "/rest/certificate-validation";
 	public static final String REST_SERVER_SIGNING = "/rest/server-signing";
@@ -100,6 +115,12 @@ public class CXFConfig {
 
 	@Autowired
 	private RemoteTrustedListSignatureService remoteTrustedListSignatureService;
+
+	@Autowired
+	private RemotePAdESWithExternalCMSService remotePadesWithExternalCmsService;
+
+	@Autowired
+	private RemoteExternalCMSService remoteExternalCmsService;
 
 	@Autowired
 	private RemoteDocumentValidationService remoteValidationService;
@@ -143,9 +164,23 @@ public class CXFConfig {
 	}
 
 	@Bean
-	public SoapTrustedListSignatureServiceImpl soapTrustedListSignatureService() {
+	public SoapTrustedListSignatureService soapTrustedListSignatureService() {
 		SoapTrustedListSignatureServiceImpl service = new SoapTrustedListSignatureServiceImpl();
 		service.setService(remoteTrustedListSignatureService);
+		return service;
+	}
+
+	@Bean
+	public SoapPAdESWithExternalCMSService soapPadesWithExternalCmsService() {
+		SoapPAdESWithExternalCMSServiceImpl service = new SoapPAdESWithExternalCMSServiceImpl();
+		service.setService(remotePadesWithExternalCmsService);
+		return service;
+	}
+
+	@Bean
+	public SoapExternalCMSService soapExternalCmsService() {
+		SoapExternalCMSServiceImpl service = new SoapExternalCMSServiceImpl();
+		service.setService(remoteExternalCmsService);
 		return service;
 	}
 
@@ -199,6 +234,24 @@ public class CXFConfig {
 	public Endpoint createSoapTrustedListSignatureEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(bus, soapTrustedListSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_TRUSTED_LIST);
+		addXmlAdapterDate(endpoint);
+		enableMTOM(endpoint);
+		return endpoint;
+	}
+
+	@Bean
+	public Endpoint createPadesWithExternalCmsEndpoint() {
+		EndpointImpl endpoint = new EndpointImpl(bus, soapPadesWithExternalCmsService());
+		endpoint.publish(SOAP_SIGNATURE_PAdES_WITH_EXTERNAL_CMS);
+		addXmlAdapterDate(endpoint);
+		enableMTOM(endpoint);
+		return endpoint;
+	}
+
+	@Bean
+	public Endpoint createExternalCmsEndpoint() {
+		EndpointImpl endpoint = new EndpointImpl(bus, soapExternalCmsService());
+		endpoint.publish(SOAP_SIGNATURE_EXTERNAL_CMS);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -267,6 +320,20 @@ public class CXFConfig {
 	public RestTrustedListSignatureService restTrustedListSignatureService() {
 		RestTrustedListSignatureServiceImpl service = new RestTrustedListSignatureServiceImpl();
 		service.setService(remoteTrustedListSignatureService);
+		return service;
+	}
+
+	@Bean
+	public RestPAdESWithExternalCMSService restPadesWithExternalCmsService() {
+		RestPAdESWithExternalCMSServiceImpl service = new RestPAdESWithExternalCMSServiceImpl();
+		service.setService(remotePadesWithExternalCmsService);
+		return service;
+	}
+
+	@Bean
+	public RestExternalCMSService restExternalCmsService() {
+		RestExternalCMSServiceImpl service = new RestExternalCMSServiceImpl();
+		service.setService(remoteExternalCmsService);
 		return service;
 	}
 
@@ -369,6 +436,28 @@ public class CXFConfig {
 		JAXRSServerFactoryBean sfb = new JAXRSServerFactoryBean();
 		sfb.setServiceBean(restTrustedListSignatureService());
 		sfb.setAddress(REST_SIGNATURE_TRUSTED_LIST);
+		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		return sfb.create();
+	}
+
+	@Bean
+	public Server createPadesWithExternalCmsRestService() {
+		JAXRSServerFactoryBean sfb = new JAXRSServerFactoryBean();
+		sfb.setServiceBean(restPadesWithExternalCmsService());
+		sfb.setAddress(REST_SIGNATURE_PAdES_WITH_EXTERNAL_CMS);
+		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		return sfb.create();
+	}
+
+	@Bean
+	public Server createExternalCmsRestService() {
+		JAXRSServerFactoryBean sfb = new JAXRSServerFactoryBean();
+		sfb.setServiceBean(restExternalCmsService());
+		sfb.setAddress(REST_SIGNATURE_EXTERNAL_CMS);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
 		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
