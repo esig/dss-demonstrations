@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,10 +75,10 @@ public abstract class AbstractValidationController {
 		model.addAttribute(ALL_REVOCATION_DATA_ATTRIBUTE, buildTokenDtos(diagnosticData.getAllRevocationData()));
 
 		// Get Timestamps for which binaries are available
-		model.addAttribute(ALL_TIMESTAMPS_ATTRIBUTE, buildTokenDtos(diagnosticData.getTimestampSet()));
+		model.addAttribute(ALL_TIMESTAMPS_ATTRIBUTE, buildTokenDtos(diagnosticData.getTimestampList()));
 	}
 
-	private Set<TokenDTO> buildTokenDtos(Set<? extends AbstractTokenProxy> abstractTokens) {
+	private Set<TokenDTO> buildTokenDtos(Collection<? extends AbstractTokenProxy> abstractTokens) {
 		Set<TokenDTO> tokenDtos = new HashSet<>();
 		for (AbstractTokenProxy token : abstractTokens) {
 			if (token.getBinaries() != null) {
