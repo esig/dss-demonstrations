@@ -7,7 +7,7 @@ import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
@@ -701,7 +701,7 @@ public class SignatureController implements Initializable {
 		fileChooser.setInitialFileName(signedDocument.getName());
 		MimeType mimeType = signedDocument.getMimeType();
 		
-		String extension = MimeType.getExtension(mimeType);
+		String extension = mimeType.getExtension();
 		String filterPattern = extension != null ? "*." + extension : "*";
 		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(), filterPattern);
 		fileChooser.getExtensionFilters().add(extFilter);

@@ -3,7 +3,7 @@ package eu.europa.esig.dss.web.controller;
 import eu.europa.esig.dss.asic.common.merge.ASiCContainerMerger;
 import eu.europa.esig.dss.asic.common.merge.DefaultContainerMerger;
 import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.ContainerMergeForm;

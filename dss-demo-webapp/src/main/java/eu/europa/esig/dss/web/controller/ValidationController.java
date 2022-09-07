@@ -7,11 +7,11 @@ import eu.europa.esig.dss.diagnostic.RevocationWrapper;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.MimeTypeEnum;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
 import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
@@ -219,7 +219,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		try {
-			response.setContentType(MimeType.PDF.getMimeTypeString());
+			response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
 
 			fopService.generateSimpleReport(simpleReport, response.getOutputStream());
@@ -236,7 +236,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		try {
-			response.setContentType(MimeType.PDF.getMimeTypeString());
+			response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Detailed-report.pdf");
 
 			fopService.generateDetailedReport(detailedReport, response.getOutputStream());
@@ -253,7 +253,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		try {
-			response.setContentType(MimeType.XML.getMimeTypeString());
+			response.setContentType(MimeTypeEnum.XML.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
 			Utils.copy(new ByteArrayInputStream(diagnosticData.getBytes()), response.getOutputStream());
 		} catch (IOException e) {
@@ -269,7 +269,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf(MimeType.SVG.getMimeTypeString()));
+		headers.setContentType(MediaType.valueOf(MimeTypeEnum.SVG.getMimeTypeString()));
 		ResponseEntity<String> svgEntity = new ResponseEntity<>(xsltService.generateSVG(diagnosticData), headers,
 				HttpStatus.OK);
 		return svgEntity;
@@ -287,7 +287,7 @@ public class ValidationController extends AbstractValidationController {
 		String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
 		String filename = DSSUtils.getNormalizedString(certificate.getReadableCertificateName()) + ".cer";
 
-		addTokenToResponse(response, filename, MimeType.CER, pemCert.getBytes());
+		addTokenToResponse(response, filename, pemCert.getBytes());
 	}
 
 	@RequestMapping(value = "/download-revocation")
@@ -301,11 +301,9 @@ public class ValidationController extends AbstractValidationController {
 			throw new SourceNotFoundException(message);
 		}
 		String filename = revocationData.getId();
-		MimeType mimeType;
 		byte[] binaries;
 
 		if (RevocationType.CRL.equals(revocationData.getRevocationType())) {
-			mimeType = MimeType.CRL;
 			filename += ".crl";
 
 			if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
@@ -317,12 +315,11 @@ public class ValidationController extends AbstractValidationController {
 				binaries = revocationData.getBinaries();
 			}
 		} else {
-			mimeType = MimeType.BINARY;
 			filename += ".ocsp";
 			binaries = revocationData.getBinaries();
 		}
 
-		addTokenToResponse(response, filename, mimeType, binaries);
+		addTokenToResponse(response, filename, binaries);
 	}
 
 	@RequestMapping(value = "/download-timestamp")
@@ -348,7 +345,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		String filename = type.name() + ".tst";
-		addTokenToResponse(response, filename, MimeType.TST, binaries);
+		addTokenToResponse(response, filename, binaries);
 	}
 
 	protected DiagnosticData getDiagnosticData(HttpSession session) {
@@ -365,8 +362,8 @@ public class ValidationController extends AbstractValidationController {
 		return null;
 	}
 
-	protected void addTokenToResponse(HttpServletResponse response, String filename, MimeType mimeType, byte[] binaries) {
-		response.setContentType(MimeType.TST.getMimeTypeString());
+	protected void addTokenToResponse(HttpServletResponse response, String filename, byte[] binaries) {
+		response.setContentType(MimeTypeEnum.TST.getMimeTypeString());
 		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 		try (InputStream is = new ByteArrayInputStream(binaries); OutputStream os = response.getOutputStream()) {
 			Utils.copy(is, os);
