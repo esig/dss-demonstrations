@@ -65,7 +65,7 @@ import java.security.KeyStore.PasswordProtection;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
+@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
 		SchedulingConfig.class })
 @ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {

@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -304,6 +304,7 @@ public class SigningService {
 		return result;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters fillParameters(SignatureMultipleDocumentsForm form) {
 		AbstractSignatureParameters finalParameters = getASiCSignatureParameters(form.getContainerType(), form.getSignatureForm());
 
@@ -312,6 +313,7 @@ public class SigningService {
 		return finalParameters;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters fillParameters(SignatureDocumentForm form) {
 		AbstractSignatureParameters parameters = getSignatureParameters(form.getContainerType(), form.getSignatureForm());
 		parameters.setSignaturePackaging(form.getSignaturePackaging());
@@ -321,6 +323,7 @@ public class SigningService {
 		return parameters;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters fillParameters(SignatureDigestForm form) {
 		AbstractSignatureParameters parameters = getSignatureParameters(null, form.getSignatureForm());
 		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
@@ -343,6 +346,7 @@ public class SigningService {
 		return parameters;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
     private SerializableCounterSignatureParameters fillParameters(CounterSignatureForm form) {
         SerializableCounterSignatureParameters parameters = getCounterSignatureParameters(form.getSignatureForm());
         parameters.setSignatureIdToCounterSign(form.getSignatureIdToCounterSign());
@@ -354,6 +358,7 @@ public class SigningService {
         return parameters;
     }
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void fillParameters(AbstractSignatureParameters parameters, AbstractSignatureForm form) {
 		parameters.setSignatureLevel(form.getSignatureLevel());
 		parameters.setDigestAlgorithm(form.getDigestAlgorithm());
@@ -363,7 +368,8 @@ public class SigningService {
 		parameters.setSignWithExpiredCertificate(form.isSignWithExpiredCertificate());
 
 		if (form.getContentTimestamp() != null) {
-			parameters.setContentTimestamps(Arrays.asList(WebAppUtils.toTimestampToken(form.getContentTimestamp())));
+			parameters.setContentTimestamps(
+					Collections.singletonList(WebAppUtils.toTimestampToken(form.getContentTimestamp())));
 		}
 
 		CertificateToken signingCertificate = DSSUtils.loadCertificate(form.getCertificate());
@@ -381,6 +387,7 @@ public class SigningService {
 		fillTimestampParameters(parameters, form);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void fillTimestampParameters(AbstractSignatureParameters parameters, AbstractSignatureForm form) {
 		SignatureForm signatureForm = form.getSignatureForm();
 
@@ -545,6 +552,7 @@ public class SigningService {
         return service;
     }
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters getSignatureParameters(ASiCContainerType containerType, SignatureForm signatureForm) {
 		AbstractSignatureParameters parameters = null;
 		if (containerType != null) {
@@ -648,6 +656,7 @@ public class SigningService {
 		return service;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters getASiCSignatureParameters(ASiCContainerType containerType, SignatureForm signatureForm) {
 		AbstractSignatureParameters parameters = null;
 		switch (signatureForm) {
