@@ -1,16 +1,19 @@
 package eu.europa.esig.dss.web.model;
 
-import javax.validation.constraints.NotNull;
-
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.utils.Utils;
+import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Represents an uploaded document.
+ * Either {@code completeFile} or {@code filename} and {@code base64Digest} and {@code digestAlgorithm} shall be present.
+ *
+ */
 public class OriginalFile {
 
-	@NotNull
-	private String filename;
+	private MultipartFile completeFile;
 
-	private String base64Complete;
+	private String filename;
 
 	private String base64Digest;
 
@@ -19,20 +22,20 @@ public class OriginalFile {
 	public OriginalFile() {
 	}
 
+	public MultipartFile getCompleteFile() {
+		return completeFile;
+	}
+
+	public void setCompleteFile(MultipartFile completeFile) {
+		this.completeFile = completeFile;
+	}
+
 	public String getFilename() {
 		return filename;
 	}
 
 	public void setFilename(String filename) {
 		this.filename = filename;
-	}
-
-	public String getBase64Complete() {
-		return base64Complete;
-	}
-
-	public void setBase64Complete(String base64Complete) {
-		this.base64Complete = base64Complete;
 	}
 
 	public String getBase64Digest() {
@@ -52,9 +55,10 @@ public class OriginalFile {
 	}
 
 	public boolean isNotEmpty() {
-		boolean filedCompleteFile = Utils.isStringNotEmpty(base64Complete) && Utils.isBase64Encoded(base64Complete);
-		boolean filedDigest = digestAlgorithm != null && Utils.isStringNotEmpty(base64Digest) && Utils.isBase64Encoded(base64Digest);
-		return filedCompleteFile || filedDigest;
+		boolean filledCompleteFile = completeFile != null && !completeFile.isEmpty();
+		boolean filledFilename = Utils.isStringNotEmpty(filename);
+		boolean filledDigest = digestAlgorithm != null && Utils.isStringNotEmpty(base64Digest) && Utils.isBase64Encoded(base64Digest);
+		return filledCompleteFile || (filledFilename && filledDigest);
 	}
 
 }

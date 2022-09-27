@@ -71,12 +71,12 @@ public final class WebAppUtils {
 			for (OriginalFile originalDocument : originalFiles) {
 				if (originalDocument.isNotEmpty()) {
 					DSSDocument dssDocument;
-					if (Utils.isStringNotEmpty(originalDocument.getBase64Complete())) {
-						dssDocument = new InMemoryDocument(Utils.fromBase64(originalDocument.getBase64Complete()));
+					if (originalDocument.getCompleteFile() != null) {
+						dssDocument = WebAppUtils.toDSSDocument(originalDocument.getCompleteFile());
 					} else {
-						dssDocument = new DigestDocument(originalDocument.getDigestAlgorithm(), originalDocument.getBase64Digest());
+						dssDocument = new DigestDocument(originalDocument.getDigestAlgorithm(),
+								originalDocument.getBase64Digest(), originalDocument.getFilename());
 					}
-					dssDocument.setName(originalDocument.getFilename());
 					dssDocuments.add(dssDocument);
 					LOG.debug("OriginalDocument with name {} added", originalDocument.getFilename());
 				}
