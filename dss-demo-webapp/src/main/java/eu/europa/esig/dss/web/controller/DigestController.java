@@ -2,11 +2,11 @@ package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -16,8 +16,8 @@ import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
+import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureDigestForm;
-import eu.europa.esig.dss.web.model.SignatureValueAsString;
 import eu.europa.esig.dss.web.service.SigningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
@@ -115,9 +114,10 @@ public class DigestController {
 	@ResponseBody
 	public GetDataToSignResponse getDataToSign(Model model, @RequestBody @Valid DataToSignParams params,
 			@ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
-		signatureDigestForm.setBase64Certificate(params.getSigningCertificate());
-		signatureDigestForm.setBase64CertificateChain(params.getCertificateChain());
-		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		signatureDigestForm.setCertificate(params.getSigningCertificate());
+		signatureDigestForm.setCertificateChain(params.getCertificateChain());
+
+		CertificateToken signingCertificate = DSSUtils.loadCertificate(params.getSigningCertificate());
 		signatureDigestForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		signatureDigestForm.setSigningDate(new Date());
 
@@ -133,16 +133,16 @@ public class DigestController {
 		}
 
 		GetDataToSignResponse responseJson = new GetDataToSignResponse();
-		responseJson.setDataToSign(DatatypeConverter.printBase64Binary(dataToSign.getBytes()));
+		responseJson.setDataToSign(dataToSign.getBytes());
 		return responseJson;
 	}
 
 	@RequestMapping(value = "/sign-document", method = RequestMethod.POST)
 	@ResponseBody
-	public SignDocumentResponse signDigest(Model model, @RequestBody @Valid SignatureValueAsString signatureValue,
+	public SignDocumentResponse signDigest(Model model, @RequestBody @Valid SignResponse signatureValue,
 			@ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
 
-		signatureDigestForm.setBase64SignatureValue(signatureValue.getSignatureValue());
+		signatureDigestForm.setSignatureValue(signatureValue.getSignatureValue());
 
 		DSSDocument document = signingService.signDigest(signatureDigestForm);
 		InMemoryDocument signedDocument = new InMemoryDocument(DSSUtils.toByteArray(document), document.getName(), document.getMimeType());

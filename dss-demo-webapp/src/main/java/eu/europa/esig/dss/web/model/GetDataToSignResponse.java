@@ -2,13 +2,13 @@ package eu.europa.esig.dss.web.model;
 
 public class GetDataToSignResponse {
 
-	private String dataToSign;
+	private byte[] dataToSign;
 
-	public String getDataToSign() {
+	public byte[] getDataToSign() {
 		return dataToSign;
 	}
 
-	public void setDataToSign(String dataToSign) {
+	public void setDataToSign(byte[] dataToSign) {
 		this.dataToSign = dataToSign;
 	}
 

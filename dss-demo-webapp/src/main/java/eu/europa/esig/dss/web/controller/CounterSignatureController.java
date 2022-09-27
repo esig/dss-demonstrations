@@ -2,12 +2,12 @@ package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -23,7 +23,7 @@ import eu.europa.esig.dss.web.model.CounterSignatureHelperResponse;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
-import eu.europa.esig.dss.web.model.SignatureValueAsString;
+import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.service.SigningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -127,9 +126,10 @@ public class CounterSignatureController {
 	@ResponseBody
 	public GetDataToSignResponse getDataToCounterSign(Model model, @RequestBody @Valid DataToSignParams params,
 			@ModelAttribute("counterSignatureForm") @Valid CounterSignatureForm counterSignatureForm, BindingResult result) {
-		counterSignatureForm.setBase64Certificate(params.getSigningCertificate());
-		counterSignatureForm.setBase64CertificateChain(params.getCertificateChain());
-		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		counterSignatureForm.setCertificate(params.getSigningCertificate());
+		counterSignatureForm.setCertificateChain(params.getCertificateChain());
+
+		CertificateToken signingCertificate = DSSUtils.loadCertificate(params.getSigningCertificate());
 		counterSignatureForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		counterSignatureForm.setSigningDate(new Date());
 
@@ -141,16 +141,16 @@ public class CounterSignatureController {
 		}
 
 		GetDataToSignResponse responseJson = new GetDataToSignResponse();
-		responseJson.setDataToSign(DatatypeConverter.printBase64Binary(dataToSign.getBytes()));
+		responseJson.setDataToSign(dataToSign.getBytes());
 		return responseJson;
 	}
 
 	@RequestMapping(value = "/sign-document", method = RequestMethod.POST)
 	@ResponseBody
-	public SignDocumentResponse counterSignSignature(Model model, @RequestBody @Valid SignatureValueAsString signatureValue,
+	public SignDocumentResponse counterSignSignature(Model model, @RequestBody @Valid SignResponse signatureValue,
 			@ModelAttribute("counterSignatureForm") @Valid CounterSignatureForm counterSignatureForm, BindingResult result) {
 
-		counterSignatureForm.setBase64SignatureValue(signatureValue.getSignatureValue());
+		counterSignatureForm.setSignatureValue(signatureValue.getSignatureValue());
 
 		DSSDocument document = signingService.counterSignSignature(counterSignatureForm);
 		InMemoryDocument signedDocument = new InMemoryDocument(DSSUtils.toByteArray(document), document.getName(), document.getMimeType());
