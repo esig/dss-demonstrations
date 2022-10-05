@@ -1,4 +1,4 @@
-package eu.europa.esig.dss.standalone;
+package eu.europa.esig.dss.standalone.service;
 
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;

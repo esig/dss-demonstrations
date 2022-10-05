@@ -2,14 +2,17 @@ package eu.europa.esig.dss.standalone.task;
 
 import eu.europa.esig.dss.DomUtils;
 import eu.europa.esig.dss.definition.xmldsig.XMLDSigElement;
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
+import eu.europa.esig.dss.enumerations.SigDMechanism;
+import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
-import eu.europa.esig.dss.standalone.RemoteDocumentSignatureServiceBuilder;
-import eu.europa.esig.dss.standalone.RemoteTrustedListSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.service.RemoteDocumentSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.service.RemoteTrustedListSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
@@ -127,6 +130,10 @@ public class SigningTask extends Task<DSSDocument> {
 		}
 		if (isXmlManifestSigning()) {
 			parameters.setManifestSignature(true);
+		}
+		if (SignatureForm.JAdES.equals(model.getSignatureForm())) {
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION); // allow extension
+			parameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH); // to be used by default
 		}
 
 		return parameters;

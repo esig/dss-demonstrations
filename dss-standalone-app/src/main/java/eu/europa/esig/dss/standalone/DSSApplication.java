@@ -1,15 +1,14 @@
 package eu.europa.esig.dss.standalone;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.standalone.controller.SignatureController;
+import eu.europa.esig.dss.standalone.controller.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DSSApplication extends Application {
 
@@ -31,14 +30,15 @@ public class DSSApplication extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(DSSApplication.class.getResource("/fxml/screen.fxml"));
-			Pane pane = loader.load();
-			
-			Scene scene = new Scene(pane, 1050, 420);
+
+			Pane view = loader.load();
+
+			Scene scene = new Scene(view, 1000, 460);
 			scene.getStylesheets().add("/styles/style.css");
 			stage.setScene(scene);
 			stage.show();
 
-			SignatureController controller = loader.getController();
+			MainController controller = loader.getController();
 			controller.setStage(stage);
 		} catch (Exception e) {
 			LOG.error("Unable to init layout : " + e.getMessage(), e);

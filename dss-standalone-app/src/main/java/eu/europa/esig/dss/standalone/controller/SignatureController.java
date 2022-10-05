@@ -7,15 +7,11 @@ import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
-import eu.europa.esig.dss.standalone.task.JobBuilder;
-import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
+import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.SigningTask;
-import eu.europa.esig.dss.tsl.job.TLValidationJob;
-import eu.europa.esig.dss.utils.Utils;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -25,7 +21,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -39,27 +34,24 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class SignatureController implements Initializable {
+public class SignatureController extends AbstractController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
 	
-	private final String nbCertificatesTest = "Number of Trusted Certificates : ";
-	
-	private final List<DigestAlgorithm> supportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
+	private static final List<DigestAlgorithm> SUPPORTED_DIGEST_ALGORITHMS = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
 			DigestAlgorithm.SHA384, DigestAlgorithm.SHA512, DigestAlgorithm.SHA3_224, DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512);
 	
 	/** A list of DigestAlgorithms supported by the current chosen SignatureFormat */
@@ -173,29 +165,11 @@ public class SignatureController implements Initializable {
 	@FXML
 	private ProgressIndicator progressSign;
 	
-	@FXML
-	private Button refreshLOTL;
-	
-	@FXML
-	private HBox refreshBox;
-	
-	@FXML
-	private Label nbCertificates;
-	
 	private ProgressIndicator progressRefreshLOTL;
-	
-	private JobBuilder jobBuilder;
-	
-	private TLValidationJob tlValidationJob;
 		
 	private Stage stage;
 
 	private SignatureModel model;
-			
-	static {
-		// Fix a freeze in Windows 10, JDK 8 and touchscreen
-		System.setProperty("glass.accessible.force", "false");
-	}
 
 	public void setStage(Stage stage) {
 		this.stage = stage;
@@ -204,13 +178,6 @@ public class SignatureController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		model = new SignatureModel();
-
-		//Create JobBuilder && TLValidationJob
-		jobBuilder = new JobBuilder();
-		tlValidationJob = jobBuilder.job();
-		tlValidationJob.offlineRefresh();
-		warningLabel.setVisible(false);
-		updateLabelText();
 		
 		// Allows to collapse items
 		hPkcsFile.managedProperty().bind(hPkcsFile.visibleProperty());
@@ -289,7 +256,7 @@ public class SignatureController implements Initializable {
 			}
 		});
 		
-		for (DigestAlgorithm digestAlgo : supportedDigestAlgorithms) {
+		for (DigestAlgorithm digestAlgo : SUPPORTED_DIGEST_ALGORITHMS) {
 			RadioButton rb = new RadioButton(digestAlgo.getName());
 			rb.setUserData(digestAlgo);
 			rb.setToggleGroup(toggleDigestAlgo);
@@ -365,15 +332,16 @@ public class SignatureController implements Initializable {
 				.or(model.signatureFormProperty().isNull()).or(model.digestAlgorithmProperty().isNull())
 				.or(model.tokenTypeProperty().isNull());
 
-		BooleanBinding isASiCorPackagingPresent = model.asicContainerTypeProperty().isNull()
+		BooleanBinding isPackagingEmpty = model.asicContainerTypeProperty().isNull()
 				.and(model.signaturePackagingProperty().isNull());
 
 		BooleanBinding isEmptyFileOrPassword = model.pkcsFileProperty().isNull().or(model.passwordProperty().isEmpty());
 
-		BooleanBinding isPKCSIncomplete = model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11)
-				.or(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12)).and(isEmptyFileOrPassword);
+		BooleanBinding isPKCSToken = model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11)
+				.or(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
+		BooleanBinding isPKCSIncomplete = isPKCSToken.and(isEmptyFileOrPassword);
 
-		final BooleanBinding disableSignButton = isMandatoryFieldsEmpty.or(isASiCorPackagingPresent)
+		final BooleanBinding disableSignButton = isMandatoryFieldsEmpty.or(isPackagingEmpty)
 				.or(isPKCSIncomplete);
 
 		signButton.disableProperty().bind(disableSignButton);
@@ -386,7 +354,7 @@ public class SignatureController implements Initializable {
 				final Service<DSSDocument> service = new Service<>() {
 					@Override
 					protected Task<DSSDocument> createTask() {
-						return new SigningTask(model, jobBuilder.getCertificateSources());
+						return new SigningTask(model, TLValidationJobExecutor.getInstance().getCertificateSources());
 					}
 				};
 				service.setOnSucceeded(new EventHandler<>() {
@@ -403,6 +371,7 @@ public class SignatureController implements Initializable {
 						String errorMessage = "Oops an error occurred : " + service.getMessage();
 						LOG.error(errorMessage, service.getException());
 						Alert alert = new Alert(AlertType.ERROR, errorMessage, ButtonType.CLOSE);
+						alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 						alert.showAndWait();
 						signButton.disableProperty().bind(disableSignButton);
 						model.setPassword(null);
@@ -415,56 +384,6 @@ public class SignatureController implements Initializable {
 			}
 		});
 
-		
-		refreshLOTL.setOnAction(new EventHandler<>() {
-			@Override
-			public void handle(ActionEvent event) {
-				final RefreshLOTLTask task = new RefreshLOTLTask(tlValidationJob);
-				task.setOnRunning(new EventHandler<>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						warningLabel.setVisible(false);
-						addLoader();
-					}
-				});
-
-				task.setOnSucceeded(new EventHandler<>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						removeLoader();
-						updateLabelText();
-					}
-				});
-
-				task.setOnFailed(new EventHandler<>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						removeLoader();
-						warningLabel.setVisible(true);
-					}
-				});
-
-				//start Task
-				Thread readValThread = new Thread(task);
-				readValThread.setDaemon(true);
-				readValThread.start();
-			}
-		});
-
-	}
-	
-	private void removeLoader() {
-		refreshBox.getChildren().remove(progressRefreshLOTL);
-	}
-	
-	private void addLoader() {
-		removeLoader();
-		progressRefreshLOTL = new ProgressIndicator();
-    	refreshBox.getChildren().add(progressRefreshLOTL);
-	}
-	
-	private void updateLabelText() {
-		nbCertificates.setText(nbCertificatesTest + jobBuilder.getCertificateSources().getNumberOfCertificates());
 	}
 
 	protected void updateSignatureFormForASiC(ASiCContainerType newValue) {
@@ -491,7 +410,7 @@ public class SignatureController implements Initializable {
 		reinitSignaturePackagings();
 		reinitSignatureOptions();
 		
-		sigFormSupportedDigestAlgorithms = supportedDigestAlgorithms;
+		sigFormSupportedDigestAlgorithms = SUPPORTED_DIGEST_ALGORITHMS;
 
 		comboLevel.setDisable(false);
 		comboLevel.getItems().removeAll(comboLevel.getItems());
@@ -499,13 +418,16 @@ public class SignatureController implements Initializable {
 		if (signatureForm != null) {
 			switch (signatureForm) {
 			case CAdES:
-				envelopingRadio.setDisable(false);
-				detachedRadio.setDisable(false);
+				if (model.getAsicContainerType() == null) {
+					envelopingRadio.setDisable(false);
+					detachedRadio.setDisable(false);
+				}
 
 				comboLevel.getItems().addAll(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
 						SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
 				comboLevel.setValue(SignatureLevel.CAdES_BASELINE_B);
 				break;
+
 			case PAdES:
 				envelopedRadio.setDisable(false);
 
@@ -515,14 +437,17 @@ public class SignatureController implements Initializable {
 						SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
 				comboLevel.setValue(SignatureLevel.PAdES_BASELINE_B);
 				break;
-			case XAdES:
-				envelopingRadio.setDisable(false);
-				envelopedRadio.setDisable(false);
-				detachedRadio.setDisable(false);
-				internallyDetachedRadio.setDisable(false);
 
-				tlSigning.setDisable(false);
-				xmlManifest.setDisable(false);
+			case XAdES:
+				if (model.getAsicContainerType() == null) {
+					envelopingRadio.setDisable(false);
+					envelopedRadio.setDisable(false);
+					detachedRadio.setDisable(false);
+					internallyDetachedRadio.setDisable(false);
+
+					tlSigning.setDisable(false);
+					xmlManifest.setDisable(false);
+				}
 				
 				sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
 						DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
@@ -531,6 +456,7 @@ public class SignatureController implements Initializable {
 						SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
 				comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
 				break;
+
 			case JAdES:
 				envelopingRadio.setDisable(false);
 				detachedRadio.setDisable(false);
@@ -540,6 +466,8 @@ public class SignatureController implements Initializable {
 				comboLevel.getItems().addAll(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
 						SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
 				comboLevel.setValue(SignatureLevel.JAdES_BASELINE_B);
+				break;
+
 			default:
 				break;
 			}
@@ -626,7 +554,7 @@ public class SignatureController implements Initializable {
 	private void updateSigTokenType(Toggle newValue) {
 		SignatureTokenType tokenType = (SignatureTokenType) newValue.getUserData();
 		
-		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<>(supportedDigestAlgorithms);
+		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
 		
 		switch (tokenType) {
 			case MSCAPI:
@@ -672,7 +600,7 @@ public class SignatureController implements Initializable {
 	}
 	
 	private void reinitDigestAlgos() {
-		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(supportedDigestAlgorithms);
+		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
 		if (sigFormSupportedDigestAlgorithms != null) {
 			digestAlgos.retainAll(sigFormSupportedDigestAlgorithms);
 		}
@@ -692,27 +620,6 @@ public class SignatureController implements Initializable {
 				if (selectedToggle != null && digestAlgorithm.equals(selectedToggle.getUserData())) {
 					selectedToggle.setSelected(false);
 				}
-			}
-		}
-	}
-
-	private void save(DSSDocument signedDocument) {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(signedDocument.getName());
-		MimeType mimeType = signedDocument.getMimeType();
-		
-		String extension = mimeType.getExtension();
-		String filterPattern = extension != null ? "*." + extension : "*";
-		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(), filterPattern);
-		fileChooser.getExtensionFilters().add(extFilter);
-		File fileToSave = fileChooser.showSaveDialog(stage);
-
-		if (fileToSave != null) {
-			try (FileOutputStream fos = new FileOutputStream(fileToSave)) {
-				Utils.copy(signedDocument.openStream(), fos);
-			} catch (Exception e) {
-				Alert alert = new Alert(AlertType.ERROR, "Unable to save file : " + e.getMessage(), ButtonType.CLOSE);
-				alert.showAndWait();
 			}
 		}
 	}
