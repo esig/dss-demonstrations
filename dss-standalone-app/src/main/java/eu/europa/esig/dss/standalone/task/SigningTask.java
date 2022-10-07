@@ -11,11 +11,12 @@ import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
-import eu.europa.esig.dss.standalone.service.RemoteDocumentSignatureServiceBuilder;
-import eu.europa.esig.dss.standalone.service.RemoteTrustedListSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
+import eu.europa.esig.dss.standalone.service.RemoteDocumentSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.service.RemoteMultipleDocumentSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.service.RemoteTrustedListSignatureServiceBuilder;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
@@ -28,6 +29,7 @@ import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.FutureTask;
+import java.util.stream.Collectors;
 
 public class SigningTask extends Task<DSSDocument> {
 
@@ -56,19 +59,25 @@ public class SigningTask extends Task<DSSDocument> {
 	private final static String TRUSTED_LIST_NAMESPACE = "http://uri.etsi.org/02231/v2#";
 
 	private final SignatureModel model;
-	private final RemoteDocumentSignatureService service;
+	private final RemoteDocumentSignatureService documentsSignatureService;
 
 	private final RemoteTrustedListSignatureService trustedListSignatureService;
+
+	private final RemoteMultipleDocumentsSignatureService multipleDocumentsSignatureService;
 
 	public SigningTask(SignatureModel model, TrustedListsCertificateSource tslCertificateSource) {
 		this.model = model;
 
 		RemoteDocumentSignatureServiceBuilder signatureServiceBuilder = new RemoteDocumentSignatureServiceBuilder();
 		signatureServiceBuilder.setTslCertificateSource(tslCertificateSource);
-		this.service = signatureServiceBuilder.build();
+		this.documentsSignatureService = signatureServiceBuilder.build();
 
 		RemoteTrustedListSignatureServiceBuilder trustedListServiceBuilder = new RemoteTrustedListSignatureServiceBuilder();
 		this.trustedListSignatureService = trustedListServiceBuilder.build();
+
+		RemoteMultipleDocumentSignatureServiceBuilder multipleDocumentSignatureServiceBuilder = new RemoteMultipleDocumentSignatureServiceBuilder();
+		multipleDocumentSignatureServiceBuilder.setTslCertificateSource(tslCertificateSource);
+		this.multipleDocumentsSignatureService = multipleDocumentSignatureServiceBuilder.build();
 	}
 
 	@Override
@@ -83,13 +92,20 @@ public class SigningTask extends Task<DSSDocument> {
 
 		DSSPrivateKeyEntry signer = getSigner(keys);
 
-		FileDocument fileToSign = new FileDocument(model.getFileToSign());
-		RemoteDocument toSignDocument = RemoteDocumentConverter.toRemoteDocument(fileToSign);
+		List<DSSDocument> fileDocuments = model.getFilesToSign().stream().map(FileDocument::new).collect(Collectors.toList());
+		List<RemoteDocument> toSignDocuments = RemoteDocumentConverter.toRemoteDocuments(fileDocuments);
 
 		DSSDocument signedDocument;
-		if (isTLSigning(fileToSign)) {
+		if (Utils.collectionSize(toSignDocuments) > 1) {
+			RemoteSignatureParameters parameters = buildParameters(signer);
+			ToBeSigned toBeSigned = getDataToSign(toSignDocuments, parameters);
+			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
+			signedDocument = signDocument(toSignDocuments, parameters, signatureValue);
+
+		} else if (isTLSigning(fileDocuments.iterator().next())) {
 			RemoteTrustedListSignatureParameters parameters = buildTrustedListParameters(signer);
 
+			RemoteDocument toSignDocument = toSignDocuments.iterator().next();
 			ToBeSigned toBeSigned = getDataToSignTrustedList(toSignDocument, parameters);
 			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
 			signedDocument = signTrustedList(toSignDocument, parameters, signatureValue);
@@ -97,6 +113,7 @@ public class SigningTask extends Task<DSSDocument> {
 		} else {
 			RemoteSignatureParameters parameters = buildParameters(signer);
 
+			RemoteDocument toSignDocument = toSignDocuments.iterator().next();
 			ToBeSigned toBeSigned = getDataToSign(toSignDocument, parameters);
 			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
 			signedDocument = signDocument(toSignDocument, parameters, signatureValue);
@@ -153,7 +170,7 @@ public class SigningTask extends Task<DSSDocument> {
 		return parameters;
 	}
 
-	private boolean isTLSigning(FileDocument toBeSigned) {
+	private boolean isTLSigning(DSSDocument toBeSigned) {
 		SignatureOption signatureOption = model.getSignatureOption();
 		if (SignatureOption.TL_SIGNING.equals(signatureOption)) {
 			if (DomUtils.isDOM(toBeSigned)) {
@@ -179,8 +196,8 @@ public class SigningTask extends Task<DSSDocument> {
 
 	private boolean isXmlManifestSigning() {
 		SignatureOption signatureOption = model.getSignatureOption();
-		if (SignatureOption.XML_MANIFEST_SIGNING.equals(signatureOption)) {
-			FileDocument fileToSign = new FileDocument(model.getFileToSign());
+		if (SignatureOption.XML_MANIFEST_SIGNING.equals(signatureOption) && Utils.collectionSize(model.getFilesToSign()) == 1) {
+			FileDocument fileToSign = new FileDocument(model.getFilesToSign().iterator().next());
 			if (DomUtils.isDOM(fileToSign)) {
 				Element document = DomUtils.buildDOM(fileToSign).getDocumentElement();
 				if (XMLDSigElement.MANIFEST.isSameTagName(document.getLocalName()) &&
@@ -206,7 +223,7 @@ public class SigningTask extends Task<DSSDocument> {
 		updateProgress(25, 100);
 		ToBeSigned toBeSigned = null;
 		try {
-			toBeSigned = DTOConverter.toToBeSigned(service.getDataToSign(toSignDocument, parameters));
+			toBeSigned = DTOConverter.toToBeSigned(documentsSignatureService.getDataToSign(toSignDocument, parameters));
 		} catch (Exception e) {
 			throwException("Unable to compute the digest to sign", e);
 		}
@@ -218,6 +235,17 @@ public class SigningTask extends Task<DSSDocument> {
 		ToBeSigned toBeSigned = null;
 		try {
 			toBeSigned = DTOConverter.toToBeSigned(trustedListSignatureService.getDataToSign(toSignDocument, parameters));
+		} catch (Exception e) {
+			throwException("Unable to compute the digest to sign", e);
+		}
+		return toBeSigned;
+	}
+
+	private ToBeSigned getDataToSign(List<RemoteDocument> toSignDocuments, RemoteSignatureParameters parameters) {
+		updateProgress(25, 100);
+		ToBeSigned toBeSigned = null;
+		try {
+			toBeSigned = DTOConverter.toToBeSigned(multipleDocumentsSignatureService.getDataToSign(toSignDocuments, parameters));
 		} catch (Exception e) {
 			throwException("Unable to compute the digest to sign", e);
 		}
@@ -241,7 +269,20 @@ public class SigningTask extends Task<DSSDocument> {
 		DSSDocument signDocument = null;
 		try {
 			signDocument = RemoteDocumentConverter.toDSSDocument(
-					service.signDocument(toSignDocument, parameters, signatureValue));
+					documentsSignatureService.signDocument(toSignDocument, parameters, signatureValue));
+		} catch (Exception e) {
+			throwException("Unable to sign the document", e);
+		}
+		return signDocument;
+	}
+
+	private DSSDocument signDocument(List<RemoteDocument> toSignDocuments, RemoteSignatureParameters parameters,
+									 SignatureValueDTO signatureValue) {
+		updateProgress(75, 100);
+		DSSDocument signDocument = null;
+		try {
+			signDocument = RemoteDocumentConverter.toDSSDocument(
+					multipleDocumentsSignatureService.signDocument(toSignDocuments, parameters, signatureValue));
 		} catch (Exception e) {
 			throwException("Unable to sign the document", e);
 		}

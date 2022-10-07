@@ -13,11 +13,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.io.File;
+import java.util.Collection;
 
 
 public class SignatureModel {
 
-	private ObjectProperty<File> fileToSign = new SimpleObjectProperty<>();
+	private ObjectProperty<Collection<File>> filesToSign = new SimpleObjectProperty<>();
 	private ObjectProperty<ASiCContainerType> asicContainerType = new SimpleObjectProperty<>();
 	private ObjectProperty<SignatureForm> signatureForm = new SimpleObjectProperty<>();
 	private ObjectProperty<SignaturePackaging> signaturePackaging = new SimpleObjectProperty<>();
@@ -29,16 +30,16 @@ public class SignatureModel {
 	private ObjectProperty<File> pkcsFile = new SimpleObjectProperty<>();
 	private StringProperty password = new SimpleStringProperty();
 
-	public File getFileToSign() {
-		return fileToSign.get();
+	public Collection<File> getFilesToSign() {
+		return filesToSign.get();
 	}
 
-	public void setFileToSign(File fileToSign) {
-		this.fileToSign.set(fileToSign);
+	public void setFilesToSign(Collection<File> filesToSign) {
+		this.filesToSign.set(filesToSign);
 	}
 
-	public ObjectProperty<File> fileToSignProperty() {
-		return fileToSign;
+	public ObjectProperty<Collection<File>> filesToSignProperty() {
+		return filesToSign;
 	}
 
 	public SignatureForm getSignatureForm() {

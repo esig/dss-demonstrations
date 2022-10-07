@@ -8,10 +8,12 @@ import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
+import eu.europa.esig.dss.standalone.fx.CollectionFilesSelectToStringConverter;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.SigningTask;
+import eu.europa.esig.dss.utils.Utils;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -62,6 +64,9 @@ public class SignatureController extends AbstractController {
 
 	@FXML
 	private Button fileSelectButton;
+
+	@FXML
+	public RadioButton asicNoneRadio;
 
 	@FXML
 	private RadioButton asicsRadio;
@@ -189,24 +194,26 @@ public class SignatureController extends AbstractController {
 			@Override
 			public void handle(ActionEvent event) {
 				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("File to sign");
-				File fileToSign = fileChooser.showOpenDialog(stage);
-				model.setFileToSign(fileToSign);
+				fileChooser.setTitle("File(s) to sign");
+				List<File> filesToSign = fileChooser.showOpenMultipleDialog(stage);
+				model.setFilesToSign(filesToSign);
+				updatePropertiesForm();
 			}
 		});
-		fileSelectButton.textProperty().bindBidirectional(model.fileToSignProperty(), new FileToStringConverter());
+		fileSelectButton.textProperty().bindBidirectional(model.filesToSignProperty(), new CollectionFilesSelectToStringConverter());
 
+		asicNoneRadio.setSelected(true);
 		asicsRadio.setUserData(ASiCContainerType.ASiC_S);
 		asiceRadio.setUserData(ASiCContainerType.ASiC_E);
 		toggleAsicContainerType.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				ASiCContainerType newContainerType = null;
 				if (newValue != null) {
-					ASiCContainerType newContainerType = (ASiCContainerType) newValue.getUserData();
-					updateSignatureFormForASiC(newContainerType);
-				} else {
-					updateSignatureFormForASiC(null);
+					newContainerType = (ASiCContainerType) newValue.getUserData();
 				}
+				model.setAsicContainerType(newContainerType);
+				updatePropertiesForm();
 			}
 		});
 
@@ -217,12 +224,12 @@ public class SignatureController extends AbstractController {
 		toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				SignatureForm newSigForm = null;
 				if (newValue != null) {
-					SignatureForm newSigForm = (SignatureForm) newValue.getUserData();
-					updateSignatureForm(newSigForm);
-				} else {
-					updateSignatureForm(null);
+					newSigForm = (SignatureForm) newValue.getUserData();
 				}
+				model.setSignatureForm(newSigForm);
+				updatePropertiesForm();
 			}
 		});
 		
@@ -233,12 +240,12 @@ public class SignatureController extends AbstractController {
 		toggleSigPackaging.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				SignaturePackaging newPackaging = null;
 				if (newValue != null) {
-					SignaturePackaging newPackaging = (SignaturePackaging) newValue.getUserData();
-					updateSignaturePackaging(newPackaging);
-				} else {
-					updateSignaturePackaging(null);
+					newPackaging = (SignaturePackaging) newValue.getUserData();
 				}
+				model.setSignaturePackaging(newPackaging);
+				updatePropertiesForm();
 			}
 		});
 
@@ -247,12 +254,12 @@ public class SignatureController extends AbstractController {
 		toggleSignatureOption.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				SignatureOption signatureOption = null;
 				if (newValue != null) {
-					SignatureOption signatureOption = (SignatureOption) newValue.getUserData();
-					updateSignatureOption(signatureOption);
-				} else {
-					updateSignatureOption(null);
+					signatureOption = (SignatureOption) newValue.getUserData();
 				}
+				model.setSignatureOption(signatureOption);
+				updatePropertiesForm();
 			}
 		});
 		
@@ -290,7 +297,7 @@ public class SignatureController extends AbstractController {
 				model.setPkcsFile(null);
 				model.setPassword(null);
 
-				updateSigTokenType(newValue);
+				updatePropertiesForm();
 			}
 		});
 		
@@ -328,7 +335,7 @@ public class SignatureController extends AbstractController {
 		labelPkcs11File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11));
 		labelPkcs12File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
 
-		BooleanBinding isMandatoryFieldsEmpty = model.fileToSignProperty().isNull()
+		BooleanBinding isMandatoryFieldsEmpty = model.filesToSignProperty().isNull()
 				.or(model.signatureFormProperty().isNull()).or(model.digestAlgorithmProperty().isNull())
 				.or(model.tokenTypeProperty().isNull());
 
@@ -386,217 +393,192 @@ public class SignatureController extends AbstractController {
 
 	}
 
-	protected void updateSignatureFormForASiC(ASiCContainerType newValue) {
-		model.setAsicContainerType(newValue);
+	private void updatePropertiesForm() {
+		updateSignatureFormAndPackaging();
+		updateSignatureLevelAndDigestAlgo();
+		updateSignatureOption();
 
-		reinitSignatureFormats();
-		reinitSignaturePackagings();
-		reinitSignatureOptions();
-
-		if (newValue != null) { // ASiC
-			cadesRadio.setDisable(false);
-			xadesRadio.setDisable(false);
-		} else {
-			cadesRadio.setDisable(false);
-			padesRadio.setDisable(false);
-			xadesRadio.setDisable(false);
-			jadesRadio.setDisable(false);
-		}
-	}
-
-	protected void updateSignatureForm(SignatureForm signatureForm) {
-		model.setSignatureForm(signatureForm);
-
-		reinitSignaturePackagings();
-		reinitSignatureOptions();
-		
-		sigFormSupportedDigestAlgorithms = SUPPORTED_DIGEST_ALGORITHMS;
-
-		comboLevel.setDisable(false);
-		comboLevel.getItems().removeAll(comboLevel.getItems());
-
-		if (signatureForm != null) {
-			switch (signatureForm) {
-			case CAdES:
-				if (model.getAsicContainerType() == null) {
-					envelopingRadio.setDisable(false);
-					detachedRadio.setDisable(false);
-				}
-
-				comboLevel.getItems().addAll(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
-						SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.CAdES_BASELINE_B);
-				break;
-
-			case PAdES:
-				envelopedRadio.setDisable(false);
-
-				envelopedRadio.setSelected(true);
-
-				comboLevel.getItems().addAll(SignatureLevel.PAdES_BASELINE_B, SignatureLevel.PAdES_BASELINE_T,
-						SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.PAdES_BASELINE_B);
-				break;
-
-			case XAdES:
-				if (model.getAsicContainerType() == null) {
-					envelopingRadio.setDisable(false);
-					envelopedRadio.setDisable(false);
-					detachedRadio.setDisable(false);
-					internallyDetachedRadio.setDisable(false);
-
-					tlSigning.setDisable(false);
-					xmlManifest.setDisable(false);
-				}
-				
-				sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
-						DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-
-				comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
-						SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
-				break;
-
-			case JAdES:
-				envelopingRadio.setDisable(false);
-				detachedRadio.setDisable(false);
-				
-				sigFormSupportedDigestAlgorithms =  Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-
-				comboLevel.getItems().addAll(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
-						SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.JAdES_BASELINE_B);
-				break;
-
-			default:
-				break;
-			}
-		}
-		
 		reinitDigestAlgos();
 	}
 
-	protected void updateSignaturePackaging(SignaturePackaging signaturePackaging) {
-		model.setSignaturePackaging(signaturePackaging);
+	private void updateSignatureFormAndPackaging() {
+		if (model.getAsicContainerType() != null) {
+			activateRadioButtons(xadesRadio, cadesRadio);
+			disableRadioButtons(padesRadio, jadesRadio);
+			disableRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
+			disableRadioButtons(tlSigning, xmlManifest);
 
-		SignatureOption signatureOption = model.getSignatureOption();
-		reinitSignatureOptions();
+		} else if (Utils.collectionSize(model.getFilesToSign()) > 1) {
+			activateRadioButtons(xadesRadio, jadesRadio);
+			disableRadioButtons(cadesRadio, padesRadio);
+			disableRadioButtons(tlSigning, xmlManifest);
+			if (model.getSignatureForm() != null) {
+				switch (model.getSignatureForm()) {
+					case XAdES:
+						activateRadioButtons(envelopingRadio, detachedRadio, internallyDetachedRadio);
+						disableRadioButtons(envelopedRadio);
+						break;
 
-		if (signaturePackaging != null && SignatureForm.XAdES.equals(model.getSignatureForm())) {
-			// for XAdES only
-			sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
-					DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+					case JAdES:
+						activateRadioButtons(detachedRadio);
+						disableRadioButtons(envelopedRadio, envelopingRadio, internallyDetachedRadio);
+						break;
 
-			switch (signaturePackaging) {
+					default:
+						break;
+				}
+			}
+
+		} else {
+			activateRadioButtons(xadesRadio, cadesRadio, padesRadio, jadesRadio);
+			if (model.getSignatureForm() != null) {
+				switch (model.getSignatureForm()) {
+					case XAdES:
+						if (model.getSignaturePackaging() == null && model.getSignatureOption() != null) {
+							switch (model.getSignatureOption()) {
+								case TL_SIGNING:
+									envelopedRadio.setSelected(true);
+									break;
+								case XML_MANIFEST_SIGNING:
+									envelopingRadio.setSelected(true);
+									break;
+								default:
+									break;
+							}
+						} else {
+							activateRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
+						}
+						activateRadioButtons(tlSigning, xmlManifest);
+						break;
+
+					case CAdES:
+					case JAdES:
+						activateRadioButtons(envelopingRadio, detachedRadio);
+						disableRadioButtons(envelopedRadio, internallyDetachedRadio);
+						disableRadioButtons(tlSigning, xmlManifest);
+						break;
+
+					case PAdES:
+						activateRadioButtons(envelopedRadio);
+						disableRadioButtons(envelopingRadio, detachedRadio, internallyDetachedRadio);
+						disableRadioButtons(tlSigning, xmlManifest);
+						break;
+
+					default:
+						break;
+				}
+			} else {
+				reinitSignaturePackagings();
+				reinitSignatureOptions();
+			}
+		}
+	}
+
+	private void updateSignatureLevelAndDigestAlgo() {
+		sigFormSupportedDigestAlgorithms = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
+
+		SignatureForm signatureForm = model.getSignatureForm();
+		if (signatureForm != null) {
+			switch (signatureForm) {
+				case XAdES:
+					if (model.getSignatureOption() != null) {
+						switch (model.getSignatureOption()) {
+							case TL_SIGNING:
+								updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B);
+								sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256,
+										DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+								break;
+							case XML_MANIFEST_SIGNING:
+								updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
+										SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
+								sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256,
+										DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+								break;
+							default:
+								break;
+						}
+					} else {
+						updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
+								SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
+						sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
+								DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+					}
+					break;
+
+				case CAdES:
+					updateSignatureLevels(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
+							SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
+					break;
+
+				case PAdES:
+					updateSignatureLevels(SignatureLevel.PAdES_BASELINE_B, SignatureLevel.PAdES_BASELINE_T,
+							SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
+					break;
+
+				case JAdES:
+					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+
+					updateSignatureLevels(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
+							SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
+					break;
+
+				default:
+					updateSignatureLevels();
+					break;
+			}
+		}
+	}
+
+	private void updateSignatureOption() {
+		if (SignatureForm.XAdES.equals(model.getSignatureForm()) && model.getSignaturePackaging() != null
+				&& Utils.collectionSize(model.getFilesToSign()) < 2) {
+			switch (model.getSignaturePackaging()) {
 				case ENVELOPED:
 					tlSigning.setDisable(false);
-					if (SignatureOption.TL_SIGNING.equals(signatureOption)) {
-						model.setSignatureOption(SignatureOption.TL_SIGNING);
-						tlSigning.setSelected(true);
-					}
+					disableRadioButtons(xmlManifest);
 					break;
 				case ENVELOPING:
 					xmlManifest.setDisable(false);
-					if (SignatureOption.XML_MANIFEST_SIGNING.equals(signatureOption)) {
-						model.setSignatureOption(SignatureOption.XML_MANIFEST_SIGNING);
-						xmlManifest.setSelected(true);
-					}
-					break;
-				case DETACHED:
-				case INTERNALLY_DETACHED:
-					// do nothing
+					disableRadioButtons(tlSigning);
 					break;
 				default:
-					break;
-			}
-
-			reinitDigestAlgos();
-		}
-	}
-
-	protected void updateSignatureOption(SignatureOption signatureOption) {
-		model.setSignatureOption(signatureOption);
-
-		if (signatureOption != null) {
-			comboLevel.setDisable(false);
-			comboLevel.getItems().removeAll(comboLevel.getItems());
-
-			switch (signatureOption) {
-				case TL_SIGNING:
-					comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B);
-					comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
-
-					envelopedRadio.setDisable(false);
-					envelopedRadio.setSelected(true);
-
-					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-					break;
-
-				case XML_MANIFEST_SIGNING:
-					comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
-							SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-					comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
-
-					envelopingRadio.setDisable(false);
-					envelopingRadio.setSelected(true);
-
-					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-					break;
-
-				default:
+					disableRadioButtons(tlSigning, xmlManifest);
 					break;
 			}
 		}
-
-		reinitDigestAlgos();
 	}
-	
-	private void updateSigTokenType(Toggle newValue) {
-		SignatureTokenType tokenType = (SignatureTokenType) newValue.getUserData();
-		
-		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
-		
-		switch (tokenType) {
-			case MSCAPI:
-				// SHA224 not supported
-				sigTokenTypeSupportedDigestAlgorithms.remove(DigestAlgorithm.SHA224);
-			default:
-				break;
+
+	private void activateRadioButtons(RadioButton... radioButtons) {
+		for (RadioButton radioButton : radioButtons) {
+			radioButton.setDisable(false);
+			if (radioButtons.length == 1) {
+				radioButton.setSelected(true);
+			}
 		}
-		
-		reinitDigestAlgos();
 	}
 
-	private void reinitSignatureFormats() {
-		cadesRadio.setDisable(true);
-		padesRadio.setDisable(true);
-		xadesRadio.setDisable(true);
-		jadesRadio.setDisable(true);
+	private void disableRadioButtons(RadioButton... radioButtons) {
+		for (RadioButton radioButton : radioButtons) {
+			radioButton.setDisable(true);
+			radioButton.setSelected(false);
+		}
+	}
 
-		cadesRadio.setSelected(false);
-		padesRadio.setSelected(false);
-		xadesRadio.setSelected(false);
-		jadesRadio.setSelected(false);
+	private void updateSignatureLevels(SignatureLevel... signatureLevels) {
+		comboLevel.setDisable(false);
+		comboLevel.getItems().removeAll(comboLevel.getItems());
+		if (Utils.isArrayNotEmpty(signatureLevels)) {
+			comboLevel.getItems().addAll(signatureLevels);
+			comboLevel.setValue(signatureLevels[0]);
+		}
 	}
 
 	private void reinitSignaturePackagings() {
-		envelopingRadio.setDisable(true);
-		envelopedRadio.setDisable(true);
-		detachedRadio.setDisable(true);
-		internallyDetachedRadio.setDisable(true);
-
-		envelopingRadio.setSelected(false);
-		envelopedRadio.setSelected(false);
-		detachedRadio.setSelected(false);
-		internallyDetachedRadio.setSelected(false);
+		disableRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
 	}
 
 	private void reinitSignatureOptions() {
-		tlSigning.setDisable(true);
-		xmlManifest.setDisable(true);
-
-		tlSigning.setSelected(false);
-		xmlManifest.setSelected(false);
+		disableRadioButtons(tlSigning, xmlManifest);
 	}
 	
 	private void reinitDigestAlgos() {
@@ -606,6 +588,10 @@ public class SignatureController extends AbstractController {
 		}
 		if (sigTokenTypeSupportedDigestAlgorithms != null) {
 			digestAlgos.retainAll(sigTokenTypeSupportedDigestAlgorithms);
+		}
+		if (SignatureTokenType.MSCAPI.equals(model.getTokenType())) {
+			// SHA224 not supported
+			digestAlgos.remove(DigestAlgorithm.SHA224);
 		}
 		
 		for (Node daButton : hBoxDigestAlgos.getChildren()) {

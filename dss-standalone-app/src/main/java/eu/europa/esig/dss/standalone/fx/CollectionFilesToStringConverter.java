@@ -11,12 +11,16 @@ public class CollectionFilesToStringConverter extends StringConverter<Collection
     @Override
     public String toString(Collection<File> files) {
         if (Utils.isCollectionEmpty(files)) {
-            return "0 files";
+            return getPrimaryString();
         } else if (Utils.collectionSize(files) == 1) {
             return new FileToStringConverter().toString(files.iterator().next());
         } else {
             return String.format("%s files", Utils.collectionSize(files));
         }
+    }
+
+    protected String getPrimaryString() {
+        return "0 files";
     }
 
     @Override

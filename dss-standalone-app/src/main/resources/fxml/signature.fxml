@@ -20,8 +20,8 @@
         <Insets bottom="20" left="20" right="20" top="20"/>
     </padding>
     <HBox styleClass="hbox-style">
-        <Label styleClass="label-style" text="File to sign"/>
-        <Button fx:id="fileSelectButton" mnemonicParsing="false" text="Select file..."/>
+        <Label styleClass="label-style" text="File(s) to sign"/>
+        <Button fx:id="fileSelectButton" mnemonicParsing="false" text="Select file(s)..."/>
     </HBox>
 
     <HBox styleClass="hbox-style">
@@ -29,7 +29,8 @@
         <fx:define>
             <ToggleGroup fx:id="toggleAsicContainerType"/>
         </fx:define>
-        <RadioButton mnemonicParsing="false" text="None" toggleGroup="$toggleAsicContainerType"/>
+        <RadioButton fx:id="asicNoneRadio" mnemonicParsing="false" text="None"
+                     toggleGroup="$toggleAsicContainerType"/>
         <RadioButton fx:id="asicsRadio" mnemonicParsing="false" text="ASiC-S"
                      toggleGroup="$toggleAsicContainerType"/>
         <RadioButton fx:id="asiceRadio" mnemonicParsing="false" text="ASiC-E"

@@ -20,12 +20,8 @@ import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.xades.signature.XAdESService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RemoteDocumentSignatureServiceBuilder {
-
-	private static final Logger LOG = LoggerFactory.getLogger(RemoteDocumentSignatureServiceBuilder.class);
 	
 	private TrustedListsCertificateSource tslCertificateSource = new TrustedListsCertificateSource();
 	

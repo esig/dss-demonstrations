@@ -33,7 +33,7 @@ public class DSSApplication extends Application {
 
 			Pane view = loader.load();
 
-			Scene scene = new Scene(view, 1000, 460);
+			Scene scene = new Scene(view, 1000, 470);
 			scene.getStylesheets().add("/styles/style.css");
 			stage.setScene(scene);
 			stage.show();
