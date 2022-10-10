@@ -73,7 +73,7 @@ public class EsigValidationTest {
     private static StringBuilder sb;
 
     @BeforeAll
-    private static void init() throws Exception {
+    public static void init() throws Exception {
         ValidationPolicyFacade policyFacade = ValidationPolicyFacade.newFacade();
         ConstraintsParameters constraints = policyFacade.unmarshall(new File(POLICY_URL));
         validationPolicy = new EtsiValidationPolicy(constraints);
