@@ -174,7 +174,7 @@
 	</div>
 	<div layout:fragment="scripts">
 		<script type="text/javascript" th:src="@{/scripts/jsValidationResult.js}"></script>
-		<script type="text/javascript">hljs.initHighlightingOnLoad();</script> <!-- highlight XML code -->
+		<script type="text/javascript">hljs.highlightAll();</script> <!-- highlight XML code -->
 		<script type="text/javascript" th:inline="javascript">
             /*<![CDATA[*/
 			$('#tabsResult a').click(function(e) {
