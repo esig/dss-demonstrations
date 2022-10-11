@@ -57,9 +57,7 @@
 		<jackson-jaxrs-json-provider.version>2.13.4</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
-		<hikaricp.version>4.0.3</hikaricp.version>
 		<freemarker.version>2.3.31</freemarker.version>
-		<hsqldb.version>2.5.2</hsqldb.version> <!-- Higher version does not support Java 8 -->
 		<fop-core.version>2.7</fop-core.version>
 		<batik.version>1.15</batik.version> <!-- To be used while fop-core is not updated -->
 		<nexu.version>1.22</nexu.version>
@@ -276,11 +274,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
 				<artifactId>spring-oxm</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
@@ -397,17 +390,6 @@
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
 				<artifactId>jackson-jaxrs-json-provider</artifactId>
 				<version>${jackson-jaxrs-json-provider.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.zaxxer</groupId>
-				<artifactId>HikariCP</artifactId>
-				<version>${hikaricp.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hsqldb</groupId>
-				<artifactId>hsqldb</artifactId>
-				<version>${hsqldb.version}</version>
 			</dependency>
 
 			<dependency>

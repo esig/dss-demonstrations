@@ -1,7 +1,6 @@
 package eu.europa.esig.dss.web;
 
 import eu.europa.esig.dss.web.config.DSSBeanConfig;
-import eu.europa.esig.dss.web.config.JdbcInitializer;
 import eu.europa.esig.dss.web.config.WebConfig;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFServlet;
@@ -49,7 +48,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
-		return new Class[] { DSSBeanConfig.class, JdbcInitializer.class };
+		return new Class[] { DSSBeanConfig.class };
 	}
 
 	@Override

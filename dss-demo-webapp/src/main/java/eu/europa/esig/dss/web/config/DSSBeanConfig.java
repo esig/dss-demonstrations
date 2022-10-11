@@ -7,7 +7,6 @@ import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.pades.signature.PAdESService;
-import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
@@ -15,10 +14,8 @@ import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
 import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
-import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
-import eu.europa.esig.dss.spi.client.jdbc.JdbcCacheConnector;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
@@ -52,14 +49,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
+@Import({ PropertiesConfig.class, CXFConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
 		SchedulingConfig.class })
 @ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {
@@ -99,9 +95,6 @@ public class DSSBeanConfig {
 	@Autowired
 	private TSPSource tspSource;
 
-	@Autowired
-	private DataSource dataSource;
-
 	@Value("${dataloader.connection.timeout}")
 	private int connectionTimeout;
 	@Value("${dataloader.connection.request.timeout}")
@@ -134,6 +127,7 @@ public class DSSBeanConfig {
 	public FileCacheDataLoader fileCacheDataLoader() {
 		FileCacheDataLoader fileCacheDataLoader = new FileCacheDataLoader();
 		fileCacheDataLoader.setDataLoader(dataLoader());
+		fileCacheDataLoader.setCacheExpirationTime(10 * 60 * 1000); // 10 minutes
 		// Per default uses "java.io.tmpdir" property
 		// fileCacheDataLoader.setFileCacheDirectory(new File("/tmp"));
 		return fileCacheDataLoader;
@@ -141,43 +135,22 @@ public class DSSBeanConfig {
 
 	@Bean
 	public OnlineAIASource onlineAIASource() {
-		return new DefaultAIASource(dataLoader());
-	}
-
-	@Bean
-	public JdbcCacheAIASource cachedAIASource() {
-		JdbcCacheAIASource jdbcCacheAIASource = new JdbcCacheAIASource();
-		jdbcCacheAIASource.setJdbcCacheConnector(jdbcCacheConnector());
-		jdbcCacheAIASource.setProxySource(onlineAIASource());
-		return jdbcCacheAIASource;
+		return new DefaultAIASource(fileCacheDataLoader());
 	}
 
 	@Bean
 	public OnlineCRLSource onlineCRLSource() {
 		OnlineCRLSource onlineCRLSource = new OnlineCRLSource();
-		onlineCRLSource.setDataLoader(dataLoader());
+		onlineCRLSource.setDataLoader(fileCacheDataLoader());
 		return onlineCRLSource;
 	}
 
-	@Bean
-	public JdbcCacheCRLSource cachedCRLSource() {
-		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
-		jdbcCacheCRLSource.setJdbcCacheConnector(jdbcCacheConnector());
-		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
-		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (60 * 10)); // 10 minutes
-		return jdbcCacheCRLSource;
-	}
 
 	@Bean
 	public OnlineOCSPSource onlineOcspSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
 		return onlineOCSPSource;
-	}
-
-	@Bean
-	public JdbcCacheConnector jdbcCacheConnector() {
-		return new JdbcCacheConnector(dataSource);
 	}
 
 	@Bean
@@ -195,9 +168,9 @@ public class DSSBeanConfig {
 	@Bean
 	public CertificateVerifier certificateVerifier() {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
-		certificateVerifier.setCrlSource(cachedCRLSource());
+		certificateVerifier.setCrlSource(onlineCRLSource());
 		certificateVerifier.setOcspSource(onlineOcspSource());
-		certificateVerifier.setAIASource(cachedAIASource());
+		certificateVerifier.setAIASource(onlineAIASource());
 		certificateVerifier.setTrustedCertSources(trustedListSource());
 
 		// Default configs
