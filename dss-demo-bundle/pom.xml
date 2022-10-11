@@ -106,8 +106,8 @@
 		<profile>
 			<id>java18</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-debugimage_x86-32_windows_hotspot_18.0.2.1_1.zip</jre.download.link>
-				<jre.root.folder>jdk-18.0.2+1-jre</jre.root.folder>
+				<jre.download.link>https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x86-32_windows_hotspot_18.0.2.1_1.zip</jre.download.link>
+				<jre.root.folder>jdk-18.0.2.1+1-jre</jre.root.folder>
 				<tomcat.version>9.0.68</tomcat.version>
 			</properties>
 		</profile>
