@@ -449,7 +449,7 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.3.Final</version> <!-- 6 version to be used until javax to jakarta update -->
+			<version>6.2.5.Final</version> <!-- 6 version to be used until javax to jakarta update -->
 		</dependency>
 		
 		<dependency>
