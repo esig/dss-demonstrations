@@ -118,7 +118,8 @@ public class EsigValidationTest {
 
             FileCacheDataLoader fileCacheDataLoader = new FileCacheDataLoader();
             fileCacheDataLoader.setDataLoader(dataLoader);
-            fileCacheDataLoader.setCacheExpirationTime(0);
+            fileCacheDataLoader.setCacheExpirationTime(-1);
+            fileCacheDataLoader.setFileCacheDirectory(new File("target/cache"));
 
             tlValidationJob.setOnlineDataLoader(fileCacheDataLoader);
 
