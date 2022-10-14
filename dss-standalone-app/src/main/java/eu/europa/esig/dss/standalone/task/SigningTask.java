@@ -2,6 +2,9 @@ package eu.europa.esig.dss.standalone.task;
 
 import eu.europa.esig.dss.DomUtils;
 import eu.europa.esig.dss.definition.xmldsig.XMLDSigElement;
+import eu.europa.esig.dss.enumerations.JWSSerializationType;
+import eu.europa.esig.dss.enumerations.SigDMechanism;
+import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
@@ -127,6 +130,10 @@ public class SigningTask extends Task<DSSDocument> {
 		}
 		if (isXmlManifestSigning()) {
 			parameters.setManifestSignature(true);
+		}
+		if (SignatureForm.JAdES.equals(model.getSignatureForm())) {
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION); // allow extension
+			parameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH); // to be used by default
 		}
 
 		return parameters;

@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.11.RC1</version>
+		<version>5.11</version>
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
 	
 	<properties>
-		<javafx.version>14</javafx.version>
+		<javafx.version>18</javafx.version>
 	</properties>
 
 	<build>

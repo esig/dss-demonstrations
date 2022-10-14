@@ -39,6 +39,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -403,6 +404,7 @@ public class SignatureController implements Initializable {
 						String errorMessage = "Oops an error occurred : " + service.getMessage();
 						LOG.error(errorMessage, service.getException());
 						Alert alert = new Alert(AlertType.ERROR, errorMessage, ButtonType.CLOSE);
+						alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 						alert.showAndWait();
 						signButton.disableProperty().bind(disableSignButton);
 						model.setPassword(null);
@@ -499,8 +501,10 @@ public class SignatureController implements Initializable {
 		if (signatureForm != null) {
 			switch (signatureForm) {
 			case CAdES:
-				envelopingRadio.setDisable(false);
-				detachedRadio.setDisable(false);
+				if (model.getAsicContainerType() == null) {
+					envelopingRadio.setDisable(false);
+					detachedRadio.setDisable(false);
+				}
 
 				comboLevel.getItems().addAll(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
 						SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
@@ -516,13 +520,15 @@ public class SignatureController implements Initializable {
 				comboLevel.setValue(SignatureLevel.PAdES_BASELINE_B);
 				break;
 			case XAdES:
-				envelopingRadio.setDisable(false);
-				envelopedRadio.setDisable(false);
-				detachedRadio.setDisable(false);
-				internallyDetachedRadio.setDisable(false);
+				if (model.getAsicContainerType() == null) {
+					envelopingRadio.setDisable(false);
+					envelopedRadio.setDisable(false);
+					detachedRadio.setDisable(false);
+					internallyDetachedRadio.setDisable(false);
 
-				tlSigning.setDisable(false);
-				xmlManifest.setDisable(false);
+					tlSigning.setDisable(false);
+					xmlManifest.setDisable(false);
+				}
 				
 				sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
 						DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
@@ -712,6 +718,7 @@ public class SignatureController implements Initializable {
 				Utils.copy(signedDocument.openStream(), fos);
 			} catch (Exception e) {
 				Alert alert = new Alert(AlertType.ERROR, "Unable to save file : " + e.getMessage(), ButtonType.CLOSE);
+				alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 				alert.showAndWait();
 			}
 		}

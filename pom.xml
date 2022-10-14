@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.11.RC1</version>
+	<version>5.11</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -41,7 +41,7 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.11.RC1</dss.framework.version>
+		<dss.framework.version>5.11</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>1.7.36</slf4j.version>
@@ -49,21 +49,22 @@
 
 		<cxf.version>3.5.3</cxf.version>
 		<swagger-ui.version>4.11.1</swagger-ui.version>
-		<spring.version>5.3.22</spring.version>
-		<spring-security.version>5.7.2</spring-security.version>
+		<spring.version>5.3.23</spring.version>
+		<spring-security.version>5.7.3</spring-security.version>
 		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>3.1.0</thymeleaf-layout-dialect.version>
 		<groovy.version>4.0.3</groovy.version> <!-- To be used while thymeleaf-layout-dialect is not updated -->
-		<jackson-jaxrs-json-provider.version>2.13.3</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.13.4</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
 		<freemarker.version>2.3.31</freemarker.version>
-		<hsqldb.version>2.5.2</hsqldb.version>
+		<hsqldb.version>2.5.2</hsqldb.version> <!-- Higher version does not support Java 8 -->
 		<fop-core.version>2.7</fop-core.version>
+		<batik.version>1.15</batik.version> <!-- To be used while fop-core is not updated -->
 		<nexu.version>1.22</nexu.version>
 		
-		<junit.jupiter.version>5.8.2</junit.jupiter.version>
+		<junit.jupiter.version>5.9.1</junit.jupiter.version>
 	</properties>
 
 	<licenses>
@@ -219,7 +220,7 @@
 		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
 		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
 		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>5.11.RC1</tag>
+		<tag>5.11</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -320,6 +321,38 @@
 				<artifactId>fop-core</artifactId>
 				<version>${fop-core.version}</version>
 			</dependency>
+
+			<!-- Upgraded in order to avoid vulnerability in the previous version -->
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-anim</artifactId>
+				<version>${batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-awt-util</artifactId>
+				<version>${batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-bridge</artifactId>
+				<version>${batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-extension</artifactId>
+				<version>${batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-gvt</artifactId>
+				<version>${batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-transcoder</artifactId>
+				<version>${batik.version}</version>
+			</dependency>
 			
 			<dependency>
 				<groupId>org.apache.cxf</groupId>
@@ -359,7 +392,6 @@
 	            <artifactId>swagger-ui</artifactId>
 	            <version>${swagger-ui.version}</version>
 	        </dependency>
-			
 
 			<dependency>
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
