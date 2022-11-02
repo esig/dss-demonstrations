@@ -41,7 +41,7 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.11</dss.framework.version>
+		<dss.framework.version>5.11.1</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>1.7.36</slf4j.version>
@@ -469,14 +469,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<repositories>
-		<repository>
-		  <id>cefdigital</id>
-		  <name>CEF Digital</name>
-		  <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss/</url>
-		</repository>
-	</repositories>
 
 	<distributionManagement>
 		<repository>
