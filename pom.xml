@@ -470,14 +470,6 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<repositories>
-		<repository>
-		  <id>cefdigital</id>
-		  <name>CEF Digital</name>
-		  <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss/</url>
-		</repository>
-	</repositories>
-
 	<distributionManagement>
 		<repository>
 			<id>cefdigital-nexus</id>
@@ -496,7 +488,6 @@
 	</issueManagement>
 
 	<profiles>
-
 		<profile>
 			<id>delivery</id>
 			<build>
