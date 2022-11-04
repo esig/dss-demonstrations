@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -502,6 +503,7 @@ public class CXFConfig {
 		JaxbAnnotationIntrospector jai = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
 		objectMapper.setAnnotationIntrospector(jai);
 		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		objectMapper.configure(DeserializationFeature.WRAP_EXCEPTIONS, false);
 		return objectMapper;
 	}
 	
