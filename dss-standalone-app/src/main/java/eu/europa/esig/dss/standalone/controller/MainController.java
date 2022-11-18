@@ -1,10 +1,8 @@
 package eu.europa.esig.dss.standalone.controller;
 
-import eu.europa.esig.dss.standalone.source.PropertyReader;
 import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
-import eu.europa.esig.dss.utils.Utils;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -38,6 +36,12 @@ public class MainController extends AbstractController {
     private ExtensionController extensionTabController;
 
     @FXML
+    private VBox validationTab;
+
+    @FXML
+    private ValidationController validationTabController;
+
+    @FXML
     private Button refreshLOTL;
 
     @FXML
@@ -48,9 +52,6 @@ public class MainController extends AbstractController {
 
     @FXML
     private Label warningLabel;
-
-    @FXML
-    public Label warningMockTSALabel;
 
     private ProgressIndicator progressRefreshLOTL;
 
@@ -67,6 +68,7 @@ public class MainController extends AbstractController {
     public void initialize(URL location, ResourceBundle resources) {
         signatureTabController.setStage(stage);
         extensionTabController.setStage(stage);
+        validationTabController.setStage(stage);
 
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.getSelectionModel().selectFirst();
@@ -109,8 +111,6 @@ public class MainController extends AbstractController {
             readValThread.setDaemon(true);
             readValThread.start();
         });
-
-        warningMockTSALabel.setVisible(Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock")));
     }
 
     private void updateLabelText() {

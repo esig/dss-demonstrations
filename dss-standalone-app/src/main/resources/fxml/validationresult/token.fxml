@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
+<HBox fx:id="parentNode" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="eu.europa.esig.dss.standalone.controller.validationresult.TokenNodeController" maxWidth="680.0">
+
+    <padding>
+        <Insets top="15.0" right="15.0" bottom="5.0" left="15.0"/>
+    </padding>
+
+    <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity">
+
+        <HBox styleClass="hbox-report-style">
+            <Label fx:id="signatureIdLabel" styleClass="label-report-style" text="Signature Id: "/>
+            <Label fx:id="timestampIdLabel" styleClass="label-report-style" text="Timestamp Id: "/>
+            <Label fx:id="id"/>
+        </HBox>
+
+        <HBox fx:id="filenameContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Filename: "/>
+            <Label fx:id="filename"/>
+        </HBox>
+
+        <HBox fx:id="qualificationLevelContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Qualification level: "/>
+            <Label fx:id="qualificationLevel"/>
+        </HBox>
+
+        <HBox fx:id="qualificationDetailsContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Qualification details: ">
+                <padding>
+                    <Insets bottom="2.0" />
+                </padding>
+            </Label>
+            <TextFlow fx:id="qualificationDetails"/>
+        </HBox>
+
+        <HBox styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Indication: "/>
+            <Label fx:id="indication"/>
+        </HBox>
+
+        <HBox fx:id="adesValidationDetailsContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="AdES validation details: ">
+                <padding>
+                    <Insets bottom="2.0" />
+                </padding>
+            </Label>
+            <TextFlow fx:id="adesValidationDetails"/>
+        </HBox>
+
+        <HBox fx:id="signatureFormatContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Signature format: "/>
+            <Label fx:id="signatureFormat"/>
+        </HBox>
+
+        <HBox styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Certificate chain: ">
+                <padding>
+                    <Insets bottom="2.0" />
+                </padding>
+            </Label>
+            <TextFlow fx:id="certificateChain" />
+        </HBox>
+
+        <HBox fx:id="claimedSigningTimeContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Claimed signing time: "/>
+            <Label fx:id="claimedSigningTime" />
+        </HBox>
+
+        <HBox fx:id="bestSignatureTimeContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Best signature time: "/>
+            <Label fx:id="bestSignatureTime" />
+        </HBox>
+
+        <HBox fx:id="productionTimeContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Production time: "/>
+            <Label fx:id="productionTime" />
+        </HBox>
+
+        <HBox fx:id="signatureScopesContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Covered scope: ">
+                <padding>
+                    <Insets bottom="2.0" />
+                </padding>
+            </Label>
+            <TextFlow fx:id="signatureScopes" styleClass="hbox-report-style"/>
+        </HBox>
+
+        <HBox fx:id="signatureTimestampsContainer">
+            <padding>
+                <Insets top="15.0"/>
+            </padding>
+
+            <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <HBox style="-fx-background-color: #DDDDDD;">
+                    <padding>
+                        <Insets top="2.0" right="10.0" bottom="1.0" left="10.0"/>
+                    </padding>
+                    <Label text="Timestamps:"/>
+                </HBox>
+                <HBox>
+                    <VBox fx:id="signatureTimestamps" />
+                </HBox>
+            </VBox>
+        </HBox>
+
+    </VBox>
+
+</HBox>

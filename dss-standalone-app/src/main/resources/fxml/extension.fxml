@@ -24,7 +24,7 @@
 
     <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text="Original file(s)"/>
-        <Button fx:id="originalFilesSelectButton" mnemonicParsing="false" text="Select file..."/>
+        <Button fx:id="originalFilesSelectButton" mnemonicParsing="false" text="Select file(s)..."/>
     </HBox>
 
     <HBox styleClass="hbox-style">
@@ -54,6 +54,9 @@
         <Label styleClass="label-style" text="Level"/>
         <ComboBox fx:id="comboLevel" disable="true" prefWidth="200.0"/>
     </HBox>
+
+    <Label fx:id="warningMockTSALabel" styleClass="warningLabel"
+           text="Warning ! The demonstration uses a dummy timestamp source."/>
 
     <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text=""/>

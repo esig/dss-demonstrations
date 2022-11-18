@@ -34,7 +34,8 @@ public class TSPSourceLoader {
         if (Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock"))) {
             MockTSPSource tspSource = new MockTSPSource();
             try (InputStream is = RemoteDocumentSignatureServiceBuilder.class.getResourceAsStream("/self-signed-tsa.p12")) {
-                tspSource.setToken(new KeyStoreSignatureTokenConnection(is, "PKCS12", new KeyStore.PasswordProtection("ks-password".toCharArray())));
+                tspSource.setToken(new KeyStoreSignatureTokenConnection(is, "PKCS12",
+                        new KeyStore.PasswordProtection(new char[] { 'w', 'h', 'r', 'm', 'b', 'Q', 'R', 'p', '2', 'n', 'Z', 'H', 'x', '7', 'T', '5' })));
             } catch (IOException e) {
                 LOG.warn("Cannot load the KeyStore");
             }
@@ -55,7 +56,7 @@ public class TSPSourceLoader {
 
                 UserCredentials userCredentials = new UserCredentials();
                 userCredentials.setUsername(PropertyReader.getProperty("timestamp.username"));
-                userCredentials.setPassword(PropertyReader.getProperty("timestamp.password"));
+                userCredentials.setPassword(PropertyReader.getCharArrayProperty("timestamp.password"));
 
                 dataLoader.addAuthentication(hostConnection, userCredentials);
             }

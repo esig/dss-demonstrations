@@ -5,10 +5,14 @@ import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.standalone.fx.CollectionFilesToStringConverter;
+import eu.europa.esig.dss.standalone.fx.DSSFileChooser;
+import eu.europa.esig.dss.standalone.fx.DSSFileChooserLoader;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.ExtensionModel;
+import eu.europa.esig.dss.standalone.source.PropertyReader;
 import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.ExtensionTask;
+import eu.europa.esig.dss.utils.Utils;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,8 +32,6 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +78,9 @@ public class ExtensionController extends AbstractController {
     public ComboBox<SignatureLevel> comboLevel;
 
     @FXML
+    public Label warningMockTSALabel;
+
+    @FXML
     public Button extendButton;
 
     @FXML
@@ -92,12 +97,6 @@ public class ExtensionController extends AbstractController {
 
     private ExtensionModel model;
 
-    private Stage stage;
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         model = new ExtensionModel();
@@ -105,8 +104,7 @@ public class ExtensionController extends AbstractController {
         signedFileSelectButton.setOnAction(new EventHandler<>() {
             @Override
             public void handle(ActionEvent event) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("File to extend");
+                DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser("File to extend");
                 File fileToExtend = fileChooser.showOpenDialog(stage);
                 model.setFileToExtend(fileToExtend);
             }
@@ -116,8 +114,7 @@ public class ExtensionController extends AbstractController {
         originalFilesSelectButton.setOnAction(new EventHandler<>() {
             @Override
             public void handle(ActionEvent event) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Original file(s)");
+                DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser("Original file(s)");
                 List<File> files = fileChooser.showOpenMultipleDialog(stage);
                 model.setOriginalDocuments(files);
             }
@@ -193,6 +190,8 @@ public class ExtensionController extends AbstractController {
                 service.start();
             }
         });
+
+        warningMockTSALabel.setVisible(Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock")));
     }
 
     protected void updateSignatureFormForASiC(ASiCContainerType newValue) {

@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0"
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
 	  prefWidth="1000.0"
 	  xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
 	  fx:controller="eu.europa.esig.dss.standalone.controller.MainController">
@@ -19,15 +19,15 @@
 		<Tab text="Extension">
 			<fx:include fx:id="extensionTab" source="extension.fxml"/>
 		</Tab>
+		<Tab text="Validation">
+			<fx:include fx:id="validationTab" source="validation.fxml"/>
+		</Tab>
 	</TabPane>
 
 	<VBox>
 		<padding>
 			<Insets left="20" right="20"/>
 		</padding>
-
-		<Label fx:id="warningMockTSALabel" styleClass="warningLabel"
-			   text="Warning ! The demonstration uses a dummy timestamp source."/>
 
 		<HBox fx:id="refreshBox" styleClass="hbox-style">
 			<Button fx:id="refreshLOTL" mnemonicParsing="false" text="Refresh LOTL"/>

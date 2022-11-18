@@ -1,6 +1,5 @@
 package eu.europa.esig.dss.standalone.source;
 
-import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
@@ -56,7 +55,7 @@ public class TLValidationJobExecutor {
 	private DSSFileLoader onlineLoader() {
 		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
 		onlineFileLoader.setCacheExpirationTime(0);
-		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setDataLoader(DataLoaderConfigLoader.getDataLoader());
 		onlineFileLoader.setFileCacheDirectory(cacheDirectory);
 		return onlineFileLoader;
 	}
@@ -67,10 +66,6 @@ public class TLValidationJobExecutor {
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader()); // do not download from Internet
 		offlineFileLoader.setFileCacheDirectory(cacheDirectory);
 		return offlineFileLoader;
-	}
-
-	private CommonsDataLoader dataLoader() {
-		return new CommonsDataLoader();
 	}
 
 	private LOTLSource europeanLOTL() {

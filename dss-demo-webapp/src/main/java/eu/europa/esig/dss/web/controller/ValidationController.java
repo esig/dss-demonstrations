@@ -252,10 +252,12 @@ public class ValidationController extends AbstractValidationController {
 			throw new SourceNotFoundException("Diagnostic data not found");
 		}
 
-		try {
+		try (InputStream is = new ByteArrayInputStream(diagnosticData.getBytes());
+			 OutputStream os = response.getOutputStream()) {
 			response.setContentType(MimeTypeEnum.XML.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
-			Utils.copy(new ByteArrayInputStream(diagnosticData.getBytes()), response.getOutputStream());
+			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnostic-data.xml");
+			Utils.copy(is, os);
+
 		} catch (IOException e) {
 			LOG.error("An error occurred while downloading diagnostic data : " + e.getMessage(), e);
 		}

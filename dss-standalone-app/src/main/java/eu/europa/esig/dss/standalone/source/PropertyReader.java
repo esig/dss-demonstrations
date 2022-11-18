@@ -6,7 +6,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class PropertyReader {
 
@@ -32,6 +36,22 @@ public class PropertyReader {
             return value;
         }
         return null;
+    }
+
+    public static char[] getCharArrayProperty(String propertyKey) {
+        if (getProperties().contains(propertyKey)) {
+            return getProperties().getProperty(propertyKey).toCharArray();
+        }
+        return null;
+    }
+
+    public static List<String> getPropertyAsList(String propertyKey) {
+        String value = getProperties().getProperty(propertyKey);
+        if (Utils.isStringNotBlank(value)) {
+            String[] strings = value.split(",");
+            return Arrays.stream(strings).map(String::trim).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     public static int getIntProperty(String propertyKey) {

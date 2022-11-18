@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="eu.europa.esig.dss.standalone.controller.validationresult.ValidationResultController">
+
+    <padding>
+        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0" />
+    </padding>
+
+    <HBox fx:id="noValidationResult" visible="true">
+        <Label styleClass="label-style" text="No signatures found"/>
+    </HBox>
+
+    <HBox fx:id="validationResultContainer" visible="false" VBox.vgrow="ALWAYS" maxHeight="Infinity">
+
+        <!-- List of found signatures -->
+        <VBox>
+            <padding>
+                <Insets right="15.0" />
+            </padding>
+            <HBox>
+                <Label styleClass="label-style" text="Found signatures/timestamps:"/>
+            </HBox>
+            <HBox>
+                <ListView fx:id="signaturesList" minHeight="160.0" minWidth="260.0"/>
+                <padding>
+                    <Insets bottom="15.0" />
+                </padding>
+            </HBox>
+            <HBox styleClass="hbox-style">
+                <Label styleClass="label-report-style" text="Simple report PDF"/>
+                <Button fx:id="simpleReportGenerate" mnemonicParsing="false" text="Generate"/>
+            </HBox>
+            <HBox styleClass="hbox-style">
+                <Label styleClass="label-report-style" text="Detailed report PDF"/>
+                <Button fx:id="detailedReportGenerate" mnemonicParsing="false" text="Generate"/>
+            </HBox>
+            <HBox styleClass="hbox-style">
+                <Label styleClass="label-report-style" text="Diagnostic Data XML"/>
+                <Button fx:id="diagnosticDataGenerate" mnemonicParsing="false" text="Generate"/>
+            </HBox>
+            <HBox styleClass="hbox-style">
+                <Label styleClass="label-report-style" text="ETSI Validation Report XML"/>
+                <Button fx:id="etsiVrGenerate" mnemonicParsing="false" text="Generate"/>
+            </HBox>
+            <HBox styleClass="hbox-style">
+                <padding>
+                    <Insets top="15.0" />
+                </padding>
+                <Label fx:id="projectVersion" text="Produced with : "/>
+            </HBox>
+        </VBox>
+
+        <!-- Validation result -->
+        <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity">
+            <Label fx:id="validationResultLabel" text="Validation result:"/>
+
+            <!-- Signature Validation result -->
+            <ScrollPane fx:id="validationResult" style="-fx-background: rgb(255,255,255);" VBox.vgrow="ALWAYS" maxHeight="Infinity" />
+
+        </VBox>
+
+    </HBox>
+
+</VBox>

@@ -9,8 +9,11 @@ import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.fx.CollectionFilesSelectToStringConverter;
+import eu.europa.esig.dss.standalone.fx.DSSFileChooser;
+import eu.europa.esig.dss.standalone.fx.DSSFileChooserLoader;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
+import eu.europa.esig.dss.standalone.source.PropertyReader;
 import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.SigningTask;
 import eu.europa.esig.dss.utils.Utils;
@@ -37,8 +40,6 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,20 +166,17 @@ public class SignatureController extends AbstractController {
 	private PasswordField pkcsPassword;
 
 	@FXML
+	public Label warningMockTSALabel;
+
+	@FXML
 	private Button signButton;
 
 	@FXML
 	private ProgressIndicator progressSign;
 	
 	private ProgressIndicator progressRefreshLOTL;
-		
-	private Stage stage;
 
 	private SignatureModel model;
-
-	public void setStage(Stage stage) {
-		this.stage = stage;
-	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -193,8 +191,7 @@ public class SignatureController extends AbstractController {
 		fileSelectButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("File(s) to sign");
+				DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser("File(s) to sign");
 				List<File> filesToSign = fileChooser.showOpenMultipleDialog(stage);
 				model.setFilesToSign(filesToSign);
 				updatePropertiesForm();
@@ -304,19 +301,19 @@ public class SignatureController extends AbstractController {
 		pkcsFileButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fileChooser = new FileChooser();
-				if (SignatureTokenType.PKCS11.equals(model.getTokenType())) {
-					fileChooser.setTitle("Library");
-					fileChooser.getExtensionFilters().add(
-							new FileChooser.ExtensionFilter("PKCS11 library (*.dll)", "*.dll"));
-				} else if (SignatureTokenType.PKCS12.equals(model.getTokenType())) {
-					fileChooser.setTitle("Keystore");
-					fileChooser.getExtensionFilters().add(
-							new FileChooser.ExtensionFilter("PKCS12 keystore (*.p12, *.pfx)", "*.p12", "*.pfx"));
+				DSSFileChooser fileChooser;
+				switch (model.getTokenType()) {
+					case PKCS11:
+						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
+								"Library", "PKCS11 library (*.dll)", "*.dll");
+						break;
+					case PKCS12:
+						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
+								"Keystore", "PKCS12 keystore (*.p12, *.pfx)", "*.p12", "*.pfx");
+						break;
+					default:
+						throw new UnsupportedOperationException(String.format("Token type '%s' is not supported!", model.getTokenType()));
 				}
-
-				FileChooser.ExtensionFilter allFilesExtensionFilter = new FileChooser.ExtensionFilter("All files", "*");
-				fileChooser.getExtensionFilters().add(allFilesExtensionFilter);
 
 				File pkcsFile = fileChooser.showOpenDialog(stage);
 				model.setPkcsFile(pkcsFile);
@@ -391,6 +388,7 @@ public class SignatureController extends AbstractController {
 			}
 		});
 
+		warningMockTSALabel.setVisible(Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock")));
 	}
 
 	private void updatePropertiesForm() {

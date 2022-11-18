@@ -10,7 +10,6 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
       prefWidth="1000.0"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
@@ -106,6 +105,9 @@
         <Label styleClass="label-style" text="Password"/>
         <PasswordField fx:id="pkcsPassword"/>
     </HBox>
+
+    <Label fx:id="warningMockTSALabel" styleClass="warningLabel"
+           text="Warning ! The demonstration uses a dummy timestamp source."/>
 
     <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text=""/>

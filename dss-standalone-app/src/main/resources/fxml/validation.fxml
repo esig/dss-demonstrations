@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="400.0" prefWidth="1000.0"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="eu.europa.esig.dss.standalone.controller.ValidationController">
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20"/>
+    </padding>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Signed file" style="-fx-font-weight: bold;"/>
+        <Button fx:id="signedFileSelectButton" mnemonicParsing="false" text="Select file..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Original file(s)"/>
+        <Button fx:id="originalFilesSelectButton" mnemonicParsing="false" text="Select file(s)..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Validation policy"/>
+        <Button fx:id="validationPolicySelectButton" mnemonicParsing="false" text="Select validation policy..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Signing Certificate"/>
+        <Button fx:id="signingCertificateSelectButton" mnemonicParsing="false" text="Select signing certificate..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Adjunct Certificates"/>
+        <Button fx:id="adjunctCertificatesSelectButton" mnemonicParsing="false" text="Select adjunct certificates..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="User-friendly identifiers"/>
+        <CheckBox fx:id="userFriendlyIdentifiersSelectButton"/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Semantics"/>
+        <CheckBox fx:id="semanticsSelectButton"/>
+    </HBox>
+
+    <HBox fx:id="validationBox" styleClass="hbox-style">
+        <Label styleClass="label-style" text=""/>
+        <Button fx:id="validateButton" mnemonicParsing="false" text="Validate document"/>
+    </HBox>
+
+</VBox>

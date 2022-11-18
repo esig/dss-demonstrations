@@ -51,7 +51,7 @@ public class XSLTService {
 		}
 	}
 
-	public  String generateDetailedReport(String detailedReport) {
+	public String generateDetailedReport(String detailedReport) {
 		try {
 			return DetailedReportFacade.newFacade().generateHtmlReport(detailedReport);
 		} catch (Exception e) {
