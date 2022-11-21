@@ -14,10 +14,6 @@ public class DSSFileChooser {
 
     private SimpleObjectProperty<File> directoryProperty;
 
-    public DSSFileChooser(String title) {
-        this(title, null);
-    }
-
     public DSSFileChooser(String title, String fileExtensionFilter, String... fileExtensions) {
         this.fileChooser = new FileChooser();
         this.fileChooser.setTitle(title);

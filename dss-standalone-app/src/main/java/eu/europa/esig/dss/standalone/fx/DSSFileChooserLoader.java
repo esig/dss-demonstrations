@@ -1,8 +1,8 @@
 package eu.europa.esig.dss.standalone.fx;
 
+import eu.europa.esig.dss.standalone.source.SystemPropertyReader;
 import javafx.beans.property.SimpleObjectProperty;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 
 public class DSSFileChooserLoader {
@@ -10,7 +10,7 @@ public class DSSFileChooserLoader {
     private static DSSFileChooserLoader instance;
 
     private final SimpleObjectProperty<File> lastKnownDirectoryProperty = new SimpleObjectProperty<>(
-            FileSystemView.getFileSystemView().getDefaultDirectory());
+            new File(SystemPropertyReader.getUserHome()));
 
     private DSSFileChooserLoader() {
     }

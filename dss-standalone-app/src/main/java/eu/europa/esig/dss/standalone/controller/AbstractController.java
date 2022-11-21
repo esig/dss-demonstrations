@@ -2,6 +2,7 @@ package eu.europa.esig.dss.standalone.controller;
 
 import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.standalone.source.SystemPropertyReader;
 import eu.europa.esig.dss.utils.Utils;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.Initializable;
@@ -10,14 +11,13 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.FileOutputStream;
 
 public abstract class AbstractController implements Initializable {
 
-    private final SimpleObjectProperty<File> lastKnownSavingDirectory = new SimpleObjectProperty<>(
-            FileSystemView.getFileSystemView().getDefaultDirectory());
+    private static final SimpleObjectProperty<File> lastKnownSavingDirectory = new SimpleObjectProperty<>(
+            new File(SystemPropertyReader.getUserHome()));
 
     protected Stage stage;
 
