@@ -23,6 +23,8 @@ import eu.europa.esig.dss.spi.x509.aia.OnlineAIASource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
+import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
+import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.validation.CertificateVerifier;
@@ -52,6 +54,8 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
@@ -82,6 +86,24 @@ public class DSSBeanConfig {
 
 	@Value("${oj.content.keystore.password}")
 	private String ksPassword;
+
+	@Value("${tl.loader.ades.enabled}")
+	private boolean adesLotlEnabled;
+
+	@Value("${tl.loader.ades.lotlUrl}")
+	private String adesLotlUrl;
+
+	@Value("${tl.loader.ades.keystore.type}")
+	private String adesKeyStoreType;
+
+	@Value("${tl.loader.ades.keystore.filename}")
+	private String adesKeyStoreFilename;
+
+	@Value("${tl.loader.ades.keystore.password}")
+	private String adesKeyStorePassword;
+
+	@Value("${tl.loader.ades.tsl.type}")
+	private String adesTSLType;
 
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
@@ -298,12 +320,21 @@ public class DSSBeanConfig {
 			throw new DSSException("Unable to load the file " + ksFilename, e);
 		}
 	}
+
+	@Bean
+	public KeyStoreCertificateSource adesLotlKeyStore() {
+		try {
+			return new KeyStoreCertificateSource(new ClassPathResource(adesKeyStoreFilename).getFile(), adesKeyStoreType, adesKeyStorePassword);
+		} catch (IOException e) {
+			throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
+		}
+	}
 	
 	@Bean 
 	public TLValidationJob job() {
 		TLValidationJob job = new TLValidationJob();
 		job.setTrustedListCertificateSource(trustedListSource());
-		job.setListOfTrustedListSources(europeanLOTL());
+		job.setListOfTrustedListSources(listOfTrustedListSources());
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
 		return job;
@@ -318,6 +349,15 @@ public class DSSBeanConfig {
 		return onlineFileLoader;
 	}
 
+	private LOTLSource[] listOfTrustedListSources() {
+		List<LOTLSource> lotlSourceList = new ArrayList<>();
+		lotlSourceList.add(europeanLOTL());
+		if (adesLotlEnabled) {
+			lotlSourceList.add(adesLOTL());
+		}
+		return lotlSourceList.toArray(new LOTLSource[0]);
+	}
+
 	@Bean(name = "european-lotl-source")
 	public LOTLSource europeanLOTL() {
 		LOTLSource lotlSource = new LOTLSource();
@@ -326,6 +366,20 @@ public class DSSBeanConfig {
 		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(currentOjUrl));
 		lotlSource.setPivotSupport(true);
 		return lotlSource;
+	}
+
+	@Bean(name = "ades-source")
+	public LOTLSource adesLOTL() {
+		LOTLSource adesLOTL = new LOTLSource();
+		adesLOTL.setUrl(adesLotlUrl);
+		adesLOTL.setCertificateSource(adesLotlKeyStore());
+		adesLOTL.setMraSupport(true);
+		adesLOTL.setPivotSupport(false);
+
+		adesLOTL.setLotlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)));
+		adesLOTL.setTlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)).negate()); // allow all TSL Types
+
+		return adesLOTL;
 	}
 
 	@Bean
