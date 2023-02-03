@@ -29,6 +29,7 @@ import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
@@ -198,10 +199,10 @@ public class ValidationController extends AbstractValidationController {
             try (InputStream is = defaultPolicy.getInputStream()) {
                 reports = documentValidator.validateDocument(is);
             } catch (IOException e) {
-                LOG.error("Unable to parse policy : " + e.getMessage(), e);
+				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
             }
 		} else {
-			LOG.error("Not correctly initialized");
+			throw new IllegalStateException("Validation policy is not correctly initialized!");
 		}
 
 		Date end = new Date();

@@ -63,6 +63,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore.PasswordProtection;
 
 @Configuration
@@ -371,13 +372,27 @@ public class DSSBeanConfig {
 	public RemoteDocumentValidationService remoteValidationService() {
 		RemoteDocumentValidationService service = new RemoteDocumentValidationService();
 		service.setVerifier(certificateVerifier());
+		if (defaultPolicy() != null) {
+			try (InputStream is = defaultPolicy().getInputStream()) {
+				service.setDefaultValidationPolicy(is);
+			} catch (IOException e) {
+				LOG.error(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
+		}
 		return service;
 	}
 	
 	@Bean
-	public RemoteCertificateValidationService RemoteCertificateValidationService() {
+	public RemoteCertificateValidationService remoteCertificateValidationService() {
 		RemoteCertificateValidationService service = new RemoteCertificateValidationService();
 		service.setVerifier(certificateVerifier());
+		if (defaultPolicy() != null) {
+			try (InputStream is = defaultPolicy().getInputStream()) {
+				service.setDefaultValidationPolicy(is);
+			} catch (IOException e) {
+				LOG.error(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
+		}
 		return service;
 	}
 

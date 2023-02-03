@@ -13,11 +13,14 @@ import eu.europa.esig.dss.validation.TokenIdentifierProvider;
 import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.model.CertificateForm;
 import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,6 +34,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +54,9 @@ public class CertificateValidationController extends AbstractValidationControlle
 	
 	private static final String[] ALLOWED_FIELDS = { "certificateForm.certificateFile", "certificateForm.certificateBase64", "certificateChainFiles",
 			"validationTime", "includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
+
+	@Autowired
+	private Resource defaultPolicy;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -106,7 +114,16 @@ public class CertificateValidationController extends AbstractValidationControlle
 		}
 		certificateValidator.setLocale(locale);
 
-		CertificateReports reports = certificateValidator.validate();
+		CertificateReports reports;
+		if (defaultPolicy != null) {
+			try (InputStream is = defaultPolicy.getInputStream()) {
+				reports = certificateValidator.validate(is);
+			} catch (IOException e) {
+				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
+		} else {
+			throw new IllegalStateException("Validation policy is not correctly initialized!");
+		}
 
 		// reports.print();
 

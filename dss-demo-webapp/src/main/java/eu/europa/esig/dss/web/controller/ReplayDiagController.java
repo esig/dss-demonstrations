@@ -16,6 +16,8 @@ import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.model.ReplayDiagForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,6 +48,9 @@ public class ReplayDiagController extends AbstractValidationController {
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
 	private static final String[] ALLOWED_FIELDS = { "diagnosticFile", "resetDate", "validationLevel", "defaultPolicy", "policyFile" };
+
+	@Autowired
+	private Resource defaultPolicy;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -106,16 +111,16 @@ public class ReplayDiagController extends AbstractValidationController {
 			try (InputStream policyIs = replayDiagForm.getPolicyFile().getInputStream()) {
 				executor.setValidationPolicy(new EtsiValidationPolicy(ValidationPolicyFacade.newFacade().unmarshall(policyIs)));
 			} catch (Exception e) {
-				LOG.warn("Unable to parse the provided validation policy", e);
-				throw new InternalServerException("Error while loading the provided validation policy");
+				throw new InternalServerException(String.format("Error while loading the provided validation policy: %s", e.getMessage()), e);
+			}
+		} else if (defaultPolicy != null) {
+			try (InputStream is = defaultPolicy.getInputStream()) {
+				executor.setValidationPolicy(ValidationPolicyFacade.newFacade().getValidationPolicy(is));
+			} catch (Exception e) {
+				throw new InternalServerException(String.format("Error while loading the default validation policy: %s", e.getMessage()), e);
 			}
 		} else {
-			try {
-				executor.setValidationPolicy(ValidationPolicyFacade.newFacade().getDefaultValidationPolicy());
-			} catch (Exception e) {
-				LOG.warn("Unable to parse the default validation policy", e);
-				throw new InternalServerException("Error while loading the default validation policy");
-			}
+			throw new IllegalStateException("Validation policy is not correctly initialized!");
 		}
 		
 		// If applicable, set certificate id

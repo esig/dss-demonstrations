@@ -1,13 +1,21 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
+import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
+import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
+import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.CertificateValidator;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
+import eu.europa.esig.dss.validation.reports.CertificateReports;
+import eu.europa.esig.dss.web.exception.InternalServerException;
+import eu.europa.esig.dss.web.model.QwacValidationForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,17 +27,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
-import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.model.x509.CertificateToken;
-import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
-import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
-import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateValidator;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
-import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.web.model.QwacValidationForm;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
@@ -45,6 +47,9 @@ public class QwacValidationController extends AbstractValidationController {
 	
 	@Autowired
 	protected SSLCertificateLoader sslCertificateLoader;
+
+	@Autowired
+	private Resource defaultPolicy;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -92,7 +97,16 @@ public class QwacValidationController extends AbstractValidationController {
 			certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
 					qwacValidationForm.isIncludeRevocationTokens()));
 
-			CertificateReports reports = certificateValidator.validate();
+			CertificateReports reports = null;
+			if (defaultPolicy != null) {
+				try (InputStream is = defaultPolicy.getInputStream()) {
+					reports = certificateValidator.validate(is);
+				} catch (IOException e) {
+					throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
+				}
+			} else {
+				throw new IllegalStateException("Validation policy is not correctly initialized!");
+			}
 			
 			setAttributesModels(model, reports);
 
