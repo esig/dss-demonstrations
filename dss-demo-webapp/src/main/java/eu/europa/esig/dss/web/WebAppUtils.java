@@ -105,7 +105,7 @@ public final class WebAppUtils {
             }
         } catch (DSSException | IOException e) {
             LOG.warn("Cannot convert file to X509 Certificate", e);
-            throw new DSSException("Unsupported certificate format for file '" + certificateFile.getOriginalFilename() + "'");
+			throw new DSSException("Unsupported certificate or file format!");
         }
         return null;
     }
