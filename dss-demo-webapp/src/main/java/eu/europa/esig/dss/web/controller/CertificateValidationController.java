@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -43,7 +42,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/certificate-validation")
 public class CertificateValidationController extends AbstractValidationController {
 
@@ -56,7 +54,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 			"validationTime", "includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
 
 	@Autowired
-	private Resource defaultPolicy;
+	private Resource defaultCertificateValidationPolicy;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -115,8 +113,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 		certificateValidator.setLocale(locale);
 
 		CertificateReports reports;
-		if (defaultPolicy != null) {
-			try (InputStream is = defaultPolicy.getInputStream()) {
+		if (defaultCertificateValidationPolicy != null) {
+			try (InputStream is = defaultCertificateValidationPolicy.getInputStream()) {
 				reports = certificateValidator.validate(is);
 			} catch (IOException e) {
 				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
@@ -161,7 +159,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 	
 	@ModelAttribute("displayDownloadPdf")
 	public boolean isDisplayDownloadPdf() {
-		return false;
+		return true;
 	}
 
 }

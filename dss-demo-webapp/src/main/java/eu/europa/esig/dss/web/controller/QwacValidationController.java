@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -34,7 +33,6 @@ import java.io.InputStream;
 import java.util.List;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/qwac-validation")
 public class QwacValidationController extends AbstractValidationController {
 
@@ -49,7 +47,7 @@ public class QwacValidationController extends AbstractValidationController {
 	protected SSLCertificateLoader sslCertificateLoader;
 
 	@Autowired
-	private Resource defaultPolicy;
+	private Resource defaultCertificateValidationPolicy;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -98,8 +96,8 @@ public class QwacValidationController extends AbstractValidationController {
 					qwacValidationForm.isIncludeRevocationTokens()));
 
 			CertificateReports reports = null;
-			if (defaultPolicy != null) {
-				try (InputStream is = defaultPolicy.getInputStream()) {
+			if (defaultCertificateValidationPolicy != null) {
+				try (InputStream is = defaultCertificateValidationPolicy.getInputStream()) {
 					reports = certificateValidator.validate(is);
 				} catch (IOException e) {
 					throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
@@ -107,10 +105,9 @@ public class QwacValidationController extends AbstractValidationController {
 			} else {
 				throw new IllegalStateException("Validation policy is not correctly initialized!");
 			}
-			
-			setAttributesModels(model, reports);
 
 			model.addAttribute("currentCertificate", qwacCertificate.getDSSIdAsString());
+			setAttributesModels(model, reports);
 
 			LOG.info("End certificate validation");
 
@@ -118,6 +115,11 @@ public class QwacValidationController extends AbstractValidationController {
 		}
 
 		throw new DSSException(String.format("The requested URL '%s' did not return a list of certificates to validate.", url));
+	}
+
+	@ModelAttribute("displayDownloadPdf")
+	public boolean isDisplayDownloadPdf() {
+		return true;
 	}
 
 }

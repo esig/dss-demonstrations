@@ -52,7 +52,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,7 +66,6 @@ import java.util.List;
 import java.util.Locale;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/validation")
 public class ValidationController extends AbstractValidationController {
 
@@ -166,7 +164,6 @@ public class ValidationController extends AbstractValidationController {
 			signingCertificateSource.addCertificate(signingCertificate);
 			documentValidator.setSigningCertificateSource(signingCertificateSource);
 		}
-
 	}
 
 	private CertificateVerifier getCertificateVerifier(ValidationForm certValidationForm) {
@@ -214,32 +211,38 @@ public class ValidationController extends AbstractValidationController {
 
 	@RequestMapping(value = "/download-simple-report")
 	public void downloadSimpleReport(HttpSession session, HttpServletResponse response) {
-		String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
-		if (simpleReport == null) {
+		final String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
+		final String simpleCertificateReport = (String) session.getAttribute(XML_SIMPLE_CERTIFICATE_REPORT_ATTRIBUTE);
+		if (Utils.isStringNotEmpty(simpleReport)) {
+			try {
+				response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
+				response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
+				fopService.generateSimpleReport(simpleReport, response.getOutputStream());
+			} catch (Exception e) {
+				LOG.error("An error occurred while generating pdf for simple report : " + e.getMessage(), e);
+			}
+		} else if (Utils.isStringNotEmpty(simpleCertificateReport)) {
+			try {
+				response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
+				response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-certificate-report.pdf");
+				fopService.generateSimpleCertificateReport(simpleCertificateReport, response.getOutputStream());
+			} catch (Exception e) {
+				LOG.error("An error occurred while generating pdf for simple certificate report : " + e.getMessage(), e);
+			}
+		} else {
 			throw new SourceNotFoundException("Simple report not found");
-		}
-
-		try {
-			response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
-
-			fopService.generateSimpleReport(simpleReport, response.getOutputStream());
-		} catch (Exception e) {
-			LOG.error("An error occurred while generating pdf for simple report : " + e.getMessage(), e);
 		}
 	}
 
 	@RequestMapping(value = "/download-detailed-report")
 	public void downloadDetailedReport(HttpSession session, HttpServletResponse response) {
-		String detailedReport = (String) session.getAttribute(XML_DETAILED_REPORT_ATTRIBUTE);
+		final String detailedReport = (String) session.getAttribute(XML_DETAILED_REPORT_ATTRIBUTE);
 		if (detailedReport == null) {
 			throw new SourceNotFoundException("Detailed report not found");
 		}
-
 		try {
 			response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Detailed-report.pdf");
-
 			fopService.generateDetailedReport(detailedReport, response.getOutputStream());
 		} catch (Exception e) {
 			LOG.error("An error occurred while generating pdf for detailed report : " + e.getMessage(), e);

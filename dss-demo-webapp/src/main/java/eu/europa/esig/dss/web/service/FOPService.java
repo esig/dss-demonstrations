@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.service;
 
 import eu.europa.esig.dss.detailedreport.DetailedReportFacade;
+import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportFacade;
 import eu.europa.esig.dss.simplereport.SimpleReportFacade;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.fop.apps.FOUserAgent;
@@ -54,6 +55,12 @@ public class FOPService {
 		Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, os);
 		Result result = new SAXResult(fop.getDefaultHandler());
 		SimpleReportFacade.newFacade().generatePdfReport(simpleReport, result);
+	}
+
+	public void generateSimpleCertificateReport(String simpleCertificateReport, OutputStream os) throws Exception {
+		Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, os);
+		Result result = new SAXResult(fop.getDefaultHandler());
+		SimpleCertificateReportFacade.newFacade().generatePdfReport(simpleCertificateReport, result);
 	}
 
 	public void generateDetailedReport(String detailedReport, OutputStream os) throws Exception {

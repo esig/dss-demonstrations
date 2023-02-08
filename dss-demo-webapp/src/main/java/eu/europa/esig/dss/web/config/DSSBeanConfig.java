@@ -78,6 +78,9 @@ public class DSSBeanConfig {
 	@Value("${default.validation.policy}")
 	private String defaultValidationPolicy;
 
+	@Value("${default.certificate.validation.policy}")
+	private String defaultCertificateValidationPolicy;
+
 	@Value("${current.lotl.url}")
 	private String lotlUrl;
 
@@ -269,6 +272,11 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
+	public ClassPathResource defaultCertificateValidationPolicy() {
+		return new ClassPathResource(defaultCertificateValidationPolicy);
+	}
+
+	@Bean
 	public CAdESService cadesService() {
 		CAdESService service = new CAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
@@ -386,8 +394,8 @@ public class DSSBeanConfig {
 	public RemoteCertificateValidationService remoteCertificateValidationService() {
 		RemoteCertificateValidationService service = new RemoteCertificateValidationService();
 		service.setVerifier(certificateVerifier());
-		if (defaultPolicy() != null) {
-			try (InputStream is = defaultPolicy().getInputStream()) {
+		if (defaultCertificateValidationPolicy() != null) {
+			try (InputStream is = defaultCertificateValidationPolicy().getInputStream()) {
 				service.setDefaultValidationPolicy(is);
 			} catch (IOException e) {
 				LOG.error(String.format("Unable to parse policy: %s", e.getMessage()), e);
