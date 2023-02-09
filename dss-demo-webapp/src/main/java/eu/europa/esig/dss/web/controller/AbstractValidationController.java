@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@SessionAttributes({ "simpleReportXml", "simpleCertificateReportXml", "detailedReportXml", "diagnosticTree" })
+@SessionAttributes({ "simpleReportXml", "simpleCertificateReportXml", "detailedReportXml", "diagnosticDataXml", "diagnosticTree" })
 public abstract class AbstractValidationController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractValidationController.class);
