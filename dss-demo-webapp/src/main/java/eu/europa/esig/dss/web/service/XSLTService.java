@@ -4,7 +4,7 @@ import eu.europa.esig.dss.DSSXmlErrorListener;
 import eu.europa.esig.dss.detailedreport.DetailedReportFacade;
 import eu.europa.esig.dss.diagnostic.DiagnosticDataXmlDefiner;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
-import eu.europa.esig.dss.simplereport.SimpleReportFacade;
+import eu.europa.esig.dss.simplereport.SimpleReportXmlDefiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,15 +23,16 @@ public class XSLTService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(XSLTService.class);
 
-	@Value("${tl.browser.trustmark.root.url}")
-	private String rootTrustmarkUrlInTlBrowser;
-
-	@Value("${tl.browser.country.root.url}")
-	private String rootCountryUrlInTlBrowser;
+	@Value("${tl.browser.root.url}")
+	private String rootUrlInTlBrowser;
 
 	public String generateSimpleReport(String simpleReport) {
-		try {
-			return SimpleReportFacade.newFacade().generateHtmlReport(simpleReport);
+		try (Writer writer = new StringWriter()) {
+			Transformer transformer = SimpleReportXmlDefiner.getHtmlBootstrap4Templates().newTransformer();
+			transformer.setErrorListener(new DSSXmlErrorListener());
+			transformer.setParameter("rootUrlInTlBrowser", rootUrlInTlBrowser);
+			transformer.transform(new StreamSource(new StringReader(simpleReport)), new StreamResult(writer));
+			return writer.toString();
 		} catch (Exception e) {
 			LOG.error("Error while generating simple report : " + e.getMessage(), e);
 			return null;
@@ -41,8 +42,7 @@ public class XSLTService {
 	public String generateSimpleCertificateReport(String simpleReport) {
 		try (Writer writer = new StringWriter()) {
 			Transformer transformer = SimpleCertificateReportXmlDefiner.getHtmlBootstrap4Templates().newTransformer();
-			transformer.setParameter("rootTrustmarkUrlInTlBrowser", rootTrustmarkUrlInTlBrowser);
-			transformer.setParameter("rootCountryUrlInTlBrowser", rootCountryUrlInTlBrowser);
+			transformer.setParameter("rootUrlInTlBrowser", rootUrlInTlBrowser);
 			transformer.transform(new StreamSource(new StringReader(simpleReport)), new StreamResult(writer));
 			return writer.toString();
 		} catch (Exception e) {
