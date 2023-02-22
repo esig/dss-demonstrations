@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EsigValidationTest {
 
-    private static final String URL_ACCESS_POINT = "https://esignature.ec.europa.eu";
+    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu";
 
     private static final List<String> TO_BE_VALIDATED = Arrays.asList("2", "3");
 
