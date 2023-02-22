@@ -55,7 +55,7 @@
 		<thymeleaf-layout-dialect.version>3.1.0</thymeleaf-layout-dialect.version>
 		<groovy.version>4.0.3</groovy.version> <!-- To be used while thymeleaf-layout-dialect is not updated -->
 		<jackson-jaxrs-json-provider.version>2.13.4</jackson-jaxrs-json-provider.version>
-		<commons-fileupload.version>1.4</commons-fileupload.version>
+		<commons-fileupload.version>1.5</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version>
 		<freemarker.version>2.3.31</freemarker.version>
