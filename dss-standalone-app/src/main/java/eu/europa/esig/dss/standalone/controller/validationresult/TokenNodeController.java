@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.standalone.controller.validationresult;
 
 import eu.europa.esig.dss.enumerations.Indication;
+import eu.europa.esig.dss.simplereport.jaxb.XmlCertificate;
 import eu.europa.esig.dss.simplereport.jaxb.XmlCertificateChain;
 import eu.europa.esig.dss.simplereport.jaxb.XmlDetails;
 import eu.europa.esig.dss.simplereport.jaxb.XmlMessage;
@@ -9,6 +10,8 @@ import eu.europa.esig.dss.simplereport.jaxb.XmlSignatureScope;
 import eu.europa.esig.dss.simplereport.jaxb.XmlTimestamp;
 import eu.europa.esig.dss.simplereport.jaxb.XmlTimestamps;
 import eu.europa.esig.dss.simplereport.jaxb.XmlToken;
+import eu.europa.esig.dss.simplereport.jaxb.XmlTrustAnchor;
+import eu.europa.esig.dss.simplereport.jaxb.XmlTrustAnchors;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.standalone.controller.AbstractController;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
@@ -282,10 +285,27 @@ public class TokenNodeController extends AbstractController {
         List<Node> result = new ArrayList<>();
         if (xmlCertificateChain != null && Utils.isCollectionNotEmpty(xmlCertificateChain.getCertificate())) {
             for (int i = 0; i < xmlCertificateChain.getCertificate().size(); i++) {
-                Text text = new Text(xmlCertificateChain.getCertificate().get(i).getQualifiedName());
+                XmlCertificate xmlCertificate = xmlCertificateChain.getCertificate().get(i);
+                Text text = new Text(xmlCertificate.getQualifiedName());
                 result.add(text);
                 if (i == 0) {
                     text.setStyle("-fx-font-weight: bold");
+                }
+                if (!isTrustedPath(xmlCertificate, xmlCertificateChain)) {
+                    text.setFill(Color.GRAY);
+                }
+                if (xmlCertificate.isTrusted()) {
+                    XmlTrustAnchors trustAnchors = xmlCertificate.getTrustAnchors();
+                    if (trustAnchors != null && Utils.isCollectionNotEmpty(trustAnchors.getTrustAnchor())) {
+                        for (XmlTrustAnchor xmlTrustAnchor : trustAnchors.getTrustAnchor()) {
+                            result.add(getIconArrow());
+                            result.add(new Text(xmlTrustAnchor.getCountryCode()));
+                            result.add(getIconArrow());
+                            result.add(new Text(xmlTrustAnchor.getTrustServiceProvider()));
+                        }
+                    } else {
+                        result.add(new Text(" (Trust Anchor)"));
+                    }
                 }
                 if (i + 1 != xmlCertificateChain.getCertificate().size()) {
                     result.add(new Text(System.lineSeparator()));
@@ -295,6 +315,24 @@ public class TokenNodeController extends AbstractController {
             result.add(new Text("-"));
         }
         return result;
+    }
+
+    private Node getIconArrow() {
+        Text text = new Text();
+        text.setText(" -> ");
+        return text;
+    }
+
+    private boolean isTrustedPath(XmlCertificate xmlCertificate, XmlCertificateChain xmlCertificateChain) {
+        boolean trustAnchorFound = false;
+        for (int i = xmlCertificateChain.getCertificate().size() - 1; i > -1; i--) {
+            XmlCertificate chainItem = xmlCertificateChain.getCertificate().get(i);
+            trustAnchorFound = trustAnchorFound || chainItem.isTrusted();
+            if (xmlCertificate == chainItem) {
+                return trustAnchorFound;
+            }
+        }
+        return trustAnchorFound;
     }
 
     protected List<Node> getSignatureScope(List<XmlSignatureScope> signatureScopes) {
