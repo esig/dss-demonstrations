@@ -23,6 +23,7 @@ public final class EtsiNamespaceValidationReportFacade extends ValidationReportF
      * Default constructor
      */
     private EtsiNamespaceValidationReportFacade() {
+        // empty
     }
 
     /**
