@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.web.service;
 
 import eu.europa.esig.dss.DSSXmlErrorListener;
-import eu.europa.esig.dss.detailedreport.DetailedReportFacade;
+import eu.europa.esig.dss.detailedreport.DetailedReportXmlDefiner;
 import eu.europa.esig.dss.diagnostic.DiagnosticDataXmlDefiner;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
 import eu.europa.esig.dss.simplereport.SimpleReportXmlDefiner;
@@ -42,6 +42,7 @@ public class XSLTService {
 	public String generateSimpleCertificateReport(String simpleReport) {
 		try (Writer writer = new StringWriter()) {
 			Transformer transformer = SimpleCertificateReportXmlDefiner.getHtmlBootstrap4Templates().newTransformer();
+			transformer.setErrorListener(new DSSXmlErrorListener());
 			transformer.setParameter("rootUrlInTlBrowser", rootUrlInTlBrowser);
 			transformer.transform(new StreamSource(new StringReader(simpleReport)), new StreamResult(writer));
 			return writer.toString();
@@ -52,8 +53,11 @@ public class XSLTService {
 	}
 
 	public String generateDetailedReport(String detailedReport) {
-		try {
-			return DetailedReportFacade.newFacade().generateHtmlReport(detailedReport);
+		try (Writer writer = new StringWriter()) {
+			Transformer transformer = DetailedReportXmlDefiner.getHtmlBootstrap4Templates().newTransformer();
+			transformer.setErrorListener(new DSSXmlErrorListener());
+			transformer.transform(new StreamSource(new StringReader(detailedReport)), new StreamResult(writer));
+			return writer.toString();
 		} catch (Exception e) {
 			LOG.error("Error while generating detailed report : " + e.getMessage(), e);
 			return null;
