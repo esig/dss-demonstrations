@@ -9,11 +9,11 @@
 	<name>DSS standalone application packager</name>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip</jre.download.link>
-		<jre.root.folder>jdk-18.0.2.1+1-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin19-binaries/releases/download/jdk-19.0.2%2B7/OpenJDK19U-jre_x64_windows_hotspot_19.0.2_7.zip</jre.download.link>
+		<jre.root.folder>jdk-19.0.2+7-jre</jre.root.folder>
 		
-		<fx.sdk.download.link>https://download2.gluonhq.com/openjfx/18.0.2/openjfx-18.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-18.0.2</fx.root.folder>
+		<fx.sdk.download.link>https://download2.gluonhq.com/openjfx/19.0.2.1/openjfx-19.0.2.1_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-19.0.2.1</fx.root.folder>
 	</properties>
 
 	<dependencies>
