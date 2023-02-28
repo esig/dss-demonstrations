@@ -148,6 +148,10 @@
   background: url(../images/flags/uk.svg);
   background-size: cover;
 }
+.flag_UA {
+  background: url(../images/flags/ua.svg);
+  background-size: cover;
+}
 .flag_no_country {
   background: url(../images/flags/no_country.svg);
   background-size: cover;
