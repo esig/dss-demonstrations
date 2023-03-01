@@ -1,4 +1,3 @@
-
 .small_flag {
   display: block;
   width: 32px;
@@ -6,6 +5,12 @@
   float: left;
   border: 1px solid #ececec;
   margin-right: 5px;
+}
+.small_flag_sig {
+   display: inline-block;
+   width: 24px;
+   height : 18px;
+   border: 1px solid #ececec;
 }
 
 .flag {
@@ -141,6 +146,10 @@
 }
 .flag_UK {
   background: url(../images/flags/uk.svg);
+  background-size: cover;
+}
+.flag_UA {
+  background: url(../images/flags/ua.svg);
   background-size: cover;
 }
 .flag_no_country {

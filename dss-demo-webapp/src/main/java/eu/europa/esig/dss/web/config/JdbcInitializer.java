@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.config;
 
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
+import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,32 +17,55 @@ import java.sql.SQLException;
 @Component
 public class JdbcInitializer {
 
-    @Autowired
-    private JdbcCacheAIASource cachedAIASource;
+    @Autowired(required = false)
+    private JdbcCacheAIASource jdbcCacheAIASource;
 
-    @Autowired
-    private JdbcCacheCRLSource cachedCRLSource;
+    @Autowired(required = false)
+    private JdbcCacheCRLSource jdbcCacheCRLSource;
+
+    @Autowired(required = false)
+    private JdbcCacheOCSPSource jdbcCacheOCSPSource;
 
     @PostConstruct
     public void cachedAIASourceInitialization() throws SQLException {
-        cachedAIASource.initTable();
+        if (jdbcCacheAIASource != null) {
+            jdbcCacheAIASource.initTable();
+        }
     }
 
     @PostConstruct
     public void cachedCRLSourceInitialization() throws SQLException {
-        cachedCRLSource.initTable();
+        if (jdbcCacheCRLSource != null) {
+            jdbcCacheCRLSource.initTable();
+        }
+    }
+
+    @PostConstruct
+    public void cacheOCSPSourceInitialization() throws SQLException {
+        if (jdbcCacheOCSPSource != null) {
+            jdbcCacheOCSPSource.initTable();
+        }
     }
 
     @PreDestroy
     public void cachedAIASourceClean() throws SQLException {
-        cachedAIASource.destroyTable();
+        if (jdbcCacheAIASource != null) {
+            jdbcCacheAIASource.destroyTable();
+        }
     }
 
     @PreDestroy
     public void cachedCRLSourceClean() throws SQLException {
-        cachedCRLSource.destroyTable();
+        if (jdbcCacheCRLSource != null) {
+            jdbcCacheCRLSource.destroyTable();
+        }
     }
 
-    // OCSP cache is not used
+    @PreDestroy
+    public void cachedOCSPSourceClean() throws SQLException {
+        if (jdbcCacheOCSPSource != null) {
+            jdbcCacheOCSPSource.destroyTable();
+        }
+    }
 
 }

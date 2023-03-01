@@ -16,10 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+@SessionAttributes({ "simpleReportXml", "simpleCertificateReportXml", "detailedReportXml", "diagnosticDataXml", "diagnosticTree" })
 public abstract class AbstractValidationController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractValidationController.class);
@@ -28,6 +31,7 @@ public abstract class AbstractValidationController {
 	protected static final String DETAILED_REPORT_ATTRIBUTE = "detailedReport";
 	
 	protected static final String XML_SIMPLE_REPORT_ATTRIBUTE = "simpleReportXml";
+	protected static final String XML_SIMPLE_CERTIFICATE_REPORT_ATTRIBUTE = "simpleCertificateReportXml";
 	protected static final String XML_DETAILED_REPORT_ATTRIBUTE = "detailedReportXml";
 	protected static final String XML_DIAGNOSTIC_DATA_ATTRIBUTE = "diagnosticDataXml";
 	protected static final String ETSI_VALIDATION_REPORT_ATTRIBUTE = "etsiValidationReport";
@@ -44,10 +48,13 @@ public abstract class AbstractValidationController {
 
 	public void setAttributesModels(Model model, AbstractReports reports) {
 		String xmlSimpleReport = reports.getXmlSimpleReport();
-		model.addAttribute(XML_SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
 		if (reports instanceof CertificateReports) {
+			model.addAttribute(XML_SIMPLE_REPORT_ATTRIBUTE, Utils.EMPTY_STRING);
+			model.addAttribute(XML_SIMPLE_CERTIFICATE_REPORT_ATTRIBUTE, xmlSimpleReport);
 			model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xsltService.generateSimpleCertificateReport(xmlSimpleReport));
 		} else {
+			model.addAttribute(XML_SIMPLE_REPORT_ATTRIBUTE, xmlSimpleReport);
+			model.addAttribute(XML_SIMPLE_CERTIFICATE_REPORT_ATTRIBUTE, Utils.EMPTY_STRING);
 			model.addAttribute(SIMPLE_REPORT_ATTRIBUTE, xsltService.generateSimpleReport(xmlSimpleReport));
 		}
 
@@ -74,10 +81,10 @@ public abstract class AbstractValidationController {
 		model.addAttribute(ALL_REVOCATION_DATA_ATTRIBUTE, buildTokenDtos(diagnosticData.getAllRevocationData()));
 
 		// Get Timestamps for which binaries are available
-		model.addAttribute(ALL_TIMESTAMPS_ATTRIBUTE, buildTokenDtos(diagnosticData.getTimestampSet()));
+		model.addAttribute(ALL_TIMESTAMPS_ATTRIBUTE, buildTokenDtos(diagnosticData.getTimestampList()));
 	}
 
-	private Set<TokenDTO> buildTokenDtos(Set<? extends AbstractTokenProxy> abstractTokens) {
+	private Set<TokenDTO> buildTokenDtos(Collection<? extends AbstractTokenProxy> abstractTokens) {
 		Set<TokenDTO> tokenDtos = new HashSet<>();
 		for (AbstractTokenProxy token : abstractTokens) {
 			if (token.getBinaries() != null) {

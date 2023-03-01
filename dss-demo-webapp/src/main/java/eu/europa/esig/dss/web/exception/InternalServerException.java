@@ -12,4 +12,8 @@ public class InternalServerException extends RuntimeException {
 		super(message);
 	}
 
+	public InternalServerException(String message, Exception e) {
+		super(message, e);
+	}
+
 }

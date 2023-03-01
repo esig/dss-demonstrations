@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.11</version>
+		<version>5.12.RC1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -425,7 +425,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-    		<version>4.6.1</version>
+    		<version>4.6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
@@ -449,7 +449,7 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.3.Final</version> <!-- 6 version to be used until javax to jakarta update -->
+			<version>6.2.5.Final</version> <!-- 6 version to be used until javax to jakarta update -->
 		</dependency>
 		
 		<dependency>
@@ -465,7 +465,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
-			<version>9.0.68</version>
+			<version>9.0.71</version>
 			<scope>test</scope>
 		</dependency>
 

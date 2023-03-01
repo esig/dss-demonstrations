@@ -1,24 +1,5 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
 import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.x509.CertificateToken;
@@ -29,10 +10,29 @@ import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
+import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.model.QwacValidationForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/qwac-validation")
 public class QwacValidationController extends AbstractValidationController {
 
@@ -45,6 +45,9 @@ public class QwacValidationController extends AbstractValidationController {
 	
 	@Autowired
 	protected SSLCertificateLoader sslCertificateLoader;
+
+	@Autowired
+	private Resource defaultCertificateValidationPolicy;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -92,11 +95,19 @@ public class QwacValidationController extends AbstractValidationController {
 			certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
 					qwacValidationForm.isIncludeRevocationTokens()));
 
-			CertificateReports reports = certificateValidator.validate();
-			
-			setAttributesModels(model, reports);
+			CertificateReports reports = null;
+			if (defaultCertificateValidationPolicy != null) {
+				try (InputStream is = defaultCertificateValidationPolicy.getInputStream()) {
+					reports = certificateValidator.validate(is);
+				} catch (IOException e) {
+					throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
+				}
+			} else {
+				throw new IllegalStateException("Validation policy is not correctly initialized!");
+			}
 
 			model.addAttribute("currentCertificate", qwacCertificate.getDSSIdAsString());
+			setAttributesModels(model, reports);
 
 			LOG.info("End certificate validation");
 
@@ -104,6 +115,11 @@ public class QwacValidationController extends AbstractValidationController {
 		}
 
 		throw new DSSException(String.format("The requested URL '%s' did not return a list of certificates to validate.", url));
+	}
+
+	@ModelAttribute("displayDownloadPdf")
+	public boolean isDisplayDownloadPdf() {
+		return true;
 	}
 
 }

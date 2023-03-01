@@ -26,17 +26,26 @@ $("#validation-form").submit(function(event) {
 	}
 });
 
-async function linkCompleteFiles(originalFiles, linkedFiles, form) {
+function linkCompleteFiles(originalFiles, linkedFiles, form) {
+    var formData = new FormData(form);
+
 	for (var i = 0; i < originalFiles.length; i++) {
 		var currentFile = originalFiles[i];
-		addFilename(linkedFiles, currentFile, i);
-		
-		var promise = getBase64(currentFile);
-		var base64 = await promise;
-		addBase64Content(linkedFiles, base64, i);
+		addFile(linkedFiles, currentFile, i);
 	}
 	
 	form.submit();
+}
+
+function addFile(linkedFiles, currentFile, i) {
+	var line = $("<input type=\"file\" id=\"originalFiles" + i + ".completeFile\" " +
+			"name=\"originalFiles[" + i + "].completeFile\" class=\"d-none\" />");
+	linkedFiles.append(line);
+
+	var list = new DataTransfer();
+    list.items.add(currentFile);
+
+    line[0].files = list.files;
 }
 
 async function linkDigestFiles(originalFiles, digestAlgorithm, linkedFiles, form) {
@@ -57,17 +66,6 @@ function addFilename(linkedFiles, currentFile, i) {
 	var line = "<input type=\"hidden\" id=\"originalFiles" + i + ".filename\" " +
 			"name=\"originalFiles[" + i + "].filename\" value=\"" + currentFile.name + "\" />";
 	linkedFiles.append(line);
-}
-
-function addBase64Content(linkedFiles, base64, i) {
-	var line = "<input type=\"hidden\" id=\"originalFiles" + i + ".base64Complete\" " +
-			"name=\"originalFiles[" + i + "].base64Complete\" value=\"" + base64 + "\" />";
-	linkedFiles.append(line);
-}
-
-async function getBase64(file) {
-	var arrayBuffer = await readFile(file);
-	return arrayBufferToBase64(arrayBuffer);
 }
 
 function readFile(file) {

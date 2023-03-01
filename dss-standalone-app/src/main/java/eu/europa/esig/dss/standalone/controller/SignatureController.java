@@ -7,14 +7,15 @@ import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignatureTokenType;
 import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
+import eu.europa.esig.dss.standalone.fx.CollectionFilesSelectToStringConverter;
+import eu.europa.esig.dss.standalone.fx.DSSFileChooser;
+import eu.europa.esig.dss.standalone.fx.DSSFileChooserLoader;
 import eu.europa.esig.dss.standalone.fx.FileToStringConverter;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
-import eu.europa.esig.dss.standalone.task.JobBuilder;
-import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
+import eu.europa.esig.dss.standalone.source.PropertyReader;
+import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.SigningTask;
-import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.utils.Utils;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
@@ -25,7 +26,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -40,29 +40,23 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class SignatureController implements Initializable {
+public class SignatureController extends AbstractController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
-	
-	private final String nbCertificatesTest = "Number of Trusted Certificates : ";
-	
-	private final List<DigestAlgorithm> supportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
+
+	private static final List<DigestAlgorithm> SUPPORTED_DIGEST_ALGORITHMS = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
 			DigestAlgorithm.SHA384, DigestAlgorithm.SHA512, DigestAlgorithm.SHA3_224, DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512);
-	
+
 	/** A list of DigestAlgorithms supported by the current chosen SignatureFormat */
 	private List<DigestAlgorithm> sigFormSupportedDigestAlgorithms;
 
@@ -71,6 +65,9 @@ public class SignatureController implements Initializable {
 
 	@FXML
 	private Button fileSelectButton;
+
+	@FXML
+	public RadioButton asicNoneRadio;
 
 	@FXML
 	private RadioButton asicsRadio;
@@ -107,7 +104,7 @@ public class SignatureController implements Initializable {
 
 	@FXML
 	private HBox hSignatureOption;
-	
+
 	@FXML
 	private HBox hBoxDigestAlgos;
 
@@ -146,7 +143,7 @@ public class SignatureController implements Initializable {
 
 	@FXML
 	private RadioButton pkcs12Radio;
-	
+
 	@FXML
 	private RadioButton mscapiRadio;
 
@@ -169,50 +166,22 @@ public class SignatureController implements Initializable {
 	private PasswordField pkcsPassword;
 
 	@FXML
+	public Label warningMockTSALabel;
+
+	@FXML
 	private Button signButton;
 
 	@FXML
 	private ProgressIndicator progressSign;
-	
-	@FXML
-	private Button refreshLOTL;
-	
-	@FXML
-	private HBox refreshBox;
-	
-	@FXML
-	private Label nbCertificates;
-	
+
 	private ProgressIndicator progressRefreshLOTL;
-	
-	private JobBuilder jobBuilder;
-	
-	private TLValidationJob tlValidationJob;
-		
-	private Stage stage;
 
 	private SignatureModel model;
-			
-	static {
-		// Fix a freeze in Windows 10, JDK 8 and touchscreen
-		System.setProperty("glass.accessible.force", "false");
-	}
-
-	public void setStage(Stage stage) {
-		this.stage = stage;
-	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		model = new SignatureModel();
 
-		//Create JobBuilder && TLValidationJob
-		jobBuilder = new JobBuilder();
-		tlValidationJob = jobBuilder.job();
-		tlValidationJob.offlineRefresh();
-		warningLabel.setVisible(false);
-		updateLabelText();
-		
 		// Allows to collapse items
 		hPkcsFile.managedProperty().bind(hPkcsFile.visibleProperty());
 		hPkcsPassword.managedProperty().bind(hPkcsPassword.visibleProperty());
@@ -222,25 +191,26 @@ public class SignatureController implements Initializable {
 		fileSelectButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("File to sign");
-				File fileToSign = fileChooser.showOpenDialog(stage);
-				model.setFileToSign(fileToSign);
+				DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser("File(s) to sign");
+				List<File> filesToSign = fileChooser.showOpenMultipleDialog(stage);
+				model.setFilesToSign(filesToSign);
+				updatePropertiesForm();
 			}
 		});
-		fileSelectButton.textProperty().bindBidirectional(model.fileToSignProperty(), new FileToStringConverter());
+		fileSelectButton.textProperty().bindBidirectional(model.filesToSignProperty(), new CollectionFilesSelectToStringConverter());
 
+		asicNoneRadio.setSelected(true);
 		asicsRadio.setUserData(ASiCContainerType.ASiC_S);
 		asiceRadio.setUserData(ASiCContainerType.ASiC_E);
 		toggleAsicContainerType.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				ASiCContainerType newContainerType = null;
 				if (newValue != null) {
-					ASiCContainerType newContainerType = (ASiCContainerType) newValue.getUserData();
-					updateSignatureFormForASiC(newContainerType);
-				} else {
-					updateSignatureFormForASiC(null);
+					newContainerType = (ASiCContainerType) newValue.getUserData();
 				}
+				model.setAsicContainerType(newContainerType);
+				updatePropertiesForm();
 			}
 		});
 
@@ -251,15 +221,15 @@ public class SignatureController implements Initializable {
 		toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				SignatureForm newSigForm = null;
 				if (newValue != null) {
-					SignatureForm newSigForm = (SignatureForm) newValue.getUserData();
-					updateSignatureForm(newSigForm);
-				} else {
-					updateSignatureForm(null);
+					newSigForm = (SignatureForm) newValue.getUserData();
 				}
+				model.setSignatureForm(newSigForm);
+				updatePropertiesForm();
 			}
 		});
-		
+
 		envelopedRadio.setUserData(SignaturePackaging.ENVELOPED);
 		envelopingRadio.setUserData(SignaturePackaging.ENVELOPING);
 		detachedRadio.setUserData(SignaturePackaging.DETACHED);
@@ -267,12 +237,12 @@ public class SignatureController implements Initializable {
 		toggleSigPackaging.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				SignaturePackaging newPackaging = null;
 				if (newValue != null) {
-					SignaturePackaging newPackaging = (SignaturePackaging) newValue.getUserData();
-					updateSignaturePackaging(newPackaging);
-				} else {
-					updateSignaturePackaging(null);
+					newPackaging = (SignaturePackaging) newValue.getUserData();
 				}
+				model.setSignaturePackaging(newPackaging);
+				updatePropertiesForm();
 			}
 		});
 
@@ -281,22 +251,22 @@ public class SignatureController implements Initializable {
 		toggleSignatureOption.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				SignatureOption signatureOption = null;
 				if (newValue != null) {
-					SignatureOption signatureOption = (SignatureOption) newValue.getUserData();
-					updateSignatureOption(signatureOption);
-				} else {
-					updateSignatureOption(null);
+					signatureOption = (SignatureOption) newValue.getUserData();
 				}
+				model.setSignatureOption(signatureOption);
+				updatePropertiesForm();
 			}
 		});
-		
-		for (DigestAlgorithm digestAlgo : supportedDigestAlgorithms) {
+
+		for (DigestAlgorithm digestAlgo : SUPPORTED_DIGEST_ALGORITHMS) {
 			RadioButton rb = new RadioButton(digestAlgo.getName());
 			rb.setUserData(digestAlgo);
 			rb.setToggleGroup(toggleDigestAlgo);
 			hBoxDigestAlgos.getChildren().add(rb);
 		}
-		
+
 		toggleDigestAlgo.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -324,26 +294,26 @@ public class SignatureController implements Initializable {
 				model.setPkcsFile(null);
 				model.setPassword(null);
 
-				updateSigTokenType(newValue);
+				updatePropertiesForm();
 			}
 		});
-		
+
 		pkcsFileButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fileChooser = new FileChooser();
-				if (SignatureTokenType.PKCS11.equals(model.getTokenType())) {
-					fileChooser.setTitle("Library");
-					fileChooser.getExtensionFilters().add(
-							new FileChooser.ExtensionFilter("PKCS11 library (*.dll)", "*.dll"));
-				} else if (SignatureTokenType.PKCS12.equals(model.getTokenType())) {
-					fileChooser.setTitle("Keystore");
-					fileChooser.getExtensionFilters().add(
-							new FileChooser.ExtensionFilter("PKCS12 keystore (*.p12, *.pfx)", "*.p12", "*.pfx"));
+				DSSFileChooser fileChooser;
+				switch (model.getTokenType()) {
+					case PKCS11:
+						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
+								"Library", "PKCS11 library (*.dll)", "*.dll");
+						break;
+					case PKCS12:
+						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
+								"Keystore", "PKCS12 keystore (*.p12, *.pfx)", "*.p12", "*.pfx");
+						break;
+					default:
+						throw new UnsupportedOperationException(String.format("Token type '%s' is not supported!", model.getTokenType()));
 				}
-
-				FileChooser.ExtensionFilter allFilesExtensionFilter = new FileChooser.ExtensionFilter("All files", "*");
-				fileChooser.getExtensionFilters().add(allFilesExtensionFilter);
 
 				File pkcsFile = fileChooser.showOpenDialog(stage);
 				model.setPkcsFile(pkcsFile);
@@ -362,19 +332,20 @@ public class SignatureController implements Initializable {
 		labelPkcs11File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11));
 		labelPkcs12File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
 
-		BooleanBinding isMandatoryFieldsEmpty = model.fileToSignProperty().isNull()
+		BooleanBinding isMandatoryFieldsEmpty = model.filesToSignProperty().isNull()
 				.or(model.signatureFormProperty().isNull()).or(model.digestAlgorithmProperty().isNull())
 				.or(model.tokenTypeProperty().isNull());
 
-		BooleanBinding isASiCorPackagingPresent = model.asicContainerTypeProperty().isNull()
+		BooleanBinding isPackagingEmpty = model.asicContainerTypeProperty().isNull()
 				.and(model.signaturePackagingProperty().isNull());
 
 		BooleanBinding isEmptyFileOrPassword = model.pkcsFileProperty().isNull().or(model.passwordProperty().isEmpty());
 
-		BooleanBinding isPKCSIncomplete = model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11)
-				.or(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12)).and(isEmptyFileOrPassword);
+		BooleanBinding isPKCSToken = model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11)
+				.or(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
+		BooleanBinding isPKCSIncomplete = isPKCSToken.and(isEmptyFileOrPassword);
 
-		final BooleanBinding disableSignButton = isMandatoryFieldsEmpty.or(isASiCorPackagingPresent)
+		final BooleanBinding disableSignButton = isMandatoryFieldsEmpty.or(isPackagingEmpty)
 				.or(isPKCSIncomplete);
 
 		signButton.disableProperty().bind(disableSignButton);
@@ -387,7 +358,7 @@ public class SignatureController implements Initializable {
 				final Service<DSSDocument> service = new Service<>() {
 					@Override
 					protected Task<DSSDocument> createTask() {
-						return new SigningTask(model, jobBuilder.getCertificateSources());
+						return new SigningTask(model, TLValidationJobExecutor.getInstance().getCertificateSources());
 					}
 				};
 				service.setOnSucceeded(new EventHandler<>() {
@@ -417,275 +388,210 @@ public class SignatureController implements Initializable {
 			}
 		});
 
-		
-		refreshLOTL.setOnAction(new EventHandler<>() {
-			@Override
-			public void handle(ActionEvent event) {
-				final RefreshLOTLTask task = new RefreshLOTLTask(tlValidationJob);
-				task.setOnRunning(new EventHandler<>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						warningLabel.setVisible(false);
-						addLoader();
-					}
-				});
-
-				task.setOnSucceeded(new EventHandler<>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						removeLoader();
-						updateLabelText();
-					}
-				});
-
-				task.setOnFailed(new EventHandler<>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						removeLoader();
-						warningLabel.setVisible(true);
-					}
-				});
-
-				//start Task
-				Thread readValThread = new Thread(task);
-				readValThread.setDaemon(true);
-				readValThread.start();
-			}
-		});
-
-	}
-	
-	private void removeLoader() {
-		refreshBox.getChildren().remove(progressRefreshLOTL);
-	}
-	
-	private void addLoader() {
-		removeLoader();
-		progressRefreshLOTL = new ProgressIndicator();
-    	refreshBox.getChildren().add(progressRefreshLOTL);
-	}
-	
-	private void updateLabelText() {
-		nbCertificates.setText(nbCertificatesTest + jobBuilder.getCertificateSources().getNumberOfCertificates());
+		warningMockTSALabel.setVisible(Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock")));
 	}
 
-	protected void updateSignatureFormForASiC(ASiCContainerType newValue) {
-		model.setAsicContainerType(newValue);
+	private void updatePropertiesForm() {
+		updateSignatureFormAndPackaging();
+		updateSignatureLevelAndDigestAlgo();
+		updateSignatureOption();
 
-		reinitSignatureFormats();
-		reinitSignaturePackagings();
-		reinitSignatureOptions();
-
-		if (newValue != null) { // ASiC
-			cadesRadio.setDisable(false);
-			xadesRadio.setDisable(false);
-		} else {
-			cadesRadio.setDisable(false);
-			padesRadio.setDisable(false);
-			xadesRadio.setDisable(false);
-			jadesRadio.setDisable(false);
-		}
-	}
-
-	protected void updateSignatureForm(SignatureForm signatureForm) {
-		model.setSignatureForm(signatureForm);
-
-		reinitSignaturePackagings();
-		reinitSignatureOptions();
-		
-		sigFormSupportedDigestAlgorithms = supportedDigestAlgorithms;
-
-		comboLevel.setDisable(false);
-		comboLevel.getItems().removeAll(comboLevel.getItems());
-
-		if (signatureForm != null) {
-			switch (signatureForm) {
-			case CAdES:
-				if (model.getAsicContainerType() == null) {
-					envelopingRadio.setDisable(false);
-					detachedRadio.setDisable(false);
-				}
-
-				comboLevel.getItems().addAll(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
-						SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.CAdES_BASELINE_B);
-				break;
-			case PAdES:
-				envelopedRadio.setDisable(false);
-
-				envelopedRadio.setSelected(true);
-
-				comboLevel.getItems().addAll(SignatureLevel.PAdES_BASELINE_B, SignatureLevel.PAdES_BASELINE_T,
-						SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.PAdES_BASELINE_B);
-				break;
-			case XAdES:
-				if (model.getAsicContainerType() == null) {
-					envelopingRadio.setDisable(false);
-					envelopedRadio.setDisable(false);
-					detachedRadio.setDisable(false);
-					internallyDetachedRadio.setDisable(false);
-
-					tlSigning.setDisable(false);
-					xmlManifest.setDisable(false);
-				}
-				
-				sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, 
-						DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-
-				comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
-						SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
-				break;
-			case JAdES:
-				envelopingRadio.setDisable(false);
-				detachedRadio.setDisable(false);
-				
-				sigFormSupportedDigestAlgorithms =  Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-
-				comboLevel.getItems().addAll(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
-						SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
-				comboLevel.setValue(SignatureLevel.JAdES_BASELINE_B);
-			default:
-				break;
-			}
-		}
-		
 		reinitDigestAlgos();
 	}
 
-	protected void updateSignaturePackaging(SignaturePackaging signaturePackaging) {
-		model.setSignaturePackaging(signaturePackaging);
+	private void updateSignatureFormAndPackaging() {
+		if (model.getAsicContainerType() != null) {
+			activateRadioButtons(xadesRadio, cadesRadio);
+			disableRadioButtons(padesRadio, jadesRadio);
+			disableRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
+			disableRadioButtons(tlSigning, xmlManifest);
 
-		SignatureOption signatureOption = model.getSignatureOption();
-		reinitSignatureOptions();
+		} else if (Utils.collectionSize(model.getFilesToSign()) > 1) {
+			activateRadioButtons(xadesRadio, jadesRadio);
+			disableRadioButtons(cadesRadio, padesRadio);
+			disableRadioButtons(tlSigning, xmlManifest);
+			if (model.getSignatureForm() != null) {
+				switch (model.getSignatureForm()) {
+					case XAdES:
+						activateRadioButtons(envelopingRadio, detachedRadio, internallyDetachedRadio);
+						disableRadioButtons(envelopedRadio);
+						break;
 
-		if (signaturePackaging != null && SignatureForm.XAdES.equals(model.getSignatureForm())) {
-			// for XAdES only
-			sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
-					DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+					case JAdES:
+						activateRadioButtons(detachedRadio);
+						disableRadioButtons(envelopedRadio, envelopingRadio, internallyDetachedRadio);
+						break;
 
-			switch (signaturePackaging) {
+					default:
+						break;
+				}
+			}
+
+		} else {
+			activateRadioButtons(xadesRadio, cadesRadio, padesRadio, jadesRadio);
+			if (model.getSignatureForm() != null) {
+				switch (model.getSignatureForm()) {
+					case XAdES:
+						if (model.getSignaturePackaging() == null && model.getSignatureOption() != null) {
+							switch (model.getSignatureOption()) {
+								case TL_SIGNING:
+									envelopedRadio.setSelected(true);
+									break;
+								case XML_MANIFEST_SIGNING:
+									envelopingRadio.setSelected(true);
+									break;
+								default:
+									break;
+							}
+						} else {
+							activateRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
+						}
+						activateRadioButtons(tlSigning, xmlManifest);
+						break;
+
+					case CAdES:
+					case JAdES:
+						activateRadioButtons(envelopingRadio, detachedRadio);
+						disableRadioButtons(envelopedRadio, internallyDetachedRadio);
+						disableRadioButtons(tlSigning, xmlManifest);
+						break;
+
+					case PAdES:
+						activateRadioButtons(envelopedRadio);
+						disableRadioButtons(envelopingRadio, detachedRadio, internallyDetachedRadio);
+						disableRadioButtons(tlSigning, xmlManifest);
+						break;
+
+					default:
+						break;
+				}
+			} else {
+				reinitSignaturePackagings();
+				reinitSignatureOptions();
+			}
+		}
+	}
+
+	private void updateSignatureLevelAndDigestAlgo() {
+		sigFormSupportedDigestAlgorithms = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
+
+		SignatureForm signatureForm = model.getSignatureForm();
+		if (signatureForm != null) {
+			switch (signatureForm) {
+				case XAdES:
+					if (model.getSignatureOption() != null) {
+						switch (model.getSignatureOption()) {
+							case TL_SIGNING:
+								updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B);
+								sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256,
+										DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+								break;
+							case XML_MANIFEST_SIGNING:
+								updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
+										SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
+								sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256,
+										DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+								break;
+							default:
+								break;
+						}
+					} else {
+						updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
+								SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
+						sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
+								DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+					}
+					break;
+
+				case CAdES:
+					updateSignatureLevels(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
+							SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
+					break;
+
+				case PAdES:
+					updateSignatureLevels(SignatureLevel.PAdES_BASELINE_B, SignatureLevel.PAdES_BASELINE_T,
+							SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
+					break;
+
+				case JAdES:
+					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+
+					updateSignatureLevels(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
+							SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
+					break;
+
+				default:
+					updateSignatureLevels();
+					break;
+			}
+		}
+	}
+
+	private void updateSignatureOption() {
+		if (SignatureForm.XAdES.equals(model.getSignatureForm()) && model.getSignaturePackaging() != null
+				&& Utils.collectionSize(model.getFilesToSign()) < 2) {
+			switch (model.getSignaturePackaging()) {
 				case ENVELOPED:
 					tlSigning.setDisable(false);
-					if (SignatureOption.TL_SIGNING.equals(signatureOption)) {
-						model.setSignatureOption(SignatureOption.TL_SIGNING);
-						tlSigning.setSelected(true);
-					}
+					disableRadioButtons(xmlManifest);
 					break;
 				case ENVELOPING:
 					xmlManifest.setDisable(false);
-					if (SignatureOption.XML_MANIFEST_SIGNING.equals(signatureOption)) {
-						model.setSignatureOption(SignatureOption.XML_MANIFEST_SIGNING);
-						xmlManifest.setSelected(true);
-					}
-					break;
-				case DETACHED:
-				case INTERNALLY_DETACHED:
-					// do nothing
+					disableRadioButtons(tlSigning);
 					break;
 				default:
-					break;
-			}
-
-			reinitDigestAlgos();
-		}
-	}
-
-	protected void updateSignatureOption(SignatureOption signatureOption) {
-		model.setSignatureOption(signatureOption);
-
-		if (signatureOption != null) {
-			comboLevel.setDisable(false);
-			comboLevel.getItems().removeAll(comboLevel.getItems());
-
-			switch (signatureOption) {
-				case TL_SIGNING:
-					comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B);
-					comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
-
-					envelopedRadio.setDisable(false);
-					envelopedRadio.setSelected(true);
-
-					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-					break;
-
-				case XML_MANIFEST_SIGNING:
-					comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
-							SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-					comboLevel.setValue(SignatureLevel.XAdES_BASELINE_B);
-
-					envelopingRadio.setDisable(false);
-					envelopingRadio.setSelected(true);
-
-					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-					break;
-
-				default:
+					disableRadioButtons(tlSigning, xmlManifest);
 					break;
 			}
 		}
-
-		reinitDigestAlgos();
 	}
-	
-	private void updateSigTokenType(Toggle newValue) {
-		SignatureTokenType tokenType = (SignatureTokenType) newValue.getUserData();
-		
-		sigTokenTypeSupportedDigestAlgorithms = new ArrayList<>(supportedDigestAlgorithms);
-		
-		switch (tokenType) {
-			case MSCAPI:
-				// SHA224 not supported
-				sigTokenTypeSupportedDigestAlgorithms.remove(DigestAlgorithm.SHA224);
-			default:
-				break;
+
+	private void activateRadioButtons(RadioButton... radioButtons) {
+		for (RadioButton radioButton : radioButtons) {
+			radioButton.setDisable(false);
+			if (radioButtons.length == 1) {
+				radioButton.setSelected(true);
+			}
 		}
-		
-		reinitDigestAlgos();
 	}
 
-	private void reinitSignatureFormats() {
-		cadesRadio.setDisable(true);
-		padesRadio.setDisable(true);
-		xadesRadio.setDisable(true);
-		jadesRadio.setDisable(true);
+	private void disableRadioButtons(RadioButton... radioButtons) {
+		for (RadioButton radioButton : radioButtons) {
+			radioButton.setDisable(true);
+			radioButton.setSelected(false);
+		}
+	}
 
-		cadesRadio.setSelected(false);
-		padesRadio.setSelected(false);
-		xadesRadio.setSelected(false);
-		jadesRadio.setSelected(false);
+	private void updateSignatureLevels(SignatureLevel... signatureLevels) {
+		comboLevel.setDisable(false);
+		comboLevel.getItems().removeAll(comboLevel.getItems());
+		if (Utils.isArrayNotEmpty(signatureLevels)) {
+			comboLevel.getItems().addAll(signatureLevels);
+			comboLevel.setValue(signatureLevels[0]);
+		}
 	}
 
 	private void reinitSignaturePackagings() {
-		envelopingRadio.setDisable(true);
-		envelopedRadio.setDisable(true);
-		detachedRadio.setDisable(true);
-		internallyDetachedRadio.setDisable(true);
-
-		envelopingRadio.setSelected(false);
-		envelopedRadio.setSelected(false);
-		detachedRadio.setSelected(false);
-		internallyDetachedRadio.setSelected(false);
+		disableRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
 	}
 
 	private void reinitSignatureOptions() {
-		tlSigning.setDisable(true);
-		xmlManifest.setDisable(true);
-
-		tlSigning.setSelected(false);
-		xmlManifest.setSelected(false);
+		disableRadioButtons(tlSigning, xmlManifest);
 	}
-	
+
 	private void reinitDigestAlgos() {
-		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(supportedDigestAlgorithms);
+		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
 		if (sigFormSupportedDigestAlgorithms != null) {
 			digestAlgos.retainAll(sigFormSupportedDigestAlgorithms);
 		}
 		if (sigTokenTypeSupportedDigestAlgorithms != null) {
 			digestAlgos.retainAll(sigTokenTypeSupportedDigestAlgorithms);
 		}
-		
+		if (SignatureTokenType.MSCAPI.equals(model.getTokenType())) {
+			// SHA224 not supported
+			digestAlgos.remove(DigestAlgorithm.SHA224);
+		}
+
 		for (Node daButton : hBoxDigestAlgos.getChildren()) {
 			DigestAlgorithm digestAlgorithm = (DigestAlgorithm) daButton.getUserData();
 			if (digestAlgorithm == null) {
@@ -698,28 +604,6 @@ public class SignatureController implements Initializable {
 				if (selectedToggle != null && digestAlgorithm.equals(selectedToggle.getUserData())) {
 					selectedToggle.setSelected(false);
 				}
-			}
-		}
-	}
-
-	private void save(DSSDocument signedDocument) {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(signedDocument.getName());
-		MimeType mimeType = signedDocument.getMimeType();
-		
-		String extension = MimeType.getExtension(mimeType);
-		String filterPattern = extension != null ? "*." + extension : "*";
-		ExtensionFilter extFilter = new ExtensionFilter(mimeType.getMimeTypeString(), filterPattern);
-		fileChooser.getExtensionFilters().add(extFilter);
-		File fileToSave = fileChooser.showSaveDialog(stage);
-
-		if (fileToSave != null) {
-			try (FileOutputStream fos = new FileOutputStream(fileToSave)) {
-				Utils.copy(signedDocument.openStream(), fos);
-			} catch (Exception e) {
-				Alert alert = new Alert(AlertType.ERROR, "Unable to save file : " + e.getMessage(), ButtonType.CLOSE);
-				alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-				alert.showAndWait();
 			}
 		}
 	}

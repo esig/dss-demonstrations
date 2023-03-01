@@ -60,8 +60,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.DatatypeConverter;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -305,6 +304,7 @@ public class SigningService {
 		return result;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters fillParameters(SignatureMultipleDocumentsForm form) {
 		AbstractSignatureParameters finalParameters = getASiCSignatureParameters(form.getContainerType(), form.getSignatureForm());
 
@@ -313,6 +313,7 @@ public class SigningService {
 		return finalParameters;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters fillParameters(SignatureDocumentForm form) {
 		AbstractSignatureParameters parameters = getSignatureParameters(form.getContainerType(), form.getSignatureForm());
 		parameters.setSignaturePackaging(form.getSignaturePackaging());
@@ -322,6 +323,7 @@ public class SigningService {
 		return parameters;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters fillParameters(SignatureDigestForm form) {
 		AbstractSignatureParameters parameters = getSignatureParameters(null, form.getSignatureForm());
 		parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
@@ -344,6 +346,7 @@ public class SigningService {
 		return parameters;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
     private SerializableCounterSignatureParameters fillParameters(CounterSignatureForm form) {
         SerializableCounterSignatureParameters parameters = getCounterSignatureParameters(form.getSignatureForm());
         parameters.setSignatureIdToCounterSign(form.getSignatureIdToCounterSign());
@@ -355,6 +358,7 @@ public class SigningService {
         return parameters;
     }
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void fillParameters(AbstractSignatureParameters parameters, AbstractSignatureForm form) {
 		parameters.setSignatureLevel(form.getSignatureLevel());
 		parameters.setDigestAlgorithm(form.getDigestAlgorithm());
@@ -364,18 +368,18 @@ public class SigningService {
 		parameters.setSignWithExpiredCertificate(form.isSignWithExpiredCertificate());
 
 		if (form.getContentTimestamp() != null) {
-			parameters.setContentTimestamps(Arrays.asList(WebAppUtils.toTimestampToken(form.getContentTimestamp())));
+			parameters.setContentTimestamps(
+					Collections.singletonList(WebAppUtils.toTimestampToken(form.getContentTimestamp())));
 		}
 
-		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(form.getBase64Certificate());
-
+		CertificateToken signingCertificate = DSSUtils.loadCertificate(form.getCertificate());
 		parameters.setSigningCertificate(signingCertificate);
 
-		List<String> base64CertificateChain = form.getBase64CertificateChain();
-		if (Utils.isCollectionNotEmpty(base64CertificateChain)) {
+		List<byte[]> certificateChainBytes = form.getCertificateChain();
+		if (Utils.isCollectionNotEmpty(certificateChainBytes)) {
 			List<CertificateToken> certificateChain = new LinkedList<>();
-			for (String base64Certificate : base64CertificateChain) {
-				certificateChain.add(DSSUtils.loadCertificateFromBase64EncodedString(base64Certificate));
+			for (byte[] certificate : certificateChainBytes) {
+				certificateChain.add(DSSUtils.loadCertificate(certificate));
 			}
 			parameters.setCertificateChain(certificateChain);
 		}
@@ -383,6 +387,7 @@ public class SigningService {
 		fillTimestampParameters(parameters, form);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void fillTimestampParameters(AbstractSignatureParameters parameters, AbstractSignatureForm form) {
 		SignatureForm signatureForm = form.getSignatureForm();
 
@@ -409,7 +414,7 @@ public class SigningService {
 		try {
 			DSSDocument toSignDocument = WebAppUtils.toDSSDocument(form.getDocumentToSign());
 			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, form.getSignatureValue());
 			DSSDocument signedDocument = service.signDocument(toSignDocument, parameters, signatureValue);
 			LOG.info("End signDocument with one document");
 			return signedDocument;
@@ -428,7 +433,7 @@ public class SigningService {
 		try {
 			DigestDocument toSignDigest = new DigestDocument(form.getDigestAlgorithm(), form.getDigestToSign(), form.getDocumentName());
 			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, form.getSignatureValue());
 			DSSDocument signedDocument = service.signDocument(toSignDigest, parameters, signatureValue);
 			LOG.info("End signDigest with one digest");
 			return signedDocument;
@@ -447,7 +452,7 @@ public class SigningService {
 		try {
 			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
 			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, Utils.fromBase64(form.getBase64SignatureValue()));
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, form.getSignatureValue());
 			DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
 			LOG.info("End signDocument with multiple documents");
 			return signedDocument;
@@ -466,7 +471,7 @@ public class SigningService {
 		try {
 			List<DSSDocument> toSignDocuments = WebAppUtils.toDSSDocuments(form.getDocumentsToSign());
 			SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+			SignatureValue signatureValue = new SignatureValue(sigAlgorithm, form.getSignatureValue());
 			DSSDocument signedDocument = service.signDocument(toSignDocuments, parameters, signatureValue);
 	
 			LOG.info("End signDocument with JAdES");
@@ -488,7 +493,7 @@ public class SigningService {
 	        SerializableCounterSignatureParameters parameters = fillParameters(form);
 	
 	        SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
-	        SignatureValue signatureValue = new SignatureValue(sigAlgorithm, DatatypeConverter.parseBase64Binary(form.getBase64SignatureValue()));
+	        SignatureValue signatureValue = new SignatureValue(sigAlgorithm, form.getSignatureValue());
 	        DSSDocument signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
 	
 	        LOG.info("End signDocument with one document");
@@ -547,6 +552,7 @@ public class SigningService {
         return service;
     }
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters getSignatureParameters(ASiCContainerType containerType, SignatureForm signatureForm) {
 		AbstractSignatureParameters parameters = null;
 		if (containerType != null) {
@@ -650,6 +656,7 @@ public class SigningService {
 		return service;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	private AbstractSignatureParameters getASiCSignatureParameters(ASiCContainerType containerType, SignatureForm signatureForm) {
 		AbstractSignatureParameters parameters = null;
 		switch (signatureForm) {

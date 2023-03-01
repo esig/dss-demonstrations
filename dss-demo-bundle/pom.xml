@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.11</version>
+		<version>5.12.RC1</version>
 	</parent>
 
 	<name>DSS Package: OOTB Web-Application</name>
@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u345-b01/OpenJDK8U-jre_x86-32_windows_hotspot_8u345b01.zip</jre.download.link>
-		<jre.root.folder>jdk8u345-b01-jre</jre.root.folder>
-		<tomcat.version>8.5.82</tomcat.version>
+		<jre.download.link>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u362-b09/OpenJDK8U-jre_x86-32_windows_hotspot_8u362b09.zip</jre.download.link>
+		<jre.root.folder>jdk8u362-b09-jre</jre.root.folder>
+		<tomcat.version>8.5.85</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -104,11 +104,11 @@
 	
 	<profiles>
 		<profile>
-			<id>java18</id>
+			<id>java19</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x86-32_windows_hotspot_18.0.2.1_1.zip</jre.download.link>
-				<jre.root.folder>jdk-18.0.2.1+1-jre</jre.root.folder>
-				<tomcat.version>9.0.68</tomcat.version>
+				<jre.download.link>https://github.com/adoptium/temurin19-binaries/releases/download/jdk-19.0.2%2B7/OpenJDK19U-jre_x86-32_windows_hotspot_19.0.2_7.zip</jre.download.link>
+				<jre.root.folder>jdk-19.0.2+7-jre</jre.root.folder>
+				<tomcat.version>9.0.72</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>

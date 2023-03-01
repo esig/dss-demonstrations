@@ -2,12 +2,12 @@ package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.ToBeSigned;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -15,8 +15,8 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
+import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
-import eu.europa.esig.dss.web.model.SignatureValueAsString;
 import eu.europa.esig.dss.web.service.SigningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
@@ -109,10 +108,10 @@ public class SignaturePdfController {
 	@ResponseBody
 	public GetDataToSignResponse getDataToSign(Model model, @RequestBody @Valid DataToSignParams params,
 			@ModelAttribute("signaturePdfForm") @Valid SignatureDocumentForm signaturePdfForm, BindingResult result) {
+		signaturePdfForm.setCertificate(params.getSigningCertificate());
+		signaturePdfForm.setCertificateChain(params.getCertificateChain());
 
-		signaturePdfForm.setBase64Certificate(params.getSigningCertificate());
-		signaturePdfForm.setBase64CertificateChain(params.getCertificateChain());
-		CertificateToken signingCertificate = DSSUtils.loadCertificateFromBase64EncodedString(params.getSigningCertificate());
+		CertificateToken signingCertificate = DSSUtils.loadCertificate(params.getSigningCertificate());
 		signaturePdfForm.setEncryptionAlgorithm(EncryptionAlgorithm.forName(signingCertificate.getPublicKey().getAlgorithm()));
 		signaturePdfForm.setSigningDate(new Date());
 
@@ -124,16 +123,16 @@ public class SignaturePdfController {
 		}
 
 		GetDataToSignResponse responseJson = new GetDataToSignResponse();
-		responseJson.setDataToSign(DatatypeConverter.printBase64Binary(dataToSign.getBytes()));
+		responseJson.setDataToSign(dataToSign.getBytes());
 		return responseJson;
 	}
 
 	@RequestMapping(value = "/sign-document", method = RequestMethod.POST)
 	@ResponseBody
-	public SignDocumentResponse signDocument(Model model, @RequestBody @Valid SignatureValueAsString signatureValue,
+	public SignDocumentResponse signDocument(Model model, @RequestBody @Valid SignResponse signatureValue,
 			@ModelAttribute("signaturePdfForm") @Valid SignatureDocumentForm signaturePdfForm, BindingResult result) {
 
-		signaturePdfForm.setBase64SignatureValue(signatureValue.getSignatureValue());
+		signaturePdfForm.setSignatureValue(signatureValue.getSignatureValue());
 
 		DSSDocument document = signingService.signDocument(signaturePdfForm);
 		InMemoryDocument signedPdfDocument = new InMemoryDocument(DSSUtils.toByteArray(document), document.getName(), document.getMimeType());

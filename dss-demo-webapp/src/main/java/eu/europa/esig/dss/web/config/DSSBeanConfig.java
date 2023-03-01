@@ -6,7 +6,9 @@ import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.pades.signature.ExternalCMSService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
+import eu.europa.esig.dss.pades.signature.PAdESWithExternalCMSService;
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
@@ -14,18 +16,23 @@ import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
 import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
+import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
-import eu.europa.esig.dss.spi.client.jdbc.JdbcCacheConnector;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
+import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
 import eu.europa.esig.dss.spi.x509.aia.OnlineAIASource;
+import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
+import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
+import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
+import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.validation.CertificateVerifier;
@@ -35,7 +42,11 @@ import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationS
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSService;
+import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSService;
+import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
@@ -52,14 +63,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
+@Import({ PropertiesConfig.class, CXFConfig.class, JdbcConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
 		SchedulingConfig.class })
 @ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {
@@ -68,6 +81,9 @@ public class DSSBeanConfig {
 
 	@Value("${default.validation.policy}")
 	private String defaultValidationPolicy;
+
+	@Value("${default.certificate.validation.policy}")
+	private String defaultCertificateValidationPolicy;
 
 	@Value("${current.lotl.url}")
 	private String lotlUrl;
@@ -87,6 +103,24 @@ public class DSSBeanConfig {
 	@Value("${oj.content.keystore.password}")
 	private String ksPassword;
 
+	@Value("${tl.loader.ades.enabled}")
+	private boolean adesLotlEnabled;
+
+	@Value("${tl.loader.ades.lotlUrl}")
+	private String adesLotlUrl;
+
+	@Value("${tl.loader.ades.keystore.type}")
+	private String adesKeyStoreType;
+
+	@Value("${tl.loader.ades.keystore.filename}")
+	private String adesKeyStoreFilename;
+
+	@Value("${tl.loader.ades.keystore.password}")
+	private String adesKeyStorePassword;
+
+	@Value("${tl.loader.ades.tsl.type}")
+	private String adesTSLType;
+
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
 
@@ -99,13 +133,36 @@ public class DSSBeanConfig {
 	@Autowired
 	private TSPSource tspSource;
 
-	@Autowired
-	private DataSource dataSource;
+	@Autowired(required = false)
+	private JdbcCacheAIASource jdbcCacheAIASource;
+
+	@Autowired(required = false)
+	private JdbcCacheCRLSource jdbcCacheCRLSource;
+
+	@Autowired(required = false)
+	private JdbcCacheOCSPSource jdbcCacheOCSPSource;
+
+	@Value("${cache.expiration:0}")
+	private long cacheExpiration;
+
+	@Value("${cache.crl.default.next.update:0}")
+	private long crlDefaultNextUpdate;
+
+	@Value("${cache.crl.max.next.update:0}")
+	private long crlMaxNextUpdate;
+
+	@Value("${cache.ocsp.default.next.update:0}")
+	private long ocspDefaultNextUpdate;
+
+	@Value("${cache.ocsp.max.next.update:0}")
+	private long ocspMaxNextUpdate;
 
 	@Value("${dataloader.connection.timeout}")
 	private int connectionTimeout;
+
 	@Value("${dataloader.connection.request.timeout}")
 	private int connectionRequestTimeout;
+
 	@Value("${dataloader.redirect.enabled}")
 	private boolean redirectEnabled;
 
@@ -132,6 +189,12 @@ public class DSSBeanConfig {
 
 	@Bean
 	public FileCacheDataLoader fileCacheDataLoader() {
+		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setCacheExpirationTime(cacheExpiration * 1000); // to millis
+		return fileCacheDataLoader;
+	}
+
+	private FileCacheDataLoader initFileCacheDataLoader() {
 		FileCacheDataLoader fileCacheDataLoader = new FileCacheDataLoader();
 		fileCacheDataLoader.setDataLoader(dataLoader());
 		// Per default uses "java.io.tmpdir" property
@@ -145,11 +208,13 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public JdbcCacheAIASource cachedAIASource() {
-		JdbcCacheAIASource jdbcCacheAIASource = new JdbcCacheAIASource();
-		jdbcCacheAIASource.setJdbcCacheConnector(jdbcCacheConnector());
-		jdbcCacheAIASource.setProxySource(onlineAIASource());
-		return jdbcCacheAIASource;
+	public AIASource cachedAIASource() {
+		if (jdbcCacheAIASource != null) {
+			jdbcCacheAIASource.setProxySource(onlineAIASource());
+			return jdbcCacheAIASource;
+		}
+		FileCacheDataLoader fileCacheDataLoader = fileCacheDataLoader();
+		return new DefaultAIASource(fileCacheDataLoader);
 	}
 
 	@Bean
@@ -160,24 +225,40 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public JdbcCacheCRLSource cachedCRLSource() {
-		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
-		jdbcCacheCRLSource.setJdbcCacheConnector(jdbcCacheConnector());
-		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
-		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (60 * 10)); // 10 minutes
-		return jdbcCacheCRLSource;
+	public CRLSource cachedCRLSource() {
+		if (jdbcCacheCRLSource != null) {
+			jdbcCacheCRLSource.setProxySource(onlineCRLSource());
+			jdbcCacheCRLSource.setDefaultNextUpdateDelay(crlDefaultNextUpdate);
+			jdbcCacheCRLSource.setMaxNextUpdateDelay(crlMaxNextUpdate);
+			return jdbcCacheCRLSource;
+		}
+		OnlineCRLSource onlineCRLSource = onlineCRLSource();
+		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setCacheExpirationTime(crlMaxNextUpdate * 1000); // to millis
+		onlineCRLSource.setDataLoader(fileCacheDataLoader);
+		return onlineCRLSource;
 	}
 
 	@Bean
-	public OnlineOCSPSource onlineOcspSource() {
+	public OnlineOCSPSource onlineOCSPSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
 		return onlineOCSPSource;
 	}
 
 	@Bean
-	public JdbcCacheConnector jdbcCacheConnector() {
-		return new JdbcCacheConnector(dataSource);
+	public OCSPSource cachedOCSPSource() {
+		if (jdbcCacheOCSPSource != null) {
+			jdbcCacheOCSPSource.setProxySource(onlineOCSPSource());
+			jdbcCacheOCSPSource.setDefaultNextUpdateDelay(ocspDefaultNextUpdate);
+			jdbcCacheOCSPSource.setMaxNextUpdateDelay(ocspMaxNextUpdate);
+			return jdbcCacheOCSPSource;
+		}
+		OnlineOCSPSource onlineOCSPSource = onlineOCSPSource();
+		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setCacheExpirationTime(ocspMaxNextUpdate * 1000); // to millis
+		onlineOCSPSource.setDataLoader(fileCacheDataLoader);
+		return onlineOCSPSource;
 	}
 
 	@Bean
@@ -196,7 +277,7 @@ public class DSSBeanConfig {
 	public CertificateVerifier certificateVerifier() {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setCrlSource(cachedCRLSource());
-		certificateVerifier.setOcspSource(onlineOcspSource());
+		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setAIASource(cachedAIASource());
 		certificateVerifier.setTrustedCertSources(trustedListSource());
 
@@ -210,6 +291,11 @@ public class DSSBeanConfig {
 	@Bean
 	public ClassPathResource defaultPolicy() {
 		return new ClassPathResource(defaultValidationPolicy);
+	}
+
+	@Bean
+	public ClassPathResource defaultCertificateValidationPolicy() {
+		return new ClassPathResource(defaultCertificateValidationPolicy);
 	}
 
 	@Bean
@@ -284,16 +370,59 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
+	public RemotePAdESWithExternalCMSService remotePadesWithExternalCmsService() {
+		RemotePAdESWithExternalCMSServiceImpl service = new RemotePAdESWithExternalCMSServiceImpl();
+		service.setService(padesWithExternalCmsService());
+		return service;
+	}
+
+	@Bean
+	public PAdESWithExternalCMSService padesWithExternalCmsService() {
+		PAdESWithExternalCMSService padesWithExternalCMSService = new PAdESWithExternalCMSService();
+		padesWithExternalCMSService.setCertificateVerifier(certificateVerifier());
+		padesWithExternalCMSService.setTspSource(tspSource);
+		return padesWithExternalCMSService;
+	}
+
+	@Bean
+	public RemoteExternalCMSService remoteExternalCmsService() {
+		RemoteExternalCMSServiceImpl service = new RemoteExternalCMSServiceImpl();
+		service.setService(externalCmsService());
+		return service;
+	}
+
+	@Bean
+	public ExternalCMSService externalCmsService() {
+		ExternalCMSService externalCMSService = new ExternalCMSService(certificateVerifier());
+		externalCMSService.setTspSource(tspSource);
+		return externalCMSService;
+	}
+
+	@Bean
 	public RemoteDocumentValidationService remoteValidationService() {
 		RemoteDocumentValidationService service = new RemoteDocumentValidationService();
 		service.setVerifier(certificateVerifier());
+		if (defaultPolicy() != null) {
+			try (InputStream is = defaultPolicy().getInputStream()) {
+				service.setDefaultValidationPolicy(is);
+			} catch (IOException e) {
+				LOG.error(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
+		}
 		return service;
 	}
 	
 	@Bean
-	public RemoteCertificateValidationService RemoteCertificateValidationService() {
+	public RemoteCertificateValidationService remoteCertificateValidationService() {
 		RemoteCertificateValidationService service = new RemoteCertificateValidationService();
 		service.setVerifier(certificateVerifier());
+		if (defaultCertificateValidationPolicy() != null) {
+			try (InputStream is = defaultCertificateValidationPolicy().getInputStream()) {
+				service.setDefaultValidationPolicy(is);
+			} catch (IOException e) {
+				LOG.error(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
+		}
 		return service;
 	}
 
@@ -325,12 +454,21 @@ public class DSSBeanConfig {
 			throw new DSSException("Unable to load the file " + ksFilename, e);
 		}
 	}
+
+	@Bean
+	public KeyStoreCertificateSource adesLotlKeyStore() {
+		try {
+			return new KeyStoreCertificateSource(new ClassPathResource(adesKeyStoreFilename).getFile(), adesKeyStoreType, adesKeyStorePassword);
+		} catch (IOException e) {
+			throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
+		}
+	}
 	
 	@Bean 
 	public TLValidationJob job() {
 		TLValidationJob job = new TLValidationJob();
 		job.setTrustedListCertificateSource(trustedListSource());
-		job.setListOfTrustedListSources(europeanLOTL());
+		job.setListOfTrustedListSources(listOfTrustedListSources());
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
 		return job;
@@ -345,6 +483,15 @@ public class DSSBeanConfig {
 		return onlineFileLoader;
 	}
 
+	private LOTLSource[] listOfTrustedListSources() {
+		List<LOTLSource> lotlSourceList = new ArrayList<>();
+		lotlSourceList.add(europeanLOTL());
+		if (adesLotlEnabled) {
+			lotlSourceList.add(adesLOTL());
+		}
+		return lotlSourceList.toArray(new LOTLSource[0]);
+	}
+
 	@Bean(name = "european-lotl-source")
 	public LOTLSource europeanLOTL() {
 		LOTLSource lotlSource = new LOTLSource();
@@ -353,6 +500,20 @@ public class DSSBeanConfig {
 		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(currentOjUrl));
 		lotlSource.setPivotSupport(true);
 		return lotlSource;
+	}
+
+	@Bean(name = "ades-source")
+	public LOTLSource adesLOTL() {
+		LOTLSource adesLOTL = new LOTLSource();
+		adesLOTL.setUrl(adesLotlUrl);
+		adesLOTL.setCertificateSource(adesLotlKeyStore());
+		adesLOTL.setMraSupport(true);
+		adesLOTL.setPivotSupport(false);
+
+		adesLOTL.setLotlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)));
+		adesLOTL.setTlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)).negate()); // allow all TSL Types
+
+		return adesLOTL;
 	}
 
 	@Bean

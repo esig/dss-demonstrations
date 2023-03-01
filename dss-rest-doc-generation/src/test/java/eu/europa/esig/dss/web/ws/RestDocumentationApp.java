@@ -2,6 +2,8 @@ package eu.europa.esig.dss.web.ws;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.MaskGenerationFunction;
+import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
@@ -10,9 +12,11 @@ import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
+import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
 import eu.europa.esig.dss.ws.converter.ColorConverter;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
@@ -25,10 +29,14 @@ import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignExternalCmsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.PDFExternalMessageDigestDTO;
+import eu.europa.esig.dss.ws.signature.dto.PDFExternalSignDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignMessageDigestExternalCmsDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
@@ -48,6 +56,7 @@ import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +69,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore.PasswordProtection;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -69,8 +80,11 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -277,12 +291,26 @@ public class RestDocumentationApp {
 		// sign on server A
 		Response responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(toBeSignedDTO)
 				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}", "certificate", parameters.getDigestAlgorithm());
-
 		responseSignature.then().assertThat().statusCode(equalTo(200));
+
 		SignatureValueDTO signatureValue = responseSignature.andReturn().as(SignatureValueDTO.class);
 		assertNotNull(signatureValue);
 		assertNotNull(signatureValue.getAlgorithm());
 		assertNotNull(signatureValue.getValue());
+
+		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSignedDTO.getBytes());
+		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
+		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
+
+		// Sign digest
+		responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestDTO)
+				.post("/services/rest/server-signing/sign-digest/{alias}", "certificate");
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue2 = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue2);
+		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
+		assertArrayEquals(signatureValue.getValue(), signatureValue2.getValue());
 
 		SignOneDocumentDTO signOneDoc = new SignOneDocumentDTO();
 		signOneDoc.setParameters(parameters);
@@ -296,6 +324,162 @@ public class RestDocumentationApp {
 		RemoteDocument signedDocument = respondeSignDocuments.andReturn().as(RemoteDocument.class);
 		assertNotNull(signedDocument);
 		assertNotNull(signedDocument.getBytes());
+	}
+
+	@Test
+	public void serverSign() throws Exception {
+		// retrieve key to be used
+		Response response = given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteKeyEntry entry = response.andReturn().as(RemoteKeyEntry.class);
+		assertNotNull(entry);
+		assertNotNull(entry.getCertificate());
+		assertNotNull(entry.getEncryptionAlgo());
+		assertEquals("certificate", entry.getAlias());
+
+		byte[] toBeSigned = "Hello World!".getBytes();
+		ToBeSignedDTO toBeSignedDTO = new ToBeSignedDTO(toBeSigned);
+
+		// sign on server A
+		Response responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(toBeSignedDTO)
+				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}", "certificate", DigestAlgorithm.SHA256);
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue);
+		assertNotNull(signatureValue.getAlgorithm());
+		assertNotNull(signatureValue.getValue());
+
+		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
+		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
+		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
+
+		// Sign digest
+		responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestDTO)
+				.post("/services/rest/server-signing/sign-digest/{alias}", "certificate");
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue2 = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue2);
+		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
+		assertArrayEquals(signatureValue.getValue(), signatureValue2.getValue());
+
+		try {
+			Signature sig = Signature.getInstance(signatureValue.getAlgorithm().getJCEId());
+			CertificateToken certificateToken = DSSUtils.loadCertificate(entry.getCertificate().getEncodedCertificate());
+			sig.initVerify(certificateToken.getPublicKey());
+			sig.update(toBeSigned);
+			assertTrue(sig.verify(signatureValue.getValue()));
+		} catch (GeneralSecurityException e) {
+			Assertions.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void serverSignWithMaskFunction() throws Exception {
+		// retrieve key to be used
+		Response response = given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteKeyEntry entry = response.andReturn().as(RemoteKeyEntry.class);
+		assertNotNull(entry);
+		assertNotNull(entry.getCertificate());
+		assertNotNull(entry.getEncryptionAlgo());
+		assertEquals("certificate", entry.getAlias());
+
+		byte[] toBeSigned = "Hello World!".getBytes();
+		ToBeSignedDTO toBeSignedDTO = new ToBeSignedDTO(toBeSigned);
+
+		// sign on server A
+		Response responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(toBeSignedDTO)
+				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}/{mask}", "certificate", DigestAlgorithm.SHA256, MaskGenerationFunction.MGF1);
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue);
+		assertNotNull(signatureValue.getAlgorithm());
+		assertNotNull(signatureValue.getValue());
+
+		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
+		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
+
+		// Sign digest
+		responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestDTO)
+				.post("/services/rest/server-signing/sign-digest/{alias}/{mask}", "certificate", MaskGenerationFunction.MGF1);
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue2 = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue2);
+		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
+		assertFalse(Arrays.equals(signatureValue.getValue(), signatureValue2.getValue()));
+
+		try {
+			Signature sig = Signature.getInstance(signatureValue.getAlgorithm().getJCEId());
+			CertificateToken certificateToken = DSSUtils.loadCertificate(entry.getCertificate().getEncodedCertificate());
+			sig.initVerify(certificateToken.getPublicKey());
+			sig.update(toBeSigned);
+			assertTrue(sig.verify(signatureValue.getValue()));
+		} catch (GeneralSecurityException e) {
+			Assertions.fail(e.getMessage());
+		}
+
+		try {
+			Signature sig = Signature.getInstance(signatureValue2.getAlgorithm().getJCEId());
+			CertificateToken certificateToken = DSSUtils.loadCertificate(entry.getCertificate().getEncodedCertificate());
+			sig.initVerify(certificateToken.getPublicKey());
+			sig.update(toBeSigned);
+			assertTrue(sig.verify(signatureValue2.getValue()));
+		} catch (GeneralSecurityException e) {
+			Assertions.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void serverSignWithSignatureAlgo() throws Exception {
+		// retrieve key to be used
+		Response response = given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate");
+		response.then().assertThat().statusCode(equalTo(200));
+		RemoteKeyEntry entry = response.andReturn().as(RemoteKeyEntry.class);
+		assertNotNull(entry);
+		assertNotNull(entry.getCertificate());
+		assertNotNull(entry.getEncryptionAlgo());
+		assertEquals("certificate", entry.getAlias());
+
+		byte[] toBeSigned = "Hello World!".getBytes();
+		ToBeSignedDTO toBeSignedDTO = new ToBeSignedDTO(toBeSigned);
+
+		// sign on server A
+		Response responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(toBeSignedDTO)
+				.post("/services/rest/server-signing/sign-with-signature-algo/{alias}/{signature-algo}", "certificate", SignatureAlgorithm.RSA_SHA256);
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue);
+		assertNotNull(signatureValue.getAlgorithm());
+		assertNotNull(signatureValue.getValue());
+
+		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
+		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
+		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
+
+		// Sign digest
+		responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestDTO)
+				.post("/services/rest/server-signing/sign-digest-with-signature-algo/{alias}/{signature-algo}", "certificate", SignatureAlgorithm.RSA_SHA256);
+		responseSignature.then().assertThat().statusCode(equalTo(200));
+
+		SignatureValueDTO signatureValue2 = responseSignature.andReturn().as(SignatureValueDTO.class);
+		assertNotNull(signatureValue2);
+		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
+		assertArrayEquals(signatureValue.getValue(), signatureValue2.getValue());
+
+		try {
+			Signature sig = Signature.getInstance(signatureValue.getAlgorithm().getJCEId());
+			CertificateToken certificateToken = DSSUtils.loadCertificate(entry.getCertificate().getEncodedCertificate());
+			sig.initVerify(certificateToken.getPublicKey());
+			sig.update(toBeSigned);
+			assertTrue(sig.verify(signatureValue.getValue()));
+		} catch (GeneralSecurityException e) {
+			Assertions.fail(e.getMessage());
+		}
 	}
 
 	@Test
@@ -587,6 +771,80 @@ public class RestDocumentationApp {
 			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
 			assertNotNull(signedDocument);
 			assertNotNull(signedDocument.getBytes());
+		}
+	}
+
+	@Test
+	public void padesWithExternalCms() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/sample.pdf"));
+			RemoteDocument tlToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteSignatureParameters padesParameters = new RemoteSignatureParameters();
+			padesParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+
+			// get message-digest
+			PDFExternalMessageDigestDTO pdfExternalMessageDigestDTO = new PDFExternalMessageDigestDTO(tlToSign, padesParameters);
+			Response responseMessageDigest = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(pdfExternalMessageDigestDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/pades-external-cms/getMessageDigest");
+			responseMessageDigest.then().assertThat().statusCode(equalTo(200));
+			DigestDTO messageDigest = responseMessageDigest.andReturn().as(DigestDTO.class);
+			assertNotNull(messageDigest);
+			assertNotNull(messageDigest.getAlgorithm());
+			assertTrue(Utils.isArrayNotEmpty(messageDigest.getValue()));
+
+			RemoteSignatureParameters cmsParameters = new RemoteSignatureParameters();
+			cmsParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+			cmsParameters.setSigningCertificate(signingCertificate);
+
+			Date signingTime = DSSUtils.getUtcDate(2021, 9, 3);
+			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
+			bLevelParameters.setSigningDate(signingTime);
+			cmsParameters.setBLevelParams(bLevelParameters);
+
+			// get DTBS
+			DataToSignExternalCmsDTO dataToBeSigned = new DataToSignExternalCmsDTO(messageDigest, cmsParameters);
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(dataToBeSigned, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/external-cms/getDataToSign");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(toBeSignedDTO);
+			assertTrue(Utils.isArrayNotEmpty(toBeSignedDTO.getBytes()));
+
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(toBeSignedDTO),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			// sign message-digest
+			SignMessageDigestExternalCmsDTO signMessageDigestExternalCmsDTO = new SignMessageDigestExternalCmsDTO(messageDigest, cmsParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			Response responseSignMessageDigest = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(signMessageDigestExternalCmsDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/external-cms/signMessageDigest");
+			responseSignMessageDigest.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument cmsSignature = responseSignMessageDigest.andReturn().as(RemoteDocument.class);
+			assertNotNull(cmsSignature);
+			assertTrue(Utils.isArrayNotEmpty(cmsSignature.getBytes()));
+
+			// sign document
+			PDFExternalSignDocumentDTO pdfExternalSignDocumentDTO = new PDFExternalSignDocumentDTO(tlToSign, padesParameters, cmsSignature);
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(pdfExternalSignDocumentDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/pades-external-cms/signDocument");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertTrue(Utils.isArrayNotEmpty(signedDocument.getBytes()));
 		}
 	}
 

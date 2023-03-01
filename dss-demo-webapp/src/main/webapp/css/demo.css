@@ -113,6 +113,14 @@ form#digest-sign-form p#filename {
 
 /* End Containers merge */
 
+/* Signature validation */
+
+.tooltip-inner {
+    white-space: pre-wrap;
+}
+
+/* End Signature validation */
+
 /* Certificate validation */
 
 .certificate-form {

@@ -4,7 +4,7 @@ import eu.europa.esig.dss.exception.IllegalInputException;
 import eu.europa.esig.dss.jaxb.object.Message;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.policy.EtsiValidationPolicy;
 import eu.europa.esig.dss.policy.ValidationPolicy;
 import eu.europa.esig.dss.policy.ValidationPolicyFacade;
@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EsigValidationTest {
 
-    private static final String URL_ACCESS_POINT = "https://esignature.ec.europa.eu";
+    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu";
 
     private static final List<String> TO_BE_VALIDATED = Arrays.asList("2", "3");
 

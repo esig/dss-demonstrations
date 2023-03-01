@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.header.HeaderWriter;
@@ -29,9 +29,9 @@ import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration {
 
-	private static final Logger LOG = LoggerFactory.getLogger(WebSecurityConfig.class);
+	private static final Logger LOG = LoggerFactory.getLogger(WebSecurityConfiguration.class);
 
 	@Value("${web.security.cookie.samesite}")
 	private String samesite;
@@ -44,18 +44,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			"/services/rest/**", "/services/soap/**"
 	};
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// javadoc uses frames
-		http.headers().addHeaderWriter(javadocHeaderWriter());
-		http.headers().addHeaderWriter(svgHeaderWriter());
-		http.headers().addHeaderWriter(serverEsigDSS());
-		
+		http.headers().addHeaderWriter(javadocHeaderWriter())
+				.addHeaderWriter(svgHeaderWriter())
+				.addHeaderWriter(serverEsigDSS());
+
 		http.csrf().ignoringAntMatchers(API_URLS); // disable CSRF for API calls (REST/SOAP webServices)
 
 		if (Utils.isStringNotEmpty(csp)) {
 			http.headers().contentSecurityPolicy(csp);
 		}
+
+		return http.build();
 	}
 
 	@Bean

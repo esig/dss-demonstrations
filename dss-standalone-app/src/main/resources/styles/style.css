@@ -5,11 +5,33 @@
 	-fx-pref-height : 30;
 }
 
+.hbox-report-style {
+    -fx-spacing: 10;
+ 	-fx-alignment : center-left;
+	-fx-min-height : 20;
+ }
+
 .label-style {
 	-fx-pref-width : 180;
 	-fx-min-width : 180;
 }
 
+.label-report-style {
+	-fx-pref-width : 150;
+	-fx-min-width : 150;
+}
+
 .warningLabel {
 	-fx-text-fill: #FF8000;
+}
+
+.hr {
+    -fx-background-color: slategray;
+    -fx-background-insets: 9 15 0 15;
+    -fx-padding: 10 15 0 15;
+}
+
+.clickable:hover {
+    -fx-cursor: hand;
+    -fx-background-color: blue;
 }
