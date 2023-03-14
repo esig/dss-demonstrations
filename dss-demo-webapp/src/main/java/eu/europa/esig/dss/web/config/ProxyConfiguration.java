@@ -63,7 +63,7 @@ public class ProxyConfiguration {
 				httpProperties.setUser(httpUser);
 			}
 			if (Utils.isStringNotEmpty(httpPassword)) {
-				httpProperties.setPassword(httpPassword);
+				httpProperties.setPassword(httpPassword.toCharArray());
 			}
 			if (Utils.isCollectionNotEmpty(httpExcludedHosts)) {
 				httpProperties.setExcludedHosts(httpExcludedHosts);
@@ -85,7 +85,7 @@ public class ProxyConfiguration {
 				httpsProperties.setUser(httpsUser);
 			}
 			if (Utils.isStringNotEmpty(httpsPassword)) {
-				httpsProperties.setPassword(httpsPassword);
+				httpsProperties.setPassword(httpsPassword.toCharArray());
 			}
 			if (Utils.isCollectionNotEmpty(httpsExcludedHosts)) {
 				httpsProperties.setExcludedHosts(httpsExcludedHosts);
