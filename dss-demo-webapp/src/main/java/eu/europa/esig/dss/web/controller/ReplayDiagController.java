@@ -156,4 +156,9 @@ public class ReplayDiagController extends AbstractValidationController {
 		return new ValidationLevel[] { ValidationLevel.BASIC_SIGNATURES, ValidationLevel.LONG_TERM_DATA, ValidationLevel.ARCHIVAL_DATA };
 	}
 
+	@ModelAttribute("displayDownloadPdf")
+	public boolean isDisplayDownloadPdf() {
+		return true;
+	}
+
 }
