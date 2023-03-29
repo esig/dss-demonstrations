@@ -30,11 +30,12 @@ public class TSPSourceLoader {
     private static TSPSource loadTspSource() {
         if (Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock"))) {
             final String ksFilePath = PropertyReader.getProperty("timestamp.mock.keystore.file");
+            final String ksType = PropertyReader.getProperty("timestamp.mock.keystore.type");
             final char[] ksPassword = PropertyReader.getCharArrayProperty("timestamp.mock.keystore.password");
             final String alias = PropertyReader.getProperty("timestamp.mock.keystore.alias");
             KeyStore keyStore;
             try (InputStream is = TSPSourceLoader.class.getResourceAsStream(ksFilePath)) {
-                keyStore = KeyStore.getInstance("PKCS12");
+                keyStore = KeyStore.getInstance(ksType);
                 keyStore.load(is, ksPassword);
             } catch (Exception e) {
                 LOG.error("Cannot load the KeyStore TSPSource! Reason : {}", e.getMessage(), e);
