@@ -79,7 +79,6 @@
 	</licenses>
 
 	<modules>
-		<module>dss-mock-tsa</module>
 		<module>dss-standalone-app</module>
 		<module>dss-standalone-app-package</module>
 		<module>dss-demo-webapp</module>
@@ -224,11 +223,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-mock-tsa</artifactId>
-				<version>${project.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 				<artifactId>dss-demo-webapp</artifactId>
