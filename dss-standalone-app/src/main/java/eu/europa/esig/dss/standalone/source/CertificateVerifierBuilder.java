@@ -33,7 +33,7 @@ public class CertificateVerifierBuilder {
         certificateVerifier.setCrlSource(onlineCRLSource());
         certificateVerifier.setOcspSource(onlineOCSPSource());
         certificateVerifier.setAIASource(onlineAIASource());
-        certificateVerifier.setTrustedCertSources(tslCertificateSource);
+        certificateVerifier.setTrustedCertSources(tslCertificateSource, TrustedCertificateSourceLoader.getTrustedCertificateSource());
         certificateVerifier.setAdjunctCertSources(adjunctCertificateSource);
 
         // Default configs
