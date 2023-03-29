@@ -39,7 +39,7 @@ public class PropertyReader {
     }
 
     public static char[] getCharArrayProperty(String propertyKey) {
-        if (getProperties().contains(propertyKey)) {
+        if (getProperties().containsKey(propertyKey)) {
             return getProperties().getProperty(propertyKey).toCharArray();
         }
         return null;
