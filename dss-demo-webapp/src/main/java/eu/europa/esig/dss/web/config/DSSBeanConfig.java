@@ -168,13 +168,13 @@ public class DSSBeanConfig {
 	@Value("${dataloader.redirect.enabled}")
 	private boolean redirectEnabled;
 
-	@Value("${trusted.source.keystore.type}")
+	@Value("${trusted.source.keystore.type:}")
 	private String trustSourceKsType;
 
-	@Value("${trusted.source.keystore.filename}")
+	@Value("${trusted.source.keystore.filename:}")
 	private String trustSourceKsFilename;
 
-	@Value("${trusted.source.keystore.password}")
+	@Value("${trusted.source.keystore.password:}")
 	private String trustSourceKsPassword;
 
 	// can be null
