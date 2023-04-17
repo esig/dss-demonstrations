@@ -14,11 +14,12 @@ public class ExceptionRestMapper implements ExceptionMapper<Exception> {
 
 	@Override
 	public Response toResponse(Exception exception) {
+		if (LOG.isDebugEnabled()) {
+			// print with error location for debug purposes
+			LOG.debug("An error occurred during the REST response : {}", exception.getMessage());
+		}
 		if (exception instanceof JsonProcessingException) {
-			if (LOG.isDebugEnabled()) {
-				// print with error location for debug purposes
-				LOG.debug("An error occurred during the REST response : {}", exception.getMessage());
-			}
+			// clear location to avoid information disclosure
 			((JsonProcessingException) exception).clearLocation();
 		}
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
