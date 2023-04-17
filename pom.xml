@@ -49,11 +49,10 @@
 
 		<cxf.version>3.5.5</cxf.version>
 		<swagger-ui.version>4.15.5</swagger-ui.version>
-		<spring.version>5.3.25</spring.version>
+		<spring.version>5.3.26</spring.version>
 		<spring-security.version>5.8.2</spring-security.version>
 		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
-		<thymeleaf-layout-dialect.version>3.2.0</thymeleaf-layout-dialect.version>
-		<groovy.version>4.0.9</groovy.version> <!-- To be used while thymeleaf-layout-dialect is not updated -->
+		<thymeleaf-layout-dialect.version>3.2.1</thymeleaf-layout-dialect.version>
 		<jackson-jaxrs-json-provider.version>2.14.2</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.5</commons-fileupload.version>
 		<commons-io.version>2.11.0</commons-io.version>
@@ -428,11 +427,6 @@
 			    <groupId>nz.net.ultraq.thymeleaf</groupId>
 			    <artifactId>thymeleaf-layout-dialect</artifactId>
 				<version>${thymeleaf-layout-dialect.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.groovy</groupId>
-				<artifactId>groovy</artifactId>
-				<version>${groovy.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
