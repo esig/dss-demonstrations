@@ -290,7 +290,7 @@ public class DSSBeanConfig {
 		if (Utils.isStringNotEmpty(trustSourceKsFilename)) {
 			try {
 				KeyStoreCertificateSource keyStore = new KeyStoreCertificateSource(
-						new ClassPathResource(trustSourceKsFilename).getFile(), trustSourceKsType, trustSourceKsPassword);
+						new ClassPathResource(trustSourceKsFilename).getFile(), trustSourceKsType, trustSourceKsPassword.toCharArray());
 				trustedCertificateSource.importAsTrusted(keyStore);
 			} catch (IOException e) {
 				throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
@@ -475,7 +475,7 @@ public class DSSBeanConfig {
 	@Bean
 	public KeyStoreCertificateSource ojContentKeyStore() {
 		try {
-			return new KeyStoreCertificateSource(new ClassPathResource(ksFilename).getFile(), ksType, ksPassword);
+			return new KeyStoreCertificateSource(new ClassPathResource(ksFilename).getFile(), ksType, ksPassword.toCharArray());
 		} catch (IOException e) {
 			throw new DSSException("Unable to load the file " + ksFilename, e);
 		}
@@ -484,7 +484,7 @@ public class DSSBeanConfig {
 	@Bean
 	public KeyStoreCertificateSource adesLotlKeyStore() {
 		try {
-			return new KeyStoreCertificateSource(new ClassPathResource(adesKeyStoreFilename).getFile(), adesKeyStoreType, adesKeyStorePassword);
+			return new KeyStoreCertificateSource(new ClassPathResource(adesKeyStoreFilename).getFile(), adesKeyStoreType, adesKeyStorePassword.toCharArray());
 		} catch (IOException e) {
 			throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
 		}

@@ -89,7 +89,7 @@ public class TLValidationJobExecutor {
 		String keyStorePath = PropertyReader.getProperty("keystore.path");
 		if (Utils.isStringNotEmpty(keyStorePath)) {
 			return new KeyStoreCertificateSource(TLValidationJobExecutor.class.getResourceAsStream(keyStorePath),
-					PropertyReader.getProperty("keystore.type"), PropertyReader.getProperty("keystore.password"));
+					PropertyReader.getProperty("keystore.type"), PropertyReader.getCharArrayProperty("keystore.password"));
 		}
 		LOG.warn("Path to the keystore is not defined!");
 		return null;
