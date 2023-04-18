@@ -588,8 +588,11 @@ public class SignatureController extends AbstractController {
 			digestAlgos.retainAll(sigTokenTypeSupportedDigestAlgorithms);
 		}
 		if (SignatureTokenType.MSCAPI.equals(model.getTokenType())) {
-			// SHA224 not supported
 			digestAlgos.remove(DigestAlgorithm.SHA224);
+			digestAlgos.remove(DigestAlgorithm.SHA3_224);
+			digestAlgos.remove(DigestAlgorithm.SHA3_256);
+			digestAlgos.remove(DigestAlgorithm.SHA3_384);
+			digestAlgos.remove(DigestAlgorithm.SHA3_512);
 		}
 		
 		for (Node daButton : hBoxDigestAlgos.getChildren()) {
