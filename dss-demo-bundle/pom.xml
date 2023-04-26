@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u362-b09/OpenJDK8U-jre_x86-32_windows_hotspot_8u362b09.zip</jre.download.link>
-		<jre.root.folder>jdk8u362-b09-jre</jre.root.folder>
-		<tomcat.version>8.5.87</tomcat.version>
+		<jre.download.link>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u372-b07/OpenJDK8U-jre_x86-32_windows_hotspot_8u372b07.zip</jre.download.link>
+		<jre.root.folder>jdk8u372-b07-jre</jre.root.folder>
+		<tomcat.version>8.5.88</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
