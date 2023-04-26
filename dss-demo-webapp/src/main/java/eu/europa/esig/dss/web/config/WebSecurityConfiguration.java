@@ -18,6 +18,7 @@ import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.MappedInterceptor;
@@ -51,13 +52,21 @@ public class WebSecurityConfiguration {
 				.addHeaderWriter(svgHeaderWriter())
 				.addHeaderWriter(serverEsigDSS());
 
-		http.csrf().ignoringAntMatchers(API_URLS); // disable CSRF for API calls (REST/SOAP webServices)
+		http.csrf().ignoringRequestMatchers(getAntMatchers()); // disable CSRF for API calls (REST/SOAP webServices)
 
 		if (Utils.isStringNotEmpty(csp)) {
 			http.headers().contentSecurityPolicy(csp);
 		}
 
 		return http.build();
+	}
+
+	private RequestMatcher[] getAntMatchers() {
+		RequestMatcher[] requestMatchers = new RequestMatcher[API_URLS.length];
+		for (int i = 0; i < API_URLS.length; i++) {
+			requestMatchers[i] = new AntPathRequestMatcher(API_URLS[i]);
+		}
+		return requestMatchers;
 	}
 
 	@Bean
