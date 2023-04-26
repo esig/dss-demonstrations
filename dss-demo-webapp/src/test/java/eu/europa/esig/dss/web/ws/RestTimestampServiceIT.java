@@ -76,8 +76,8 @@ public class RestTimestampServiceIT extends AbstractRestIT {
 	@Test
 	public void simpleTest() {
 		byte[] contentToBeTimestamped = "Hello World!".getBytes();
-		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA1, contentToBeTimestamped);
-		DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA1, digestValue);
+		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA256, contentToBeTimestamped);
+		DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA256, digestValue);
 		TimestampResponseDTO timestampResponse = timestampService.getTimestampResponse(digest);
 		assertNotNull(timestampResponse);
 		assertTrue(Utils.isArrayNotEmpty(timestampResponse.getBinaries()));
@@ -106,8 +106,8 @@ public class RestTimestampServiceIT extends AbstractRestIT {
 		/* Create a content timestamp */
 		FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 		
-		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA1, DSSUtils.toByteArray(fileToSign));
-		DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA1, digestValue);
+		byte[] digestValue = DSSUtils.digest(DigestAlgorithm.SHA256, DSSUtils.toByteArray(fileToSign));
+		DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA256, digestValue);
 		TimestampResponseDTO timeStampResponse = timestampService.getTimestampResponse(digest);
 		
 		TimestampDTO contentTimestamp = new TimestampDTO(timeStampResponse.getBinaries(), TimestampType.ALL_DATA_OBJECTS_TIMESTAMP);
