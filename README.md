@@ -8,21 +8,13 @@ Please, use the new JIRA for project is on https://ec.europa.eu/digital-building
 
 # Maven repository
 
-The release is published on DIGITAL repository : 
+The release of [DSS](https://github.com/esig/dss) is published on Maven Central repository : 
 
-https://ec.europa.eu/digital-building-blocks/artifact/#welcome
-
-<pre>
-&lt;repository&gt;
-  &lt;id&gt;cefdigital&lt;/id&gt;
-  &lt;name&gt;cefdigital&lt;/name&gt;
-  &lt;url&gt;https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/esignaturedss/&lt;/url&gt;
-&lt;/repository&gt;
-</pre>
+https://central.sonatype.com/search?q=eu.europa.ec.joinup.sd-dss
 
 # Demonstration
 
-The release is deployed on https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo
+The demonstration bundle is deployed at https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo
 
 # DSS Standalone Application
 

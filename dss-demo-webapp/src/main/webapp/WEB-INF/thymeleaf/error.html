@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.error}">
 	<body>		
 		<div layout:fragment="content">
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-danger text-break" role="alert">
 				<i class="fa fa-exclamation-circle"></i>&nbsp;
                 <strong th:text="#{label.error.occurred}"></strong>&nbsp;<span th:text="${exception}"></span>
             </div>

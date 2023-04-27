@@ -22,6 +22,7 @@ import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
@@ -35,6 +36,7 @@ import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
 import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.validation.SignaturePolicyProvider;
@@ -166,6 +168,15 @@ public class DSSBeanConfig {
 	@Value("${dataloader.redirect.enabled}")
 	private boolean redirectEnabled;
 
+	@Value("${trusted.source.keystore.type:}")
+	private String trustSourceKsType;
+
+	@Value("${trusted.source.keystore.filename:}")
+	private String trustSourceKsFilename;
+
+	@Value("${trusted.source.keystore.password:}")
+	private String trustSourceKsPassword;
+
 	// can be null
 	@Autowired(required = false)
 	private ProxyConfig proxyConfig;
@@ -274,12 +285,27 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
+	public CommonTrustedCertificateSource trustedCertificateSource() {
+		CommonTrustedCertificateSource trustedCertificateSource = new CommonTrustedCertificateSource();
+		if (Utils.isStringNotEmpty(trustSourceKsFilename)) {
+			try {
+				KeyStoreCertificateSource keyStore = new KeyStoreCertificateSource(
+						new ClassPathResource(trustSourceKsFilename).getFile(), trustSourceKsType, trustSourceKsPassword);
+				trustedCertificateSource.importAsTrusted(keyStore);
+			} catch (IOException e) {
+				throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
+			}
+		}
+		return trustedCertificateSource;
+	}
+
+	@Bean
 	public CertificateVerifier certificateVerifier() {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setCrlSource(cachedCRLSource());
 		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setAIASource(cachedAIASource());
-		certificateVerifier.setTrustedCertSources(trustedListSource());
+		certificateVerifier.setTrustedCertSources(trustedListSource(), trustedCertificateSource());
 
 		// Default configs
 		certificateVerifier.setAlertOnMissingRevocationData(new ExceptionOnStatusAlert());

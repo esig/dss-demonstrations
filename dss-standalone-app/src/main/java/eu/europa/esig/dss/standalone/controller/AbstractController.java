@@ -31,7 +31,11 @@ public abstract class AbstractController implements Initializable {
         fileChooser.initialDirectoryProperty().bindBidirectional(lastKnownSavingDirectory);
 
         MimeType mimeType = document.getMimeType();
-        String extension = mimeType.getExtension();
+        String extension = Utils.getFileNameExtension(document.getName());
+        if (Utils.isStringEmpty(extension)) {
+            extension = mimeType.getExtension();
+        }
+
         String filterPattern = extension != null ? "*." + extension : "*";
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(mimeType.getMimeTypeString(), filterPattern);
         fileChooser.getExtensionFilters().add(extFilter);
