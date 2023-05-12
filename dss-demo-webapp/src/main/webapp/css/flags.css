@@ -12,6 +12,7 @@
    width: 24px;
    height : 18px;
    border: 1px solid #ececec;
+   background-size: cover!important;
 }
 
 .flag {
