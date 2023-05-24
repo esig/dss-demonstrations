@@ -267,6 +267,7 @@ public class DSSBeanConfig {
 		}
 		OnlineOCSPSource onlineOCSPSource = onlineOCSPSource();
 		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setDataLoader(ocspDataLoader());
 		fileCacheDataLoader.setCacheExpirationTime(ocspMaxNextUpdate * 1000); // to millis
 		onlineOCSPSource.setDataLoader(fileCacheDataLoader);
 		return onlineOCSPSource;
