@@ -4,6 +4,7 @@ import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.exception.IllegalInputException;
 import eu.europa.esig.dss.jaxb.object.Message;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.policy.EtsiValidationPolicy;
 import eu.europa.esig.dss.policy.ValidationPolicy;
@@ -15,6 +16,7 @@ import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.simplereport.SimpleReport;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.client.http.DataLoader;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
@@ -69,6 +71,8 @@ public class EsigValidationTest {
 
     private static final File fileCacheDirectory = new File("target/cache");
 
+    private static DataLoader dataLoader;
+
     private static ValidationPolicy validationPolicy;
 
     private static StringBuilder sb;
@@ -78,6 +82,7 @@ public class EsigValidationTest {
         ValidationPolicyFacade policyFacade = ValidationPolicyFacade.newFacade();
         ConstraintsParameters constraints = policyFacade.unmarshall(new File(POLICY_URL));
         validationPolicy = new EtsiValidationPolicy(constraints);
+        dataLoader = new CommonsDataLoader();
 
         sb = new StringBuilder();
 
@@ -95,12 +100,8 @@ public class EsigValidationTest {
     }
 
     private static Stream<Arguments> data() {
-        // -DeSig.validation.tests.url=...
-        String eSigValidationTestsUrl = System.getProperty("eSig.validation.tests.url", URL_ACCESS_POINT);
-
-        CommonsDataLoader dataLoader = new CommonsDataLoader();
-        byte[] zipArchiveBinary = dataLoader.get(eSigValidationTestsUrl);
-        List<DSSDocument> allArchiveContent = extractContainerContent(new InMemoryDocument(zipArchiveBinary));
+        DSSDocument testArchive = getTestArchive();
+        List<DSSDocument> allArchiveContent = extractContainerContent(testArchive);
 
         Collection<Arguments> dataToRun = new ArrayList<>();
 
@@ -143,6 +144,20 @@ public class EsigValidationTest {
         }
 
         return dataToRun.stream();
+    }
+
+    private static DSSDocument getTestArchive() {
+        // -DeSig.validation.tests.bundle.path=...
+        String eSigValidationTestsBundlePath = System.getProperty("eSig.validation.tests.bundle.path", null);
+        if (Utils.isStringNotEmpty(eSigValidationTestsBundlePath)) {
+            return new FileDocument(eSigValidationTestsBundlePath);
+        }
+
+        // -DeSig.validation.tests.url=...
+        String eSigValidationTestsUrl = System.getProperty("eSig.validation.tests.url", URL_ACCESS_POINT);
+
+        byte[] zipArchiveBinary = dataLoader.get(eSigValidationTestsUrl);
+        return new InMemoryDocument(zipArchiveBinary);
     }
 
     private static List<DSSDocument> extractContainerContent(DSSDocument archive) {
