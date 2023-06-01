@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -186,8 +187,7 @@ public class EsigValidationTest {
 
     private static KeyStoreCertificateSource getKeyStore(List<DSSDocument> documents, String testKey) {
         DSSDocument keyStore = getKeyStoreDocument(documents, testKey);
-        String keyStorePassword = getKeyStorePassword(documents, testKey);
-
+        char[] keyStorePassword = getKeyStorePassword(documents, testKey);
         if (keyStore != null && keyStorePassword != null) {
             try (InputStream is = keyStore.openStream()) {
                 return new KeyStoreCertificateSource(is, KEY_STORE_TYPE, keyStorePassword);
@@ -208,14 +208,41 @@ public class EsigValidationTest {
         return null;
     }
 
-    private static String getKeyStorePassword(List<DSSDocument> documents, String testKey) {
+    private static char[] getKeyStorePassword(List<DSSDocument> documents, String testKey) {
         for (DSSDocument document : documents) {
             if (String.format(KEY_STORE_PASSWORD_FILE_NAME, testKey).equals(document.getName())) {
-                return new String(DSSUtils.toByteArray(document));
+                return readToCharArray(document);
             }
         }
         fail("Unable to find the key store password!");
         return null;
+    }
+
+    public static char[] readToCharArray(DSSDocument document) {
+        try (InputStream is = document.openStream(); InputStreamReader reader = new InputStreamReader(is)) {
+            char[] buffer = new char[1024];
+
+            int totalCharsRead = 0;
+            int charsRead;
+            while ((charsRead = reader.read(buffer, totalCharsRead, buffer.length - totalCharsRead)) != -1) {
+                totalCharsRead += charsRead;
+                if (totalCharsRead == buffer.length) {
+                    char[] newBuffer = new char[buffer.length * 2];
+                    System.arraycopy(buffer, 0, newBuffer, 0, buffer.length);
+                    buffer = newBuffer;
+                }
+            }
+            reader.close();
+
+            char[] content = new char[totalCharsRead];
+            System.arraycopy(buffer, 0, content, 0, totalCharsRead);
+            return content;
+            
+        } catch (IOException e) {
+            fail(String.format("An error occurred while reading document with name [%s] : %s",
+                    document.getName(), e.getMessage()));
+            return null;
+        }
     }
 
     private static String getLotlUrl(List<DSSDocument> documents) {
