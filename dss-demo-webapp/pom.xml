@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.12</version>
+		<version>5.12.1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -429,6 +429,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
 			<artifactId>font-awesome</artifactId>
 			<version>4.7.0</version>
 		</dependency>
@@ -465,7 +470,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
-			<version>9.0.74</version>
+			<version>9.0.75</version>
 			<scope>test</scope>
 		</dependency>
 

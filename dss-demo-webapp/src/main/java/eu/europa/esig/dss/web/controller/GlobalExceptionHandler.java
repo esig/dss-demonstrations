@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.controller;
 
+import eu.europa.esig.dss.exception.IllegalInputException;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.exception.InternalServerException;
@@ -72,6 +73,17 @@ public class GlobalExceptionHandler {
 			LOG.debug("The max upload file size exceeded. Reason : {}", e.getMessage());
 		}
 		return getMAV(req, new DSSException("Uploaded file size exceeded max allowed limit."), HttpStatus.FORBIDDEN, DEFAULT_ERROR_VIEW);
+	}
+
+	@ExceptionHandler({UnsupportedOperationException.class, IllegalArgumentException.class, IllegalInputException.class})
+	public ModelAndView unsupportedOperationExceptionHandler(HttpServletRequest req, Exception e) {
+		String errorMessage = "An error occurred on URI call [{}] : {}";
+		if (LOG.isDebugEnabled()) {
+			LOG.warn(errorMessage, req.getRequestURI(), e.getMessage(), e);
+		} else {
+			LOG.warn(errorMessage, req.getRequestURI(), e.getMessage());
+		}
+		return getMAV(req, e, HttpStatus.BAD_REQUEST, DEFAULT_ERROR_VIEW);
 	}
 
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {

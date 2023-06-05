@@ -1,10 +1,11 @@
 package eu.europa.esig.dss.validation;
 
+import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.exception.IllegalInputException;
 import eu.europa.esig.dss.jaxb.object.Message;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.enumerations.MimeType;
 import eu.europa.esig.dss.policy.EtsiValidationPolicy;
 import eu.europa.esig.dss.policy.ValidationPolicy;
 import eu.europa.esig.dss.policy.ValidationPolicyFacade;
@@ -15,6 +16,7 @@ import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.simplereport.SimpleReport;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.client.http.DataLoader;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
@@ -37,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -51,22 +52,26 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EsigValidationTest {
 
-    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu";
+    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu/efda/api/v2/validation-tests/testcase/testFile/all/";
 
-    private static final List<String> TO_BE_VALIDATED = Arrays.asList("2", "3");
+    private static final String ZIP_ARCHIVE_EXTENSION = ".zip";
 
-    private static final String TEST_CASES_ZIP_PATH = "/efda/validation-tests/testcase/testFile/lotl/LOTL-%s";
-    private static final String LOTL_PATH = "/efda/validation-tests/testcase/tl/force_download/LOTL-%s";
-
-    private static final String KEY_STORE_FILE_NAME = "CERT-LOTL-%s.p12";
-    private static final String KEY_STORE_PASSWORD_FILE_NAME = "CERT-LOTL-%s-PASSWORD.txt";
+    private static final String KEY_STORE_FILE_NAME = "CERT-%s.p12";
+    private static final String KEY_STORE_PASSWORD_FILE_NAME = "CERT-%s-PASSWORD.txt";
 
     private static final String KEY_STORE_TYPE = "PKCS12";
 
+    private static final String LOTL_URL_SUFFIX = "LOTL URL.txt";
     private static final String TEST_FILE_SUFFIX = "TEST FILE.xml";
     private static final String CONCLUSION_SUFFIX = "CONCLUSION.txt";
 
     private static final String POLICY_URL = "src/test/resources/constraint.xml";
+
+    private static final String OUTPUT_FILENAME = "target/validationTestsResult.csv";
+
+    private static final File fileCacheDirectory = new File("target/cache");
+
+    private static DataLoader dataLoader;
 
     private static ValidationPolicy validationPolicy;
 
@@ -77,6 +82,7 @@ public class EsigValidationTest {
         ValidationPolicyFacade policyFacade = ValidationPolicyFacade.newFacade();
         ConstraintsParameters constraints = policyFacade.unmarshall(new File(POLICY_URL));
         validationPolicy = new EtsiValidationPolicy(constraints);
+        dataLoader = new CommonsDataLoader();
 
         sb = new StringBuilder();
 
@@ -94,15 +100,16 @@ public class EsigValidationTest {
     }
 
     private static Stream<Arguments> data() {
+        DSSDocument testArchive = getTestArchive();
+        List<DSSDocument> allArchiveContent = extractContainerContent(testArchive);
+
         Collection<Arguments> dataToRun = new ArrayList<>();
 
-        for (String testKey : TO_BE_VALIDATED) {
-            CommonsDataLoader dataLoader = new CommonsDataLoader();
-
-            byte[] zipArchiveBinary = dataLoader.get(URL_ACCESS_POINT + String.format(TEST_CASES_ZIP_PATH, testKey));
-            List<DSSDocument> zipArchiveContent = extractContainerContent(new InMemoryDocument(zipArchiveBinary));
+        for (DSSDocument testPackage : allArchiveContent) {
+            List<DSSDocument> zipArchiveContent = extractContainerContent(testPackage);
             Map<DSSDocument, String> documentsAndResults = getDocumentsToValidateAndExpectedResultsMap(zipArchiveContent);
 
+            String testKey = getTestKey(testPackage);
             KeyStoreCertificateSource keyStore = getKeyStore(zipArchiveContent, testKey);
 
             TrustedListsCertificateSource trustedCertSource = new TrustedListsCertificateSource();
@@ -112,14 +119,14 @@ public class EsigValidationTest {
             tlValidationJob.setSynchronizationStrategy(new AcceptAllStrategy());
 
             LOTLSource lotlSource = new LOTLSource();
-            lotlSource.setUrl(URL_ACCESS_POINT + String.format(LOTL_PATH, testKey));
+            lotlSource.setUrl(getLotlUrl(zipArchiveContent));
             lotlSource.setCertificateSource(keyStore);
             tlValidationJob.setListOfTrustedListSources(lotlSource);
 
             FileCacheDataLoader fileCacheDataLoader = new FileCacheDataLoader();
             fileCacheDataLoader.setDataLoader(dataLoader);
             fileCacheDataLoader.setCacheExpirationTime(-1);
-            fileCacheDataLoader.setFileCacheDirectory(new File("target/cache"));
+            fileCacheDataLoader.setFileCacheDirectory(fileCacheDirectory);
 
             tlValidationJob.setOnlineDataLoader(fileCacheDataLoader);
 
@@ -137,6 +144,20 @@ public class EsigValidationTest {
         }
 
         return dataToRun.stream();
+    }
+
+    private static DSSDocument getTestArchive() {
+        // -DeSig.validation.tests.bundle.path=...
+        String eSigValidationTestsBundlePath = System.getProperty("eSig.validation.tests.bundle.path", null);
+        if (Utils.isStringNotEmpty(eSigValidationTestsBundlePath)) {
+            return new FileDocument(eSigValidationTestsBundlePath);
+        }
+
+        // -DeSig.validation.tests.url=...
+        String eSigValidationTestsUrl = System.getProperty("eSig.validation.tests.url", URL_ACCESS_POINT);
+
+        byte[] zipArchiveBinary = dataLoader.get(eSigValidationTestsUrl);
+        return new InMemoryDocument(zipArchiveBinary);
     }
 
     private static List<DSSDocument> extractContainerContent(DSSDocument archive) {
@@ -170,14 +191,24 @@ public class EsigValidationTest {
         }
     }
 
+    private static String getTestKey(DSSDocument testPackage) {
+        if (testPackage.getName() != null && testPackage.getName().endsWith(ZIP_ARCHIVE_EXTENSION)) {
+            return testPackage.getName().replace(ZIP_ARCHIVE_EXTENSION, "");
+        }
+        fail(String.format("Unsupported filename [%s]", testPackage.getName()));
+        return null;
+    }
+
     private static KeyStoreCertificateSource getKeyStore(List<DSSDocument> documents, String testKey) {
         DSSDocument keyStore = getKeyStoreDocument(documents, testKey);
         String keyStorePassword = getKeyStorePassword(documents, testKey);
 
-        try (InputStream is = keyStore.openStream()) {
-            return new KeyStoreCertificateSource(is, KEY_STORE_TYPE, keyStorePassword);
-        } catch (IOException e) {
-            fail(e);
+        if (keyStore != null && keyStorePassword != null) {
+            try (InputStream is = keyStore.openStream()) {
+                return new KeyStoreCertificateSource(is, KEY_STORE_TYPE, keyStorePassword);
+            } catch (IOException e) {
+                fail(e);
+            }
         }
         return null;
     }
@@ -202,10 +233,20 @@ public class EsigValidationTest {
         return null;
     }
 
+    private static String getLotlUrl(List<DSSDocument> documents) {
+        for (DSSDocument document : documents) {
+            if (document.getName().endsWith(LOTL_URL_SUFFIX)) {
+                return new String(DSSUtils.toByteArray(document));
+            }
+        }
+        fail("Unable to find the LOTL URL!");
+        return null;
+    }
+
     private static Map<DSSDocument, String> getDocumentsToValidateAndExpectedResultsMap(List<DSSDocument> documents) {
         Map<DSSDocument, String> documentsMap = new LinkedHashMap<>();
         for (DSSDocument document : documents) {
-            if (document.getName().contains(TEST_FILE_SUFFIX)) {
+            if (document.getName().endsWith(TEST_FILE_SUFFIX)) {
                 String testFileId = StringUtils.substringBefore(document.getName(), "-" + TEST_FILE_SUFFIX);
                 String conclusion = getConclusionForTestFileWithId(documents, testFileId);
                 documentsMap.put(document, conclusion);
@@ -236,16 +277,16 @@ public class EsigValidationTest {
         SimpleReport simpleReport = reports.getSimpleReport();
         String obtainedResult = simpleReport.getSignatureQualification(simpleReport.getFirstSignatureId()).getReadable();
 
-        sb.append(document.getName() + ",");
-        sb.append(expectedResult + ",");
-        sb.append(obtainedResult + ",");
-        sb.append(expectedResult.equals(obtainedResult) + ",");
-        sb.append(simpleReport.getIndication(simpleReport.getFirstSignatureId()) + ",");
+        sb.append(document.getName()).append(",");
+        sb.append(expectedResult).append(",");
+        sb.append(obtainedResult).append(",");
+        sb.append(expectedResult.equals(obtainedResult)).append(",");
+        sb.append(simpleReport.getIndication(simpleReport.getFirstSignatureId())).append(",");
         sb.append((simpleReport.getSubIndication(simpleReport.getFirstSignatureId()) != null ?
-                simpleReport.getSubIndication(simpleReport.getFirstSignatureId()) : "-") + ",");
-        sb.append(toString(simpleReport.getAdESValidationErrors(simpleReport.getFirstSignatureId())) + ",");
-        sb.append(toString(simpleReport.getAdESValidationWarnings(simpleReport.getFirstSignatureId())) + ",");
-        sb.append(toString(simpleReport.getQualificationErrors(simpleReport.getFirstSignatureId())) + ",");
+                simpleReport.getSubIndication(simpleReport.getFirstSignatureId()) : "-")).append(",");
+        sb.append(toString(simpleReport.getAdESValidationErrors(simpleReport.getFirstSignatureId()))).append(",");
+        sb.append(toString(simpleReport.getAdESValidationWarnings(simpleReport.getFirstSignatureId()))).append(",");
+        sb.append(toString(simpleReport.getQualificationErrors(simpleReport.getFirstSignatureId()))).append(",");
         sb.append(toString(simpleReport.getQualificationWarnings(simpleReport.getFirstSignatureId())));
         sb.append('\n');
 
@@ -275,7 +316,7 @@ public class EsigValidationTest {
 
     @AfterAll
     public static void storeResult() throws Exception {
-        try (FileOutputStream fos = new FileOutputStream("target/validationTestsResult.csv");
+        try (FileOutputStream fos = new FileOutputStream(OUTPUT_FILENAME);
                 PrintWriter writer = new PrintWriter(fos)) {
             writer.write(sb.toString());
         }
