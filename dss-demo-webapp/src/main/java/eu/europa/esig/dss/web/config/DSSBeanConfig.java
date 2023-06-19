@@ -177,6 +177,10 @@ public class DSSBeanConfig {
 	@Value("${trusted.source.keystore.password:}")
 	private String trustSourceKsPassword;
 
+	@Value("${bc.rsa.max_mr_tests:}")
+	private String bcRsaValidation;
+
+
 	// can be null
 	@Autowired(required = false)
 	private ProxyConfig proxyConfig;
@@ -570,6 +574,13 @@ public class DSSBeanConfig {
         sslCertificateLoader.setCommonsDataLoader(trustAllDataLoader());
         return sslCertificateLoader;
     }
+
+	@Bean
+	public void bcRsaValidation() {
+		if (Utils.isStringNotEmpty(bcRsaValidation)) {
+			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
+		}
+	}
 
 	private <C extends CommonsDataLoader> C configureCommonsDataLoader(C dataLoader) {
 		dataLoader.setTimeoutConnection(connectionTimeout);
