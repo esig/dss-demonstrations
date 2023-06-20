@@ -5,6 +5,7 @@ import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.AssertTrue;
+import java.util.Date;
 import java.util.List;
 
 public class ValidationForm {
@@ -12,6 +13,10 @@ public class ValidationForm {
 	private MultipartFile signedFile;
 
 	private List<OriginalFile> originalFiles;
+
+	private Date validationTime;
+
+	private int timezoneDifference;
 
 	private ValidationLevel validationLevel;
 
@@ -47,6 +52,22 @@ public class ValidationForm {
 
 	public void setOriginalFiles(List<OriginalFile> originalFiles) {
 		this.originalFiles = originalFiles;
+	}
+
+	public Date getValidationTime() {
+		return validationTime;
+	}
+
+	public void setValidationTime(Date validationTime) {
+		this.validationTime = validationTime;
+	}
+
+	public int getTimezoneDifference() {
+		return timezoneDifference;
+	}
+
+	public void setTimezoneDifference(int timezoneDifference) {
+		this.timezoneDifference = timezoneDifference;
 	}
 
 	public ValidationLevel getValidationLevel() {

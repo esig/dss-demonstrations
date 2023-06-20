@@ -61,6 +61,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -74,9 +75,10 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_TILE = "validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 
-	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationLevel", "defaultPolicy",
-			"policyFile", "signingCertificate", "adjunctCertificates", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
-			"includeUserFriendlyIdentifiers", "includeSemantics" };
+	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationTime",
+			"validationLevel", "timezoneDifference", "defaultPolicy", "policyFile", "signingCertificate", "adjunctCertificates",
+			"includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers",
+			"includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -89,6 +91,7 @@ public class ValidationController extends AbstractValidationController {
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
+		super.initBinder(webDataBinder);
 		webDataBinder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
 	}
 
@@ -127,6 +130,8 @@ public class ValidationController extends AbstractValidationController {
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
+		documentValidator.setValidationLevel(validationForm.getValidationLevel());
+		documentValidator.setValidationTime(getValidationTime(validationForm));
 
 		TokenIdentifierProvider identifierProvider = validationForm.isIncludeUserFriendlyIdentifiers() ?
 				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
@@ -149,12 +154,21 @@ public class ValidationController extends AbstractValidationController {
 		return VALIDATION_RESULT_TILE;
 	}
 
+	private Date getValidationTime(ValidationForm validationForm) {
+		if (validationForm.getValidationTime() != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(validationForm.getValidationTime());
+			calendar.add(Calendar.MINUTE, validationForm.getTimezoneDifference());
+			return calendar.getTime();
+		}
+		return null;
+	}
+
 	private void setDetachedContents(DocumentValidator documentValidator, ValidationForm validationForm) {
 		List<DSSDocument> originalFiles = WebAppUtils.originalFilesToDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
 			documentValidator.setDetachedContents(originalFiles);
 		}
-		documentValidator.setValidationLevel(validationForm.getValidationLevel());
 	}
 
 	private void setSigningCertificate(DocumentValidator documentValidator, ValidationForm validationForm) {

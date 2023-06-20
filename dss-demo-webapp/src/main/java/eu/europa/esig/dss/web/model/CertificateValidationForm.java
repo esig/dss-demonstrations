@@ -10,6 +10,8 @@ public class CertificateValidationForm {
 
 	private Date validationTime;
 
+	private int timezoneDifference;
+
 	private CertificateForm certificateForm;
 
 	private List<MultipartFile> certificateChainFiles;
@@ -26,6 +28,14 @@ public class CertificateValidationForm {
 
 	public void setValidationTime(Date validationTime) {
 		this.validationTime = validationTime;
+	}
+
+	public int getTimezoneDifference() {
+		return timezoneDifference;
+	}
+
+	public void setTimezoneDifference(int timezoneDifference) {
+		this.timezoneDifference = timezoneDifference;
 	}
 
 	public CertificateForm getCertificateForm() {

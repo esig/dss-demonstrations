@@ -18,7 +18,9 @@
                     <span th:text="#{label.validation.advanced.options}" th:remove="tag"></span>
                 </div>
                 <div id="advancedOptions" class="card-body collapse in">
-					<div th:replace="fragment/fields::validation-level-policy"></div>
+					<div th:replace="fragment/fields::field-validation-level"></div>
+					<div th:replace="fragment/fields::field-validation-time"></div>
+					<div th:replace="fragment/fields::field-validation-policy"></div>
 					<div th:replace="fragment/fields::field-signing-certificate"></div>
                     <div th:replace="fragment/fields::field-adjunct-certificates"></div>
 					<div th:replace="fragment/fields::field-certificate-tokens"></div>

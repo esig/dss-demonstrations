@@ -375,7 +375,15 @@
 <div class="form-group row" th:fragment="field-validation-time">
 	<label class="col-sm-3 col-form-label" for="validationTime" th:text="#{label.validation.time.opt}"></label>
 	<div class="col-sm-6">
-		<input type="date" name="validationTime" th:field="*{validationTime}" />
+		<input class="form-control input-sm w-auto" type="datetime-local" name="validationTime" th:field="*{validationTime}" />
+		<!-- Get user timezone difference relatively UTC -->
+		<input type="hidden" name="timezoneDifference" id="timezoneDifference" th:field="*{timezoneDifference}">
+		<script>
+			$(document).ready(function() {
+			  var timezoneOffset = new Date().getTimezoneOffset();
+			  $('#timezoneDifference').val(timezoneOffset);
+			});
+		</script>
 	</div>
 	<div class="col-sm-9 offset-sm-3 align-self-center">
 		<p th:if="${#fields.hasErrors('validationTime')}" th:errors="*{validationTime}" class="text-danger">Error</p>
@@ -503,32 +511,33 @@
     <div th:replace="fragment/fields::field-digest-alert"></div>
 </div>
 
-<th:block th:fragment="validation-level-policy">
+
+<th:block th:fragment="field-validation-level">
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label" th:text="#{label.validation.level}"></label>
 		<div class="col-sm-9">
 			<select th:field="*{validationLevel}" class="custom-select">
 				<option th:each="level : ${validationLevels}" th:value="${level}"
-					th:text="#{${'label.validation.level.'+level}}" />
+						th:text="#{${'label.validation.level.'+level}}" />
 			</select>
 		</div>
 	</div>
+</th:block>
 
+<th:block th:fragment="field-validation-policy">
 	<div class="form-group row">
-		<div class="offset-sm-3 col-sm-9">
+		<label class="col-sm-3 col-form-label" th:text="#{label.validation.policy}"></label>
+		<div class="col-sm-9">
 			<div class="form-check form-check-inline">
-           		<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="true" th:id="defaultPolicy" />
-           		<label class="form-check-label" th:for="defaultPolicy" th:text="#{label.validation.default.policy.file}"></label>
-           	</div>
+				<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="true" th:id="defaultPolicy" />
+				<label class="form-check-label" th:for="defaultPolicy" th:text="#{label.validation.default.policy.file}"></label>
+			</div>
 		</div>
-	</div>
-
-	<div class="form-group row">
 		<div class="offset-sm-3 col-sm-3">
 			<div class="form-check form-check-inline">
-           		<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="false" th:id="otherPolicy" />
-           		<label class="form-check-label" th:for="otherPolicy" th:text="#{label.validation.custom.policy.file}"></label>
-           	</div>
+				<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="false" th:id="otherPolicy" />
+				<label class="form-check-label" th:for="otherPolicy" th:text="#{label.validation.custom.policy.file}"></label>
+			</div>
 		</div>
 		<div class="col-sm-5">
 			<input type="file" class="form-control-file" name="policyFile" id="policyFile" disabled="disabled" />
