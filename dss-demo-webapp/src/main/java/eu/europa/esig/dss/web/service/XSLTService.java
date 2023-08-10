@@ -1,6 +1,6 @@
 package eu.europa.esig.dss.web.service;
 
-import eu.europa.esig.dss.DSSXmlErrorListener;
+import eu.europa.esig.dss.xml.DSSXmlErrorListener;
 import eu.europa.esig.dss.detailedreport.DetailedReportXmlDefiner;
 import eu.europa.esig.dss.diagnostic.DiagnosticDataXmlDefiner;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
