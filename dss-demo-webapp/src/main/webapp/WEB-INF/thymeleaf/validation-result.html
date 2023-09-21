@@ -150,10 +150,13 @@
 										<optgroup th:label="#{label.signatures}" id="select-visualrepresentation-sigs">
 
 										</optgroup>
+										<optgroup th:label="#{label.evidence.records}" id="select-visualrepresentation-ers">
+
+										</optgroup>
 										<optgroup th:label="#{label.timestamps}" id="select-visualrepresentation-tsts">
 
 										</optgroup>
-										<optgroup th:label="#{label.certificate.chains}"  id="select-visualrepresentation-chains">
+										<optgroup th:label="#{label.certificate.chains}" id="select-visualrepresentation-chains">
 
 										</optgroup>
 									</select>
@@ -214,6 +217,9 @@
                 var signatureIds = mySVG.contentDocument.getSignatureIds();
                 initSignatureSelect(signatureIds);
 
+				var evidenceRecordIds = mySVG.contentDocument.getEvidenceRecordIds();
+				initEvidenceRecordSelect(evidenceRecordIds);
+
                 var timestampIds = mySVG.contentDocument.getTimestampIds();
                 initTimestampSelect(timestampIds);
                 
@@ -253,6 +259,22 @@
                 }
             }
 
+            function initEvidenceRecordSelect(evidenceRecordIds) {
+				var optgroup = document.getElementById("select-visualrepresentation-ers");
+				if (evidenceRecordIds == null || evidenceRecordIds.length == 0) {
+					optgroup.style.display="none";
+				} else {
+					optgroup.style.display="";
+					for (var elementIdx = 0;  elementIdx < evidenceRecordIds.length; elementIdx++) {
+						var erId = evidenceRecordIds[elementIdx];
+						var option = document.createElement("option");
+						option.text = erId;
+						option.className = "er";
+						optgroup.appendChild(option);
+					}
+				}
+			}
+
             function initCertChainSelect(certificateIds) {
                 var optgroup = document.getElementById("select-visualrepresentation-chains");
                 if (certificateIds == null || certificateIds.length == 0) {
@@ -278,6 +300,8 @@
                 var option = this.selectedOptions[0];
                 if ("sig" == option.className) {
                     representation.displaySignatureById(option.value);
+				} else if ("er" == option.className) {
+					representation.displayEvidenceRecordById(option.value);
                 } else if ("tst" == option.className) {
                     representation.displayTimestampById(option.value);
                 } else {
