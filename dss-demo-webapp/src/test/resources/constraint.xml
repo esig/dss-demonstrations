@@ -711,6 +711,11 @@
 			</Cryptographic>
 		</BasicSignatureConstraints>
 	</Revocation>
+	<EvidenceRecord>
+		<DataObjectExistence Level="FAIL" />
+		<DataObjectIntact Level="FAIL" />
+		<Cryptographic />
+	</EvidenceRecord>
 	<Cryptographic />
 	<!-- <Cryptographic> <AlgoExpirationDate Format="yyyy-MM-dd"> <Algo Date="2017-02-24">SHA1</Algo> <Algo Date="2035-02-24">SHA224</Algo> <Algo Date="2035-02-24">SHA256</Algo> <Algo 
 		Date="2035-02-24">SHA384</Algo> <Algo Date="2035-02-24">SHA512</Algo> <Algo Date="2017-02-24">RIPEMD160</Algo> <Algo Date="2017-02-24">DSA128</Algo> <Algo Date="2015-02-24">RSA1024</Algo> 

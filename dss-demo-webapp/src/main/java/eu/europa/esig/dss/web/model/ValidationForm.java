@@ -27,6 +27,8 @@ public class ValidationForm {
 	private MultipartFile signingCertificate;
 
 	private List<MultipartFile> adjunctCertificates;
+
+	private List<MultipartFile> evidenceRecordFiles;
 	
 	private boolean includeCertificateTokens;
 	
@@ -68,6 +70,14 @@ public class ValidationForm {
 
 	public void setTimezoneDifference(int timezoneDifference) {
 		this.timezoneDifference = timezoneDifference;
+	}
+
+	public List<MultipartFile> getEvidenceRecordFiles() {
+		return evidenceRecordFiles;
+	}
+
+	public void setEvidenceRecordFiles(List<MultipartFile> evidenceRecordFiles) {
+		this.evidenceRecordFiles = evidenceRecordFiles;
 	}
 
 	public ValidationLevel getValidationLevel() {

@@ -448,7 +448,7 @@
 </div>
 
 <div class="form-group row" th:fragment="field-identifiers">
-	<label class="col-sm-3 col-form-label font-weight-bold" th:text="#{label.validation.user.friendly.ids}"></label>
+	<label class="col-sm-3 col-form-label" th:text="#{label.validation.user.friendly.ids}"></label>
 	<div class="col-sm-9">
 		<div class="form-check mt-1">
 			<input class="form-check-input mt-2" type="checkbox" th:field="*{includeUserFriendlyIdentifiers}" checked />
@@ -477,6 +477,16 @@
     <div class="col-xs-4">
      	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
     </div>
+</div>
+
+<div class="form-group row" th:fragment="field-evidence-record-files">
+	<label class="col-sm-3 col-form-label" for="evidenceRecordFiles" th:text="#{label.evidence.record.files}"></label>
+	<div class="col-sm-5">
+		<input type="file" class="form-control-file" id="evidenceRecordFiles" name="evidenceRecordFiles" multiple="multiple" />
+	</div>
+	<div class="col-xs-4">
+		<p th:if="${#fields.hasErrors('evidenceRecordFiles')}" th:errors="*{evidenceRecordFiles}" class="text-danger">Error</p>
+	</div>
 </div>
 
 <div class="form-group row" th:fragment="field-qwac-url">
