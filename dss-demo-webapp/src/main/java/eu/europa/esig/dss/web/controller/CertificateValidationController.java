@@ -84,8 +84,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(getCertificateVerifier(certValidationForm));
-		certificateValidator.setTokenExtractionStrategy(
-				TokenExtractionStrategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
+		certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(
+				certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens(), false));
 		certificateValidator.setValidationTime(getValidationTime(certValidationForm));
 
 		TokenIdentifierProvider identifierProvider = certValidationForm.isIncludeUserFriendlyIdentifiers() ?

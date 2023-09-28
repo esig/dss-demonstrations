@@ -127,7 +127,7 @@ public class ValidationController extends AbstractValidationController {
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
 		documentValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
 		documentValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
-				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
+				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens(), false));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
 		documentValidator.setValidationLevel(validationForm.getValidationLevel());

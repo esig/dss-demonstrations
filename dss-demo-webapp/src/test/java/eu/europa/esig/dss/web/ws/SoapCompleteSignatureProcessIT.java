@@ -188,12 +188,12 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			assertNotNull(result.getSimpleReport());
 			assertNotNull(result.getValidationReport());
 
-			assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+			assertEquals(1, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().size());
 			
 			XmlSignature xmlSignature = result.getDiagnosticData().getSignatures().get(0);
 			assertEquals(1, xmlSignature.getFoundTimestamps().size());
 			assertEquals(SignatureLevel.CAdES_BASELINE_T, xmlSignature.getSignatureFormat());
-			assertEquals(result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication(), Indication.INDETERMINATE);
+			assertEquals(result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getIndication(), Indication.INDETERMINATE);
 		}
 	}
 	
@@ -247,14 +247,14 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 		assertNotNull(result.getSimpleReport());
 		assertNotNull(result.getValidationReport());
 
-		assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().size());
 		
 		XmlSignature xmlSignature = result.getDiagnosticData().getSignatures().get(0);
 		assertEquals(1, xmlSignature.getFoundTimestamps().size());
 		assertEquals(SignatureLevel.CAdES_BASELINE_T, xmlSignature.getSignatureFormat());
 		assertEquals(DSSUtils.loadCertificate(remoteKeyEntry.getCertificate().getEncodedCertificate()).getDSSIdAsString(), 
 				xmlSignature.getSigningCertificate().getCertificate().getId());
-		assertEquals(result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication(), Indication.INDETERMINATE);
+		assertEquals(result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getIndication(), Indication.INDETERMINATE);
 		
 	}
 
@@ -297,11 +297,11 @@ public class SoapCompleteSignatureProcessIT extends AbstractIT {
 			assertNotNull(result.getSimpleReport());
 			assertNotNull(result.getValidationReport());
 
-			assertEquals(1, result.getSimpleReport().getSignatureOrTimestamp().size());
+			assertEquals(1, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().size());
 			
 			XmlSignature signature = result.getDiagnosticData().getSignatures().get(0);
 			assertEquals(SignatureLevel.JAdES_BASELINE_B, signature.getSignatureFormat());
-			assertEquals(result.getSimpleReport().getSignatureOrTimestamp().get(0).getIndication(), Indication.INDETERMINATE);
+			assertEquals(result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getIndication(), Indication.INDETERMINATE);
 			
 			List<XmlDigestMatcher> digestMatchers = signature.getDigestMatchers();
 			assertEquals(3, digestMatchers.size());

@@ -173,7 +173,7 @@ public class ValidationController extends AbstractController {
                             validationStage.setResizable(true);
 
                             Scene scene;
-                            if (Utils.isCollectionNotEmpty(value.getSimpleReportJaxb().getSignatureOrTimestamp())) {
+                            if (Utils.isCollectionNotEmpty(value.getSimpleReportJaxb().getSignatureOrTimestampOrEvidenceRecord())) {
                                 scene = new Scene(loader.load(), 1000, 550);
                             } else {
                                 scene = new Scene(loader.load(), 150, 75);
