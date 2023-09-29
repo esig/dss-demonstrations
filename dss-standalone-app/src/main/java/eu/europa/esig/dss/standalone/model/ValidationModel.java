@@ -18,6 +18,8 @@ public class ValidationModel {
 
     private ObjectProperty<Collection<File>> adjunctCertificates = new SimpleObjectProperty<>();
 
+    private ObjectProperty<Collection<File>> evidenceRecords = new SimpleObjectProperty<>();
+
     private ObjectProperty<Boolean> userFriendlyIdentifiers = new SimpleObjectProperty<>(true);
 
     private ObjectProperty<Boolean> semantics = new SimpleObjectProperty<>(false);
@@ -80,6 +82,18 @@ public class ValidationModel {
 
     public void setAdjunctCertificates(Collection<File> adjunctCertificates) {
         this.adjunctCertificates.set(adjunctCertificates);
+    }
+
+    public Collection<File> getEvidenceRecords() {
+        return evidenceRecords.get();
+    }
+
+    public ObjectProperty<Collection<File>> evidenceRecordsProperty() {
+        return evidenceRecords;
+    }
+
+    public void setEvidenceRecords(Collection<File> evidenceRecords) {
+        this.evidenceRecords.set(evidenceRecords);
     }
 
     public Boolean isUserFriendlyIdentifiers() {

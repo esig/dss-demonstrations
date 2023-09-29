@@ -63,6 +63,9 @@ public class ValidationController extends AbstractController {
     public Button adjunctCertificatesSelectButton;
 
     @FXML
+    public Button evidenceRecordsSelectButton;
+
+    @FXML
     public CheckBox userFriendlyIdentifiersSelectButton;
 
     @FXML
@@ -131,6 +134,16 @@ public class ValidationController extends AbstractController {
             }
         });
         adjunctCertificatesSelectButton.textProperty().bindBidirectional(model.adjunctCertificatesProperty(), new CollectionFilesToStringConverter());
+
+        evidenceRecordsSelectButton.setOnAction(new EventHandler<>() {
+            @Override
+            public void handle(ActionEvent event) {
+                DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser("Evidence record(s)");
+                List<File> files = fileChooser.showOpenMultipleDialog(stage);
+                model.setEvidenceRecords(files);
+            }
+        });
+        evidenceRecordsSelectButton.textProperty().bindBidirectional(model.evidenceRecordsProperty(), new CollectionFilesToStringConverter());
 
         userFriendlyIdentifiersSelectButton.selectedProperty().bindBidirectional(model.userFriendlyIdentifiersProperty());
 

@@ -110,6 +110,10 @@
 			<artifactId>dss-tsl-validation</artifactId>
 		</dependency>
 		
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-evidence-record-xml</artifactId>
+		</dependency>
 		<!-- Choose your PAdES implementation -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
