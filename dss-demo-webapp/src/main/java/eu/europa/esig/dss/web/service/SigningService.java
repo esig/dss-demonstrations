@@ -36,7 +36,7 @@ import eu.europa.esig.dss.signature.CounterSignatureService;
 import eu.europa.esig.dss.signature.DocumentSignatureService;
 import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
 import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.spi.x509.tsp.KeyStoreTSPSource;
+import eu.europa.esig.dss.spi.x509.tsp.KeyEntityTSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.spi.x509.tsp.TimestampToken;
@@ -91,7 +91,7 @@ public class SigningService {
 	private TSPSource tspSource;
 
 	public boolean isMockTSPSourceUsed() {
-		return tspSource instanceof KeyStoreTSPSource;
+		return tspSource instanceof KeyEntityTSPSource;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

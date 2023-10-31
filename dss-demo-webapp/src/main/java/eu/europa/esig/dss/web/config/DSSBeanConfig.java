@@ -26,7 +26,6 @@ import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
-import eu.europa.esig.dss.spi.x509.aia.OnlineAIASource;
 import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
@@ -218,7 +217,7 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public OnlineAIASource onlineAIASource() {
+	public DefaultAIASource onlineAIASource() {
 		return new DefaultAIASource(dataLoader());
 	}
 

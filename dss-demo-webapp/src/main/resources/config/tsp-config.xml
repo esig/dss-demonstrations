@@ -2,7 +2,7 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
-	<bean id="tspSource" class="eu.europa.esig.dss.spi.x509.tsp.KeyStoreTSPSource">
+	<bean id="tspSource" class="eu.europa.esig.dss.spi.x509.tsp.KeyEntityTSPSource">
 		<constructor-arg name="ksFile" type="java.io.File" value="classpath:self_signed_tsa.p12" />
 		<constructor-arg name="ksType" value="PKCS12" />
 		<constructor-arg name="ksPassword" value="whrmbQRp2nZHx7T5" />

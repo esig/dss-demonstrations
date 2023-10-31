@@ -4,7 +4,7 @@ import eu.europa.esig.dss.service.http.commons.HostConnection;
 import eu.europa.esig.dss.service.http.commons.TimestampDataLoader;
 import eu.europa.esig.dss.service.http.commons.UserCredentials;
 import eu.europa.esig.dss.service.tsp.OnlineTSPSource;
-import eu.europa.esig.dss.spi.x509.tsp.KeyStoreTSPSource;
+import eu.europa.esig.dss.spi.x509.tsp.KeyEntityTSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.utils.Utils;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
@@ -42,7 +42,7 @@ public class TSPSourceLoader {
                 return null;
             }
 
-            return new KeyStoreTSPSource(keyStore, alias, ksPassword);
+            return new KeyEntityTSPSource(keyStore, alias, ksPassword);
 
         } else {
             OnlineTSPSource tspSource = new OnlineTSPSource(PropertyReader.getProperty("timestamp.url"));

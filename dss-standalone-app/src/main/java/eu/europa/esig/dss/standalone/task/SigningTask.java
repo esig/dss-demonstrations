@@ -33,7 +33,7 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.xades.DSSXMLUtils;
-import eu.europa.esig.dss.xml.DomUtils;
+import eu.europa.esig.dss.xml.utils.DomUtils;
 import eu.europa.esig.trustedlist.TrustedListUtils;
 import eu.europa.esig.xmldsig.XmlDSigUtils;
 import eu.europa.esig.xmldsig.definition.XMLDSigElement;

@@ -8,7 +8,6 @@ import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
-import eu.europa.esig.dss.spi.x509.aia.OnlineAIASource;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 
@@ -43,8 +42,8 @@ public class CertificateVerifierBuilder {
         return certificateVerifier;
     }
 
-    private OnlineAIASource onlineAIASource() {
-        OnlineAIASource onlineAIASource = new DefaultAIASource();
+    private DefaultAIASource onlineAIASource() {
+        DefaultAIASource onlineAIASource = new DefaultAIASource();
         onlineAIASource.setDataLoader(DataLoaderConfigLoader.getDataLoader());
         return onlineAIASource;
     }
