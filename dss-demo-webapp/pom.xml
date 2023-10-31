@@ -340,6 +340,11 @@
 			<artifactId>dss-token</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-evidence-record-xml</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		
 		<!-- Replace commons-logging -->
 		<dependency>

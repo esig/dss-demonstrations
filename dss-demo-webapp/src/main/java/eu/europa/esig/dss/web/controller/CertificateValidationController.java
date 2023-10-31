@@ -9,7 +9,7 @@ import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
-import eu.europa.esig.dss.validation.TokenIdentifierProvider;
+import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
 import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -84,8 +84,8 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(getCertificateVerifier(certValidationForm));
-		certificateValidator.setTokenExtractionStrategy(
-				TokenExtractionStrategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
+		certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(
+				certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens(), false));
 		certificateValidator.setValidationTime(getValidationTime(certValidationForm));
 
 		TokenIdentifierProvider identifierProvider = certValidationForm.isIncludeUserFriendlyIdentifiers() ?

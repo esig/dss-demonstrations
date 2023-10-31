@@ -17,6 +17,7 @@
         <HBox styleClass="hbox-report-style">
             <Label fx:id="signatureIdLabel" styleClass="label-report-style" text="Signature Id: "/>
             <Label fx:id="timestampIdLabel" styleClass="label-report-style" text="Timestamp Id: "/>
+            <Label fx:id="evidenceRecordIdLabel" styleClass="label-report-style" text="Evidence Record Id: "/>
             <Label fx:id="id"/>
         </HBox>
 
@@ -58,7 +59,7 @@
             <Label fx:id="signatureFormat"/>
         </HBox>
 
-        <HBox styleClass="hbox-report-style">
+        <HBox fx:id="certificateChainContainer" styleClass="hbox-report-style">
             <Label styleClass="label-report-style" text="Certificate chain: ">
                 <padding>
                     <Insets bottom="2.0" />
@@ -80,6 +81,11 @@
         <HBox fx:id="productionTimeContainer" styleClass="hbox-report-style">
             <Label styleClass="label-report-style" text="Production time: "/>
             <Label fx:id="productionTime" />
+        </HBox>
+
+        <HBox fx:id="lowestPOEContainer" styleClass="hbox-report-style">
+            <Label styleClass="label-report-style" text="Lowest POE: "/>
+            <Label fx:id="lowestPOE" />
         </HBox>
 
         <HBox fx:id="signatureScopesContainer" styleClass="hbox-report-style">
@@ -105,6 +111,24 @@
                 </HBox>
                 <HBox>
                     <VBox fx:id="signatureTimestamps" />
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <HBox fx:id="signatureEvidenceRecordsContainer">
+            <padding>
+                <Insets top="15.0"/>
+            </padding>
+
+            <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <HBox style="-fx-background-color: #DDDDDD;">
+                    <padding>
+                        <Insets top="2.0" right="10.0" bottom="1.0" left="10.0"/>
+                    </padding>
+                    <Label text="Evidence records:"/>
+                </HBox>
+                <HBox>
+                    <VBox fx:id="signatureEvidenceRecords" />
                 </HBox>
             </VBox>
         </HBox>

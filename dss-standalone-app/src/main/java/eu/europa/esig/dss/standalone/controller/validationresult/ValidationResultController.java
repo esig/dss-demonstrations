@@ -89,7 +89,7 @@ public class ValidationResultController extends AbstractController {
         Objects.requireNonNull(reports, "Reports cannot be null!");
         XmlSimpleReport simpleReport = reports.getSimpleReportJaxb();
 
-        List<String> signatureIds = simpleReport.getSignatureOrTimestamp()
+        List<String> signatureIds = simpleReport.getSignatureOrTimestampOrEvidenceRecord()
                 .stream().map(XmlToken::getId).collect(Collectors.toList());
         noValidationResult.setVisible(Utils.isCollectionEmpty(signatureIds));
 
@@ -104,7 +104,7 @@ public class ValidationResultController extends AbstractController {
                 @Override
                 public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                     LOG.debug("Changed signature view to '{}'", t1);
-                    for (XmlToken token : simpleReport.getSignatureOrTimestamp()) {
+                    for (XmlToken token : simpleReport.getSignatureOrTimestampOrEvidenceRecord()) {
                         if (t1.equals(token.getId())) {
                             fillValidationResult(token);
                             break;

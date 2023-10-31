@@ -23,7 +23,7 @@ import eu.europa.esig.dss.validation.DocumentValidator;
 import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
 import eu.europa.esig.dss.validation.SignaturePolicyProvider;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.validation.TokenIdentifierProvider;
+import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
 import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
@@ -77,8 +77,8 @@ public class ValidationController extends AbstractValidationController {
 
 	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationTime",
 			"validationLevel", "timezoneDifference", "defaultPolicy", "policyFile", "signingCertificate", "adjunctCertificates",
-			"includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers",
-			"includeSemantics" };
+			"evidenceRecordFiles", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
+			"includeUserFriendlyIdentifiers", "includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -127,7 +127,7 @@ public class ValidationController extends AbstractValidationController {
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
 		documentValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
 		documentValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
-				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
+				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens(), false));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
 		documentValidator.setValidationLevel(validationForm.getValidationLevel());
@@ -139,6 +139,7 @@ public class ValidationController extends AbstractValidationController {
 
 		setSigningCertificate(documentValidator, validationForm);
 		setDetachedContents(documentValidator, validationForm);
+		setDetachedEvidenceRecords(documentValidator, validationForm);
 
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);
@@ -164,6 +165,15 @@ public class ValidationController extends AbstractValidationController {
 		return null;
 	}
 
+	private void setSigningCertificate(DocumentValidator documentValidator, ValidationForm validationForm) {
+		CertificateToken signingCertificate = WebAppUtils.toCertificateToken(validationForm.getSigningCertificate());
+		if (signingCertificate != null) {
+			CertificateSource signingCertificateSource = new CommonCertificateSource();
+			signingCertificateSource.addCertificate(signingCertificate);
+			documentValidator.setSigningCertificateSource(signingCertificateSource);
+		}
+	}
+
 	private void setDetachedContents(DocumentValidator documentValidator, ValidationForm validationForm) {
 		List<DSSDocument> originalFiles = WebAppUtils.originalFilesToDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
@@ -171,12 +181,10 @@ public class ValidationController extends AbstractValidationController {
 		}
 	}
 
-	private void setSigningCertificate(DocumentValidator documentValidator, ValidationForm validationForm) {
-		CertificateToken signingCertificate = WebAppUtils.toCertificateToken(validationForm.getSigningCertificate());
-		if (signingCertificate != null) {
-			CertificateSource signingCertificateSource = new CommonCertificateSource();
-			signingCertificateSource.addCertificate(signingCertificate);
-			documentValidator.setSigningCertificateSource(signingCertificateSource);
+	private void setDetachedEvidenceRecords(DocumentValidator documentValidator, ValidationForm validationForm) {
+		List<DSSDocument> evidenceRecordFiles = WebAppUtils.toDSSDocuments(validationForm.getEvidenceRecordFiles());
+		if (Utils.isCollectionNotEmpty(evidenceRecordFiles)) {
+			documentValidator.setDetachedEvidenceRecordDocuments(evidenceRecordFiles);
 		}
 	}
 

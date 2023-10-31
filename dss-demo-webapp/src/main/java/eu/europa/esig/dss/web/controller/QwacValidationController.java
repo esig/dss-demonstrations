@@ -93,7 +93,7 @@ public class QwacValidationController extends AbstractValidationController {
 			CertificateValidator certificateValidator = CertificateValidator.fromCertificate(qwacCertificate);
 			certificateValidator.setCertificateVerifier(cv);
 			certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(qwacValidationForm.isIncludeCertificateTokens(), false,
-					qwacValidationForm.isIncludeRevocationTokens()));
+					qwacValidationForm.isIncludeRevocationTokens(), false));
 
 			CertificateReports reports = null;
 			if (defaultCertificateValidationPolicy != null) {

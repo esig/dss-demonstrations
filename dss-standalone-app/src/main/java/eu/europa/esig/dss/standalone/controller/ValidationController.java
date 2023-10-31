@@ -63,6 +63,9 @@ public class ValidationController extends AbstractController {
     public Button adjunctCertificatesSelectButton;
 
     @FXML
+    public Button evidenceRecordsSelectButton;
+
+    @FXML
     public CheckBox userFriendlyIdentifiersSelectButton;
 
     @FXML
@@ -132,6 +135,16 @@ public class ValidationController extends AbstractController {
         });
         adjunctCertificatesSelectButton.textProperty().bindBidirectional(model.adjunctCertificatesProperty(), new CollectionFilesToStringConverter());
 
+        evidenceRecordsSelectButton.setOnAction(new EventHandler<>() {
+            @Override
+            public void handle(ActionEvent event) {
+                DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser("Evidence record(s)");
+                List<File> files = fileChooser.showOpenMultipleDialog(stage);
+                model.setEvidenceRecords(files);
+            }
+        });
+        evidenceRecordsSelectButton.textProperty().bindBidirectional(model.evidenceRecordsProperty(), new CollectionFilesToStringConverter());
+
         userFriendlyIdentifiersSelectButton.selectedProperty().bindBidirectional(model.userFriendlyIdentifiersProperty());
 
         semanticsSelectButton.selectedProperty().bindBidirectional(model.semanticsProperty());
@@ -173,7 +186,7 @@ public class ValidationController extends AbstractController {
                             validationStage.setResizable(true);
 
                             Scene scene;
-                            if (Utils.isCollectionNotEmpty(value.getSimpleReportJaxb().getSignatureOrTimestamp())) {
+                            if (Utils.isCollectionNotEmpty(value.getSimpleReportJaxb().getSignatureOrTimestampOrEvidenceRecord())) {
                                 scene = new Scene(loader.load(), 1000, 550);
                             } else {
                                 scene = new Scene(loader.load(), 150, 75);
