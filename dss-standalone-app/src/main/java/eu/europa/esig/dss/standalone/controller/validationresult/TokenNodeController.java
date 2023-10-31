@@ -221,12 +221,16 @@ public class TokenNodeController extends AbstractController {
             if (timestamps != null && Utils.isCollectionNotEmpty(timestamps.getTimestamp())) {
                 signatureTimestamps.getChildren().addAll(getSignatureTimestamps(timestamps));
                 signatureTimestampsContainer.setVisible(true);
+            } else {
+                signatureTimestampsContainer.setVisible(false);
             }
 
             XmlEvidenceRecords evidenceRecords = signature.getEvidenceRecords();
             if (evidenceRecords != null && Utils.isCollectionNotEmpty(evidenceRecords.getEvidenceRecord())) {
                 signatureEvidenceRecords.getChildren().addAll(getSignatureEvidenceRecords(evidenceRecords));
                 signatureEvidenceRecordsContainer.setVisible(true);
+            } else {
+                signatureEvidenceRecordsContainer.setVisible(false);
             }
 
         } else if (token instanceof XmlTimestamp) {
