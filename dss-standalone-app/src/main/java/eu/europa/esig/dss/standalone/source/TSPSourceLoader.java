@@ -33,6 +33,8 @@ public class TSPSourceLoader {
             final String ksType = PropertyReader.getProperty("timestamp.mock.keystore.type");
             final char[] ksPassword = PropertyReader.getCharArrayProperty("timestamp.mock.keystore.password");
             final String alias = PropertyReader.getProperty("timestamp.mock.keystore.alias");
+            final String tsaPolicy = PropertyReader.getProperty("timestamp.mock.policy.oid");
+
             KeyStore keyStore;
             try (InputStream is = TSPSourceLoader.class.getResourceAsStream(ksFilePath)) {
                 keyStore = KeyStore.getInstance(ksType);
@@ -42,7 +44,9 @@ public class TSPSourceLoader {
                 return null;
             }
 
-            return new KeyEntityTSPSource(keyStore, alias, ksPassword);
+            KeyEntityTSPSource keyEntityTSPSource = new KeyEntityTSPSource(keyStore, alias, ksPassword);
+            keyEntityTSPSource.setTsaPolicy(tsaPolicy);
+            return keyEntityTSPSource;
 
         } else {
             OnlineTSPSource tspSource = new OnlineTSPSource(PropertyReader.getProperty("timestamp.url"));

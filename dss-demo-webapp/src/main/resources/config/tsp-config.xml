@@ -8,6 +8,7 @@
 		<constructor-arg name="ksPassword" value="whrmbQRp2nZHx7T5" />
 		<constructor-arg name="alias" value="self-signed-tsa" />
 		<constructor-arg name="keyEntryPassword" value="whrmbQRp2nZHx7T5" />
+		<property name="tsaPolicy" value="1.2.3.4" />
 	</bean>
 
 </beans>
