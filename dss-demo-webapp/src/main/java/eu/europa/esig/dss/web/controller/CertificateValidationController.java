@@ -9,7 +9,7 @@ import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
-import eu.europa.esig.dss.validation.TokenIdentifierProvider;
+import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
 import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.WebAppUtils;
@@ -19,7 +19,6 @@ import eu.europa.esig.dss.web.model.CertificateValidationForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,11 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 @Controller
 @RequestMapping(value = "/certificate-validation")
@@ -51,18 +49,10 @@ public class CertificateValidationController extends AbstractValidationControlle
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 	
 	private static final String[] ALLOWED_FIELDS = { "certificateForm.certificateFile", "certificateForm.certificateBase64", "certificateChainFiles",
-			"validationTime", "includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
+			"validationTime", "timezoneDifference", "includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
 
 	@Autowired
 	private Resource defaultCertificateValidationPolicy;
-
-	@InitBinder
-	public void initBinder(WebDataBinder webDataBinder) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-		dateFormat.setLenient(false);
-		webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
-	}
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -71,9 +61,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String showValidationForm(Model model, HttpServletRequest request) {
-		CertificateValidationForm certificateValidationForm = new CertificateValidationForm();
-		certificateValidationForm.setValidationTime(new Date());
-		model.addAttribute("certValidationForm", certificateValidationForm);
+		model.addAttribute("certValidationForm", new CertificateValidationForm());
 		return VALIDATION_TILE;
 	}
 
@@ -96,9 +84,9 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 		CertificateValidator certificateValidator = CertificateValidator.fromCertificate(certificate);
 		certificateValidator.setCertificateVerifier(getCertificateVerifier(certValidationForm));
-		certificateValidator.setTokenExtractionStrategy(
-				TokenExtractionStrategy.fromParameters(certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens()));
-		certificateValidator.setValidationTime(certValidationForm.getValidationTime());
+		certificateValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(
+				certValidationForm.isIncludeCertificateTokens(), false, certValidationForm.isIncludeRevocationTokens(), false));
+		certificateValidator.setValidationTime(getValidationTime(certValidationForm));
 
 		TokenIdentifierProvider identifierProvider = certValidationForm.isIncludeUserFriendlyIdentifiers() ?
 				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
@@ -129,6 +117,16 @@ public class CertificateValidationController extends AbstractValidationControlle
 		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
+	}
+
+	private Date getValidationTime(CertificateValidationForm validationForm) {
+		if (validationForm.getValidationTime() != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(validationForm.getValidationTime());
+			calendar.add(Calendar.MINUTE, validationForm.getTimezoneDifference());
+			return calendar.getTime();
+		}
+		return null;
 	}
 	
 	private CertificateToken getCertificate(CertificateForm certificateForm) {

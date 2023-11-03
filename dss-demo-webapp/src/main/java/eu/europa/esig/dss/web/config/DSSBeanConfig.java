@@ -26,7 +26,6 @@ import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
-import eu.europa.esig.dss.spi.x509.aia.OnlineAIASource;
 import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
@@ -177,6 +176,10 @@ public class DSSBeanConfig {
 	@Value("${trusted.source.keystore.password:}")
 	private String trustSourceKsPassword;
 
+	@Value("${bc.rsa.max_mr_tests:}")
+	private String bcRsaValidation;
+
+
 	// can be null
 	@Autowired(required = false)
 	private ProxyConfig proxyConfig;
@@ -214,7 +217,7 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public OnlineAIASource onlineAIASource() {
+	public DefaultAIASource onlineAIASource() {
 		return new DefaultAIASource(dataLoader());
 	}
 
@@ -291,7 +294,7 @@ public class DSSBeanConfig {
 		if (Utils.isStringNotEmpty(trustSourceKsFilename)) {
 			try {
 				KeyStoreCertificateSource keyStore = new KeyStoreCertificateSource(
-						new ClassPathResource(trustSourceKsFilename).getFile(), trustSourceKsType, trustSourceKsPassword);
+						new ClassPathResource(trustSourceKsFilename).getFile(), trustSourceKsType, trustSourceKsPassword.toCharArray());
 				trustedCertificateSource.importAsTrusted(keyStore);
 			} catch (IOException e) {
 				throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
@@ -476,7 +479,7 @@ public class DSSBeanConfig {
 	@Bean
 	public KeyStoreCertificateSource ojContentKeyStore() {
 		try {
-			return new KeyStoreCertificateSource(new ClassPathResource(ksFilename).getFile(), ksType, ksPassword);
+			return new KeyStoreCertificateSource(new ClassPathResource(ksFilename).getFile(), ksType, ksPassword.toCharArray());
 		} catch (IOException e) {
 			throw new DSSException("Unable to load the file " + ksFilename, e);
 		}
@@ -485,7 +488,7 @@ public class DSSBeanConfig {
 	@Bean
 	public KeyStoreCertificateSource adesLotlKeyStore() {
 		try {
-			return new KeyStoreCertificateSource(new ClassPathResource(adesKeyStoreFilename).getFile(), adesKeyStoreType, adesKeyStorePassword);
+			return new KeyStoreCertificateSource(new ClassPathResource(adesKeyStoreFilename).getFile(), adesKeyStoreType, adesKeyStorePassword.toCharArray());
 		} catch (IOException e) {
 			throw new DSSException("Unable to load the file " + adesKeyStoreFilename, e);
 		}
@@ -570,6 +573,13 @@ public class DSSBeanConfig {
         sslCertificateLoader.setCommonsDataLoader(trustAllDataLoader());
         return sslCertificateLoader;
     }
+
+	@Bean
+	public void bcRsaValidation() {
+		if (Utils.isStringNotEmpty(bcRsaValidation)) {
+			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
+		}
+	}
 
 	private <C extends CommonsDataLoader> C configureCommonsDataLoader(C dataLoader) {
 		dataLoader.setTimeoutConnection(connectionTimeout);

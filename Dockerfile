@@ -2,9 +2,6 @@ FROM maven:3.9.2-eclipse-temurin-11 as build
 
 COPY pom.xml /usr/src/mymaven/dss-demonstrations/
 
-COPY dss-mock-tsa/pom.xml /usr/src/mymaven/dss-demonstrations/dss-mock-tsa/
-COPY dss-mock-tsa/src /usr/src/mymaven/dss-demonstrations/dss-mock-tsa/src
-
 COPY dss-standalone-app/pom.xml /usr/src/mymaven/dss-demonstrations/dss-standalone-app/
 COPY dss-standalone-app/src /usr/src/mymaven/dss-demonstrations/dss-standalone-app/src
 
@@ -25,7 +22,7 @@ COPY dss-esig-validation-tests/pom.xml /usr/src/mymaven/dss-demonstrations/dss-e
 
 WORKDIR /usr/src/mymaven/dss-demonstrations
 
-RUN mvn package -pl dss-mock-tsa,dss-standalone-app,dss-standalone-app-package,dss-demo-webapp -P quick
+RUN mvn package -pl dss-standalone-app,dss-standalone-app-package,dss-demo-webapp -P quick
 
 
 FROM tomcat:9

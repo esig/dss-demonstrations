@@ -21,9 +21,4 @@ public class SignatureStandaloneController {
 		return "signature-standalone";
 	}
 
-	@RequestMapping(value = "/signature-rest", method = RequestMethod.GET)
-	public String getRestInfo() {
-		return "signature-rest";
-	}
-
 }

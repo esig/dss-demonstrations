@@ -4,16 +4,13 @@ import eu.europa.esig.dss.service.http.commons.HostConnection;
 import eu.europa.esig.dss.service.http.commons.TimestampDataLoader;
 import eu.europa.esig.dss.service.http.commons.UserCredentials;
 import eu.europa.esig.dss.service.tsp.OnlineTSPSource;
+import eu.europa.esig.dss.spi.x509.tsp.KeyEntityTSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
-import eu.europa.esig.dss.standalone.service.RemoteDocumentSignatureServiceBuilder;
-import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.x509.tsp.MockTSPSource;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 
@@ -32,15 +29,24 @@ public class TSPSourceLoader {
 
     private static TSPSource loadTspSource() {
         if (Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock"))) {
-            MockTSPSource tspSource = new MockTSPSource();
-            try (InputStream is = RemoteDocumentSignatureServiceBuilder.class.getResourceAsStream("/self-signed-tsa.p12")) {
-                tspSource.setToken(new KeyStoreSignatureTokenConnection(is, "PKCS12",
-                        new KeyStore.PasswordProtection(new char[] { 'w', 'h', 'r', 'm', 'b', 'Q', 'R', 'p', '2', 'n', 'Z', 'H', 'x', '7', 'T', '5' })));
-            } catch (IOException e) {
-                LOG.warn("Cannot load the KeyStore");
+            final String ksFilePath = PropertyReader.getProperty("timestamp.mock.keystore.file");
+            final String ksType = PropertyReader.getProperty("timestamp.mock.keystore.type");
+            final char[] ksPassword = PropertyReader.getCharArrayProperty("timestamp.mock.keystore.password");
+            final String alias = PropertyReader.getProperty("timestamp.mock.keystore.alias");
+            final String tsaPolicy = PropertyReader.getProperty("timestamp.mock.policy.oid");
+
+            KeyStore keyStore;
+            try (InputStream is = TSPSourceLoader.class.getResourceAsStream(ksFilePath)) {
+                keyStore = KeyStore.getInstance(ksType);
+                keyStore.load(is, ksPassword);
+            } catch (Exception e) {
+                LOG.error("Cannot load the KeyStore TSPSource! Reason : {}", e.getMessage(), e);
+                return null;
             }
-            tspSource.setAlias("self-signed-tsa");
-            return tspSource;
+
+            KeyEntityTSPSource keyEntityTSPSource = new KeyEntityTSPSource(keyStore, alias, ksPassword);
+            keyEntityTSPSource.setTsaPolicy(tsaPolicy);
+            return keyEntityTSPSource;
 
         } else {
             OnlineTSPSource tspSource = new OnlineTSPSource(PropertyReader.getProperty("timestamp.url"));

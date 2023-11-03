@@ -27,7 +27,7 @@ public class TrustedCertificateSourceLoader {
 
             final String ksFilePath = PropertyReader.getProperty("trusted.source.keystore.filename");
             final String ksType = PropertyReader.getProperty("trusted.source.keystore.type");
-            final String ksPassword = PropertyReader.getProperty("trusted.source.keystore.password");
+            final char[] ksPassword = PropertyReader.getCharArrayProperty("trusted.source.keystore.password");
             if (Utils.isStringNotEmpty(ksFilePath)) {
                 try (InputStream is = TSPSourceLoader.class.getResourceAsStream(ksFilePath)) {
                     KeyStoreCertificateSource keyStore = new KeyStoreCertificateSource(is, ksType, ksPassword);

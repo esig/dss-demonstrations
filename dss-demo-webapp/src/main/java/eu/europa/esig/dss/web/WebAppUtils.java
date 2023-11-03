@@ -9,7 +9,7 @@ import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.timestamp.TimestampToken;
+import eu.europa.esig.dss.spi.x509.tsp.TimestampToken;
 import eu.europa.esig.dss.web.config.MultipartResolverProvider;
 import eu.europa.esig.dss.web.model.OriginalFile;
 import eu.europa.esig.dss.ws.dto.TimestampDTO;

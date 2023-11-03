@@ -89,8 +89,8 @@ public class ReplayDiagController extends AbstractValidationController {
 			
 		// Determine if Diagnostic data is a certificate or signature validation
 		ProcessExecutor<? extends AbstractReports> executor;
-		executor = Utils.isCollectionEmpty(dd.getSignatures()) ? new DefaultCertificateProcessExecutor()
-				: new DefaultSignatureProcessExecutor();
+		executor = Utils.isCollectionEmpty(dd.getSignatures()) && Utils.isCollectionEmpty(dd.getUsedTimestamps()) ?
+				new DefaultCertificateProcessExecutor() : new DefaultSignatureProcessExecutor();
 		executor.setDiagnosticData(dd);
 
 		Locale locale = request.getLocale();

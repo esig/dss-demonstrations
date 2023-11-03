@@ -41,6 +41,11 @@
     </HBox>
 
     <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Evidence record(s)"/>
+        <Button fx:id="evidenceRecordsSelectButton" mnemonicParsing="false" text="Select file(s)..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text="User-friendly identifiers"/>
         <CheckBox fx:id="userFriendlyIdentifiersSelectButton"/>
     </HBox>

@@ -1,10 +1,10 @@
 package eu.europa.esig.dss.web.service;
 
-import eu.europa.esig.dss.DSSXmlErrorListener;
 import eu.europa.esig.dss.detailedreport.DetailedReportXmlDefiner;
 import eu.europa.esig.dss.diagnostic.DiagnosticDataXmlDefiner;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
 import eu.europa.esig.dss.simplereport.SimpleReportXmlDefiner;
+import eu.europa.esig.dss.xml.utils.DSSXmlErrorListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

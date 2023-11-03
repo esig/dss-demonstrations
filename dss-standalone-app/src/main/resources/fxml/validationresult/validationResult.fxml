@@ -26,7 +26,7 @@
                 <Insets right="15.0" />
             </padding>
             <HBox>
-                <Label styleClass="label-style" text="Found signatures/timestamps:"/>
+                <Label styleClass="label-style" text="Found tokens:"/>
             </HBox>
             <HBox>
                 <ListView fx:id="signaturesList" minHeight="160.0" minWidth="260.0"/>

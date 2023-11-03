@@ -4,6 +4,8 @@ import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.simplereport.jaxb.XmlCertificate;
 import eu.europa.esig.dss.simplereport.jaxb.XmlCertificateChain;
 import eu.europa.esig.dss.simplereport.jaxb.XmlDetails;
+import eu.europa.esig.dss.simplereport.jaxb.XmlEvidenceRecord;
+import eu.europa.esig.dss.simplereport.jaxb.XmlEvidenceRecords;
 import eu.europa.esig.dss.simplereport.jaxb.XmlMessage;
 import eu.europa.esig.dss.simplereport.jaxb.XmlSignature;
 import eu.europa.esig.dss.simplereport.jaxb.XmlSignatureScope;
@@ -50,6 +52,9 @@ public class TokenNodeController extends AbstractController {
     public Label timestampIdLabel;
 
     @FXML
+    public Label evidenceRecordIdLabel;
+
+    @FXML
     public Label id;
 
     @FXML
@@ -86,6 +91,9 @@ public class TokenNodeController extends AbstractController {
     public Label signatureFormat;
 
     @FXML
+    public HBox certificateChainContainer;
+
+    @FXML
     public TextFlow certificateChain;
 
     @FXML
@@ -107,6 +115,12 @@ public class TokenNodeController extends AbstractController {
     public Label productionTime;
 
     @FXML
+    public HBox lowestPOEContainer;
+
+    @FXML
+    public Label lowestPOE;
+
+    @FXML
     public HBox signatureScopesContainer;
 
     @FXML
@@ -117,6 +131,12 @@ public class TokenNodeController extends AbstractController {
 
     @FXML
     public VBox signatureTimestamps;
+
+    @FXML
+    public HBox signatureEvidenceRecordsContainer;
+
+    @FXML
+    public VBox signatureEvidenceRecords;
 
     public static TokenNodeController loadController() {
         try {
@@ -137,16 +157,20 @@ public class TokenNodeController extends AbstractController {
         // bind visibility
         signatureIdLabel.managedProperty().bind(signatureIdLabel.visibleProperty());
         timestampIdLabel.managedProperty().bind(timestampIdLabel.visibleProperty());
+        evidenceRecordIdLabel.managedProperty().bind(evidenceRecordIdLabel.visibleProperty());
         filenameContainer.managedProperty().bind(filenameContainer.visibleProperty());
         qualificationLevelContainer.managedProperty().bind(qualificationLevelContainer.visibleProperty());
         qualificationDetailsContainer.managedProperty().bind(qualificationDetailsContainer.visibleProperty());
         adesValidationDetailsContainer.managedProperty().bind(adesValidationDetailsContainer.visibleProperty());
         signatureFormatContainer.managedProperty().bind(signatureFormatContainer.visibleProperty());
+        certificateChainContainer.managedProperty().bind(certificateChainContainer.visibleProperty());
         claimedSigningTimeContainer.managedProperty().bind(claimedSigningTimeContainer.visibleProperty());
         bestSignatureTimeContainer.managedProperty().bind(bestSignatureTimeContainer.visibleProperty());
         productionTimeContainer.managedProperty().bind(productionTimeContainer.visibleProperty());
+        lowestPOEContainer.managedProperty().bind(lowestPOEContainer.visibleProperty());
         signatureScopesContainer.managedProperty().bind(signatureScopesContainer.visibleProperty());
         signatureTimestampsContainer.managedProperty().bind(signatureTimestampsContainer.visibleProperty());
+        signatureEvidenceRecordsContainer.managedProperty().bind(signatureEvidenceRecordsContainer.visibleProperty());
     }
 
     public Node create(XmlToken token) {
@@ -165,6 +189,7 @@ public class TokenNodeController extends AbstractController {
         adesValidationDetailsContainer.setVisible(isNotEmpty(token.getAdESValidationDetails()));
 
         certificateChain.getChildren().addAll(getCertificateChain(token.getCertificateChain()));
+        certificateChainContainer.setVisible(isNotEmpty(token.getCertificateChain()));
 
         signatureIdLabel.setVisible(token instanceof XmlSignature);
         signatureFormatContainer.setVisible(token instanceof XmlSignature);
@@ -172,8 +197,11 @@ public class TokenNodeController extends AbstractController {
         bestSignatureTimeContainer.setVisible(token instanceof XmlSignature);
         signatureFormatContainer.setVisible(token instanceof XmlSignature);
         signatureTimestampsContainer.setVisible(token instanceof XmlSignature);
+        signatureEvidenceRecordsContainer.setVisible(token instanceof XmlSignature);
         timestampIdLabel.setVisible(token instanceof XmlTimestamp);
         productionTimeContainer.setVisible(token instanceof XmlTimestamp);
+        evidenceRecordIdLabel.setVisible(token instanceof XmlEvidenceRecord);
+        lowestPOEContainer.setVisible(token instanceof XmlEvidenceRecord);
 
         if (token instanceof XmlSignature) {
             XmlSignature signature = (XmlSignature) token;
@@ -189,9 +217,21 @@ public class TokenNodeController extends AbstractController {
             signatureScopes.getChildren().addAll(getSignatureScope(signature.getSignatureScope()));
             signatureScopesContainer.setVisible(Utils.isCollectionNotEmpty(signature.getSignatureScope()));
 
-            signatureTimestamps.getChildren().addAll(getSignatureTimestamps(signature.getTimestamps()));
-            signatureTimestampsContainer.setVisible(signature.getTimestamps() != null &&
-                    Utils.isCollectionNotEmpty(signature.getTimestamps().getTimestamp()));
+            XmlTimestamps timestamps = signature.getTimestamps();
+            if (timestamps != null && Utils.isCollectionNotEmpty(timestamps.getTimestamp())) {
+                signatureTimestamps.getChildren().addAll(getSignatureTimestamps(timestamps));
+                signatureTimestampsContainer.setVisible(true);
+            } else {
+                signatureTimestampsContainer.setVisible(false);
+            }
+
+            XmlEvidenceRecords evidenceRecords = signature.getEvidenceRecords();
+            if (evidenceRecords != null && Utils.isCollectionNotEmpty(evidenceRecords.getEvidenceRecord())) {
+                signatureEvidenceRecords.getChildren().addAll(getSignatureEvidenceRecords(evidenceRecords));
+                signatureEvidenceRecordsContainer.setVisible(true);
+            } else {
+                signatureEvidenceRecordsContainer.setVisible(false);
+            }
 
         } else if (token instanceof XmlTimestamp) {
             XmlTimestamp timestamp = (XmlTimestamp) token;
@@ -206,6 +246,21 @@ public class TokenNodeController extends AbstractController {
 
             signatureScopesContainer.setVisible(Utils.isCollectionNotEmpty(timestamp.getTimestampScope()));
 
+        } else if (token instanceof XmlEvidenceRecord) {
+            XmlEvidenceRecord evidenceRecord = (XmlEvidenceRecord) token;
+
+            qualificationLevelContainer.setVisible(false);
+
+            lowestPOE.setText(DSSUtils.formatDateToRFC(evidenceRecord.getPOETime()));
+            signatureScopes.getChildren().addAll(getSignatureScope(evidenceRecord.getEvidenceRecordScope()));
+            signatureScopesContainer.setVisible(Utils.isCollectionNotEmpty(evidenceRecord.getEvidenceRecordScope()));
+
+            XmlTimestamps timestamps = evidenceRecord.getTimestamps();
+            if (timestamps != null && Utils.isCollectionNotEmpty(timestamps.getTimestamp())) {
+                signatureTimestamps.getChildren().addAll(getSignatureTimestamps(timestamps));
+                signatureTimestampsContainer.setVisible(true);
+            }
+
         } else {
             throw new UnsupportedOperationException(String.format("XmlToken class '%s' is not supported!", token.getClass().toString()));
         }
@@ -216,6 +271,10 @@ public class TokenNodeController extends AbstractController {
     protected boolean isNotEmpty(XmlDetails xmlDetails) {
         return xmlDetails != null && (Utils.isCollectionNotEmpty(xmlDetails.getError()) ||
                 Utils.isCollectionNotEmpty(xmlDetails.getWarning()) || Utils.isCollectionNotEmpty(xmlDetails.getInfo()));
+    }
+
+    protected boolean isNotEmpty(XmlCertificateChain xmlCertificateChain) {
+        return xmlCertificateChain != null && (Utils.isCollectionNotEmpty(xmlCertificateChain.getCertificate()));
     }
 
     protected List<Node> getDetails(XmlDetails xmlDetails) {
@@ -363,6 +422,28 @@ public class TokenNodeController extends AbstractController {
                     XmlTimestamp xmlTimestamp = it.next();
                     Node timestampNode = TokenNodeController.loadController().create(xmlTimestamp);
                     result.add(timestampNode);
+
+                } catch (Exception e) {
+                    LOG.error(String.format("An error occurred: %s", e.getMessage()),  e);
+                    throw new ApplicationException(e);
+                }
+                if (it.hasNext()) {
+                    result.add(getHrNode());
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<Node> getSignatureEvidenceRecords(XmlEvidenceRecords xmlEvidenceRecords) {
+        List<Node> result = new ArrayList<>();
+        if (xmlEvidenceRecords != null && Utils.isCollectionNotEmpty(xmlEvidenceRecords.getEvidenceRecord())) {
+            Iterator<XmlEvidenceRecord> it = xmlEvidenceRecords.getEvidenceRecord().iterator();
+            while (it.hasNext()) {
+                try {
+                    XmlEvidenceRecord xmlEvidenceRecord = it.next();
+                    Node evidenceRecordNode = TokenNodeController.loadController().create(xmlEvidenceRecord);
+                    result.add(evidenceRecordNode);
 
                 } catch (Exception e) {
                     LOG.error(String.format("An error occurred: %s", e.getMessage()),  e);

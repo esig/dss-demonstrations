@@ -15,10 +15,12 @@
 				<div th:class="${'card-header clearfix bg-' + status}">
 					<span th:class="${'badge pull-right badge-' + status}" th:if="${tlInfo.parsingCacheInfo != null and tlInfo.parsingCacheInfo.trustServiceProviders != null}"
 							th:text="${#lists.size(tlInfo.parsingCacheInfo.trustServiceProviders)}" title="Number of Trust Service Providers"></span>
-					<th:block th:if="${tlInfo.parsingCacheInfo != null}" th:with="country=${tlInfo.parsingCacheInfo.isResultExist()}?${tlInfo.parsingCacheInfo.territory}:'no_country'">
-						<span th:class="'small_flag flag_' + ${country}" th:title="${country != 'no_country'}?${tlInfo.parsingCacheInfo.territory}:'?'"></span>
+					<th:block th:with="country = ${tlInfo.parsingCacheInfo != null and tlInfo.parsingCacheInfo.isResultExist()} ? ${tlInfo.parsingCacheInfo.territory} :
+							(${tlInfo.otherTSLPointer != null} ? ${tlInfo.otherTSLPointer.schemeTerritory} : 'no_country')">
+						<span th:class="${'small_flag flag_' + country}" th:title="${country != 'no_country'} ? ${country} : '?'"></span>
 						<span th:if="${country != 'no_country'}" th:text="#{${'label.country.code.'+country}}" class="tl-card-country-name"></span>
-						<a class="text-white" th:if="${tlInfo.parsingCacheInfo.TSLType != null}" th:text="'(' + (${tlInfo.parsingCacheInfo.TSLType.label != null ? tlInfo.parsingCacheInfo.TSLType.label : tlInfo.parsingCacheInfo.TSLType.uri}) + ')'" th:href="${tlInfo.parsingCacheInfo.TSLType.uri}" target="_blank"></a>
+						<a class="text-white" th:if="${tlInfo.parsingCacheInfo.TSLType != null}" th:text="'(' + (${tlInfo.parsingCacheInfo.TSLType.label != null ? tlInfo.parsingCacheInfo.TSLType.label : tlInfo.parsingCacheInfo.TSLType.uri}) + ')'"
+						   th:href="${tlInfo.parsingCacheInfo.TSLType.uri}" target="_blank"></a>
 					</th:block>
 					<h3 th:if="${tlInfo.parsingCacheInfo == null}" class="card-title" th:text="Country Not Found"></h3>
 				</div>

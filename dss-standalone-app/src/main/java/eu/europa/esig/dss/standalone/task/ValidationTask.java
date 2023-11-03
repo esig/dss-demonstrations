@@ -55,6 +55,12 @@ public class ValidationTask extends Task<Reports> {
                 documentValidator.setDetachedContents(fileDocuments);
             }
 
+            if (model.getEvidenceRecords() != null) {
+                List<DSSDocument> fileDocuments = model.getEvidenceRecords().stream().map(FileDocument::new)
+                        .collect(Collectors.toList());
+                documentValidator.setDetachedEvidenceRecordDocuments(fileDocuments);
+            }
+
             if (model.getSigningCertificate() != null) {
                 CommonCertificateSource signingCertificateSource = new CommonCertificateSource();
                 signingCertificateSource.addCertificate(DSSUtils.loadCertificate(model.getSigningCertificate()));

@@ -1,9 +1,9 @@
 package eu.europa.esig.dss.web.ws;
 
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
-import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
-import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
 import eu.europa.esig.dss.asic.common.ASiCContent;
+import eu.europa.esig.dss.asic.common.validation.ASiCManifestParser;
+import eu.europa.esig.dss.asic.common.validation.ASiCManifestValidator;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
@@ -18,13 +18,13 @@ import eu.europa.esig.dss.jades.JWSConverter;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
+import eu.europa.esig.dss.model.ManifestEntry;
+import eu.europa.esig.dss.model.ManifestFile;
 import eu.europa.esig.dss.model.SignatureValue;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.ManifestEntry;
-import eu.europa.esig.dss.validation.ManifestFile;
 import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.dss.ws.converter.ColorConverter;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
@@ -519,10 +519,10 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
 		
-		DSSDocument timestampManifest = ASiCWithCAdESManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
-		ManifestFile manifestFile = ASiCWithCAdESManifestParser.getManifestFile(timestampManifest);
-		
-		ASiCEWithCAdESManifestValidator manifestValidator = new ASiCEWithCAdESManifestValidator(manifestFile, extractedResult.getSignedDocuments());
+		DSSDocument timestampManifest = ASiCManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
+		ManifestFile manifestFile = ASiCManifestParser.getManifestFile(timestampManifest);
+
+		ASiCManifestValidator manifestValidator = new ASiCManifestValidator(manifestFile, extractedResult.getSignedDocuments());
 		List<ManifestEntry> manifestEntries = manifestValidator.validateEntries();
 		
 		assertEquals(2, manifestEntries.size());

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.12.1</version>
+		<version>5.13.RC1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -172,11 +172,6 @@
 		<dependency>
 		    <groupId>nz.net.ultraq.thymeleaf</groupId>
 		    <artifactId>thymeleaf-layout-dialect</artifactId>
-		</dependency>
-	
-		<dependency>
-			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-mock-tsa</artifactId>
 		</dependency>
 
 		<dependency>
@@ -345,6 +340,11 @@
 			<artifactId>dss-token</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-evidence-record-xml</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		
 		<!-- Replace commons-logging -->
 		<dependency>
@@ -430,7 +430,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>jquery</artifactId>
-			<version>3.6.4</version>
+			<version>3.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
@@ -470,7 +470,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
-			<version>9.0.75</version>
+			<version>9.0.82</version>
 			<scope>test</scope>
 		</dependency>
 

@@ -20,7 +20,6 @@ The demonstration bundle is deployed at https://ec.europa.eu/digital-building-bl
 
 In order to build the standalone application, the following modules are required:
 
- * dss-mock-tsa;
  * dss-standalone-app;
  * dss-standalone-package.
  
@@ -35,7 +34,6 @@ In order to launch the application, you will need to extract the archive and run
 
 To build the DSS Web Application the following modules are required:
 
- * dss-mock-tsa;
  * dss-demo-webapp;
  * dss-demo-bundle.
  

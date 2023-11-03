@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.12.1</version>
+		<version>5.13.RC1</version>
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
@@ -63,10 +63,6 @@
 
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-mock-tsa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-signature-remote</artifactId>
 			<exclusions>
 				<exclusion>
@@ -114,6 +110,10 @@
 			<artifactId>dss-tsl-validation</artifactId>
 		</dependency>
 		
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-evidence-record-xml</artifactId>
+		</dependency>
 		<!-- Choose your PAdES implementation -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
