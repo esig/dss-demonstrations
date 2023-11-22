@@ -1,11 +1,10 @@
 package eu.europa.esig.dss.web.model;
 
-import java.util.List;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public class CounterSignatureForm extends AbstractSignatureForm {
 

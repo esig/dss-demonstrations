@@ -4,6 +4,7 @@ import eu.europa.esig.dss.detailedreport.DetailedReportXmlDefiner;
 import eu.europa.esig.dss.simplecertificatereport.SimpleCertificateReportXmlDefiner;
 import eu.europa.esig.dss.simplereport.SimpleReportXmlDefiner;
 import eu.europa.esig.dss.xml.utils.DSSXmlErrorListener;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;

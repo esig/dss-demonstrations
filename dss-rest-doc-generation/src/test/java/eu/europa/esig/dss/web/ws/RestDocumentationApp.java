@@ -62,7 +62,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 import java.awt.Color;
 import java.io.File;
@@ -88,8 +89,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 @ExtendWith(RestDocumentationExtension.class)
 public class RestDocumentationApp {
@@ -100,8 +99,8 @@ public class RestDocumentationApp {
 
 	@BeforeEach
 	public void setUp(RestDocumentationContextProvider restDocumentation) throws Exception {
-		this.documentationFilter = document("{method-name}/{step}/", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
-		this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)).addFilter(this.documentationFilter).build();
+		this.documentationFilter = RestAssuredRestDocumentation.document("{method-name}/{step}/", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+		this.spec = new RequestSpecBuilder().addFilter(RestAssuredRestDocumentation.documentationConfiguration(restDocumentation)).addFilter(this.documentationFilter).build();
 	}
 
 	@Test

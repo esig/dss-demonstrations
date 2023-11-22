@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.summary.lotl.complete}">
+	<head>
+		<title th:text="#{label.summary.lotl.complete}"></title>
+	</head>
+	<body>
+		<div layout:fragment="content">
+			<p th:if="${lotlInfo == null}">No info found for this LOTL</p>
+			
+			<div th:if="${lotlInfo != null}">
+	
+				<div class="lotl" th:with="downloadResult=${lotlInfo.downloadCacheInfo}, parsingResult=${lotlInfo.parsingCacheInfo}, validationResult=${lotlInfo.validationCacheInfo}">
+					<h2>
+						<th:block th:with="country = ${lotlInfo.parsingCacheInfo != null and lotlInfo.parsingCacheInfo.isResultExist()} ? ${lotlInfo.parsingCacheInfo.territory} :
+							(${lotlInfo.otherTSLPointer != null} ? ${lotlInfo.otherTSLPointer.schemeTerritory} : 'no_country')">
+							<a th:href="@{/tl-info/lotl/} + ${lotlInfo.getDSSId().asXmlId()}">
+								<span th:class="${'lotl-flag small_flag mt-2 flag_' + country}" th:title="${country != 'no_country'} ? ${country} : '?'"></span>
+							</a>
+						</th:block>
+						<span th:text="#{label.summary.lotl}"></span>
+						<a class="h4" th:if="${parsingResult.TSLType != null}" th:text="'(' + (${parsingResult.TSLType.label != null ? parsingResult.TSLType.label : parsingResult.TSLType.uri}) + ')'" th:href="${parsingResult.TSLType.uri}" target="_blank"></a>
+						<a class="h6" th:href="${lotlInfo.url}" th:text="${lotlInfo.url}?:'-'" target="_blank"></a>
+					</h2>
+					
+					<!-- LOTL Info -->
+					<div th:replace="~{fragment/lotl-info-fragments :: lotl-info-summary(downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult})}"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,9 +1,8 @@
 package eu.europa.esig.dss.web.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
 import eu.europa.esig.dss.utils.Utils;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class Base64Validator implements ConstraintValidator<Base64, String> {
     

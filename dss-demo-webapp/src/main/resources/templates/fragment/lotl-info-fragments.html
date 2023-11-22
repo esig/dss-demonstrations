@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- LOTL Info -->
+<div class="lotl-info row mb-4" th:fragment="lotl-info-summary(downloadResult, parsingResult, validationResult)">
+	<div th:with="status=${(parsingResult != null and parsingResult.resultExist and validationResult != null and validationResult.resultExist and validationResult.isValid())?
+				((downloadResult != null and downloadResult.isSynchronized() and parsingResult != null and parsingResult.isSynchronized() and validationResult != null and validationResult.isSynchronized())?'success':'warning'):
+				'danger'}" 
+				 th:class="${'lotl-card border rounded border-' + status}">
+		<div>
+			
+			<!-- LOTL indication -->
+			<div th:class="${'card-header bg-' + status}"></div>
+			
+			<!-- LOTL info body -->
+			<div class="card-body">
+				<div th:replace="~{fragment/tl-info :: tl-info-body-content(url='lotl',
+						downloadResult=${downloadResult}, 
+						parsingResult=${parsingResult}, 
+						validationResult=${validationResult}, 
+						potentialSigners=null)}"></div>
+			</div>
+		</div>
+	</div>
+	
+</div>

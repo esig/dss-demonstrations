@@ -12,13 +12,13 @@ import eu.europa.esig.dss.ws.cert.validation.soap.client.SoapCertificateValidati
 import eu.europa.esig.dss.ws.cert.validation.soap.client.WSCertificateReportsDTO;
 import eu.europa.esig.dss.ws.converter.RemoteCertificateConverter;
 import eu.europa.esig.dss.ws.dto.RemoteCertificate;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.ws.soap.SOAPFaultException;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -159,7 +159,7 @@ public class SoapCertificateValidationIT extends AbstractIT {
 	public void testWithNoCertificateProvided() {
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(null);
 
-		assertThrows(SOAPFaultException.class, () -> validationService.validateCertificate(certificateToValidateDTO));
+		assertThrows(WebServiceException.class, () -> validationService.validateCertificate(certificateToValidateDTO));
 	}
 
 }

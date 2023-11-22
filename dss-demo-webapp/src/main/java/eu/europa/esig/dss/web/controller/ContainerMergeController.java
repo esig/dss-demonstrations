@@ -2,11 +2,14 @@ package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.asic.common.merge.ASiCContainerMerger;
 import eu.europa.esig.dss.asic.common.merge.DefaultContainerMerger;
-import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.enumerations.MimeType;
+import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.model.ContainerMergeForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,9 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;

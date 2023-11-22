@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import eu.europa.esig.dss.web.exception.ExceptionRestMapper;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.cert.validation.rest.RestCertificateValidationServiceImpl;
@@ -52,6 +52,9 @@ import eu.europa.esig.dss.ws.validation.rest.RestDocumentValidationServiceImpl;
 import eu.europa.esig.dss.ws.validation.rest.client.RestDocumentValidationService;
 import eu.europa.esig.dss.ws.validation.soap.SoapDocumentValidationServiceImpl;
 import eu.europa.esig.dss.ws.validation.soap.client.SoapDocumentValidationService;
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -61,19 +64,18 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
-import javax.annotation.PostConstruct;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
 import java.util.Arrays;
 
 @Configuration
-@ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
+@ImportResource({ "classpath:META-INF/cxf/cxf.xml" }) // loads Bus cxf
 public class CXFConfig {
 
 	public static final String SOAP_SIGNATURE_ONE_DOCUMENT = "/soap/signature/one-document";
@@ -106,7 +108,7 @@ public class CXFConfig {
 	private String dssVersion;
 
 	@Autowired
-	private Bus bus;
+	private Bus cxf;
 
 	@Autowired
 	private RemoteDocumentSignatureService remoteSignatureService;
@@ -135,16 +137,24 @@ public class CXFConfig {
 	@Autowired
 	private RemoteTimestampService timestampService;
 
+	@Bean
+	public ServletRegistrationBean<CXFServlet> cxfServlet() {
+		final ServletRegistrationBean<CXFServlet> servletRegistrationBean =
+				new ServletRegistrationBean<>(new CXFServlet(), "/services/*");
+		servletRegistrationBean.setLoadOnStartup(1); // priority order on load
+		return servletRegistrationBean;
+	}
+
 	@PostConstruct
 	private void addLoggers() {
 		if (cxfDebug) {
 			LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-			bus.getInInterceptors().add(loggingInInterceptor);
-			bus.getInFaultInterceptors().add(loggingInInterceptor);
+			cxf.getInInterceptors().add(loggingInInterceptor);
+			cxf.getInFaultInterceptors().add(loggingInInterceptor);
 
 			LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-			bus.getOutInterceptors().add(loggingOutInterceptor);
-			bus.getOutFaultInterceptors().add(loggingOutInterceptor);
+			cxf.getOutInterceptors().add(loggingOutInterceptor);
+			cxf.getOutFaultInterceptors().add(loggingOutInterceptor);
 		}
 	}
 
@@ -215,7 +225,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createSoapSignatureEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapDocumentSignatureService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapDocumentSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_ONE_DOCUMENT);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
@@ -224,7 +234,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createSoapMultipleDocumentsSignatureEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapMultipleDocumentsSignatureService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapMultipleDocumentsSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_MULTIPLE_DOCUMENTS);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
@@ -233,7 +243,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createSoapTrustedListSignatureEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapTrustedListSignatureService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapTrustedListSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_TRUSTED_LIST);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
@@ -242,7 +252,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createPadesWithExternalCmsEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapPadesWithExternalCmsService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapPadesWithExternalCmsService());
 		endpoint.publish(SOAP_SIGNATURE_PAdES_WITH_EXTERNAL_CMS);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
@@ -251,7 +261,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createExternalCmsEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapExternalCmsService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapExternalCmsService());
 		endpoint.publish(SOAP_SIGNATURE_EXTERNAL_CMS);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
@@ -260,7 +270,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createSoapValidationEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapValidationService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapValidationService());
 		endpoint.publish(SOAP_VALIDATION);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -268,7 +278,7 @@ public class CXFConfig {
 	
 	@Bean
 	public Endpoint createSoapCertificateValidationEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapCertificateValidationService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapCertificateValidationService());
 		endpoint.publish(SOAP_CERTIFICATE_VALIDATION);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -276,7 +286,7 @@ public class CXFConfig {
 
 	@Bean
 	public Endpoint createSoapServerSigningEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapServerSigningService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapServerSigningService());
 		endpoint.publish(SOAP_SERVER_SIGNING);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -284,7 +294,7 @@ public class CXFConfig {
 	
 	@Bean
 	public Endpoint createSoapRemoteTimestampEndpoint() {
-		EndpointImpl endpoint = new EndpointImpl(bus, soapTimestampService());
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapTimestampService());
 		endpoint.publish(SOAP_TIMESTAMP_SERVICE);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -499,8 +509,8 @@ public class CXFConfig {
 	@Bean
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		// true value allows processing of {@code @IDREF}s cycles
-		JaxbAnnotationIntrospector jai = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
+		// true value allows processing of {@code @IDREF}s cycle
+		JakartaXmlBindAnnotationIntrospector jai = new JakartaXmlBindAnnotationIntrospector(TypeFactory.defaultInstance());
 		objectMapper.setAnnotationIntrospector(jai);
 		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		objectMapper.configure(DeserializationFeature.WRAP_EXCEPTIONS, false);

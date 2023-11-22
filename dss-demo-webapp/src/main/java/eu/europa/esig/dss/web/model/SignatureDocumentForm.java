@@ -2,10 +2,9 @@ package eu.europa.esig.dss.web.model;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
 
 public class SignatureDocumentForm extends AbstractSignatureForm implements ContainerDocumentForm {
 

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.signAPDF}">
+<body>
+	<div layout:fragment="content">
+		<div th:replace="~{fragment/disclaimer-mock-tsp :: mock-tsp-warn}"></div>
+
+		<form method="post" id="sign-pdf-form"
+			  enctype="multipart/form-data" th:action="@{/sign-a-pdf}"
+			  th:object="${signaturePdfForm}">
+
+			<div th:replace="~{fragment/fields :: field-sign-pdf}"></div>
+
+			<p th:if="${#fields.hasErrors('documentToSign')}"
+			   th:errors="*{documentToSign}" class="text-danger" th:text="#{label.error}"></p>
+
+			<div th:replace="~{fragment/nexu :: nexu-alert}"></div>
+
+			<div th:replace="~{fragment/fields :: sign-pdf-submit}"></div>
+
+		</form>
+	</div>
+	<div layout:fragment="scripts">
+		<script type="text/javascript">
+			$('form input')
+					.change(
+							function() {
+								if (this.files.length == 1) {
+									let file = this.files[0];
+									$('#filename').text(file.name);
+								} else {
+									$('#filename')
+											.text("[[#{label.sign.pdf.drag.file}]]");
+								}
+							});
+		</script>
+		<script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+		<script type="text/javascript" th:src="@{/js/nexu-deploy.js}"></script>
+	</div>
+</body>
+</html>

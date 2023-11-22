@@ -25,6 +25,9 @@ import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.service.SigningService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +48,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -105,7 +105,7 @@ public class CounterSignatureController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
-			@ModelAttribute("counterSignatureForm") @Valid CounterSignatureForm counterSignatureForm, BindingResult result) {
+										  @ModelAttribute("counterSignatureForm") @Valid CounterSignatureForm counterSignatureForm, BindingResult result) {
 		if (result.hasErrors()) {
 			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();

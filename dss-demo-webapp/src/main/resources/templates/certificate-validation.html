@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.cert.validate}">
+	<body>		
+		<div layout:fragment="content">
+			<form method="post"
+				enctype="multipart/form-data"
+				th:action="@{/certificate-validation}"
+				th:object="${certValidationForm}">
+
+				<div class="certificate-form">
+					<div class="certificate-form-switcher form-group row">
+						<div class="col-lg-10">
+		            		<button id="certificate-switcher" class="btn btn-primary" th:text="#{label.cert.switch.base64}"></button>
+						</div>
+					</div>
+					<div th:replace="~{fragment/fields :: field-certificate-file}"></div>
+					<div th:replace="~{fragment/fields :: field-certificate-base64}"></div>
+				</div>
+				<div th:replace="~{fragment/fields :: field-certificate-chain-files}"></div>
+
+				<div class="card mb-3">
+					<div class="card-header cursor-pointer" data-toggle='collapse' data-target='#advancedOptions' aria-expanded='false'>
+						<span th:text="#{label.validation.advanced.options}" th:remove="tag"></span>
+					</div>
+					<div id="advancedOptions" class="card-body collapse in">
+						<div th:replace="~{fragment/fields :: field-validation-time}"></div>
+						<div th:replace="~{fragment/fields :: field-certificate-tokens}"></div>
+						<div th:replace="~{fragment/fields :: field-revocation-data-tokens}"></div>
+						<div th:replace="~{fragment/fields :: field-identifiers}"></div>
+					</div>
+				</div>
+
+				<div th:replace="~{fragment/fields :: submit-reset}"></div>
+			</form>
+		</div>
+		<div layout:fragment="scripts">
+			<script type="text/javascript">
+				$('[data-toggle="tooltip"]').tooltip();
+				
+	        	$("#certificate-switcher").click(function (e) {
+	        		e.preventDefault();
+	        		var $base64form = $(".certificate-form-base64");
+	        		var $fileform = $(".certificate-form-file");
+	        	    if ($base64form.hasClass("d-none")) {
+	        	    	$fileform.find("input").val(null);
+	        	    	$fileform.addClass("d-none");
+	        	    	$base64form.removeClass("d-none");
+	        	    	$(this).text("[[#{label.cert.switch.file}]]");
+	        	    } else {
+	        	    	$base64form.find("textarea").val(null);
+	        	    	$base64form.addClass("d-none");
+	        	    	$fileform.removeClass("d-none");
+	        	    	$(this).text("[[#{label.cert.switch.base64}]]");
+	        	    }     
+	        	});
+			</script>
+		</div>
+	</body>
+</html>

@@ -1,10 +1,8 @@
 package eu.europa.esig.dss.web.model;
 
-import javax.validation.constraints.AssertTrue;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import jakarta.validation.constraints.AssertTrue;
+import org.springframework.web.multipart.MultipartFile;
 
 public class ReplayDiagForm {
 

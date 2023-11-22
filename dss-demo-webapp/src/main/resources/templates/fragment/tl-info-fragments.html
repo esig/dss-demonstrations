@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Indication -->
+<span class="indication" th:fragment="indication(indicationName)">
+	<span th:with="status=${(indicationName == 'TOTAL_PASSED')?'success':((indicationName == 'TOTAL_FAILED')?'danger':'warning')}" 
+			th:class="${'badge badge-' + status}" th:text="${indicationName}?:'-'"></span>
+</span>
+
+<!-- SubIndication -->
+<span class="sub-indication" th:fragment="subIndication(indicationName, subIndicationName)">
+	<span th:with="status=${(indicationName == 'TOTAL_FAILED')?'danger':'warning'}" 
+			th:class="${'badge badge-' + status}" th:text="${subIndicationName}?:'-'"></span>
+</span>
+
+<!-- Cached Result -->
+<span class="task-result" th:fragment="task-result(result)">
+	<span th:text="${result?.getStatusName()}?:'-'"></span>
+	<span th:replace="~{fragment/tl-info-fragments :: result-status(result=${result})}"></span>
+	<span th:text="${result != null and result.isError()} ?
+			(${result.exceptionFirstOccurrenceTime != null}?${' (' + #dates.format(result.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:'-') :
+            (${result.lastStateTransitionTime != null}?${#dates.format(result.lastStateTransitionTime, 'dd-MMM-yyyy HH:mm:ss')}:'-')"></span>
+</span>
+
+<span th:fragment="result-status(result)">
+	<i th:if="${result == null or (!result.resultExist and !result.isError())}" class="fa fa-ban text-muted" title="Not performed"></i>
+	<i th:if="${result != null and result.isSynchronized()}" class="fa fa-check-circle text-success" title="OK"></i>
+	<i th:if="${result != null and result.isError()}" class="fa fa fa-times-circle text-danger"
+		th:title="${result.exceptionMessage}?:'-'"></i>
+</span>
+
+<!-- Validation result -->
+<span class="task-result" th:fragment="validation-result(validationResult)">
+	<span th:text="${validationResult?.getStatusName()}?:'-'"></span>
+	<span th:replace="~{fragment/tl-info-fragments :: validation-status(validationResult=${validationResult})}"></span>
+    <span th:text="${validationResult != null and validationResult.isError()} ?
+			(${validationResult.exceptionFirstOccurrenceTime != null}?${' (' + #dates.format(validationResult.exceptionFirstOccurrenceTime, 'dd-MMM-yyyy HH:mm:ss') + ') '}:'-') :
+            (${validationResult.lastStateTransitionTime != null}?${#dates.format(validationResult.lastStateTransitionTime, 'dd-MMM-yyyy HH:mm:ss')}:'-')"></span>
+</span>
+
+<span th:fragment="validation-status(validationResult)">
+	<i th:if="${validationResult == null or (!validationResult.resultExist and !validationResult.isError())}" class="fa fa-ban text-muted" title="Not performed"></i>
+	<i th:if="${validationResult != null and validationResult.isValid()}" class="fa fa-check-circle text-success"
+		th:title="${validationResult.indication}?:'-'"></i>
+	<i th:if="${validationResult != null and validationResult.isIndeterminate()}" class="fa fa-exclamation-circle text-warning"
+		th:title="${validationResult.indication?:'-' + ' : ' + validationResult.subIndication?:'-'}"></i>
+	<i th:if="${validationResult != null and validationResult.isInvalid()}" class="fa fa-times-circle text-danger"
+		th:title="${validationResult.indication?:'-' + ' : ' + validationResult.subIndication?:'-'}"></i>
+	<i th:if="${validationResult != null and validationResult.isError()}" class="fa fa-times-circle text-danger"
+	   th:title="${validationResult.exceptionMessage}?:'-'"></i>
+</span>
+
+<!-- Next Update -->
+<th:block th:fragment="next-update(parsingResult)">
+    <span th:if="${parsingResult == null or !parsingResult.resultExist or parsingResult.nextUpdateDate == null}" th:text="${'-'}"></span>
+    <span th:if="${parsingResult != null and parsingResult.resultExist and parsingResult.nextUpdateDate != null and parsingResult.nextUpdateDate.after(#dates.createNow())}">
+        <span th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+    </span>
+    <span th:if="${parsingResult != null and parsingResult.resultExist and parsingResult.nextUpdateDate != null and !(parsingResult.nextUpdateDate.after(#dates.createNow()))}">
+        <span th:text="${#dates.format(parsingResult.nextUpdateDate, 'dd-MMM-yyyy HH:mm:ss')}"></span>
+        <i class="fa fa-exclamation-circle text-danger" th:title="#{label.summary.tl.info}"></i>
+    </span>
+</th:block>

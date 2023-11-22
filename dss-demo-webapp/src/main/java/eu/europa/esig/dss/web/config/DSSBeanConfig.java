@@ -73,7 +73,7 @@ import java.util.List;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, JdbcConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
+@Import({ PropertiesConfig.class, JdbcConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
 		SchedulingConfig.class })
 @ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {

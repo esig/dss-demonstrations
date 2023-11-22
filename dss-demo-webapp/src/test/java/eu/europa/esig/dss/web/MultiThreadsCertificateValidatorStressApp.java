@@ -5,17 +5,10 @@ import eu.europa.esig.dss.enumerations.CertificateQualification;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.validation.CertificateValidator;
-import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
-import eu.europa.esig.dss.web.config.DSSBeanConfig;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,15 +22,10 @@ import java.util.concurrent.Future;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@WebAppConfiguration
-@ContextConfiguration(classes = { DSSBeanConfig.class })
-@ExtendWith(SpringExtension.class)
-public class MultiThreadsCertificateValidatorStressApp {
+public class MultiThreadsCertificateValidatorStressApp extends DssDemoApplicationTests {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MultiThreadsCertificateValidatorStressApp.class);
 
-	@Autowired
-	private CertificateVerifier certificateVerifier;
 
 	@Test
 	public void test() throws InterruptedException, ExecutionException {
@@ -80,9 +68,9 @@ public class MultiThreadsCertificateValidatorStressApp {
 		}
 
 		@Override
-		public CertificateReports call() throws Exception {
+		public CertificateReports call() {
 			CertificateValidator cv = CertificateValidator.fromCertificate(certificate);
-			cv.setCertificateVerifier(certificateVerifier);
+			cv.setCertificateVerifier(getCertificateVerifier());
 			return cv.validate();
 		}
 

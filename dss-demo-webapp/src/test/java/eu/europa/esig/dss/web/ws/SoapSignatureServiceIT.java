@@ -44,6 +44,7 @@ import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapTrustedListSignatureService;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -51,7 +52,6 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.ws.soap.SOAPFaultException;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,7 +62,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -534,9 +533,9 @@ public class SoapSignatureServiceIT extends AbstractIT {
 
 			final DataToBeCounterSignedDTO dataToBeCounterSignedDTO = new DataToBeCounterSignedDTO(signatureDocument,
 					parameters);
-			Exception exception = assertThrows(SOAPFaultException.class,
+			Exception exception = assertThrows(WebServiceException.class,
 					() -> soapClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
-			assertEquals("Unsupported signature form for counter signature : PAdES", exception.getMessage());
+			assertTrue(exception.getMessage().contains("Unsupported signature form for counter signature : PAdES"));
 		}
 	}
 

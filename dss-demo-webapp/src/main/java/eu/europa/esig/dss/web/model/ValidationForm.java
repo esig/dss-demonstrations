@@ -2,9 +2,9 @@ package eu.europa.esig.dss.web.model;
 
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.Date;
 import java.util.List;
 

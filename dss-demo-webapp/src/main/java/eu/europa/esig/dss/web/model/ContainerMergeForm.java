@@ -2,11 +2,11 @@ package eu.europa.esig.dss.web.model;
 
 import eu.europa.esig.dss.asic.common.ASiCUtils;
 import eu.europa.esig.dss.web.WebAppUtils;
+import jakarta.validation.constraints.AssertTrue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;

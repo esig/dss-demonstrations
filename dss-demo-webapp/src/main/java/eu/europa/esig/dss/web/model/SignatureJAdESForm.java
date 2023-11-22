@@ -5,10 +5,10 @@ import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.web.WebAppUtils;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class SignatureJAdESForm extends AbstractSignatureForm {

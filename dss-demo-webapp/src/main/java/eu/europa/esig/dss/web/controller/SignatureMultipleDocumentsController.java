@@ -21,6 +21,9 @@ import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureMultipleDocumentsForm;
 import eu.europa.esig.dss.web.service.SigningService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +42,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
@@ -96,7 +96,7 @@ public class SignatureMultipleDocumentsController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
-			@ModelAttribute("signatureMultipleDocumentsForm") @Valid SignatureMultipleDocumentsForm signatureMultipleDocumentsForm, BindingResult result) {
+										  @ModelAttribute("signatureMultipleDocumentsForm") @Valid SignatureMultipleDocumentsForm signatureMultipleDocumentsForm, BindingResult result) {
 		if (result.hasErrors()) {
 			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();

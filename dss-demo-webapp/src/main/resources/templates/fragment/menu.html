@@ -1,0 +1,63 @@
+<th:block th:fragment="menu" xmlns:th="http://www.thymeleaf.org">
+
+    <div class="card">
+        <div class="card-header bg-primary">e-Signature</div>
+        <div class="list-group list-group-flush">
+            <a th:with="label=#{label.signADocument}" th:href="@{/sign-a-document}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.signADigest}" th:href="@{/sign-a-digest}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.signAPDF}" th:href="@{/sign-a-pdf}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.signWithJAdES}" th:href="@{/sign-with-jades}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.signMultipleDocuments}" th:href="@{/sign-multiple-documents}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.counterSignature}" th:href="@{/counter-sign}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.standalone.application}" th:href="@{/signature-standalone}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.rest.soap.services}" th:href="@{/signature-rest}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+        </div>
+    </div>
+    
+    <div class="card mt-3">
+        <div class="card-header bg-primary">Server side</div>
+        <div class="list-group list-group-flush">
+            <a th:with="label=#{label.extend}" th:href="@{/extension}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.timestamp.doc}" th:href="@{/timestamp-a-document}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.validate}" th:href="@{/validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.cert.validate}" th:href="@{/certificate-validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.qwac.validate}" th:href="@{/qwac-validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.replay.diag}" th:href="@{/replay-diagnostic-data}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.merge.containers}" th:href="@{/merge-containers}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-primary">EU LOTL</div>
+        <div class="list-group list-group-flush">
+            <a th:with="label=#{label.tsls.summary}" th:href="@{/tl-info}" th:text="${label}" class="list-group-item" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.eu.oj.certificates}, pageTitle=#{label.eu.oj.certificates.page}" th:href="@{/oj-certificates}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == pageTitle} ? 'active'"></a>
+            <a href="https://ec.europa.eu/tools/lotl/pivot-lotl-explanation.html" class="list-group-item" target="_blank">Pivot LOTL explanation</a>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-primary">Documentation</div>
+        <div class="list-group list-group-flush">
+            <a th:href="@{/doc/dss-documentation.html}" target="_blank" class="list-group-item">HTML</a>
+            <a th:href="@{/doc/dss-documentation.pdf}" target="_blank" class="list-group-item">PDF</a>
+            <a th:href="@{/apidocs/index.html}" target="_blank" class="list-group-item">Javadoc</a>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-primary">Useful links</div>
+        <div class="list-group list-group-flush d-print-none">
+            <a href="https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/eSignature" class="list-group-item" target="_blank">DIGITAL Building Blocks</a>
+            <a href="https://ec.europa.eu/eusurvey/runner/BuildingBlocksBulletin" class="list-group-item" target="_blank">DIGITAL Newsletter</a>
+            <a href="https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/eSignature+FAQ" class="list-group-item" target="_blank">eSignature FAQ</a>
+            <a href="https://github.com/esig/" class="list-group-item" title="GitHub - Source code" target="_blank">GitHub source code</a>
+            <a href="https://ec.europa.eu/digital-building-blocks/code/projects/ESIG/" class="list-group-item" title="Bitbucket - Source code" target="_blank">Bitbucket source code</a>
+            <a href="https://ec.europa.eu/digital-building-blocks/tracker/projects/DSS/issues" class="list-group-item" title="Jira - Issue tracker" target="_blank">Report a bug</a>
+            <a href="https://esig-dss.atlassian.net/projects/DSS" class="list-group-item" title="Jira - old" target="_blank">Old Jira</a>
+            <a href="https://eidas.ec.europa.eu/efda/home/" class="list-group-item" target="_blank">Trust Services Dashboard</a>
+            <a href="https://eidas.ec.europa.eu/efda/validation-tests/" class="list-group-item" target="_blank">eSignature validation test cases</a>
+            <a href="https://ec.europa.eu/digital-building-blocks/wikis/display/TLSO/Trusted+List+Manager+non-EU" class="list-group-item" target="_blank">TL Manager non-EU</a>
+        </div>
+    </div>
+</th:block>
