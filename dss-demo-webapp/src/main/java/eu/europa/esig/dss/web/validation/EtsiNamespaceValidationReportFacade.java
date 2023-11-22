@@ -62,7 +62,7 @@ public final class EtsiNamespaceValidationReportFacade extends ValidationReportF
             prefixMap.put("urn:oasis:names:tc:dss:1.0:core:schema", "dss");
             prefixMap.put("http://uri.etsi.org/02231/v2#", "tsl");
             prefixMap.put("http://uri.etsi.org/01903/v1.3.2#", "XAdES");
-            prefixMap.put("http://uri.etsi.org/19102/v1.2.1#", "vr");
+            prefixMap.put("http://uri.etsi.org/19102/v1.4.1#", "vr");
         }
 
         /**
