@@ -77,8 +77,7 @@
 		<module>dss-standalone-app</module>
 		<module>dss-standalone-app-package</module>
 		<module>dss-demo-webapp</module>
-		<module>dss-demo-bundle</module>        
-		<module>sscd-mocca-adapter</module>
+		<module>dss-demo-bundle</module>
 		<module>dss-rest-doc-generation</module>
 		<module>dss-esig-validation-tests</module>
 	</modules>
@@ -238,11 +237,6 @@
 				<artifactId>dss-standalone-app-package</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-                <groupId>eu.europa.ec.joinup.sd-dss</groupId>
-                <artifactId>sscd-mocca-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
 			<!-- DSS Framework dependencies -->
 
