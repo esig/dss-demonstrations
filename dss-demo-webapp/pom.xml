@@ -427,6 +427,9 @@
         </profile>
         <profile>
             <id>run-integration-test</id>
+            <properties>
+                <packaging.type>war</packaging.type>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
