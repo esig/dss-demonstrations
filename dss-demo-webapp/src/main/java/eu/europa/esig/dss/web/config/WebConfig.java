@@ -1,12 +1,12 @@
 package eu.europa.esig.dss.web.config;
 
-import jakarta.servlet.MultipartConfigElement;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -17,11 +17,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.controller" })
 public class WebConfig implements WebMvcConfigurer {
 
-	@Value("${multipart.maxFileSize}")
+	@Value("${multipart.maxFileSize:-1}")
 	private long maxFileSize;
 
-	@Value("${multipart.maxInMemorySize}")
-	private int maxInMemorySize;
+	@Value("${multipart.maxInMemorySize:-1}")
+	private long maxInMemorySize;
+
+	@Value("${multipart.resolveLazily:false}")
+	private boolean resolveLazily;
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -37,8 +40,12 @@ public class WebConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public MultipartConfigElement multipartConfigElement() {
-		return new MultipartConfigElement("", maxFileSize, maxFileSize, maxInMemorySize);
+	public MultipartResolver multipartResolver() {
+		MultipartResolverProvider multipartResolverProvider = MultipartResolverProvider.getInstance();
+		multipartResolverProvider.setMaxFileSize(maxFileSize);
+		multipartResolverProvider.setMaxInMemorySize(maxInMemorySize);
+		multipartResolverProvider.setResolveLazily(resolveLazily);
+		return multipartResolverProvider.createMultipartResolver();
 	}
 
 	@Bean
