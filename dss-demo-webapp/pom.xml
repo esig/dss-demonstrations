@@ -224,7 +224,7 @@
                     <artifactId>xalan</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>jakarta.servlet</groupId>
+                    <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
@@ -234,6 +234,10 @@
                 <exclusion> <!-- Exclude to avoid conflict with PdfBox (shall be removed when using OpenPDF) -->
                     <groupId>org.apache.pdfbox</groupId>
                     <artifactId>fontbox</artifactId>
+                </exclusion>
+                <exclusion> <!-- Exclude to avoid JDK vs provided dependency class conflict -->
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
