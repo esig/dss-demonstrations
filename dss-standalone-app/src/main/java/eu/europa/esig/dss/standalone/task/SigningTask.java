@@ -165,6 +165,7 @@ public class SigningTask extends Task<DSSDocument> {
 		parameters.setBLevelParameters(bLevelParams);
 
 		parameters.setSigningCertificate(new RemoteCertificate(signer.getCertificate().getEncoded()));
+		parameters.setDigestAlgorithm(model.getDigestAlgorithm());
 		parameters.setReferenceDigestAlgorithm(model.getDigestAlgorithm());
 
 		return parameters;
