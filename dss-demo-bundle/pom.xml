@@ -18,7 +18,7 @@
 	<properties>
 		<jre.download.link>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x86-32_windows_hotspot_8u392b08.zip</jre.download.link>
 		<jre.root.folder>jdk8u392-b08-jre</jre.root.folder>
-		<tomcat.version>8.5.95</tomcat.version>
+		<tomcat.version>8.5.97</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -108,7 +108,7 @@
 			<properties>
 				<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jre_x64_windows_hotspot_21.0.1_12.zip</jre.download.link>
 				<jre.root.folder>jdk-21.0.1+12-jre</jre.root.folder>
-				<tomcat.version>9.0.82</tomcat.version>
+				<tomcat.version>9.0.84</tomcat.version>
 			</properties>
 		</profile>
 	</profiles>
