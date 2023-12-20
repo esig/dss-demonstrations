@@ -50,7 +50,7 @@ public class OJCertificatesController {
 		model.addAttribute("keystoreCertificates", keystoreService.getCertificatesDTOFromKeyStore(lotlSource.getCertificateSource().getCertificates()));
 
 		OfficialJournalSchemeInformationURI ojUriInfo = (OfficialJournalSchemeInformationURI) lotlSource.getSigningCertificatesAnnouncementPredicate();
-		model.addAttribute("currentOjUrl", ojUriInfo.getOfficialJournalURL());
+		model.addAttribute("currentOjUrl", ojUriInfo.getUri());
 
 		// From Job
 		model.addAttribute("actualOjUrl", getActualOjUrl());
