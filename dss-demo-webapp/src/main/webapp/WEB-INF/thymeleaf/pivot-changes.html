@@ -59,7 +59,7 @@
 			<!-- Pivot certificate source changes -->
 			<div th:if="${not #lists.isEmpty(lotl.pivotInfos)}" class="certificates-container original-certificates" th:each="i : ${#numbers.sequence(lotl.pivotInfos.size() - 1, 0, -1)}"
 					 th:with="pivot=${lotl.pivotInfos[i]}, pivotId=${pivot.getDSSId().asXmlId()}, pivotUrl=${pivot.url}, pivotCerts=${pivot.getCertificateStatusMap()},
-					lotlLocation=${pivot.getLOTLLocation()}">
+					lastLotlLocation=${lotl.pivotInfos[lotl.pivotInfos.size() - 1].getLOTLLocation()}, lotlLocation=${pivot.getLOTLLocation()}">
 					
 				<div class="card bg-primary mb-3">
 					<div class="card-header">
@@ -72,7 +72,7 @@
 						<div class="lotl-location mb-2" th:if="${lotlLocation != null}">
 							<span class="bold" th:text="#{label.summary.pivot.found.lotl.location}"></span>
 							<a class="lotl-url h6 font-weight-bold" th:href="${lotlLocation}" th:text="'(' + ${lotlLocation} + ')'" target="_blank"></a>
-							<span class="lotl-change-warning" th:if="${lotl.url != lotlLocation}">
+							<span class="lotl-change-warning" th:if="${lotl.url != lotlLocation and lotlLocation == lastLotlLocation}">
 								<i class="fa fa-exclamation-circle text-warning" title="Updated LOTL location"></i>
 								<span class="badge badge-warning" th:text="#{label.summary.pivot.found.new.lotl}"></span>
 							</span>
