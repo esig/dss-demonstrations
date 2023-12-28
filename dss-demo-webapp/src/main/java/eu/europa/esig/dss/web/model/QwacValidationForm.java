@@ -1,9 +1,8 @@
 package eu.europa.esig.dss.web.model;
 
-import javax.validation.constraints.AssertTrue;
-
 import eu.europa.esig.dss.spi.client.http.Protocol;
 import eu.europa.esig.dss.utils.Utils;
+import jakarta.validation.constraints.AssertTrue;
 
 public class QwacValidationForm {
 	

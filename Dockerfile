@@ -1,4 +1,4 @@
-FROM maven:3.9.2-eclipse-temurin-11 as build
+FROM maven:3.9.5-eclipse-temurin-17 as build
 
 COPY pom.xml /usr/src/mymaven/dss-demonstrations/
 
@@ -25,7 +25,7 @@ WORKDIR /usr/src/mymaven/dss-demonstrations
 RUN mvn package -pl dss-standalone-app,dss-standalone-app-package,dss-demo-webapp -P quick
 
 
-FROM tomcat:9
+FROM tomcat:10
 
 COPY --from=build /usr/src/mymaven/dss-demonstrations/dss-demo-webapp/target/dss-demo-webapp-*.war /usr/local/tomcat/webapps/ROOT.war
 

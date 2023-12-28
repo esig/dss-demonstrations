@@ -54,13 +54,13 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignature
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestTrustedListSignatureService;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.ServerErrorException;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -631,7 +631,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 			final DataToBeCounterSignedDTO dataToBeCounterSignedDTO = new DataToBeCounterSignedDTO(signatureDocument,
 					parameters);
-			assertThrows(ServerErrorException.class,
+			assertThrows(InternalServerErrorException.class,
 					() -> restClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
 		}
 	}

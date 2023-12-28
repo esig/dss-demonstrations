@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="form-group row" th:fragment="field-document-to-sign">
+     <label class="col-sm-3 col-form-label" for="documentToSign" th:text="#{label.to.sign.file}"></label>
+     <div class="col-sm-5">
+    	<input type="file" class="form-control-file" name="documentToSign" id="documentToSign" /> 
+     </div>
+     <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('documentToSign')}" th:errors="*{documentToSign}" class="text-danger">Error</p>
+     </div>
+</div>
+
+<div class="form-group row" th:fragment="field-diagnostic-data">
+    <label class="col-sm-3 col-form-label" for="diagnosticFile" th:text="#{label.replay.file}"></label>
+    <div class="col-sm-5">
+    	<input type="file" class="form-control-file" name="diagnosticFile" id="diagnosticFile" /> 
+    </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('diagnosticFile')}" th:errors="*{diagnosticFile}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-documents-to-sign">
+     <label class="col-sm-3 col-form-label" for="documentsToSign" th:text="#{label.to.sign.files}"></label>
+     <div class="col-sm-5">
+    	<input type="file" class="form-control-file" name="documentsToSign" id="documentsToSign" multiple="multiple" /> 
+     </div>
+     <div class="col-sm-4 p-0">
+        <p th:if="${#fields.hasErrors('documentsToSign*')}" th:errors="*{documentsToSign*}" class="text-danger">Error</p>
+     </div>
+</div>
+
+<div class="form-group row" th:fragment="field-file">
+     <label class="col-sm-3 col-form-label" for="documentToSign" th:text="#{label.file}"></label>
+     <div class="col-sm-5">
+    	<input type="file" class="form-control-file" name="file" id="file" /> 
+     </div>
+     <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('file')}" th:errors="*{file}" class="text-danger">Error</p>
+     </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signed-file">
+    <label class="col-sm-3 col-form-label" for="signedFile" th:text="#{label.signed.file}"></label>
+    <div class="col-sm-5">
+    	<input type="file" class="form-control-file" name="signedFile" id="signedFile" /> 
+    </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('signedFile')}" th:errors="*{signedFile}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-original-files">
+    <label class="col-sm-3 col-form-label" for="originalFiles" th:text="#{label.original.files}"></label>
+    <div class="col-sm-5">
+        <input type="file" class="form-control-file" name="originalFiles" id="originalFiles" multiple="multiple" />
+    </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-simplified-container-type-form">
+	<label  class="col-sm-3 col-form-label" for="containerType" th:text="#{label.asic.container.type}"></label>
+	<div class="col-sm-5">
+		<th:block th:each="asicType : ${asicContainerTypes}">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="${asicType}" th:id="container+${asicType}" />
+           		<label class="form-check-label" th:for="container+${asicType}" th:text="#{${'label.'+asicType}}"></label>
+           	</div>
+		</th:block>
+	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-container-type-form">
+	<label class="col-sm-3 col-form-label" for="containerType" th:text="#{label.asic.container.type}"></label>
+	<div class="col-sm-5">
+		<div class="form-check form-check-inline">
+           	<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="none" id="containerNone" />
+           	<label class="form-check-label" th:for="containerNone" th:text="#{label.container.none}"></label>
+		</div>
+		
+		<th:block th:each="asicType : ${asicContainerTypes}">
+			<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="${asicType}" th:id="container+${asicType}" />
+            	<label class="form-check-label" th:for="container+${asicType}" th:text="#{${'label.'+asicType}}"></label>
+            </div>
+		</th:block>
+	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-container-type-form-timestamp">
+	<label class="col-sm-3 col-form-label" for="containerType" th:text="#{label.timestamp.format}"></label>
+	<div class="col-sm-5">
+		<th:block th:each="timestampForm : ${timestampContainerForms}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{containerType}" th:value="${timestampForm}" th:id="container+${timestampForm}" />
+            	<label class="form-check-label" th:for="container+${timestampForm}" th:text="#{${'label.'+timestampForm}}"></label>
+            </div>
+		</th:block>
+	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('containerType')}" th:errors="*{containerType}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-form">
+    <label class="col-sm-3 col-form-label" for="signatureForm" th:text="#{label.signature.form}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="sigForm : ${signatureForms}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{signatureForm}" th:value="${sigForm}" th:id="form+${sigForm}" />
+            	<label class="form-check-label" th:for="form+${sigForm}" th:text="#{${'label.'+sigForm}}"></label>
+            </div>
+		</th:block>
+    </div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('signatureForm')}" th:errors="*{signatureForm}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-document-digest">
+    <label class="col-sm-3 col-form-label" for="digestToSign">
+    	<span th:text="#{label.to.sign.digest}"></span>
+    </label>
+    <div class="col-sm-5">
+		<input type="text" class="form-control input-sm" th:field="*{digestToSign}" />
+		<input type="hidden" class="form-control input-sm" th:field="*{documentName}" />
+    </div>
+    <div class="loader d-none" id="spinner"></div>
+	<div class="offset-sm-3 col-sm-5">
+		<div class="position-relative">
+		  	<label for="fileToCompute" data-toggle="tooltip" data-placement="right" th:title="#{label.compute.digest}"></label>	
+			<input type="file" id="fileToCompute" class="cursor-pointer drag-file" name="fileToCompute" onchange="readFile(this)" /> 
+			<p id="filename" class="drag-file-label" th:text="#{label.compute.digest}"></p>
+		</div>
+	</div>
+    <div class="col-xs-4">
+       	<p th:if="${#fields.hasErrors('digestToSign')}" th:errors="*{digestToSign}" class="text-danger">Error</p>
+       	<p th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}" class="text-danger">Error</p>
+    </div>
+    
+    <div th:replace="~{fragment/fields :: field-digest-alert}"></div>
+</div>
+
+<div id="alert-digest" class="col-sm-12" style="display: none" th:fragment="field-digest-alert">
+    <div class="alert alert-warning m-0" role="alert">
+         The digest computation is not available in your browser! More information is available by the 
+         <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest" target="_blank">link</a>.
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-document-to-counter-sign">
+    <label class="col-sm-3 col-form-label" for="documentToCounterSign" th:text="#{label.to.counter.sign.file}"></label>
+    <div class="col-sm-5">
+           <input type="file" class="form-control-file" name="documentToCounterSign" id="documentToCounterSign" /> 
+    </div>
+    <div class="loader d-none" id="spinner"></div>
+    <div class="col-sm-4 p-0" id="documentToCounterSignError">
+       <p th:if="${#fields.hasErrors('documentToCounterSign')}" 
+                th:errors="*{documentToCounterSign}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-id">
+    <label class="col-sm-3 col-form-label" for="signatureIdToCounterSign" th:text="#{label.signature.id}"></label>
+    <div class="col-sm-5">
+        <select name="signatureIdToCounterSign" class="custom-select" id="selectSignatureId">
+        </select>
+    </div>
+    <div class="col-xs-3 col-md-offset-1">     
+           <p th:if="${#fields.hasErrors('signatureIdToCounterSign')}" th:errors="*{signatureIdToCounterSign}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-level">
+    <label class="col-sm-3 col-form-label" for="signatureLevel" th:text="#{label.signature.level}"></label>
+    <div class="col-sm-5">
+        <select name="signatureLevel" class="custom-select" id="selectSignatureLevel">
+        </select>
+    </div>
+    <div class="col-xs-3 col-md-offset-1"> 	
+    	<p th:if="${#fields.hasErrors('signatureLevel')}" th:errors="*{signatureLevel}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-signature-packaging">
+    <label class="col-sm-3 col-form-label" for="signaturePackaging" th:text="#{label.signature.packaging}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="sigPack : ${signaturePackagings}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{signaturePackaging}" th:value="${sigPack}" th:id="${'signaturePackaging-'+sigPack}" />
+            	<label class="form-check-label" th:for="${'signaturePackaging-'+sigPack}" th:text="#{${'label.'+sigPack}}"></label>
+            </div>
+		</th:block>
+    </div>
+    <div class="col-xs-3">
+    	<p th:if="${#fields.hasErrors('signaturePackaging')}" th:errors="*{signaturePackaging}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-digest-algo">
+    <label class="col-sm-3 col-form-label" for="digestAlgorithm" th:text="#{label.digest.algorithm}"></label>
+    <div class="col-sm-5">
+   		<th:block th:each="algo : ${digestAlgos}">
+   			<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{digestAlgorithm}" th:value="${algo}" th:id="algo+${algo}" />
+                <label th:if="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" 
+                        th:text="${algo}" data-toggle="tooltip" data-placement="top" th:title="#{label.deprecated}"></label>
+                <label th:unless="${algo == T(eu.europa.esig.dss.enumerations.DigestAlgorithm).SHA1}" class="form-check-label" th:for="algo+${algo}" 
+                        th:text="${algo}"></label>
+            </div>
+		</th:block>
+    </div>
+    <div class="col-xs-4">
+    	<p th:if="${#fields.hasErrors('digestAlgorithm')}" th:errors="*{digestAlgorithm}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<!-- JAdES specific -->
+
+<div class="form-group row" th:fragment="field-jws-serialization-type">
+    <label class="col-sm-3 col-form-label" for="jwsSerializationType" th:text="#{label.signature.jws.serialization.type}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="serializationType : ${jwsSerializationTypes}">
+			<div class="form-check form-check-inline">
+           		<input class="form-check-input" type="radio" th:field="*{jwsSerializationType}" 
+           				th:value="${serializationType}" th:id="serialization+${serializationType}" />
+           		<label class="form-check-label" th:for="serialization+${serializationType}" th:text="#{${'label.'+serializationType}}"></label>
+           	</div>
+		</th:block>
+    </div>
+    <div class="col-xs-3 col-md-offset-1"> 	
+    	<p th:if="${#fields.hasErrors('jwsSerializationType')}" th:errors="*{jwsSerializationType}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-sigd-mechanism">
+    <label class="col-sm-3 col-form-label" for="sigDMechanism" th:text="#{label.signature.sigd.mechanism}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="mechanism : ${sigDMechanisms}">
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="radio" th:field="*{sigDMechanism}" th:value="${mechanism}" 
+						th:id="mechanism+${mechanism}" />
+				<th:block th:with="httpHeaders = ${mechanism == T(eu.europa.esig.dss.enumerations.SigDMechanism).HTTP_HEADERS}">
+					<th:block th:if="${httpHeaders}">
+           				<label class="form-check-label" th:for="mechanism+${mechanism}" th:text="#{${'label.'+mechanism}}"
+           						data-toggle="tooltip" data-placement="top" th:title="#{label.sigD.http.headers.tooltip}"></label>
+					</th:block>
+					<th:block th:unless="${httpHeaders}">
+           				<label class="form-check-label" th:for="mechanism+${mechanism}" th:text="#{${'label.'+mechanism}}"></label>
+					</th:block>
+				</th:block>
+           	</div>
+		</th:block>
+    </div>
+    <div class="col-sm-4 p-0">
+    	<p th:if="${#fields.hasErrors('sigDMechanism*')}" th:errors="*{sigDMechanism*}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" id="base64url-payload" th:fragment="field-base64url-payload">
+	<label class="col-sm-3 col-form-label" for="base64UrlEncodedPayload" th:text="#{label.signature.jws.base64url}"></label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="base64UrlEncodedPayload"
+				   th:aria-label="#{label.signature.jws.base64url}" checked />
+			<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+			   data-placement="top" th:title="#{label.signature.jws.base64url.tooltip}"></i>
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" id="base64url-etsiU" th:fragment="field-base64url-etsiU">
+	<label class="col-sm-3 col-form-label" for="base64UrlEncodedEtsiU" th:text="#{label.signature.jws.etsiu.base64url}"></label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="base64UrlEncodedEtsiU"
+				   th:aria-label="#{label.signature.jws.etsiu.base64url}" checked />
+			<input type="hidden" name="base64UrlEncodedEtsiU" value="true" />
+			<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+			   data-placement="top" th:title="#{label.signature.jws.etsiu.base64url.tooltip}"></i>
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-jades-signature-packaging">
+    <label class="col-sm-3 col-form-label" for="signaturePackaging" th:text="#{label.signature.packaging}"></label>
+    <div class="col-sm-5">
+		<th:block th:each="sigPack : ${signaturePackagings}">
+       		<div class="form-check form-check-inline">
+            	<input class="form-check-input" type="radio" th:field="*{signaturePackaging}" th:value="${sigPack}" th:id="${'signaturePackaging-'+sigPack}" />
+            	<th:block th:with="enveloping = ${sigPack == T(eu.europa.esig.dss.enumerations.SignaturePackaging).ENVELOPING}">
+					<th:block th:if="${enveloping}">
+            			<label class="form-check-label" th:for="${'signaturePackaging-'+sigPack}" th:text="#{${'label.'+sigPack}}"
+           						data-toggle="tooltip" data-placement="top" th:title="#{label.jades.enveloping.tooltip}"></label>
+					</th:block>
+					<th:block th:unless="${enveloping}">
+            			<label class="form-check-label" th:for="${'signaturePackaging-'+sigPack}" th:text="#{${'label.'+sigPack}}"></label>
+					</th:block>
+				</th:block>
+            </div>
+		</th:block>
+    </div>
+    <div class="col-xs-3">
+    	<p th:if="${#fields.hasErrors('signaturePackaging')}" th:errors="*{signaturePackaging}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<!-- END JAdES specific -->
+
+<div class="form-group row" id="sign-expired-block" th:fragment="field-sign-expired">
+	<label class="col-sm-3 col-form-label" for="signWithExpiredCertificate" th:text="#{label.allow.expired.certificate}">Accept expired certificate</label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="signWithExpiredCertificate" th:aria-label="#{label.allow.expired.certificate}" />
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-reset-date">
+     <label class="col-sm-3 col-form-label" th:text="#{label.replay.date}"></label>
+     <div class="col-sm-5">
+		<div class="form-check mt-1">
+	         <input class="form-check-input position-static mt-2" type="checkbox" th:field="*{resetDate}" value="false"/>
+	         <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	         	data-placement="right" th:title="#{label.replay.date.tooltip}"></i>
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" id="content-timestamp-block" th:fragment="field-content-timestamp">
+	<label class="col-sm-3 col-form-label" for="addContentTimestamp" th:text="#{label.add.content.timestamp}">Add a content timestamp</label>
+	<div class="col-sm-5">
+		<div class="form-check">
+			<input class="form-check-input position-static" type="checkbox" name="addContentTimestamp" th:aria-label="#{label.add.content.timestamp}" />
+		</div>
+	</div>
+</div>
+
+<div class="certificate-form-file form-group row" th:fragment="field-certificate-file">
+	<label class="col-sm-3 col-form-label" for="certificateForm.certificateFile" th:text="#{label.certificate.file}"></label>
+	<div class="col-sm-6">
+		<input type="file" class="form-control-file" name="certificateForm.certificateFile" accept=".cer,.der,.pem,.crt" />
+	</div>
+	<div class="col-sm-9 offset-sm-3 align-self-center">
+		<p th:if="${#fields.hasErrors('certificateFormValid')}" th:errors="*{certificateFormValid}" class="text-danger">Error</p>
+	</div>
+</div>
+
+<div class="certificate-form-base64 form-group row d-none" th:fragment="field-certificate-base64">
+	<label class="col-sm-3 col-form-label" for="certificateForm.certificateBase64" th:text="#{label.certificate.base64}"></label>
+	<div class="col-lg-5">
+		<textarea class="form-control" name="certificateForm.certificateBase64" th:placeholder="#{label.certificate.base64.planetext}"></textarea>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-certificate-chain-files">
+	<label class="col-sm-3 col-form-label" for="certificateChainFiles" th:text="#{label.certificate.chain.files.opt}"></label>
+	<div class="col-sm-6">
+		<input type="file" class="form-control-file" name="certificateChainFiles" multiple="multiple" accept=".cer,.der,.pem,.crt" />
+	</div>
+	<div class="col-sm-9 offset-sm-3 align-self-center">
+		<p th:if="${#fields.hasErrors('certificateChainFiles')}" th:errors="*{certificateChainFiles}" class="text-danger">Error</p>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-validation-time">
+	<label class="col-sm-3 col-form-label" for="validationTime" th:text="#{label.validation.time.opt}"></label>
+	<div class="col-sm-6">
+		<input class="form-control input-sm w-auto" type="datetime-local" name="validationTime" th:field="*{validationTime}" />
+		<!-- Get user timezone difference relatively UTC -->
+		<input type="hidden" name="timezoneDifference" id="timezoneDifference" th:field="*{timezoneDifference}">
+		<script>
+			$(document).ready(function() {
+			  var timezoneOffset = new Date().getTimezoneOffset();
+			  $('#timezoneDifference').val(timezoneOffset);
+			});
+		</script>
+	</div>
+	<div class="col-sm-9 offset-sm-3 align-self-center">
+		<p th:if="${#fields.hasErrors('validationTime')}" th:errors="*{validationTime}" class="text-danger">Error</p>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-signing-certificate">
+    <label class="col-sm-3 col-form-label" for="signingCertificate" th:text="#{label.signing.certificate}"></label>
+    <div class="col-sm-6">
+        <input type="file" class="form-control-file" name="signingCertificate" accept=".cer,.der,.pem,.crt" />
+        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+            data-placement="top" th:title="#{label.validation.signing.certificate.tooltip}"></i>
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('signingCertificate')}" th:errors="*{signingCertificate}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-adjunct-certificates">
+    <label class="col-sm-3 col-form-label" for="adjunctCertificates" th:text="#{label.adjunct.certificates}"></label>
+    <div class="col-sm-6">
+        <input type="file" class="form-control-file" name="adjunctCertificates" multiple="multiple" accept=".cer,.der,.pem,.crt" />
+        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+            data-placement="top" th:title="#{label.validation.adjunct.certificates.tooltip}"></i>
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('adjunctCertificates')}" th:errors="adjunctCertificates" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-certificate-tokens">
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.certificates.used}"></label>
+    <div class="col-sm-9">
+		<div class="form-check mt-1">
+	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeCertificateTokens}" value="false"/>
+	        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.certificate.tooltip}"></i>
+		</div>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-revocation-data-tokens">
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.revocation}"></label>
+    <div class="col-sm-9">
+		<div class="form-check mt-1">
+	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeRevocationTokens}" value="false"/>
+	        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.revocation.tooltip}"></i>
+		</div>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-timestamp-tokens">
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.timestamps}"></label>
+    <div class="col-sm-9">
+		<div class="form-check mt-1">
+	        <input class="form-check-input mt-2" type="checkbox" th:field="*{includeTimestampTokens}" value="false"/>
+	        <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+	            data-placement="top" th:title="#{label.validation.timestamp.tooltip}"></i>
+		</div>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-identifiers">
+	<label class="col-sm-3 col-form-label" th:text="#{label.validation.user.friendly.ids}"></label>
+	<div class="col-sm-9">
+		<div class="form-check mt-1">
+			<input class="form-check-input mt-2" type="checkbox" th:field="*{includeUserFriendlyIdentifiers}" checked />
+			<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+			   data-placement="top" th:title="#{label.validation.user.friendly.ids.tooltip}"></i>
+		</div>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-semantics">
+    <label class="col-sm-3 col-form-label" th:text="#{label.validation.semantics}"></label>
+    <div class="col-sm-9">
+        <div class="form-check mt-1">
+            <input class="form-check-input mt-2" type="checkbox" th:field="*{includeSemantics}" value="false"/>
+            <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip" 
+                data-placement="top" th:title="#{label.validation.semantics.tooltip}"></i>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-detached-original-files">
+    <label class="col-sm-3 col-form-label" for="originalFiles" th:text="#{label.original.files}"></label>
+    <div class="col-sm-5">
+        <input type="file" class="form-control-file" id="detachedOriginalFiles" name="detachedOriginalFiles" multiple="multiple" />
+    </div>
+    <div class="col-xs-4">
+     	<p th:if="${#fields.hasErrors('originalFiles')}" th:errors="*{originalFiles}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div class="form-group row" th:fragment="field-evidence-record-files">
+	<label class="col-sm-3 col-form-label" for="evidenceRecordFiles" th:text="#{label.evidence.record.files}"></label>
+	<div class="col-sm-5">
+		<input type="file" class="form-control-file" id="evidenceRecordFiles" name="evidenceRecordFiles" multiple="multiple" />
+	</div>
+	<div class="col-xs-4">
+		<p th:if="${#fields.hasErrors('evidenceRecordFiles')}" th:errors="*{evidenceRecordFiles}" class="text-danger">Error</p>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-qwac-url">
+    <label class="col-sm-3 col-form-label" for="url" th:text="#{label.qwac.url}"></label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" th:field="*{url}" name="url" th:placeholder="#{label.qwac.url.add}" />
+    </div>
+    <div class="col-sm-9 offset-sm-3 align-self-center">
+        <p th:if="${#fields.hasErrors('urlValid')}" th:errors="*{urlValid}" class="text-danger">Error</p>
+    </div>
+</div>
+
+<div id="digestAlgoToSend" class="form-group row" th:fragment="send-digest-algo">
+    <label class="col-sm-3 mb-2 col-form-label" for="digestToSend" th:text="#{label.send.detached.as}"></label>
+    <div class="col-sm-5 mb-2">
+    	<div class="form-check form-check-inline">
+           	<input class="form-check-input" type="radio" name="digestToSend" value="" id="algoNone" checked='checked' />
+           	<label class="form-check-label" th:for="algoNone" th:text="#{label.complete.documents}"></label>
+		</div>
+    
+    	<br />
+    	
+		<th:block th:each="algo : ${digestAlgos}">
+			<div class="form-check form-check-inline">
+                   <input class="form-check-input digest-algo-input" type="radio" name="digestToSend" th:value="${algo}" th:id="algo+${algo}" th:attr="data-javaname=${algo.javaName}" />
+           		<label class="form-check-label" th:for="algo+${algo}" th:text="${algo}"></label>
+           	</div>
+		</th:block>
+    </div>
+    <div class="col-xs-4"></div>
+    
+    <div th:replace="~{fragment/fields :: field-digest-alert}"></div>
+</div>
+
+
+<th:block th:fragment="field-validation-level">
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" th:text="#{label.validation.level}"></label>
+		<div class="col-sm-9">
+			<select th:field="*{validationLevel}" class="custom-select">
+				<option th:each="level : ${validationLevels}" th:value="${level}"
+						th:text="#{${'label.validation.level.'+level}}" />
+			</select>
+		</div>
+	</div>
+</th:block>
+
+<th:block th:fragment="field-validation-policy">
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" th:text="#{label.validation.policy}"></label>
+		<div class="col-sm-9">
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="true" th:id="defaultPolicy" />
+				<label class="form-check-label" th:for="defaultPolicy" th:text="#{label.validation.default.policy.file}"></label>
+			</div>
+		</div>
+		<div class="offset-sm-3 col-sm-3">
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="false" th:id="otherPolicy" />
+				<label class="form-check-label" th:for="otherPolicy" th:text="#{label.validation.custom.policy.file}"></label>
+			</div>
+		</div>
+		<div class="col-sm-5">
+			<input type="file" class="form-control-file" name="policyFile" id="policyFile" disabled="disabled" />
+		</div>
+	</div>
+</th:block>
+
+<div class="position-relative form-group row" th:fragment="field-sign-pdf">
+	<div class="col-sm-8">
+		<input type="file" class="drag-file cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />
+		<p id="filename" class="drag-file-label large-field" th:text="#{label.sign.pdf.drag.file}"></p>
+	</div>
+</div>
+
+<div class="position-relative form-group row" th:fragment="sign-pdf-submit">
+	<div class="col-sm-8">
+		<button type="submit" class="btn btn-primary w-100" id="submit-button" th:text="#{label.sign}" disabled="disabled">
+		</button>
+	</div>
+</div>
+
+<div class="position-relative form-group row" th:fragment="field-merge-containers">
+	<div class="col-sm-9">
+		<input type="file" class="drag-file cursor-pointer" name="documentsToMerge" id="documentsToMerge" multiple="multiple" />
+		<div class="drag-file-label large-field">
+			<p id="filenames" class="drag-file-content" th:text="#{label.merge.containers.drag.files}"></p>
+		</div>
+	</div>
+	<div class="col-sm-9">
+		<p th:if="${#fields.hasErrors('documentsToMerge*')}" th:errors="*{documentsToMerge*}" class="errors text-danger" th:text="#{label.error}"></p>
+	</div>
+</div>
+
+<div class="position-relative form-group row" th:fragment="merge-containers-submit">
+	<div class="col-sm-9">
+		<button type="submit" class="btn btn-primary w-100" id="submit-button" th:text="#{label.merge}">
+		</button>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="submit-reset">
+	<div class="offset-sm-3 col-sm-9">
+		<button type="submit" class="btn btn-primary" th:text="#{label.submit}"></button>
+		<button type="reset" class="btn btn-secondary" th:text="#{label.clear}"></button>
+	</div>
+</div>
+
+<div style="display: inline;" th:fragment="field-der-pem (isPemAvailable, url)">
+    <a th:text="#{label.DER}" th:href="@{|${url}&format=#{label.DER}|}"></a>
+    <span th:if="${isPemAvailable}" th:text="'|'"></span>
+    <a th:if="${isPemAvailable}" th:href="@{|${url}&format=#{label.PEM}|}">
+    	<span th:text="#{label.PEM}"></span>
+		<i class="fa fa-download"></i>
+    </a>
+</div>
+
+</html>

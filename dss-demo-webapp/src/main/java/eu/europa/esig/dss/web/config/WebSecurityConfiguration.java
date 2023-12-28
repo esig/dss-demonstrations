@@ -1,6 +1,8 @@
 package eu.europa.esig.dss.web.config;
 
 import eu.europa.esig.dss.utils.Utils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.header.HeaderWriter;
@@ -23,8 +26,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.MappedInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -47,16 +48,22 @@ public class WebSecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
 		// javadoc uses frames
-		http.headers().addHeaderWriter(javadocHeaderWriter())
-				.addHeaderWriter(svgHeaderWriter())
-				.addHeaderWriter(serverEsigDSS());
+		http.headers(headers -> {
+			headers.addHeaderWriter(javadocHeaderWriter())
+					.addHeaderWriter(svgHeaderWriter())
+					.addHeaderWriter(serverEsigDSS());
+			if (Utils.isStringNotEmpty(csp)) {
+				headers.contentSecurityPolicy(policy -> policy.policyDirectives(csp));
+			}
+		});
 
-		http.csrf().ignoringRequestMatchers(getAntMatchers()); // disable CSRF for API calls (REST/SOAP webServices)
+		http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.anyRequest().permitAll());
 
-		if (Utils.isStringNotEmpty(csp)) {
-			http.headers().contentSecurityPolicy(csp);
-		}
+		// disable CSRF for API calls (REST/SOAP webServices)
+		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				.ignoringRequestMatchers(getAntMatchers()));
 
 		return http.build();
 	}
@@ -77,7 +84,7 @@ public class WebSecurityConfiguration {
 	}
 
 	@Bean
-	public  HeaderWriter svgHeaderWriter() {
+	public HeaderWriter svgHeaderWriter() {
 		final AntPathRequestMatcher javadocAntPathRequestMatcher = new AntPathRequestMatcher("/validation/diag-data.svg");
 		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
 		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);

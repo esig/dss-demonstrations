@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Replay Diagnostic Data'">
+	<body>		
+		<div layout:fragment="content">
+           <form method="post" enctype="multipart/form-data" th:action="@{/replay-diagnostic-data}" th:object="${replayDiagForm}">
+
+				<div th:replace="~{fragment/fields :: field-diagnostic-data}"></div>
+				<div th:replace="~{fragment/fields :: field-reset-date}"></div>
+			    <div th:replace="~{fragment/fields :: field-validation-level}"></div>
+				
+				<div th:replace="~{fragment/fields :: submit-reset}"></div>
+             </form>
+		</div>
+		<div layout:fragment="scripts">
+			<script type="text/javascript">
+			$('[data-toggle="tooltip"]').tooltip();
+			
+			$('input[name="defaultPolicy"]:radio').change(
+				function() {
+					$('#policyFile').attr("disabled",
+							this.value == 'true');
+				});
+			</script>
+		</div>
+	</body>

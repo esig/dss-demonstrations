@@ -2,11 +2,12 @@ package eu.europa.esig.dss.web.model;
 
 import eu.europa.esig.dss.asic.common.ASiCUtils;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
+import jakarta.validation.constraints.AssertTrue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -15,6 +16,7 @@ public class ContainerMergeForm {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMergeForm.class);
 
+    @AssertMultipartFile
     private List<MultipartFile> documentsToMerge;
 
     public List<MultipartFile> getDocumentsToMerge() {

@@ -1,6 +1,6 @@
 package eu.europa.esig.dss.web.model;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class SignResponse {
 

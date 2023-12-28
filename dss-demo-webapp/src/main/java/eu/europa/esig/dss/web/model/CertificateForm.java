@@ -1,11 +1,13 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import eu.europa.esig.dss.utils.Utils;
 
 public class CertificateForm {
 	
+	@AssertMultipartFile
 	private MultipartFile certificateFile;
 	
 	private String certificateBase64;

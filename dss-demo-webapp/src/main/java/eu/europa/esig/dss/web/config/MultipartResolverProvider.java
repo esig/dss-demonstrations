@@ -1,11 +1,24 @@
 package eu.europa.esig.dss.web.config;
 
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
-/**
- * Class to access a CommonsMultipartResolver instances
- */
 public class MultipartResolverProvider {
+
+    /**
+     * Defines the maximum file upload size
+     */
+    private long maxFileSize = -1;
+
+    /**
+     * Defines the maximum inMemory file size
+     */
+    private long maxInMemorySize = -1;
+
+    /**
+     * Defines whether the file load should be resolved lazily
+     */
+    private boolean resolveLazily = false;
 
     /**
      * Singleton instance
@@ -13,33 +26,10 @@ public class MultipartResolverProvider {
     private static MultipartResolverProvider singleton;
 
     /**
-     * Defines the maximum file upload size
-     *
-     * Default : 50 MB
-     */
-    private long maxFileSize = 52428800;
-
-    /**
-     * Defines the maximum inMemory file size
-     *
-     * Default : 50 MB
-     */
-    private int maxInMemorySize = 52428800;
-
-    /**
-     * The empty instance of multipart resolver
-     */
-    private CommonsMultipartResolver emptyMultipartResolver;
-
-    /**
-     * The used MultipartResolverInstance
-     */
-    private CommonsMultipartResolver commonMultipartResolver;
-
-    /**
      * Default constructor
      */
     private MultipartResolverProvider() {
+        // empty
     }
 
     /**
@@ -69,9 +59,16 @@ public class MultipartResolverProvider {
      * @param maxFileSize maximum file size
      */
     public void setMaxFileSize(long maxFileSize) {
-        getCommonMultipartResolver().setMaxUploadSize(maxFileSize);
-        getCommonMultipartResolver().setMaxUploadSizePerFile(maxFileSize);
         this.maxFileSize = maxFileSize;
+    }
+
+    /**
+     * Gets max in memory size
+     *
+     * @return max in memory size
+     */
+    public long getMaxInMemorySize() {
+        return maxInMemorySize;
     }
 
     /**
@@ -79,42 +76,37 @@ public class MultipartResolverProvider {
      *
      * @param maxInMemorySize maximum in memory file size
      */
-    public void setMaxInMemorySize(int maxInMemorySize) {
-        getAcceptAllFilesResolver().setMaxInMemorySize(maxInMemorySize);
-        getCommonMultipartResolver().setMaxInMemorySize(maxInMemorySize);
+    public void setMaxInMemorySize(long maxInMemorySize) {
         this.maxInMemorySize = maxInMemorySize;
     }
 
     /**
-     * Returns an empty MultipartResolver, that does not verify the file size
+     * Whether the file load should be resolved lazily
      *
-     * @return {@link CommonsMultipartResolver}
+     * @return TRUE if the file load should be resolved lazily, FALSE otherwise
      */
-    public CommonsMultipartResolver getAcceptAllFilesResolver() {
-        if (emptyMultipartResolver == null) {
-            emptyMultipartResolver = new CommonsMultipartResolver();
-            emptyMultipartResolver.setMaxInMemorySize(maxInMemorySize);
-            emptyMultipartResolver.setResolveLazily(true);
-            emptyMultipartResolver.setDefaultEncoding("UTF-8");
-        }
-        return emptyMultipartResolver;
+    public boolean isResolveLazily() {
+        return resolveLazily;
     }
 
     /**
-     * Returns the singleton resolver instance
+     * Sets whether the file load should be resolved lazily
      *
-     * @return {@link CommonsMultipartResolver}
+     * @param resolveLazily whether the file load should be resolved lazily
      */
-    public CommonsMultipartResolver getCommonMultipartResolver() {
-        if (commonMultipartResolver == null) {
-            commonMultipartResolver = new CommonsMultipartResolver();
-            commonMultipartResolver.setMaxUploadSize(maxFileSize);
-            commonMultipartResolver.setMaxUploadSizePerFile(maxFileSize);
-            commonMultipartResolver.setMaxInMemorySize(maxInMemorySize);
-            commonMultipartResolver.setResolveLazily(true);
-            commonMultipartResolver.setDefaultEncoding("UTF-8");
-        }
-        return commonMultipartResolver;
+    public void setResolveLazily(boolean resolveLazily) {
+        this.resolveLazily = resolveLazily;
+    }
+
+    /**
+     * Creates a new multipart resolver
+     *
+     * @return {@link MultipartResolver}
+     */
+    public MultipartResolver createMultipartResolver() {
+        StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver();
+        multipartResolver.setResolveLazily(resolveLazily);
+        return multipartResolver;
     }
 
 }

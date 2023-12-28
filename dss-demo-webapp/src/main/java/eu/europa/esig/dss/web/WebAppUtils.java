@@ -8,8 +8,8 @@ import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
-import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.spi.x509.tsp.TimestampToken;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.config.MultipartResolverProvider;
 import eu.europa.esig.dss.web.model.OriginalFile;
 import eu.europa.esig.dss.ws.dto.TimestampDTO;
@@ -32,7 +32,7 @@ public final class WebAppUtils {
 
 	public static DSSDocument toDSSDocument(MultipartFile multipartFile) {
 		try {
-			if ((multipartFile != null) && !multipartFile.isEmpty()) {
+			if (multipartFile != null && !multipartFile.isEmpty()) {
 				if (multipartFile.getSize() > MultipartResolverProvider.getInstance().getMaxFileSize()) {
 					throw new MaxUploadSizeExceededException(MultipartResolverProvider.getInstance().getMaxFileSize());
 				}
@@ -68,11 +68,17 @@ public final class WebAppUtils {
 	public static List<DSSDocument> originalFilesToDSSDocuments(List<OriginalFile> originalFiles) {
 		List<DSSDocument> dssDocuments = new ArrayList<>();
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
+			long inMemorySize = 0;
 			for (OriginalFile originalDocument : originalFiles) {
 				if (originalDocument.isNotEmpty()) {
 					DSSDocument dssDocument;
-					if (originalDocument.getCompleteFile() != null) {
-						dssDocument = WebAppUtils.toDSSDocument(originalDocument.getCompleteFile());
+					MultipartFile completeFile = originalDocument.getCompleteFile();
+					if (completeFile != null) {
+						dssDocument = WebAppUtils.toDSSDocument(completeFile);
+						inMemorySize += completeFile.getSize();
+						if (inMemorySize > MultipartResolverProvider.getInstance().getMaxInMemorySize()) {
+							throw new MaxUploadSizeExceededException(MultipartResolverProvider.getInstance().getMaxInMemorySize());
+						}
 					} else {
 						dssDocument = new DigestDocument(originalDocument.getDigestAlgorithm(),
 								originalDocument.getBase64Digest(), originalDocument.getFilename());

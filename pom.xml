@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.13</version>
+	<version>6.0</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -41,20 +41,16 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.13</dss.framework.version>
+		<dss.framework.version>6.0</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.9</slf4j.version>
 		<logback-classic.version>1.3.14</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
 
-		<cxf.version>3.5.7</cxf.version> <!-- Higher requires Jakarta + JDK 11+ -->
+		<cxf.version>4.0.3</cxf.version>
 		<swagger-ui.version>5.10.3</swagger-ui.version>
-		<spring.version>5.3.31</spring.version>
-		<spring-security.version>5.8.8</spring-security.version>
-		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
-		<thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.16.0</jackson-jaxrs-json-provider.version>
-		<commons-fileupload.version>1.5</commons-fileupload.version>
+		<jackson-jakarta-rs-json-provider.version>2.16.0</jackson-jakarta-rs-json-provider.version>
+		<jakarta.xml.bind-api.version>3.0.1</jakarta.xml.bind-api.version>
 		<commons-io.version>2.15.1</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version> <!-- Higher version does not support Java 8 -->
 		<freemarker.version>2.3.32</freemarker.version>
@@ -81,8 +77,7 @@
 		<module>dss-standalone-app</module>
 		<module>dss-standalone-app-package</module>
 		<module>dss-demo-webapp</module>
-		<module>dss-demo-bundle</module>        
-		<module>sscd-mocca-adapter</module>
+		<module>dss-demo-bundle</module>
 		<module>dss-rest-doc-generation</module>
 		<module>dss-esig-validation-tests</module>
 	</modules>
@@ -158,10 +153,14 @@
 					<version>3.3.1</version>
 					<configuration>
 						<encoding>${project.encoding}</encoding>
-						<nonFilteredFileExtensions><!-- Avoid to modify keystore -->
+						<nonFilteredFileExtensions>
+							<!-- Avoid to modify keystore -->
 							<nonFilteredFileExtension>jks</nonFilteredFileExtension>
 							<nonFilteredFileExtension>p12</nonFilteredFileExtension>
+							<!-- Avoid to modify fonts -->
 							<nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+							<nonFilteredFileExtension>woff</nonFilteredFileExtension>
+							<nonFilteredFileExtension>woff2</nonFilteredFileExtension>
 						</nonFilteredFileExtensions>
 					</configuration>
 				</plugin>
@@ -238,11 +237,6 @@
 				<artifactId>dss-standalone-app-package</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-                <groupId>eu.europa.ec.joinup.sd-dss</groupId>
-                <artifactId>sscd-mocca-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
 			<!-- DSS Framework dependencies -->
 
@@ -257,47 +251,13 @@
 			<!-- Public Dependencies -->
 
 			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-webmvc</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context-support</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-oxm</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-		        <groupId>org.springframework.security</groupId>
-		        <artifactId>spring-security-web</artifactId>
-		        <version>${spring-security.version}</version>
-		    </dependency>
-		    <dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-				<version>${spring-security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>${spring.version}</version>
-				<scope>test</scope>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<type>pom</type>
+				<version>3.2.0</version>
+				<scope>import</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>commons-fileupload</groupId>
-				<artifactId>commons-fileupload</artifactId>
-				<version>${commons-fileupload.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
@@ -354,9 +314,14 @@
 	        </dependency>
 
 			<dependency>
-				<groupId>com.fasterxml.jackson.jaxrs</groupId>
-				<artifactId>jackson-jaxrs-json-provider</artifactId>
-				<version>${jackson-jaxrs-json-provider.version}</version>
+				<groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+				<artifactId>jackson-jakarta-rs-json-provider</artifactId>
+				<version>${jackson-jakarta-rs-json-provider.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jakarta.xml.bind</groupId>
+				<artifactId>jakarta.xml.bind-api</artifactId>
+				<version>${jakarta.xml.bind-api.version}</version>
 			</dependency>
 
 			<dependency>
@@ -368,12 +333,6 @@
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
 				<version>${hsqldb.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.thymeleaf</groupId>
-				<artifactId>thymeleaf-spring5</artifactId>
-				<version>${thymeleaf-spring5.version}</version>
 			</dependency>
 				
 			<!-- Logger -->
@@ -411,16 +370,17 @@
 				<artifactId>logback-classic</artifactId>
 				<version>${logback-classic.version}</version>
 			</dependency>
+			<dependency>
+				<!-- Workaround for issue: https://github.com/qos-ch/logback/issues/744 -->
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${logback-classic.version}</version>
+			</dependency>
 			
 			<dependency>
 			    <groupId>org.junit.jupiter</groupId>
 			    <artifactId>junit-jupiter-engine</artifactId>
 			    <version>${junit.jupiter.version}</version>
-			</dependency>
-			<dependency>
-			    <groupId>nz.net.ultraq.thymeleaf</groupId>
-			    <artifactId>thymeleaf-layout-dialect</artifactId>
-				<version>${thymeleaf-layout-dialect.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

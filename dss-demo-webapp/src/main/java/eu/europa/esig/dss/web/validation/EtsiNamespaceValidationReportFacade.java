@@ -1,11 +1,11 @@
 package eu.europa.esig.dss.web.validation;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import eu.europa.esig.validationreport.ValidationReportFacade;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
 public final class EtsiNamespaceValidationReportFacade extends ValidationReportFacade {
 
     /** namespacePrefixMapper attribute name */
-    private static final String NAMESPACE_PREFIX_MAPPER = "com.sun.xml.bind.namespacePrefixMapper";
+    private static final String NAMESPACE_PREFIX_MAPPER = "org.glassfish.jaxb.namespacePrefixMapper";
 
     /**
      * Default constructor

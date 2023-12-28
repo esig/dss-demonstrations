@@ -2,9 +2,10 @@ package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.exception.IllegalInputException;
 import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.exception.InternalServerException;
+import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -17,8 +18,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -53,6 +53,14 @@ public class GlobalExceptionHandler {
 	public ModelAndView sourceNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("The page [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
+		}
+		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ModelAndView resourceNotFoundErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("The resource [{}] does not exist : {}", req.getRequestURI(), e.getMessage());
 		}
 		return getMAV(req, e, HttpStatus.NOT_FOUND, PAGE_NOT_FOUND_ERROR_VIEW);
 	}
