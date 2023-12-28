@@ -1,11 +1,13 @@
 package eu.europa.esig.dss.web.model;
 
 import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ReplayDiagForm {
 
+	@AssertMultipartFile
 	private MultipartFile diagnosticFile;
 	
 	private ValidationLevel validationLevel;
@@ -14,6 +16,7 @@ public class ReplayDiagForm {
 	
 	private boolean defaultPolicy;
 
+	@AssertMultipartFile
 	private MultipartFile policyFile;
 
 	public MultipartFile getDiagnosticFile() {

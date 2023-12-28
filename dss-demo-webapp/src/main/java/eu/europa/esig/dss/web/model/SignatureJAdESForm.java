@@ -5,6 +5,7 @@ import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class SignatureJAdESForm extends AbstractSignatureForm {
 
+	@AssertMultipartFile
 	private List<MultipartFile> documentsToSign;
 
 	@NotNull(message = "{error.signature.jws.serialization.type.mandatory}")
