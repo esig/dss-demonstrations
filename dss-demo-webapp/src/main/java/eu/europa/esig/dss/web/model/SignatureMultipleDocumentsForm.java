@@ -2,6 +2,7 @@ package eu.europa.esig.dss.web.model;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ public class SignatureMultipleDocumentsForm extends AbstractSignatureForm implem
 	@NotNull(message = "{error.container.type.mandatory}")
 	private ASiCContainerType containerType;
 
+	@AssertMultipartFile
 	private List<MultipartFile> documentsToSign;
 
 	@Override

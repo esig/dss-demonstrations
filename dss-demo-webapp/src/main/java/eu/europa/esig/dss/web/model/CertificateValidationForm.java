@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,7 @@ public class CertificateValidationForm {
 
 	private CertificateForm certificateForm;
 
+	@AssertMultipartFile
 	private List<MultipartFile> certificateChainFiles;
 	
 	private boolean includeCertificateTokens;
