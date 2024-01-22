@@ -12,7 +12,7 @@ COPY dss-demo-webapp/pom.xml /usr/src/mymaven/dss-demonstrations/dss-demo-webapp
 COPY dss-demo-webapp/src /usr/src/mymaven/dss-demonstrations/dss-demo-webapp/src
 
 COPY dss-demo-bundle/pom.xml /usr/src/mymaven/dss-demonstrations/dss-demo-bundle/
-COPY sscd-mocca-adapter/pom.xml /usr/src/mymaven/dss-demonstrations/sscd-mocca-adapter/
+
 COPY dss-rest-doc-generation/pom.xml /usr/src/mymaven/dss-demonstrations/dss-rest-doc-generation/
 COPY dss-esig-validation-tests/pom.xml /usr/src/mymaven/dss-demonstrations/dss-esig-validation-tests/
 
