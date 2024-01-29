@@ -104,6 +104,9 @@ public class DSSBeanConfig {
 	@Value("${oj.content.keystore.password}")
 	private String ksPassword;
 
+	@Value("${tl.loader.trust.all}")
+	private boolean tlTrustAllStrategy;
+
 	@Value("${tl.loader.ades.enabled}")
 	private boolean adesLotlEnabled;
 
@@ -505,9 +508,19 @@ public class DSSBeanConfig {
 	public DSSFileLoader onlineLoader() {
 		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
 		onlineFileLoader.setCacheExpirationTime(0);
-		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setDataLoader(tlDataLoader());
 		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
 		return onlineFileLoader;
+	}
+
+	@Bean
+	public CommonsDataLoader tlDataLoader() {
+		if (tlTrustAllStrategy) {
+			LOG.info("TrustAllStrategy is enabled on TL loading.");
+			return trustAllDataLoader();
+		} else {
+			return dataLoader();
+		}
 	}
 
 	private LOTLSource[] listOfTrustedListSources() {
