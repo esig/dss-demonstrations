@@ -110,20 +110,20 @@
         </dependency>
 
         <!-- Choose your PAdES implementation -->
-        <dependency>
-            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
-            <artifactId>dss-pades-pdfbox</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- 		<dependency> -->
-        <!-- 			<groupId>eu.europa.ec.joinup.sd-dss</groupId> -->
-        <!-- 			<artifactId>dss-pades-openpdf</artifactId> -->
-        <!-- 		</dependency> -->
+<!--        <dependency>-->
+<!--            <groupId>eu.europa.ec.joinup.sd-dss</groupId>-->
+<!--            <artifactId>dss-pades-pdfbox</artifactId>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>commons-logging</groupId>-->
+<!--                    <artifactId>commons-logging</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+         		<dependency>
+         			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+         			<artifactId>dss-pades-openpdf</artifactId>
+         		</dependency>
 
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -158,6 +158,10 @@
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-evidence-record-xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-evidence-record-asn1</artifactId>
         </dependency>
 
         <!-- REST -->
