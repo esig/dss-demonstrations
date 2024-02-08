@@ -110,20 +110,20 @@
         </dependency>
 
         <!-- Choose your PAdES implementation -->
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-pades-pdfbox</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.europa.ec.joinup.sd-dss</groupId>-->
-<!--            <artifactId>dss-pades-pdfbox</artifactId>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>commons-logging</groupId>-->
-<!--                    <artifactId>commons-logging</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
+<!--            <artifactId>dss-pades-openpdf</artifactId>-->
 <!--        </dependency>-->
-         		<dependency>
-         			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-         			<artifactId>dss-pades-openpdf</artifactId>
-         		</dependency>
 
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
