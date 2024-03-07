@@ -1,6 +1,7 @@
 package eu.europa.esig.dss.web.service;
 
 import eu.europa.esig.dss.AbstractSignatureParameters;
+import eu.europa.esig.dss.alert.LogOnStatusAlert;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESSignatureParameters;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESTimestampParameters;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
@@ -38,8 +39,10 @@ import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.x509.tsp.KeyEntityTSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
-import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.spi.x509.tsp.TimestampToken;
+import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.exception.SignatureOperationException;
 import eu.europa.esig.dss.web.model.AbstractSignatureForm;
@@ -70,22 +73,7 @@ public class SigningService {
 	private static final Logger LOG = LoggerFactory.getLogger(SigningService.class);
 
 	@Autowired
-	private CAdESService cadesService;
-
-	@Autowired
-	private PAdESService padesService;
-
-	@Autowired
-	private XAdESService xadesService;
-
-	@Autowired
-	private JAdESService jadesService;
-
-	@Autowired
-	private ASiCWithCAdESService asicWithCAdESService;
-
-	@Autowired
-	private ASiCWithXAdESService asicWithXAdESService;
+	private CertificateVerifier certificateVerifier;
 
 	@Autowired
 	private TSPSource tspSource;
@@ -121,7 +109,7 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ToBeSigned getDataToSign(SignatureDocumentForm form) {
 		LOG.info("Start getDataToSign with one document");
-		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm());
+		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm(), form.isSignWithExpiredCertificate());
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
@@ -138,7 +126,7 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ToBeSigned getDataToSign(SignatureDigestForm form) {
 		LOG.info("Start getDataToSign with one digest");
-		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
+		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm(), form.isSignWithExpiredCertificate());
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
@@ -155,7 +143,8 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ToBeSigned getDataToSign(SignatureMultipleDocumentsForm form) {
 		LOG.info("Start getDataToSign with multiple documents");
-		MultipleDocumentsSignatureService service = getASiCSignatureService(form.getSignatureForm());
+		MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService)
+				getSignatureService(form.getContainerType(), form.getSignatureForm(), form.isSignWithExpiredCertificate());
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
@@ -172,8 +161,9 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ToBeSigned getDataToSign(SignatureJAdESForm form) {
 		LOG.info("Start getDataToSign with one JAdES");
-		
-		MultipleDocumentsSignatureService service = jadesService;
+
+		MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService)
+				getSignatureService(SignatureForm.JAdES, form.isSignWithExpiredCertificate());
 		JAdESSignatureParameters parameters = fillParameters(form);
 
 		try {
@@ -195,7 +185,7 @@ public class SigningService {
 	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
 			boolean zip = ASiCUtils.isZip(signatureDocument);
 	        
-			CounterSignatureService service = getCounterSignatureService(zip, form.getSignatureForm());
+			CounterSignatureService service = getCounterSignatureService(zip, form.getSignatureForm(), form.isSignWithExpiredCertificate());
 	        SerializableCounterSignatureParameters parameters = fillParameters(form);
 	
 	        ToBeSigned toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
@@ -230,7 +220,7 @@ public class SigningService {
 	public TimestampToken getContentTimestamp(SignatureDigestForm form) {
 		LOG.info("Start getContentTimestamp with one digest");
 
-		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
+		DocumentSignatureService service = getSignatureService(form.getSignatureForm());
 		AbstractSignatureParameters parameters = fillParameters(form);
 
 		try {
@@ -249,7 +239,8 @@ public class SigningService {
 	public TimestampToken getContentTimestamp(SignatureMultipleDocumentsForm form) {
 		LOG.info("Start getContentTimestamp with multiple documents");
 
-		MultipleDocumentsSignatureService service = getASiCSignatureService(form.getSignatureForm());
+		MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService)
+				getSignatureService(form.getContainerType(), form.getSignatureForm());
 		AbstractSignatureParameters parameters = fillParameters(form);
 
 		try {
@@ -267,7 +258,7 @@ public class SigningService {
 	public TimestampToken getContentTimestamp(SignatureJAdESForm form) {
 		LOG.info("Start getContentTimestamp with JAdES");
 
-		MultipleDocumentsSignatureService service = jadesService;
+		MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService) getSignatureService(SignatureForm.JAdES);
 		JAdESSignatureParameters parameters = fillParameters(form);
 
 		try {
@@ -282,6 +273,7 @@ public class SigningService {
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DSSDocument timestamp(TimestampForm form) {
 		List<DSSDocument> dssDocuments = WebAppUtils.toDSSDocuments(form.getOriginalFiles());
 		LOG.info("Start timestamp with {} document(s)", dssDocuments.size());
@@ -293,11 +285,12 @@ public class SigningService {
 				throw new DSSException("Only one document is allowed for PAdES");
 			}
 			DSSDocument toTimestampDocument = dssDocuments.get(0);
-			result = padesService.timestamp(toTimestampDocument, new PAdESTimestampParameters());
+			result = getSignatureService(SignatureForm.PAdES).timestamp(toTimestampDocument, new PAdESTimestampParameters());
 		} else {
 			ASiCWithCAdESTimestampParameters parameters = new ASiCWithCAdESTimestampParameters();
 			parameters.aSiC().setContainerType(containerType);
-			result = asicWithCAdESService.timestamp(dssDocuments, parameters);
+			MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService) getSignatureService(containerType, SignatureForm.CAdES);
+			result = service.timestamp(dssDocuments, parameters);
 		}
 
 		LOG.info("End timestamp with {} document(s)", dssDocuments.size());
@@ -365,8 +358,6 @@ public class SigningService {
 		// parameters.setEncryptionAlgorithm(form.getEncryptionAlgorithm()); retrieved from certificate
 		parameters.bLevel().setSigningDate(form.getSigningDate());
 
-		parameters.setSignWithExpiredCertificate(form.isSignWithExpiredCertificate());
-
 		if (form.getContentTimestamp() != null) {
 			parameters.setContentTimestamps(
 					Collections.singletonList(WebAppUtils.toTimestampToken(form.getContentTimestamp())));
@@ -407,7 +398,7 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DSSDocument signDocument(SignatureDocumentForm form) {
 		LOG.info("Start signDocument with one document");
-		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm());
+		DocumentSignatureService service = getSignatureService(form.getContainerType(), form.getSignatureForm(), form.isSignWithExpiredCertificate());
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
@@ -426,7 +417,7 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DSSDocument signDigest(SignatureDigestForm form) {
 		LOG.info("Start signDigest with one digest");
-		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm());
+		DocumentSignatureService service = getSignatureService(null, form.getSignatureForm(), form.isSignWithExpiredCertificate());
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
@@ -445,7 +436,8 @@ public class SigningService {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DSSDocument signDocument(SignatureMultipleDocumentsForm form) {
 		LOG.info("Start signDocument with multiple documents");
-		MultipleDocumentsSignatureService service = getASiCSignatureService(form.getSignatureForm());
+		MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService)
+				getSignatureService(form.getContainerType(), form.getSignatureForm(), form.isSignWithExpiredCertificate());
 
 		AbstractSignatureParameters parameters = fillParameters(form);
 
@@ -465,7 +457,8 @@ public class SigningService {
 	public DSSDocument signDocument(SignatureJAdESForm form) {
 		LOG.info("Start signDocument with JAdES");
 		
-		MultipleDocumentsSignatureService service = jadesService;
+		MultipleDocumentsSignatureService service = (MultipleDocumentsSignatureService)
+				getSignatureService(SignatureForm.JAdES, form.isSignWithExpiredCertificate());
 		JAdESSignatureParameters parameters = fillParameters(form);
 
 		try {
@@ -489,7 +482,7 @@ public class SigningService {
 	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
 			boolean zip = ASiCUtils.isZip(signatureDocument);
 	        
-			CounterSignatureService service = getCounterSignatureService(zip, form.getSignatureForm());
+			CounterSignatureService service = getCounterSignatureService(zip, form.getSignatureForm(), form.isSignWithExpiredCertificate());
 	        SerializableCounterSignatureParameters parameters = fillParameters(form);
 	
 	        SignatureAlgorithm sigAlgorithm = SignatureAlgorithm.getAlgorithm(form.getEncryptionAlgorithm(), form.getDigestAlgorithm());
@@ -504,51 +497,78 @@ public class SigningService {
     }
 
 	@SuppressWarnings("rawtypes")
+	private DocumentSignatureService getSignatureService(SignatureForm signatureForm) {
+		return getSignatureService(null, signatureForm, false);
+	}
+
+	@SuppressWarnings("rawtypes")
 	private DocumentSignatureService getSignatureService(ASiCContainerType containerType, SignatureForm signatureForm) {
+		return getSignatureService(containerType, signatureForm, false);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private DocumentSignatureService getSignatureService(SignatureForm signatureForm, boolean signWithExpiredCertificate) {
+		return getSignatureService(null, signatureForm, signWithExpiredCertificate);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private DocumentSignatureService getSignatureService(ASiCContainerType containerType, SignatureForm signatureForm, boolean signWithExpiredCertificate) {
+		CertificateVerifier cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
+		if (signWithExpiredCertificate) {
+			cv.setAlertOnExpiredCertificate(new LogOnStatusAlert());
+		}
 		DocumentSignatureService service = null;
 		if (containerType != null) {
-			service = (DocumentSignatureService) getASiCSignatureService(signatureForm);
+			service = (DocumentSignatureService) getASiCSignatureService(signatureForm, cv);
 		} else {
 			switch (signatureForm) {
-			case CAdES:
-				service = cadesService;
-				break;
-			case PAdES:
-				service = padesService;
-				break;
-			case XAdES:
-				service = xadesService;
-				break;
-			case JAdES:
-				service = jadesService;
-				break;
-			default:
-				LOG.error("Unknown signature form : " + signatureForm);
+				case CAdES:
+					service = new CAdESService(cv);
+					break;
+				case PAdES:
+					service = new PAdESService(cv);
+					break;
+				case XAdES:
+					service = new XAdESService(cv);
+					break;
+				case JAdES:
+					service = new JAdESService(cv);
+					break;
+				default:
+					throw new IllegalArgumentException(String.format("Unknown signature form : %s", signatureForm));
 			}
 		}
+		service.setTspSource(tspSource);
 		return service;
 	}
 	
     @SuppressWarnings("rawtypes")
-	private CounterSignatureService getCounterSignatureService(boolean isZipContainer, SignatureForm signatureForm) {
+	private CounterSignatureService getCounterSignatureService(boolean isZipContainer, SignatureForm signatureForm, boolean signWithExpiredCertificate) {
+		CertificateVerifier cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
+		if (signWithExpiredCertificate) {
+			cv.setAlertOnExpiredCertificate(new LogOnStatusAlert());
+		}
         CounterSignatureService service;
 		if (isZipContainer) {
-            service = (CounterSignatureService) getASiCSignatureService(signatureForm);
+            service = (CounterSignatureService) getASiCSignatureService(signatureForm, cv);
         } else {
             switch (signatureForm) {
             case CAdES:
-                service = cadesService;
+                service = new CAdESService(cv);
                 break;
             case XAdES:
-                service = xadesService;
+                service = new XAdESService(cv);
                 break;
             case JAdES:
-                service = jadesService;
+                service = new JAdESService(cv);
                 break;
             default:
-                throw new DSSException("Not supported signature form for a counter signature : " + signatureForm);
+                throw new IllegalArgumentException(String.format("Not supported signature form for a counter signature : %s", signatureForm));
             }
         }
+		if (service != null) {
+			service.setTspSource(tspSource);
+		}
         return service;
     }
 
@@ -577,7 +597,7 @@ public class SigningService {
 				parameters = jadesParameters;
 				break;
 			default:
-				LOG.error("Unknown signature form : " + signatureForm);
+				throw new IllegalArgumentException(String.format("Unknown signature form : %s", signatureForm));
 			}
 		}
 		return parameters;
@@ -598,7 +618,7 @@ public class SigningService {
 	            parameters = jadesCounterSignatureParameters;
                 break;
             default:
-                LOG.error("Not supported form for a counter signature : " + signatureForm);
+				throw new IllegalArgumentException(String.format("Not supported signature form for a counter signature : %s", signatureForm));
         }
         return parameters;
     }
@@ -620,7 +640,7 @@ public class SigningService {
 					parameters = new JAdESTimestampParameters();
 					break;
 				default:
-					LOG.error("Not supported form for a timestamp : " + signatureForm);
+					throw new IllegalArgumentException(String.format("Not supported signature form for a time-stamp : %s", signatureForm));
 			}
 
 		} else {
@@ -634,24 +654,24 @@ public class SigningService {
 					parameters = new XAdESTimestampParameters();
 					break;
 				default:
-					LOG.error("Not supported form for an ASiC timestamp : " + signatureForm);
+					throw new IllegalArgumentException(String.format("Not supported signature form for an ASiC time-stamp : %s", signatureForm));
 			}
 		}
 		return parameters;
 	}
 
 	@SuppressWarnings("rawtypes")
-	private MultipleDocumentsSignatureService getASiCSignatureService(SignatureForm signatureForm) {
+	private MultipleDocumentsSignatureService getASiCSignatureService(SignatureForm signatureForm, CertificateVerifier cv) {
 		MultipleDocumentsSignatureService service = null;
 		switch (signatureForm) {
-		case CAdES:
-			service = asicWithCAdESService;
-			break;
-		case XAdES:
-			service = asicWithXAdESService;
-			break;
-		default:
-			LOG.error("Unknown signature form : " + signatureForm);
+			case CAdES:
+				service = new ASiCWithCAdESService(cv);
+				break;
+			case XAdES:
+				service = new ASiCWithXAdESService(cv);
+				break;
+			default:
+				throw new IllegalArgumentException(String.format("Not supported signature form for an ASiC container : %s", signatureForm));
 		}
 		return service;
 	}
@@ -671,7 +691,7 @@ public class SigningService {
 			parameters = asicXadesParams;
 			break;
 		default:
-			LOG.error("Unknown signature form for ASiC container: " + signatureForm);
+			throw new IllegalArgumentException(String.format("Not supported signature form for an ASiC container : %s", signatureForm));
 		}
 		return parameters;
 	}
