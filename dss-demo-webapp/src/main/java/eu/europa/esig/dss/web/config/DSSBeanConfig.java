@@ -34,6 +34,7 @@ import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
 import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
+import eu.europa.esig.dss.tsl.sha2.Sha2FileCacheDataLoader;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
@@ -507,10 +508,10 @@ public class DSSBeanConfig {
 	@Bean
 	public DSSFileLoader onlineLoader() {
 		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
-		onlineFileLoader.setCacheExpirationTime(0);
+		onlineFileLoader.setCacheExpirationTime(-1);
 		onlineFileLoader.setDataLoader(tlDataLoader());
 		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
-		return onlineFileLoader;
+		return Sha2FileCacheDataLoader.initSha2DailyUpdateDataLoader(onlineFileLoader);
 	}
 
 	@Bean
