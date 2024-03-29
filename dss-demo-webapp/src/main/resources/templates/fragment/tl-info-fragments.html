@@ -33,8 +33,8 @@
 <!-- Download result -->
 <span th:fragment="download-status(result)" class="position-relative">
     <span th:replace="~{fragment/tl-info-fragments :: result-status(result=${result})}"></span>
-    <span th:if="${result != null and result.isSynchronized() and result.sha2ErrorMessage != null}"
-		  th:title="${result.sha2ErrorMessage}" class="position-absolute sha2-star">*</span>
+    <span th:if="${result != null and result.isSynchronized() and result.sha2ErrorMessages != null and !result.sha2ErrorMessages.isEmpty()}"
+		  th:title="${result.sha2ErrorMessages[0]}" class="position-absolute sha2-star">*</span>
 </span>
 
 <!-- Validation result -->
