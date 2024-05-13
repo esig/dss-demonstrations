@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EsigValidationTest {
 
-    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu/efda/api/v2/validation-tests/testcase/testFile/all/";
+    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu/efda/api/v2/validation-tests/testcase/testFile/all";
 
     private static final String ZIP_ARCHIVE_EXTENSION = ".zip";
 
