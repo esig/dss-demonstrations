@@ -171,6 +171,9 @@ public class DSSBeanConfig {
 	@Value("${dataloader.redirect.enabled}")
 	private boolean redirectEnabled;
 
+	@Value("${dataloader.use.system.properties}")
+	private boolean useSystemProperties;
+
 	@Value("${trusted.source.keystore.type:}")
 	private String trustSourceKsType;
 
@@ -589,6 +592,7 @@ public class DSSBeanConfig {
 		dataLoader.setTimeoutConnection(connectionTimeout);
 		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
 		dataLoader.setRedirectsEnabled(redirectEnabled);
+		dataLoader.setUseSystemProperties(useSystemProperties);
 		dataLoader.setProxyConfig(proxyConfig);
 		return dataLoader;
 	}
