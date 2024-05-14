@@ -50,9 +50,9 @@ $('input[type=file][name=documentToCounterSign]').change(function() {
 
         	disable(false);
         },
-        error : function(msg) {
+        error: function(msg) {
         	disable(true);
-        	$('<p class="text-danger">' + msg.responseText + '</p>').appendTo('#documentToCounterSignError');
+			$('<p class="text-danger"></p>').appendTo('#documentToCounterSignError').text(msg.responseText);
         },
         contentType: false,
         processData: false
