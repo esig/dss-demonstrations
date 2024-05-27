@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.enumerations.ValidationLevel;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;

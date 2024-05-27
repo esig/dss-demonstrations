@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.web;
 
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
-import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
 import eu.europa.esig.dss.web.config.DSSBeanConfig;
 import eu.europa.esig.dss.web.service.FOPService;
 import eu.europa.esig.dss.web.service.XSLTService;
