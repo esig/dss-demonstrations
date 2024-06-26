@@ -17,6 +17,9 @@ public class TSLLoaderJob {
 	@Value("${bc.rsa.max_mr_tests:}")
 	private String bcRsaValidation;
 
+	@Value("${xmlsec.manifest.max.references:}")
+	private String xmlsecManifestMaxRefsCount;
+
 	@Autowired
 	private TLValidationJob job;
 
@@ -24,6 +27,9 @@ public class TSLLoaderJob {
 	public void init() {
 		if (Utils.isStringNotEmpty(bcRsaValidation)) {
 			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
+		}
+		if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
+			System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
 		}
 		job.offlineRefresh();
 	}
