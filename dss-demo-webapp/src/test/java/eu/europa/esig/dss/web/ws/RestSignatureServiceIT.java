@@ -530,7 +530,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		for (ManifestEntry manifestEntry : manifestEntries) {
 			boolean signedDocFound = false;
 			for (DSSDocument document : documentsToSign) {
-				if (manifestEntry.getFileName().equals(document.getName())) {
+				if (manifestEntry.getUri().equals(document.getName())) {
 					signedDocFound = true;
 				}
 			}
