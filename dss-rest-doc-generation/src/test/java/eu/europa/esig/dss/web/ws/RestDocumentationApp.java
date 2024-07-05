@@ -787,6 +787,7 @@ public class RestDocumentationApp {
 
 			RemoteSignatureParameters padesParameters = new RemoteSignatureParameters();
 			padesParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			padesParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 			// get message-digest
 			PDFExternalMessageDigestDTO pdfExternalMessageDigestDTO = new PDFExternalMessageDigestDTO(tlToSign, padesParameters);
@@ -804,6 +805,7 @@ public class RestDocumentationApp {
 			RemoteCertificate signingCertificate = new RemoteCertificate(
 					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
 			cmsParameters.setSigningCertificate(signingCertificate);
+			cmsParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 			Date signingTime = DSSUtils.getUtcDate(2021, 9, 3);
 			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
