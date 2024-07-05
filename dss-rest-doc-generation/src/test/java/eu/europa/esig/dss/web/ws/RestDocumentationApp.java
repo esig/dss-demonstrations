@@ -527,12 +527,27 @@ public class RestDocumentationApp {
 			signMultiDocsDto.setSignatureValue(DTOConverter.toSignatureValueDTO(signatureValue));
 
 			// sign documents
-			Response respondeSignDocuments = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+			Response responseSignDocuments = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.body(signMultiDocsDto, ObjectMapperType.JACKSON_2).post("/services/rest/signature/multiple-documents/signDocument");
-			respondeSignDocuments.then().assertThat().statusCode(equalTo(200));
-			RemoteDocument signedDocument = respondeSignDocuments.andReturn().as(RemoteDocument.class);
+			responseSignDocuments.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument signedDocument = responseSignDocuments.andReturn().as(RemoteDocument.class);
 			assertNotNull(signedDocument);
 			assertNotNull(signedDocument.getBytes());
+
+			ExtendDocumentDTO extendOneDoc = new ExtendDocumentDTO();
+			parameters = new RemoteSignatureParameters();
+			parameters.setAsicContainerType(ASiCContainerType.ASiC_E);
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_T);
+			extendOneDoc.setParameters(parameters);
+			extendOneDoc.setToExtendDocument(signedDocument);
+
+			// extend signed document
+			Response extendResponse = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).accept(ContentType.JSON)
+					.body(extendOneDoc, ObjectMapperType.JACKSON_2).post("/services/rest/signature/multiple-documents/extendDocument");
+			extendResponse.then().assertThat().statusCode(equalTo(200));
+			RemoteDocument extendedDocument = extendResponse.andReturn().as(RemoteDocument.class);
+			assertNotNull(extendedDocument);
+			assertNotNull(extendedDocument.getBytes());
 		}
 	}
 
@@ -756,7 +771,7 @@ public class RestDocumentationApp {
 			assertNotNull(dataToBeSigned);
 
 			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
-					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+					DigestAlgorithm.SHA512, dssPrivateKeyEntry);
 
 			SignTrustedListDTO signTrustedListDTO = new SignTrustedListDTO(tlToSign, tlSignatureParameters,
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
