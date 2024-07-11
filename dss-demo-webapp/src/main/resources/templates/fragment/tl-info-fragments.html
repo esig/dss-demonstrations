@@ -22,11 +22,19 @@
             (${result.lastStateTransitionTime != null}?${#dates.format(result.lastStateTransitionTime, 'dd-MMM-yyyy HH:mm:ss')}:'-')"></span>
 </span>
 
+<!-- Generic result -->
 <span th:fragment="result-status(result)">
 	<i th:if="${result == null or (!result.resultExist and !result.isError())}" class="fa fa-ban text-muted" title="Not performed"></i>
 	<i th:if="${result != null and result.isSynchronized()}" class="fa fa-check-circle text-success" title="OK"></i>
 	<i th:if="${result != null and result.isError()}" class="fa fa fa-times-circle text-danger"
 		th:title="${result.exceptionMessage}?:'-'"></i>
+</span>
+
+<!-- Download result -->
+<span th:fragment="download-status(result)" class="position-relative">
+    <span th:replace="~{fragment/tl-info-fragments :: result-status(result=${result})}"></span>
+    <span th:if="${result != null and result.isSynchronized() and result.sha2ErrorMessages != null and !result.sha2ErrorMessages.isEmpty()}"
+		  th:title="${result.sha2ErrorMessages[0]}" class="position-absolute sha2-star">*</span>
 </span>
 
 <!-- Validation result -->

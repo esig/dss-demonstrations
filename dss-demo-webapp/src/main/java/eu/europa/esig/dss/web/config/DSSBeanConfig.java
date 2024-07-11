@@ -21,7 +21,10 @@ import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
+import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
+import eu.europa.esig.dss.spi.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
@@ -34,11 +37,9 @@ import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
 import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
+import eu.europa.esig.dss.tsl.sha2.Sha2FileCacheDataLoader;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CommonCertificateVerifier;
-import eu.europa.esig.dss.validation.SignaturePolicyProvider;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
@@ -104,6 +105,9 @@ public class DSSBeanConfig {
 	@Value("${oj.content.keystore.password}")
 	private String ksPassword;
 
+	@Value("${tl.loader.trust.all}")
+	private boolean tlTrustAllStrategy;
+
 	@Value("${tl.loader.ades.enabled}")
 	private boolean adesLotlEnabled;
 
@@ -166,6 +170,9 @@ public class DSSBeanConfig {
 
 	@Value("${dataloader.redirect.enabled}")
 	private boolean redirectEnabled;
+
+	@Value("${dataloader.use.system.properties}")
+	private boolean useSystemProperties;
 
 	@Value("${trusted.source.keystore.type:}")
 	private String trustSourceKsType;
@@ -504,10 +511,20 @@ public class DSSBeanConfig {
 	@Bean
 	public DSSFileLoader onlineLoader() {
 		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
-		onlineFileLoader.setCacheExpirationTime(0);
-		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setCacheExpirationTime(-1);
+		onlineFileLoader.setDataLoader(tlDataLoader());
 		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
-		return onlineFileLoader;
+		return Sha2FileCacheDataLoader.initSha2DailyUpdateDataLoader(onlineFileLoader);
+	}
+
+	@Bean
+	public CommonsDataLoader tlDataLoader() {
+		if (tlTrustAllStrategy) {
+			LOG.info("TrustAllStrategy is enabled on TL loading.");
+			return trustAllDataLoader();
+		} else {
+			return dataLoader();
+		}
 	}
 
 	private LOTLSource[] listOfTrustedListSources() {
@@ -575,6 +592,7 @@ public class DSSBeanConfig {
 		dataLoader.setTimeoutConnection(connectionTimeout);
 		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
 		dataLoader.setRedirectsEnabled(redirectEnabled);
+		dataLoader.setUseSystemProperties(useSystemProperties);
 		dataLoader.setProxyConfig(proxyConfig);
 		return dataLoader;
 	}

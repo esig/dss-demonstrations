@@ -40,6 +40,9 @@ public class WebSecurityConfiguration {
 
 	@Value("${web.security.csp}")
 	private String csp;
+
+	@Value("${web.strict.transport.security:}")
+	private String strictTransportSecurity;
 	
 	/** API urls (REST/SOAP webServices) */
 	private static final String[] API_URLS = new String[] {
@@ -54,6 +57,9 @@ public class WebSecurityConfiguration {
 			headers.addHeaderWriter(javadocHeaderWriter())
 					.addHeaderWriter(svgHeaderWriter())
 					.addHeaderWriter(serverEsigDSS());
+			if (Utils.isStringNotEmpty(strictTransportSecurity)) {
+				headers.addHeaderWriter(strictTransportSecurity());
+			}
 			if (Utils.isStringNotEmpty(csp)) {
 				headers.contentSecurityPolicy(policy -> policy.policyDirectives(csp));
 			}
@@ -93,6 +99,11 @@ public class WebSecurityConfiguration {
 	@Bean
 	public HeaderWriter serverEsigDSS() {
 		return new StaticHeadersWriter("Server", "ESIG-DSS");
+	}
+
+	@Bean
+	public HeaderWriter strictTransportSecurity() {
+		return new StaticHeadersWriter("Strict-Transport-Security", strictTransportSecurity);
 	}
 
 	@Bean

@@ -9,6 +9,7 @@ import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
 import eu.europa.esig.dss.enumerations.TextWrapping;
+import eu.europa.esig.dss.jades.DSSJsonUtils;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
@@ -35,6 +36,7 @@ import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
@@ -58,10 +60,12 @@ import java.io.FileInputStream;
 import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -381,7 +385,12 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
 			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
-			parameters.setJwsSerializationType(JWSSerializationType.FLATTENED_JSON_SERIALIZATION);
+			parameters.setJwsSerializationType(JWSSerializationType.COMPACT_SERIALIZATION);
+
+			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
+			bLevelParameters.setClaimedSignerRoles(Arrays.asList("Manager", "Administrator"));
+			bLevelParameters.setSignedAssertions(Collections.singletonList("SignedAssertion"));
+			parameters.setBLevelParams(bLevelParameters);
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
@@ -393,6 +402,11 @@ public class SoapSignatureServiceIT extends AbstractIT {
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = soapClient.signDocument(signDocument);
 			assertNotNull(signedDocument);
+
+			String strSignature = new String(signedDocument.getBytes());
+			String protectedHeader = new String(DSSJsonUtils.fromBase64Url(strSignature.split("\\.")[0]));
+			assertTrue(bLevelParameters.getClaimedSignerRoles().stream().allMatch(protectedHeader::contains));
+			assertTrue(bLevelParameters.getSignedAssertions().stream().allMatch(protectedHeader::contains));
 
 			parameters = new RemoteSignatureParameters();
 			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_B);
@@ -478,6 +492,78 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			toSignDocuments.add(toSignDoc2);
 			
 			assertThrows(Exception.class, () -> soapMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters)));
+		}
+	}
+
+	@Test
+	void testSignJAdESWithPlainPayload() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_T);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION);
+			parameters.setBase64UrlEncodedPayload(false);
+
+			DSSDocument fileToSign = new InMemoryDocument("HelloWorld".getBytes(), "helloWorld");
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = soapClient.signDocument(signDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			String strSignature = new String(DSSUtils.toByteArray(iMD));
+			assertTrue(strSignature.contains(new String(DSSUtils.toByteArray(fileToSign))));
+			assertFalse(strSignature.contains("sigT"));
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	void testSignJAdESWithPlainEtsiU() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_T);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION);
+			parameters.setBase64UrlEncodedEtsiUComponents(false);
+
+			DSSDocument fileToSign = new InMemoryDocument("HelloWorld".getBytes(), "helloWorld");
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = soapClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = soapClient.signDocument(signDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			String strSignature = new String(DSSUtils.toByteArray(iMD));
+			assertFalse(strSignature.contains(new String(DSSUtils.toByteArray(fileToSign))));
+			assertTrue(strSignature.contains("sigT"));
+			assertNotNull(iMD);
 		}
 	}
 

@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.validation;
 
 import eu.europa.esig.dss.enumerations.MimeType;
-import eu.europa.esig.dss.exception.IllegalInputException;
+import eu.europa.esig.dss.spi.exception.IllegalInputException;
 import eu.europa.esig.dss.jaxb.object.Message;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
@@ -18,6 +18,8 @@ import eu.europa.esig.dss.simplereport.SimpleReport;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.client.http.DataLoader;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
+import eu.europa.esig.dss.spi.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
@@ -53,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EsigValidationTest {
 
-    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu/efda/api/v2/validation-tests/testcase/testFile/all/";
+    private static final String URL_ACCESS_POINT = "https://eidas.ec.europa.eu/efda/api/v2/validation-tests/testcase/testFile/all";
 
     private static final String ZIP_ARCHIVE_EXTENSION = ".zip";
 

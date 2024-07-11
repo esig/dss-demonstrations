@@ -40,7 +40,7 @@
 
 	<!-- Download result -->
 	<td class="align-middle">
-		<span th:replace="~{fragment/tl-info-fragments :: result-status(result=${downloadResult})}"></span>
+		<span th:replace="~{fragment/tl-info-fragments :: download-status(result=${downloadResult})}"></span>
 	</td>
 	
 	<!-- Parsing result -->
@@ -113,6 +113,12 @@
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.download.error}"></div>
 		<div class="mb-1 col-xl-9">
 			<p class="m-0 error" th:text="${downloadResult.exceptionMessage}?:'-'"></p>
+		</div>
+	</div>
+	<div class="row" th:if="${downloadResult != null and downloadResult.sha2ErrorMessages != null and !downloadResult.sha2ErrorMessages.isEmpty()}">
+		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.download.sha2.error}"></div>
+		<div class="mb-1 col-xl-9">
+			<p th:each="message : ${downloadResult.sha2ErrorMessages}" class="m-0 error text-secondary" th:text="${message}?:'-'"></p>
 		</div>
 	</div>
 	

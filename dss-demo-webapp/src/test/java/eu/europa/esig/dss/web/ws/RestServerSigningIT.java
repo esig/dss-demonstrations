@@ -2,7 +2,6 @@ package eu.europa.esig.dss.web.ws;
 
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.MaskGenerationFunction;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
@@ -111,12 +110,12 @@ public class RestServerSigningIT extends AbstractRestIT {
 		String alias = remoteKeyEntry.getAlias();
 
 		ToBeSignedDTO toBeSigned = new ToBeSignedDTO(DSSUtils.digest(DigestAlgorithm.SHA256, "Hello world!".getBytes(Charset.defaultCharset())));
-		SignatureValueDTO signatureValue = remoteToken.sign(toBeSigned, DigestAlgorithm.SHA256, MaskGenerationFunction.MGF1, alias);
+		SignatureValueDTO signatureValue = remoteToken.sign(toBeSigned, SignatureAlgorithm.RSA_SSA_PSS_SHA256_MGF1, alias);
 		assertNotNull(signatureValue);
 		assertNotNull(signatureValue.getAlgorithm());
 		assertNotNull(signatureValue.getValue());
 
-		SignatureValueDTO signatureValue2 = remoteToken.sign(toBeSigned, DigestAlgorithm.SHA256, MaskGenerationFunction.MGF1, alias);
+		SignatureValueDTO signatureValue2 = remoteToken.sign(toBeSigned, SignatureAlgorithm.RSA_SSA_PSS_SHA256_MGF1, alias);
 		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
 		assertFalse(Arrays.equals(signatureValue.getValue(), signatureValue2.getValue()));
 
@@ -215,12 +214,12 @@ public class RestServerSigningIT extends AbstractRestIT {
 		byte[] toBeSigned = "Hello world!".getBytes(Charset.defaultCharset());
 		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
 		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
-		SignatureValueDTO signatureValue = remoteToken.signDigest(digestDTO, MaskGenerationFunction.MGF1, alias);
+		SignatureValueDTO signatureValue = remoteToken.signDigest(digestDTO, SignatureAlgorithm.RSA_SSA_PSS_SHA256_MGF1, alias);
 		assertNotNull(signatureValue);
 		assertNotNull(signatureValue.getAlgorithm());
 		assertNotNull(signatureValue.getValue());
 
-		SignatureValueDTO signatureValue2 = remoteToken.signDigest(digestDTO, MaskGenerationFunction.MGF1, alias);
+		SignatureValueDTO signatureValue2 = remoteToken.signDigest(digestDTO, SignatureAlgorithm.RSA_SSA_PSS_SHA256_MGF1, alias);
 		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
 		assertFalse(Arrays.equals(signatureValue.getValue(), signatureValue2.getValue()));
 

@@ -1,6 +1,6 @@
 package eu.europa.esig.dss.web.ws;
 
-import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
+import eu.europa.esig.dss.asic.cades.extract.ASiCWithCAdESContainerExtractor;
 import eu.europa.esig.dss.asic.common.ASiCContent;
 import eu.europa.esig.dss.asic.common.validation.ASiCManifestParser;
 import eu.europa.esig.dss.asic.common.validation.ASiCManifestValidator;
@@ -14,6 +14,7 @@ import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
 import eu.europa.esig.dss.enumerations.TextWrapping;
 import eu.europa.esig.dss.enumerations.TimestampContainerForm;
+import eu.europa.esig.dss.jades.DSSJsonUtils;
 import eu.europa.esig.dss.jades.JWSConverter;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
@@ -45,6 +46,7 @@ import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
@@ -67,9 +69,11 @@ import java.io.FileInputStream;
 import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -374,6 +378,11 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 			parameters.setJwsSerializationType(JWSSerializationType.COMPACT_SERIALIZATION);
 
+			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
+			bLevelParameters.setClaimedSignerRoles(Arrays.asList("Manager", "Administrator"));
+			bLevelParameters.setSignedAssertions(Collections.singletonList("SignedAssertion"));
+			parameters.setBLevelParams(bLevelParameters);
+
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
 			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
@@ -384,6 +393,11 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument signedDocument = restClient.signDocument(signDocument);
 			assertNotNull(signedDocument);
+
+			String strSignature = new String(signedDocument.getBytes());
+			String protectedHeader = new String(DSSJsonUtils.fromBase64Url(strSignature.split("\\.")[0]));
+			assertTrue(bLevelParameters.getClaimedSignerRoles().stream().allMatch(protectedHeader::contains));
+			assertTrue(bLevelParameters.getSignedAssertions().stream().allMatch(protectedHeader::contains));
 			
 			DSSDocument dssSignedDocument = RemoteDocumentConverter.toDSSDocument(signedDocument);
 			DSSDocument flattenedJson = JWSConverter.fromJWSCompactToJSONFlattenedSerialization(dssSignedDocument);
@@ -478,6 +492,78 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	}
 
 	@Test
+	void testSignJAdESWithPlainPayload() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_T);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION);
+			parameters.setBase64UrlEncodedPayload(false);
+
+			DSSDocument fileToSign = new InMemoryDocument("HelloWorld".getBytes(), "helloWorld");
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			String strSignature = new String(DSSUtils.toByteArray(iMD));
+			assertTrue(strSignature.contains(new String(DSSUtils.toByteArray(fileToSign))));
+			assertFalse(strSignature.contains("sigT"));
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	void testSignJAdESWithPlainEtsiU() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.JAdES_BASELINE_T);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION);
+			parameters.setBase64UrlEncodedEtsiUComponents(false);
+
+			DSSDocument fileToSign = new InMemoryDocument("HelloWorld".getBytes(), "helloWorld");
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			String strSignature = new String(DSSUtils.toByteArray(iMD));
+			assertFalse(strSignature.contains(new String(DSSUtils.toByteArray(fileToSign))));
+			assertTrue(strSignature.contains("sigT"));
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
 	public void testTimestamping() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.PDF, DigestAlgorithm.SHA512);
 		
@@ -530,7 +616,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		for (ManifestEntry manifestEntry : manifestEntries) {
 			boolean signedDocFound = false;
 			for (DSSDocument document : documentsToSign) {
-				if (manifestEntry.getFileName().equals(document.getName())) {
+				if (manifestEntry.getUri().equals(document.getName())) {
 					signedDocFound = true;
 				}
 			}

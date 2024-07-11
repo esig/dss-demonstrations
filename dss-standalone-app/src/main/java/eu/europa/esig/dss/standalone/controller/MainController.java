@@ -1,8 +1,10 @@
 package eu.europa.esig.dss.standalone.controller;
 
+import eu.europa.esig.dss.standalone.source.PropertyReader;
 import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
+import eu.europa.esig.dss.utils.Utils;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -62,6 +64,16 @@ public class MainController extends AbstractController {
     static {
         // Fix a freeze in Windows 10, JDK 8 and touchscreen
         System.setProperty("glass.accessible.force", "false");
+
+        String bcRsaValidation = PropertyReader.getProperty("bc.rsa.max_mr_tests");
+        if (Utils.isStringNotEmpty(bcRsaValidation)) {
+            System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
+        }
+
+        String xmlsecManifestMaxRefsCount = PropertyReader.getProperty("xmlsec.manifest.max.references");
+        if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
+            System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
+        }
     }
 
     @Override

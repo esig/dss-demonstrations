@@ -1,12 +1,12 @@
 package eu.europa.esig.dss.standalone.service;
 
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.standalone.source.CertificateVerifierBuilder;
 import eu.europa.esig.dss.standalone.source.TSPSourceLoader;
-import eu.europa.esig.dss.validation.CertificateVerifier;
 
 public class AbstractDocumentServiceBuilder {
 

@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.0</version>
+	<version>6.1.RC1</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -34,31 +34,31 @@
 	</developers>
 
 	<properties>
-		<project.source.version>1.8</project.source.version>
+		<project.source.version>17</project.source.version>
 		<project.encoding>UTF-8</project.encoding>
 
 		<!-- We suppose that we have : -->
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>6.0</dss.framework.version>
+		<dss.framework.version>6.1.RC1</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<slf4j.version>2.0.9</slf4j.version>
-		<logback-classic.version>1.3.14</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
+		<slf4j.version>2.0.13</slf4j.version>
+		<logback-classic.version>1.5.6</logback-classic.version>
 
-		<cxf.version>4.0.3</cxf.version>
-		<swagger-ui.version>5.10.3</swagger-ui.version>
-		<jackson-jakarta-rs-json-provider.version>2.16.0</jackson-jakarta-rs-json-provider.version>
+		<cxf.version>4.0.4</cxf.version>
+		<swagger-ui.version>5.17.14</swagger-ui.version>
+		<jackson-jakarta-rs-json-provider.version>2.17.1</jackson-jakarta-rs-json-provider.version>
 		<jakarta.xml.bind-api.version>3.0.1</jakarta.xml.bind-api.version>
-		<commons-io.version>2.15.1</commons-io.version>
-		<hikaricp.version>4.0.3</hikaricp.version> <!-- Higher version does not support Java 8 -->
-		<freemarker.version>2.3.32</freemarker.version>
-		<hsqldb.version>2.5.2</hsqldb.version> <!-- Higher version does not support Java 8 -->
+		<commons-io.version>2.16.1</commons-io.version>
+		<hikaricp.version>5.1.0</hikaricp.version>
+		<freemarker.version>2.3.33</freemarker.version>
+		<hsqldb.version>2.7.3</hsqldb.version>
 		<fop-core.version>2.9</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 		
-		<junit.jupiter.version>5.10.1</junit.jupiter.version>
+		<junit.jupiter.version>5.10.2</junit.jupiter.version>
 	</properties>
 
 	<licenses>
@@ -91,7 +91,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.4.1</version>
+				<version>3.5.0</version>
 				<executions>
 					<execution>
 						<id>enforce</id>
@@ -130,17 +130,17 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.11.0</version>
+					<version>3.13.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.1.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -162,22 +162,22 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.4.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.5.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-assembly-plugin</artifactId>
 					<version>3.6.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>3.7.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>3.1.0</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<tagNameFormat>@{project.version}</tagNameFormat>
@@ -191,7 +191,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.1.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.tomcat.maven</groupId>
@@ -201,7 +201,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.2.3</version>
+					<version>3.3.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -211,7 +211,7 @@
 		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
 		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
 		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>5.13</tag>
+		<tag>6.1.RC1</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -249,7 +249,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<type>pom</type>
-				<version>3.2.0</version>
+				<version>3.3.1</version>
 				<scope>import</scope>
 			</dependency>
 
@@ -365,12 +365,6 @@
 				<artifactId>logback-classic</artifactId>
 				<version>${logback-classic.version}</version>
 			</dependency>
-			<dependency>
-				<!-- Workaround for issue: https://github.com/qos-ch/logback/issues/744 -->
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>${logback-classic.version}</version>
-			</dependency>
 			
 			<dependency>
 			    <groupId>org.junit.jupiter</groupId>
@@ -433,7 +427,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>9.0.5</version>
+						<version>9.2.0</version>
 						<executions>
 							<execution>
 								<goals>
