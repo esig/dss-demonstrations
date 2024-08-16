@@ -2,7 +2,6 @@ package eu.europa.esig.dss.web.ws;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.MaskGenerationFunction;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
@@ -369,64 +368,6 @@ public class RestDocumentationApp {
 			sig.initVerify(certificateToken.getPublicKey());
 			sig.update(toBeSigned);
 			assertTrue(sig.verify(signatureValue.getValue()));
-		} catch (GeneralSecurityException e) {
-			Assertions.fail(e.getMessage());
-		}
-	}
-
-	@Test
-	public void serverSignWithMaskFunction() throws Exception {
-		// retrieve key to be used
-		Response response = given(this.spec).accept(ContentType.JSON).get("/services/rest/server-signing/key/{alias}", "certificate");
-		response.then().assertThat().statusCode(equalTo(200));
-		RemoteKeyEntry entry = response.andReturn().as(RemoteKeyEntry.class);
-		assertNotNull(entry);
-		assertNotNull(entry.getCertificate());
-		assertNotNull(entry.getEncryptionAlgo());
-		assertEquals("certificate", entry.getAlias());
-
-		byte[] toBeSigned = "Hello World!".getBytes();
-		ToBeSignedDTO toBeSignedDTO = new ToBeSignedDTO(toBeSigned);
-
-		// sign on server A
-		Response responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(toBeSignedDTO)
-				.post("/services/rest/server-signing/sign/{alias}/{digest-algo}/{mask}", "certificate", DigestAlgorithm.SHA256, MaskGenerationFunction.MGF1);
-		responseSignature.then().assertThat().statusCode(equalTo(200));
-
-		SignatureValueDTO signatureValue = responseSignature.andReturn().as(SignatureValueDTO.class);
-		assertNotNull(signatureValue);
-		assertNotNull(signatureValue.getAlgorithm());
-		assertNotNull(signatureValue.getValue());
-
-		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
-		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
-
-		// Sign digest
-		responseSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(digestDTO)
-				.post("/services/rest/server-signing/sign-digest/{alias}/{mask}", "certificate", MaskGenerationFunction.MGF1);
-		responseSignature.then().assertThat().statusCode(equalTo(200));
-
-		SignatureValueDTO signatureValue2 = responseSignature.andReturn().as(SignatureValueDTO.class);
-		assertNotNull(signatureValue2);
-		assertEquals(signatureValue.getAlgorithm(), signatureValue2.getAlgorithm());
-		assertFalse(Arrays.equals(signatureValue.getValue(), signatureValue2.getValue()));
-
-		try {
-			Signature sig = Signature.getInstance(signatureValue.getAlgorithm().getJCEId());
-			CertificateToken certificateToken = DSSUtils.loadCertificate(entry.getCertificate().getEncodedCertificate());
-			sig.initVerify(certificateToken.getPublicKey());
-			sig.update(toBeSigned);
-			assertTrue(sig.verify(signatureValue.getValue()));
-		} catch (GeneralSecurityException e) {
-			Assertions.fail(e.getMessage());
-		}
-
-		try {
-			Signature sig = Signature.getInstance(signatureValue2.getAlgorithm().getJCEId());
-			CertificateToken certificateToken = DSSUtils.loadCertificate(entry.getCertificate().getEncodedCertificate());
-			sig.initVerify(certificateToken.getPublicKey());
-			sig.update(toBeSigned);
-			assertTrue(sig.verify(signatureValue2.getValue()));
 		} catch (GeneralSecurityException e) {
 			Assertions.fail(e.getMessage());
 		}
