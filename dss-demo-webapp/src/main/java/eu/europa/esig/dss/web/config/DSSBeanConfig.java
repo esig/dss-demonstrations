@@ -6,6 +6,7 @@ import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.tsl.TrustServiceStatusAndInformationExtensions;
 import eu.europa.esig.dss.pades.signature.ExternalCMSService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.pades.signature.PAdESWithExternalCMSService;
@@ -33,7 +34,9 @@ import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
+import eu.europa.esig.dss.tsl.function.GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
+import eu.europa.esig.dss.tsl.function.TrustAnchorPeriodPredicate;
 import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
 import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
@@ -108,6 +111,9 @@ public class DSSBeanConfig {
 	@Value("${tl.loader.trust.all}")
 	private boolean tlTrustAllStrategy;
 
+	@Value("${tl.loader.lotl.use.sunset.date}")
+	private boolean useSunsetDate;
+
 	@Value("${tl.loader.ades.enabled}")
 	private boolean adesLotlEnabled;
 
@@ -125,6 +131,9 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.ades.tsl.type}")
 	private String adesTSLType;
+
+	@Value("${tl.loader.ades.tsl.status.list}")
+	private List<String> adesTSLStatusList;
 
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
@@ -543,6 +552,9 @@ public class DSSBeanConfig {
 		lotlSource.setCertificateSource(ojContentKeyStore());
 		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(currentOjUrl));
 		lotlSource.setPivotSupport(true);
+		if (useSunsetDate) {
+			lotlSource.setTrustAnchorValidityPredicate(new GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate());
+		}
 		return lotlSource;
 	}
 
@@ -557,7 +569,21 @@ public class DSSBeanConfig {
 		adesLOTL.setLotlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)));
 		adesLOTL.setTlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)).negate()); // allow all TSL Types
 
+		if (Utils.isCollectionNotEmpty(adesTSLStatusList)) {
+			adesLOTL.setTrustAnchorValidityPredicate(adesLOTLTrustAnchorValidityPrecicate());
+		}
+
 		return adesLOTL;
+	}
+
+	@Bean
+	public TrustAnchorPeriodPredicate adesLOTLTrustAnchorValidityPrecicate() {
+		return new TrustAnchorPeriodPredicate() {
+			@Override
+			public boolean test(TrustServiceStatusAndInformationExtensions trustServiceStatusAndInformationExtensions) {
+				return adesTSLStatusList.stream().anyMatch(v -> v.equals(trustServiceStatusAndInformationExtensions.getStatus()));
+			}
+		};
 	}
 
 	@Bean
