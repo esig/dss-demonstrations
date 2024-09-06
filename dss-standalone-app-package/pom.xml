@@ -9,11 +9,11 @@
 	<name>DSS standalone application packager</name>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin22-binaries/releases/download/jdk-22.0.1%2B8/OpenJDK22U-jre_x64_windows_hotspot_22.0.1_8.zip</jre.download.link>
-		<jre.root.folder>jdk-22.0.1+8-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin22-binaries/releases/download/jdk-22.0.2%2B9/OpenJDK22U-jre_x64_windows_hotspot_22.0.2_9.zip</jre.download.link>
+		<jre.root.folder>jdk-22.0.2+9-jre</jre.root.folder>
 		
-		<fx.sdk.download.link>https://download.java.net/java/GA/javafx22.0.1/a68ed855214445099a20b82a8dfa3cc3/7/openjfx-22.0.1_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-22.0.1</fx.root.folder>
+		<fx.sdk.download.link>https://download.java.net/java/GA/javafx22.0.2/b49be951a0e54d58bc5ee9d0056044b9/4/openjfx-22.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-22.0.2</fx.root.folder>
 	</properties>
 
 	<dependencies>
