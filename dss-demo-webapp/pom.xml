@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.joinup.sd-dss</groupId>
         <artifactId>dss-demos</artifactId>
-        <version>6.1.RC1</version>
+        <version>6.1</version>
     </parent>
 
     <artifactId>dss-demo-webapp</artifactId>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.3.0</version>
+            <version>2.6.0</version>
         </dependency>
 
         <!-- DSS Core dependencies -->
@@ -304,7 +304,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.3.3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -445,7 +445,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>3.3.0</version>
+                        <version>3.5.0</version>
                         <executions>
                             <execution>
                                 <goals>
