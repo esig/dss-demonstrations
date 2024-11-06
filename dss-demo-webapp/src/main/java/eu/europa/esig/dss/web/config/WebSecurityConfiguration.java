@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -149,6 +151,13 @@ public class WebSecurityConfiguration {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				response.getWriter().println("Bad request : " + requestRejectedException.getMessage());
 			}
+		};
+	}
+
+	@Bean
+	public AuthenticationManager noAuthenticationManager() {
+		return authentication -> {
+			throw new AuthenticationServiceException("Authentication is disabled");
 		};
 	}
 
