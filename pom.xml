@@ -55,7 +55,7 @@
 		<hikaricp.version>5.1.0</hikaricp.version>
 		<freemarker.version>2.3.33</freemarker.version>
 		<hsqldb.version>2.7.3</hsqldb.version>
-		<fop-core.version>2.9</fop-core.version>
+		<fop-core.version>2.10</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 		
 		<junit-jupiter.version>5.11.0</junit-jupiter.version>
