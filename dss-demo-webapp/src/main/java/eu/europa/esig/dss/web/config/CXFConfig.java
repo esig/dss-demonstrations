@@ -72,7 +72,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml" }) // loads Bus cxf
@@ -383,7 +384,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestDocumentValidationService.class.getName()));
 		return sfb.create();
 	}
 
@@ -394,7 +395,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_CERTIFICATE_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestCertificateValidationService.class.getName()));
 		return sfb.create();
 	}
 
@@ -405,7 +406,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SERVER_SIGNING);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestSignatureTokenConnection.class.getName()));
 		return sfb.create();
 	}
 
@@ -416,7 +417,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_TIMESTAMP_SERVICE);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestTimestampService.class.getName()));
 		return sfb.create();
 	}
 
@@ -427,7 +428,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_ONE_DOCUMENT);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestDocumentSignatureService.class.getName()));
 		return sfb.create();
 	}
 
@@ -438,7 +439,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_MULTIPLE_DOCUMENTS);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestMultipleDocumentSignatureService.class.getName()));
 		return sfb.create();
 	}
 
@@ -449,7 +450,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_TRUSTED_LIST);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestTrustedListSignatureService.class.getName()));
 		return sfb.create();
 	}
 
@@ -460,7 +461,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_PAdES_WITH_EXTERNAL_CMS);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestPAdESWithExternalCMSService.class.getName()));
 		return sfb.create();
 	}
 
@@ -471,12 +472,15 @@ public class CXFConfig {
 		sfb.setAddress(REST_SIGNATURE_EXTERNAL_CMS);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Arrays.asList(createOpenApiFeature()));
+		sfb.setFeatures(createFeatures(RestExternalCMSService.class.getName()));
 		return sfb.create();
 	}
-	
-    @Bean
-    public OpenApiFeature createOpenApiFeature() {
+
+	private List<OpenApiFeature> createFeatures(String resourcesClassName) {
+		return Collections.singletonList(createOpenApiFeature(resourcesClassName));
+	}
+
+    private OpenApiFeature createOpenApiFeature(String resourcesClassName) {
         final OpenApiFeature openApiFeature = new OpenApiFeature();
 		openApiFeature.setCustomizer(openApiCustomizer());
         openApiFeature.setPrettyPrint(true);
@@ -484,11 +488,11 @@ public class CXFConfig {
 		openApiFeature.setUseContextBasedConfig(true);
         openApiFeature.setTitle("DSS WebServices");
 		openApiFeature.setVersion(dssVersion);
+		openApiFeature.setResourceClasses(Collections.singleton(resourcesClassName));
         return openApiFeature;
     }
 
-	@Bean
-	public OpenApiCustomizer openApiCustomizer() {
+	private OpenApiCustomizer openApiCustomizer() {
 		OpenApiCustomizer customizer = new OpenApiCustomizer();
 		customizer.setDynamicBasePath(true);
 		return customizer;
