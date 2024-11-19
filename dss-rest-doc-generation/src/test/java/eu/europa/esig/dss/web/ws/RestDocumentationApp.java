@@ -296,7 +296,6 @@ public class RestDocumentationApp {
 		assertNotNull(signatureValue.getValue());
 
 		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSignedDTO.getBytes());
-		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
 		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
 
 		// Sign digest
@@ -348,7 +347,6 @@ public class RestDocumentationApp {
 		assertNotNull(signatureValue.getValue());
 
 		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
-		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
 		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
 
 		// Sign digest
@@ -397,7 +395,6 @@ public class RestDocumentationApp {
 		assertNotNull(signatureValue.getValue());
 
 		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
-		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
 		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
 
 		// Sign digest
