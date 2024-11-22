@@ -45,7 +45,7 @@
 	
 	<!-- Parsing result -->
 	<td class="align-middle">
-		<span th:replace="~{fragment/tl-info-fragments :: result-status(result=${parsingResult})}"></span>
+		<span th:replace="~{fragment/tl-info-fragments :: parsing-status(result=${parsingResult})}"></span>
 	</td>
 	
 	<!-- Validation result -->
@@ -149,14 +149,31 @@
 			<p class="m-0 error" th:text="${validationResult.exceptionMessage}?:'-'"></p>
 		</div>
 	</div>
-	
+
+	<div class="row" th:if="${parsingResult != null and parsingResult.version != null}">
+		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.version.identifier}"></div>
+		<div class="mb-1 col-xl-9">
+			<p class="m-0">
+				<span th:text="${parsingResult.version}?:'-'"></span>
+				<i th:if="${parsingResult.version != null and parsingResult.structureValidationMessages != null and !parsingResult.structureValidationMessages.isEmpty()}"
+				   class="fa fa-exclamation-circle text-warning" title="WARNING"></i>
+			</p>
+		</div>
+	</div>
+	<div class="row" th:if="${parsingResult != null and parsingResult.structureValidationMessages != null and !parsingResult.structureValidationMessages.isEmpty()}">
+		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.parsing.structure.error}"></div>
+		<div class="mb-1 col-xl-9">
+			<p th:each="message : ${parsingResult.structureValidationMessages}" class="m-0 error text-secondary" th:text="${message}?:'-'"></p>
+		</div>
+	</div>
+
 	<div class="row" th:if="${parsingResult != null and parsingResult.sequenceNumber != null}">
-        <div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.sequence.num}"></div>
-        <div class="mb-1 col-xl-9">
-            <p class="m-0" th:text="${parsingResult.sequenceNumber}?:'-'"></p>
-        </div>
-    </div>
-	
+		<div class="font-weight-bold mb-1 col-xl-3" th:text="#{label.summary.tl.info.sequence.num}"></div>
+		<div class="mb-1 col-xl-9">
+			<p class="m-0" th:text="${parsingResult.sequenceNumber}?:'-'"></p>
+		</div>
+	</div>
+
 	<!-- Parsing status -->
 	<div class="row" th:if="${parsingResult != null and parsingResult.isResultExist()}">
 		<div class="font-weight-bold mb-1 col-xl-3" th:text="${url == 'lotl'} ?

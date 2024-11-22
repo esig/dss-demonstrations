@@ -114,6 +114,9 @@ public class DSSBeanConfig {
 	@Value("${tl.loader.lotl.use.sunset.date}")
 	private boolean useSunsetDate;
 
+	@Value("${tl.loader.lotl.tl.versions}")
+	private List<Integer> lotlTLVersions;
+
 	@Value("${tl.loader.ades.enabled}")
 	private boolean adesLotlEnabled;
 
@@ -134,6 +137,9 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.ades.tsl.status.list}")
 	private List<String> adesTSLStatusList;
+
+	@Value("${tl.loader.ades.tl.versions}")
+	private List<Integer> adesTLVersions;
 
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
@@ -555,6 +561,9 @@ public class DSSBeanConfig {
 		if (useSunsetDate) {
 			lotlSource.setTrustAnchorValidityPredicate(new GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate());
 		}
+		if (Utils.isCollectionNotEmpty(lotlTLVersions)) {
+			lotlSource.setTLVersions(lotlTLVersions);
+		}
 		return lotlSource;
 	}
 
@@ -571,6 +580,9 @@ public class DSSBeanConfig {
 
 		if (Utils.isCollectionNotEmpty(adesTSLStatusList)) {
 			adesLOTL.setTrustAnchorValidityPredicate(adesLOTLTrustAnchorValidityPrecicate());
+		}
+		if (Utils.isCollectionNotEmpty(adesTLVersions)) {
+			adesLOTL.setTLVersions(adesTLVersions);
 		}
 
 		return adesLOTL;

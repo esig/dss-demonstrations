@@ -37,6 +37,16 @@
 		  th:title="${result.sha2ErrorMessages[0]}" class="position-absolute sha2-star">*</span>
 </span>
 
+<!-- Parsing result -->
+<span th:fragment="parsing-status(result)" class="position-relative">
+	<i th:if="${result == null or (!result.resultExist and !result.isError())}" class="fa fa-ban text-muted" title="Not performed"></i>
+	<i th:if="${result != null and result.isSynchronized() and (result.structureValidationMessages == null or result.structureValidationMessages.isEmpty())}" class="fa fa-check-circle text-success" title="OK"></i>
+	<i th:if="${result != null and result.isSynchronized() and result.structureValidationMessages != null and !result.structureValidationMessages.isEmpty()}" class="fa fa-exclamation-circle text-warning"
+	   th:title="${result.structureValidationMessages[0]}?:'-'"></i>
+	<i th:if="${result != null and result.isError()}" class="fa fa fa-times-circle text-danger"
+	   th:title="${result.exceptionMessage}?:'-'"></i>
+</span>
+
 <!-- Validation result -->
 <span class="task-result" th:fragment="validation-result(validationResult)">
 	<span th:text="${validationResult?.getStatusName()}?:'-'"></span>
