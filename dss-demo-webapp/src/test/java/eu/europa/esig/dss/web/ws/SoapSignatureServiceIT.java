@@ -643,6 +643,7 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			tlSignatureParameters.setSigningCertificate(signingCertificate);
 			tlSignatureParameters.setReferenceId("lotl");
 			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
+			tlSignatureParameters.setTlVersion(5);
 
 			DataToSignTrustedListDTO dataToBeSignedDTO = new DataToSignTrustedListDTO(lotlToSign, tlSignatureParameters);
 			ToBeSignedDTO dataToBeSigned = soapTLSigningClient.getDataToSign(dataToBeSignedDTO);

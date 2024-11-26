@@ -15,6 +15,7 @@ import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.standalone.service.RemoteDocumentSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.service.RemoteMultipleDocumentSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.service.RemoteTrustedListSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.source.PropertyReader;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
@@ -33,11 +34,11 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.xades.DSSXMLUtils;
-import eu.europa.esig.dss.xml.utils.DomUtils;
-import eu.europa.esig.trustedlist.TrustedListUtils;
-import eu.europa.esig.xmldsig.XmlDSigUtils;
+import eu.europa.esig.dss.xades.tsl.XAdESTrustedListUtils;
 import eu.europa.esig.dss.xml.common.definition.xmldsig.XMLDSigElement;
 import eu.europa.esig.dss.xml.common.definition.xmldsig.XMLDSigNamespace;
+import eu.europa.esig.dss.xml.utils.DomUtils;
+import eu.europa.esig.xmldsig.XmlDSigUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.w3c.dom.Document;
@@ -47,16 +48,13 @@ import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 public class SigningTask extends Task<DSSDocument> {
-
-	private final static String TRUSTED_LIST_PARENT_ELEMENT = "TrustServiceStatusList";
-
-	private final static String TRUSTED_LIST_NAMESPACE = "http://uri.etsi.org/02231/v2#";
 
 	private final SignatureModel model;
 	private final RemoteDocumentSignatureService documentsSignatureService;
@@ -102,8 +100,9 @@ public class SigningTask extends Task<DSSDocument> {
 			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
 			signedDocument = signDocument(toSignDocuments, parameters, signatureValue);
 
-		} else if (isTLSigning(fileDocuments.iterator().next())) {
-			RemoteTrustedListSignatureParameters parameters = buildTrustedListParameters(signer);
+		} else if (isTLSigning()) {
+			DSSDocument documentToSign = fileDocuments.iterator().next();
+			RemoteTrustedListSignatureParameters parameters = buildTrustedListParameters(signer, documentToSign);
 
 			RemoteDocument toSignDocument = toSignDocuments.iterator().next();
 			ToBeSigned toBeSigned = getDataToSignTrustedList(toSignDocument, parameters);
@@ -156,7 +155,7 @@ public class SigningTask extends Task<DSSDocument> {
 		return parameters;
 	}
 
-	private RemoteTrustedListSignatureParameters buildTrustedListParameters(DSSPrivateKeyEntry signer) {
+	private RemoteTrustedListSignatureParameters buildTrustedListParameters(DSSPrivateKeyEntry signer, DSSDocument documentToSign) {
 		updateProgress(20, 100);
 
 		RemoteTrustedListSignatureParameters parameters = new RemoteTrustedListSignatureParameters();
@@ -168,31 +167,44 @@ public class SigningTask extends Task<DSSDocument> {
 		parameters.setDigestAlgorithm(model.getDigestAlgorithm());
 		parameters.setReferenceDigestAlgorithm(model.getDigestAlgorithm());
 
+		Integer tlVersion = getTLVersion(documentToSign);
+		if (tlVersion != null) {
+			parameters.setTlVersion(tlVersion);
+		}
+
 		return parameters;
 	}
 
-	private boolean isTLSigning(DSSDocument toBeSigned) {
+	private boolean isTLSigning() {
 		SignatureOption signatureOption = model.getSignatureOption();
-		if (SignatureOption.TL_SIGNING.equals(signatureOption)) {
-			if (DomUtils.isDOM(toBeSigned)) {
-				Document document = DomUtils.buildDOM(toBeSigned);
-				Element documentElement = document.getDocumentElement();
-				if (TRUSTED_LIST_PARENT_ELEMENT.equals(documentElement.getLocalName()) &&
-						TRUSTED_LIST_NAMESPACE.equals(documentElement.getNamespaceURI())) {
-					List<String> errors = DSSXMLUtils.validateAgainstXSD(TrustedListUtils.getInstance(), new DOMSource(document));
-					if (Utils.isCollectionEmpty(errors)) {
-						return true;
-					} else {
-						throwException(String.format("The provided file is not a valid Trusted List! %s", errors.toString()), null);
-					}
-				} else {
-					throwException("The provided file is not a Trusted List!", null);
-				}
-			} else {
-				throwException("The provided file is not an XML!", null);
+		return SignatureOption.TL_SIGNING.equals(signatureOption);
+	}
+
+	private Integer getTLVersion(DSSDocument documentToSign) {
+		if (DomUtils.isDOM(documentToSign)) {
+			List<Integer> supportedTLVersions = PropertyReader.getIntegerListProperty("tl.loader.lotl.tl.versions");
+
+			Document document = DomUtils.buildDOM(documentToSign);
+			Integer tslVersionIdentifier = XAdESTrustedListUtils.getTSLVersionIdentifier(document);
+
+			List<String> errors = null;
+			if (tslVersionIdentifier == null) {
+				errors = Collections.singletonList("No TSLVersionIdentifier has been found!");
+			} else if (supportedTLVersions != null && !supportedTLVersions.contains(tslVersionIdentifier)) {
+				errors = Collections.singletonList(String.format("The TSLVersionIdentifier '%s' is not supported!", tslVersionIdentifier));
 			}
+			// NOTE: validation of TL is done on signing
+
+			if (Utils.isCollectionEmpty(errors)) {
+				return tslVersionIdentifier;
+			} else {
+				throwException(String.format("The provided file is not a valid Trusted List! %s", errors), null);
+			}
+
+		} else {
+			throwException("The provided file is not an XML!", null);
 		}
-		return false;
+		return null;
 	}
 
 	private boolean isXmlManifestSigning() {
