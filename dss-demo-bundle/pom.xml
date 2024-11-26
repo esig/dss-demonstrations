@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.4%2B7/OpenJDK21U-jre_x64_windows_hotspot_21.0.4_7.zip</jre.download.link>
-		<jre.root.folder>jdk-21.0.4+7-jre</jre.root.folder>
-		<tomcat.version>10.1.28</tomcat.version>
+		<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_windows_hotspot_21.0.5_11.zip</jre.download.link>
+		<jre.root.folder>jdk-21.0.5+11-jre</jre.root.folder>
+		<tomcat.version>10.1.33</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -111,10 +111,10 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>java22</id>
+			<id>java23</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin22-binaries/releases/download/jdk-22.0.2%2B9/OpenJDK22U-jre_x64_windows_hotspot_22.0.2_9.zip</jre.download.link>
-				<jre.root.folder>jdk-22.0.2+9-jre</jre.root.folder>
+				<jre.download.link>https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jre_x64_windows_hotspot_23.0.1_11.zip</jre.download.link>
+				<jre.root.folder>jdk-23.0.1+11-jre</jre.root.folder>
 			</properties>
 		</profile>
 	</profiles>
