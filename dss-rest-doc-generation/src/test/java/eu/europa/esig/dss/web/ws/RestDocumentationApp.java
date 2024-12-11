@@ -68,6 +68,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore.PasswordProtection;
@@ -75,6 +76,7 @@ import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -135,7 +137,7 @@ public class RestDocumentationApp {
 			dataToSign.setParameters(parameters);
 
 			RemoteDocument toSignDocument = new RemoteDocument();
-			toSignDocument.setBytes("Hello".getBytes("UTF-8"));
+			toSignDocument.setBytes("Hello".getBytes(StandardCharsets.UTF_8));
 			dataToSign.setToSignDocument(toSignDocument);
 
 			// get data to sign
@@ -437,12 +439,12 @@ public class RestDocumentationApp {
 
 			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			RemoteDocument doc1 = new RemoteDocument();
-			doc1.setBytes("Hello".getBytes("UTF-8"));
+			doc1.setBytes("Hello".getBytes(StandardCharsets.UTF_8));
 			doc1.setName("test1.bin");
 			toSignDocuments.add(doc1);
 
 			RemoteDocument doc2 = new RemoteDocument();
-			doc2.setBytes("World".getBytes("UTF-8"));
+			doc2.setBytes("World".getBytes(StandardCharsets.UTF_8));
 			doc2.setName("test2.bin");
 			toSignDocuments.add(doc2);
 			dataToSignMultiDocs.setToSignDocuments(toSignDocuments);
@@ -504,7 +506,7 @@ public class RestDocumentationApp {
 		originalDoc.setBytes(toByteArray(detached));
 		originalDoc.setName(detached.getName());
 
-		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
+		dataToValidateDTO.setOriginalDocuments(Collections.singletonList(originalDoc));
 
 		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));
@@ -519,7 +521,7 @@ public class RestDocumentationApp {
 		dataToValidateDTO.setCertificate(new RemoteCertificate(Base64.getDecoder().decode(
 				"MIIC6jCCAdKgAwIBAgIGLtYU17tXMA0GCSqGSIb3DQEBCwUAMDAxGzAZBgNVBAMMElJvb3RTZWxmU2lnbmVkRmFrZTERMA8GA1UECgwIRFNTLXRlc3QwHhcNMTcwNjA4MTEyNjAxWhcNNDcwNzA0MDc1NzI0WjAoMRMwEQYDVQQDDApTaWduZXJGYWtlMREwDwYDVQQKDAhEU1MtdGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMI3kZhtnipn+iiZHZ9ax8FlfE5Ow/cFwBTfAEb3R1ZQUp6/BQnBt7Oo0JWBtc9qkv7JUDdcBJXPV5QWS5AyMPHpqQ75Hitjsq/Fzu8eHtkKpFizcxGa9BZdkQjh4rSrtO1Kjs0Rd5DQtWSgkeVCCN09kN0ZsZ0ENY+Ip8QxSmyztsStkYXdULqpwz4JEXW9vz64eTbde4vQJ6pjHGarJf1gQNEc2XzhmI/prXLysWNqC7lZg7PUZUTrdegABTUzYCRJ1kWBRPm4qo0LN405c94QQd45a5kTgowHzEgLnAQI28x0M3A59TKC+ieNc6VF1PsTLpUw7PNI2VstX5jAuasCAwEAAaMSMBAwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQCK6LGA01TR+rmU8p6yhAi4OkDN2b1dbIL8l8iCMYopLCxx8xqq3ubZCOxqh1X2j6pgWzarb0b/MUix00IoUvNbFOxAW7PBZIKDLnm6LsckRxs1U32sC9d1LOHe3WKBNB6GZALT1ewjh7hSbWjftlmcovq+6eVGA5cvf2u/2+TkKkyHV/NR394nXrdsdpvygwypEtXjetzD7UT93Nuw3xcV8VIftIvHf9LjU7h+UjGmKXG9c15eYr3SzUmv6kyOI0Bvw14PWtsWGl0QdOSRvIBBrP4adCnGTgjgjk9LTcO8B8FKrr+8lHGuc0bp4lIUToiUkGILXsiEeEg9WAqm+XqO")));
 
-		dataToValidateDTO.setCertificateChain(Arrays.asList(new RemoteCertificate(Base64.getDecoder().decode(
+		dataToValidateDTO.setCertificateChain(Collections.singletonList(new RemoteCertificate(Base64.getDecoder().decode(
 				"MIIC6jCCAdKgAwIBAgIGLtYU17tXMA0GCSqGSIb3DQEBCwUAMDAxGzAZBgNVBAMMElJvb3RTZWxmU2lnbmVkRmFrZTERMA8GA1UECgwIRFNTLXRlc3QwHhcNMTcwNjA4MTEyNjAxWhcNNDcwNzA0MDc1NzI0WjAoMRMwEQYDVQQDDApTaWduZXJGYWtlMREwDwYDVQQKDAhEU1MtdGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMI3kZhtnipn+iiZHZ9ax8FlfE5Ow/cFwBTfAEb3R1ZQUp6/BQnBt7Oo0JWBtc9qkv7JUDdcBJXPV5QWS5AyMPHpqQ75Hitjsq/Fzu8eHtkKpFizcxGa9BZdkQjh4rSrtO1Kjs0Rd5DQtWSgkeVCCN09kN0ZsZ0ENY+Ip8QxSmyztsStkYXdULqpwz4JEXW9vz64eTbde4vQJ6pjHGarJf1gQNEc2XzhmI/prXLysWNqC7lZg7PUZUTrdegABTUzYCRJ1kWBRPm4qo0LN405c94QQd45a5kTgowHzEgLnAQI28x0M3A59TKC+ieNc6VF1PsTLpUw7PNI2VstX5jAuasCAwEAAaMSMBAwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQCK6LGA01TR+rmU8p6yhAi4OkDN2b1dbIL8l8iCMYopLCxx8xqq3ubZCOxqh1X2j6pgWzarb0b/MUix00IoUvNbFOxAW7PBZIKDLnm6LsckRxs1U32sC9d1LOHe3WKBNB6GZALT1ewjh7hSbWjftlmcovq+6eVGA5cvf2u/2+TkKkyHV/NR394nXrdsdpvygwypEtXjetzD7UT93Nuw3xcV8VIftIvHf9LjU7h+UjGmKXG9c15eYr3SzUmv6kyOI0Bvw14PWtsWGl0QdOSRvIBBrP4adCnGTgjgjk9LTcO8B8FKrr+8lHGuc0bp4lIUToiUkGILXsiEeEg9WAqm+XqO"))));
 
 		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
@@ -544,7 +546,7 @@ public class RestDocumentationApp {
 		originalDoc.setBytes(DSSUtils.digest(DigestAlgorithm.SHA256, detached));
 		originalDoc.setName(detached.getName());
 
-		dataToValidateDTO.setOriginalDocuments(Arrays.asList(originalDoc));
+		dataToValidateDTO.setOriginalDocuments(Collections.singletonList(originalDoc));
 
 		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(dataToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/validation/validateSignature").then().assertThat().statusCode(equalTo(200));

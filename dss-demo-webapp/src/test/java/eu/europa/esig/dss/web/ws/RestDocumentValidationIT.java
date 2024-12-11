@@ -24,7 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,6 +97,34 @@ public class RestDocumentValidationIT extends AbstractRestIT {
 		assertEquals(SubIndication.NO_CERTIFICATE_CHAIN_FOUND, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getSubIndication());
 
 		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(), 
+				result.getValidationReport());
+		assertNotNull(reports);
+	}
+
+	@Test
+	public void testWithValidationTimeAndOriginalFile() throws Exception {
+
+		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+		RemoteDocument originalFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2016, Calendar.JANUARY, 31);
+		Date validationDate = calendar.getTime();
+
+		DataToValidateDTO toValidate = new DataToValidateDTO(signedFile, originalFile, validationDate, null);
+
+		WSReportsDTO result = validationService.validateSignature(toValidate);
+
+		assertNotNull(result.getDiagnosticData());
+		assertNotNull(result.getDetailedReport());
+		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
+
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getIndication());
+		assertEquals(SubIndication.NO_CERTIFICATE_CHAIN_FOUND, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getSubIndication());
+
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(),
 				result.getValidationReport());
 		assertNotNull(reports);
 	}
