@@ -694,7 +694,7 @@ public class RestDocumentationApp {
 			tlSignatureParameters.setSigningCertificate(signingCertificate);
 			tlSignatureParameters.setReferenceId("tl");
 			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
-			tlSignatureParameters.setTlVersion(5);
+			tlSignatureParameters.setTlVersion("5");
 
 			Date signingTime = DSSUtils.getUtcDate(2021, 9, 3);
 			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();

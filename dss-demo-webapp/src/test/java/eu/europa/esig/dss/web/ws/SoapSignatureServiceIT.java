@@ -643,7 +643,7 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			tlSignatureParameters.setSigningCertificate(signingCertificate);
 			tlSignatureParameters.setReferenceId("lotl");
 			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
-			tlSignatureParameters.setTlVersion(5);
+			tlSignatureParameters.setTlVersion("5");
 
 			DataToSignTrustedListDTO dataToBeSignedDTO = new DataToSignTrustedListDTO(lotlToSign, tlSignatureParameters);
 			ToBeSignedDTO dataToBeSigned = soapTLSigningClient.getDataToSign(dataToBeSignedDTO);
@@ -656,6 +656,9 @@ public class SoapSignatureServiceIT extends AbstractIT {
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument counterSignedDocument = soapTLSigningClient.signDocument(signTrustedListDTO);
 			assertNotNull(counterSignedDocument);
+
+			tlSignatureParameters.setTlVersion("7");
+			assertThrows(WebServiceException.class, () -> soapTLSigningClient.getDataToSign(dataToBeSignedDTO));
 		}
 	}
 

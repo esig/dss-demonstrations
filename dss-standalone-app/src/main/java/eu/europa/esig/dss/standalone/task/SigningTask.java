@@ -167,7 +167,7 @@ public class SigningTask extends Task<DSSDocument> {
 		parameters.setDigestAlgorithm(model.getDigestAlgorithm());
 		parameters.setReferenceDigestAlgorithm(model.getDigestAlgorithm());
 
-		Integer tlVersion = getTLVersion(documentToSign);
+		String tlVersion = getTLVersion(documentToSign);
 		if (tlVersion != null) {
 			parameters.setTlVersion(tlVersion);
 		}
@@ -180,7 +180,7 @@ public class SigningTask extends Task<DSSDocument> {
 		return SignatureOption.TL_SIGNING.equals(signatureOption);
 	}
 
-	private Integer getTLVersion(DSSDocument documentToSign) {
+	private String getTLVersion(DSSDocument documentToSign) {
 		if (DomUtils.isDOM(documentToSign)) {
 			List<Integer> supportedTLVersions = PropertyReader.getIntegerListProperty("tl.loader.lotl.tl.versions");
 
@@ -196,7 +196,7 @@ public class SigningTask extends Task<DSSDocument> {
 			// NOTE: validation of TL is done on signing
 
 			if (Utils.isCollectionEmpty(errors)) {
-				return tslVersionIdentifier;
+				return tslVersionIdentifier != null ? tslVersionIdentifier.toString() : null;
 			} else {
 				throwException(String.format("The provided file is not a valid Trusted List! %s", errors), null);
 			}

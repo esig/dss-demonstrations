@@ -740,7 +740,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 			tlSignatureParameters.setSigningCertificate(signingCertificate);
 			tlSignatureParameters.setReferenceId("lotl");
 			tlSignatureParameters.setReferenceDigestAlgorithm(DigestAlgorithm.SHA512);
-			tlSignatureParameters.setTlVersion(5);
+			tlSignatureParameters.setTlVersion("5");
 
 			DataToSignTrustedListDTO dataToBeSignedDTO = new DataToSignTrustedListDTO(lotlToSign, tlSignatureParameters);
 			ToBeSignedDTO dataToBeSigned = restTLSigningClient.getDataToSign(dataToBeSignedDTO);
@@ -753,6 +753,9 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			RemoteDocument counterSignedDocument = restTLSigningClient.signDocument(signTrustedListDTO);
 			assertNotNull(counterSignedDocument);
+
+			tlSignatureParameters.setTlVersion("7");
+			assertThrows(InternalServerErrorException.class, () -> restTLSigningClient.getDataToSign(dataToBeSignedDTO));
 		}
 	}
 
