@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>6.1</version>
+		<version>6.2.RC1</version>
 	</parent>
 
 	<name>DSS REST Doc generation</name>
@@ -73,7 +73,7 @@
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>
 			<artifactId>spring-restdocs-restassured</artifactId>
-			<version>3.0.1</version>
+			<version>3.0.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
