@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.2.RC1</version>
+	<version>6.2</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -41,19 +41,19 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>6.2.RC1</dss.framework.version>
+		<dss.framework.version>6.2</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.16</slf4j.version>
-		<logback-classic.version>1.5.15</logback-classic.version>
+		<logback-classic.version>1.5.16</logback-classic.version>
 
 		<cxf.version>4.1.0</cxf.version>
-		<swagger-ui.version>5.18.2</swagger-ui.version>
+		<swagger-ui.version>5.18.3</swagger-ui.version>
 		<jackson-jakarta-rs-json-provider.version>2.18.2</jackson-jakarta-rs-json-provider.version>
 		<jakarta.xml.bind-api.version>3.0.1</jakarta.xml.bind-api.version>
 		<commons-io.version>2.18.0</commons-io.version>
 		<hikaricp.version>6.2.1</hikaricp.version>
-		<freemarker.version>2.3.33</freemarker.version>
+		<freemarker.version>2.3.34</freemarker.version>
 		<hsqldb.version>2.7.4</hsqldb.version>
 		<fop-core.version>2.10</fop-core.version>
 		<nexu.version>1.22</nexu.version>
@@ -211,7 +211,7 @@
 		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
 		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
 		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>6.2.RC1</tag>
+		<tag>6.2</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -249,7 +249,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<type>pom</type>
-				<version>3.4.1</version>
+				<version>3.4.2</version>
 				<scope>import</scope>
 			</dependency>
 
@@ -432,7 +432,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>11.1.1</version>
+						<version>12.1.0</version>
 						<executions>
 							<execution>
 								<goals>

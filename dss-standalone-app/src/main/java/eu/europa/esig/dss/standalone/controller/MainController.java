@@ -69,6 +69,10 @@ public class MainController extends AbstractController {
         if (Utils.isStringNotEmpty(bcRsaValidation)) {
             System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
         }
+        String bcAllowWrongOidEncoding = PropertyReader.getProperty("bc.allow.wrong.oid.enc");
+        if (Utils.isStringNotEmpty(bcAllowWrongOidEncoding)) {
+            System.setProperty("org.bouncycastle.asn1.allow_wrong_oid_enc", bcAllowWrongOidEncoding);
+        }
 
         String xmlsecManifestMaxRefsCount = PropertyReader.getProperty("xmlsec.manifest.max.references");
         if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {

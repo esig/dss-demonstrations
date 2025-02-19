@@ -17,6 +17,9 @@ public class TSLLoaderJob {
 	@Value("${bc.rsa.max_mr_tests:}")
 	private String bcRsaValidation;
 
+	@Value("${bc.allow.wrong.oid.enc:}")
+	private String bcAllowWrongOidEncoding;
+
 	@Value("${xmlsec.manifest.max.references:}")
 	private String xmlsecManifestMaxRefsCount;
 
@@ -27,6 +30,9 @@ public class TSLLoaderJob {
 	public void init() {
 		if (Utils.isStringNotEmpty(bcRsaValidation)) {
 			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
+		}
+		if (Utils.isStringNotEmpty(bcAllowWrongOidEncoding)) {
+			System.setProperty("org.bouncycastle.asn1.allow_wrong_oid_enc", bcAllowWrongOidEncoding);
 		}
 		if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
 			System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
