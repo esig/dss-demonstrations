@@ -1,3 +1,6 @@
+*.versionsBackup
+*.releaseBackup
+release.properties
 .*
 *.iml
 .idea
