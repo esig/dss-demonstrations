@@ -119,6 +119,16 @@
 			<artifactId>dss-evidence-record-asn1</artifactId>
 		</dependency>
 
+		<!-- Choose your CMS implementation -->
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-cms-object</artifactId>
+		</dependency>
+		<!--        <dependency>-->
+		<!--            <groupId>eu.europa.ec.joinup.sd-dss</groupId>-->
+		<!--            <artifactId>dss-cms-stream</artifactId>-->
+		<!--        </dependency>-->
+
 		<!-- Choose your PAdES implementation -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
