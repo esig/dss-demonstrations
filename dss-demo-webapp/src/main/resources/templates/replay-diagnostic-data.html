@@ -7,6 +7,15 @@
 				<div th:replace="~{fragment/fields :: field-diagnostic-data}"></div>
 				<div th:replace="~{fragment/fields :: field-reset-date}"></div>
 			    <div th:replace="~{fragment/fields :: field-validation-level}"></div>
+
+			   <div class="card mb-3">
+				   <div class="card-header cursor-pointer" data-toggle='collapse' data-target='#advancedOptions' aria-expanded='false'>
+					   <span th:text="#{label.validation.advanced.options}" th:remove="tag"></span>
+				   </div>
+				   <div id="advancedOptions" class="card-body collapse in">
+					   <div th:replace="~{fragment/fields :: field-validation-policy}"></div>
+				   </div>
+			   </div>
 				
 				<div th:replace="~{fragment/fields :: submit-reset}"></div>
              </form>
@@ -23,3 +32,4 @@
 			</script>
 		</div>
 	</body>
+</html>
