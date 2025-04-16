@@ -14,6 +14,8 @@ public class ValidationModel {
 
     private ObjectProperty<File> validationPolicy = new SimpleObjectProperty<>();
 
+    private ObjectProperty<File> cryptographicSuite = new SimpleObjectProperty<>();
+
     private ObjectProperty<File> signingCertificate = new SimpleObjectProperty<>();
 
     private ObjectProperty<Collection<File>> adjunctCertificates = new SimpleObjectProperty<>();
@@ -58,6 +60,18 @@ public class ValidationModel {
 
     public void setValidationPolicy(File validationPolicy) {
         this.validationPolicy.set(validationPolicy);
+    }
+
+    public File getCryptographicSuite() {
+        return cryptographicSuite.get();
+    }
+
+    public ObjectProperty<File> fileCryptographicSuiteProperty() {
+        return cryptographicSuite;
+    }
+
+    public void setCryptographicSuite(File cryptographicSuite) {
+        this.cryptographicSuite.set(cryptographicSuite);
     }
 
     public File getSigningCertificate() {

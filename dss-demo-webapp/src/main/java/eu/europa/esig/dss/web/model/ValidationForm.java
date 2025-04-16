@@ -27,6 +27,9 @@ public class ValidationForm {
 
 	@AssertMultipartFile
 	private MultipartFile policyFile;
+
+	@AssertMultipartFile
+	private MultipartFile cryptographicSuite;
 	
 	@AssertMultipartFile
 	private MultipartFile signingCertificate;
@@ -109,6 +112,14 @@ public class ValidationForm {
 
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
+	}
+
+	public MultipartFile getCryptographicSuite() {
+		return cryptographicSuite;
+	}
+
+	public void setCryptographicSuite(MultipartFile cryptographicSuite) {
+		this.cryptographicSuite = cryptographicSuite;
 	}
 
 	public MultipartFile getSigningCertificate() {

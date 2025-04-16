@@ -159,6 +159,20 @@
 			<artifactId>dss-crl-parser-stream</artifactId>
 		</dependency>
 
+		<!-- Validation policy support -->
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-policy-jaxb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-policy-crypto-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-policy-crypto-json</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop-core</artifactId>

@@ -2,8 +2,8 @@ package eu.europa.esig.dss.standalone.task;
 
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
-import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.identifier.OriginalIdentifierProvider;
+import eu.europa.esig.dss.model.policy.ValidationPolicy;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
@@ -19,6 +19,7 @@ import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.DocumentValidator;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import eu.europa.esig.dss.validation.identifier.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.policy.ValidationPolicyLoader;
 import eu.europa.esig.dss.validation.reports.Reports;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
@@ -90,13 +91,17 @@ public class ValidationTask extends Task<Reports> {
             signaturePolicyProvider.setDataLoader(DataLoaderConfigLoader.getDataLoader());
             documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
 
-            DSSDocument validationPolicy = null;
+            ValidationPolicyLoader validationPolicyLoader;
             if (model.getValidationPolicy() != null) {
-                validationPolicy = new FileDocument(model.getValidationPolicy());
+                validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(model.getValidationPolicy());
             } else {
-                validationPolicy = loadDefaultValidationPolicy();
+                validationPolicyLoader = fromDefaultValidationPolicy();
+            }
+            if (model.getCryptographicSuite() != null) {
+                validationPolicyLoader = validationPolicyLoader.withCryptographicSuite(model.getCryptographicSuite());
             }
 
+            ValidationPolicy validationPolicy = validationPolicyLoader.create();
             return documentValidator.validateDocument(validationPolicy);
 
         } catch (Exception e) {
@@ -105,13 +110,13 @@ public class ValidationTask extends Task<Reports> {
         }
     }
 
-    private DSSDocument loadDefaultValidationPolicy() {
+    private ValidationPolicyLoader fromDefaultValidationPolicy() {
         String policyPath = PropertyReader.getProperty("default.validation.policy");
         if (Utils.isStringEmpty(policyPath)) {
             throw new IllegalArgumentException("default.validation.policy is not defined!");
         }
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(policyPath)) {
-            return new InMemoryDocument(is);
+            return ValidationPolicyLoader.fromValidationPolicy(is);
 
         } catch (Exception e) {
             throwException("Unable to load validation policy", e);
