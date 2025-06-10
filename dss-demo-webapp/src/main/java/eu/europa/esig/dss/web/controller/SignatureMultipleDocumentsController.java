@@ -64,6 +64,9 @@ public class SignatureMultipleDocumentsController {
 
 	@Value("${nexuDownloadUrl}")
 	private String nexuDownloadUrl;
+
+	@Value("${nexuInfoUrl}")
+	private String nexuInfoUrl;
 	
     @Value("${default.digest.algo}")
     private String defaultDigestAlgo;
@@ -91,6 +94,7 @@ public class SignatureMultipleDocumentsController {
 		signatureMultipleDocumentsForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("signatureMultipleDocumentsForm", signatureMultipleDocumentsForm);
 		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
+		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return SIGNATURE_PARAMETERS;
 	}
 

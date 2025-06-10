@@ -61,6 +61,9 @@ public class SignaturePdfController {
 	@Value("${nexuDownloadUrl}")
 	private String nexuDownloadUrl;
 
+	@Value("${nexuInfoUrl}")
+	private String nexuInfoUrl;
+
 	@Autowired
 	private SigningService signingService;
 	
@@ -81,6 +84,7 @@ public class SignaturePdfController {
 
 		model.addAttribute("signaturePdfForm", signaturePdfForm);
 		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
+		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return SIGNATURE_PDF_PARAMETERS;
 	}
 

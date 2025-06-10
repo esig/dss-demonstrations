@@ -72,6 +72,9 @@ public class CounterSignatureController {
 	@Value("${nexuDownloadUrl}")
 	private String nexuDownloadUrl;
 
+	@Value("${nexuInfoUrl}")
+	private String nexuInfoUrl;
+
 	@Value("${default.digest.algo}")
 	private String defaultDigestAlgo;
 
@@ -100,6 +103,7 @@ public class CounterSignatureController {
 		counterSignatureForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("counterSignatureForm", counterSignatureForm);
 		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
+		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return COUNTER_SIGN;
 	}
 

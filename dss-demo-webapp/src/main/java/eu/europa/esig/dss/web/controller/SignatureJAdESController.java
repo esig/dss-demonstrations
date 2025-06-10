@@ -67,6 +67,9 @@ public class SignatureJAdESController {
 	@Value("${nexuDownloadUrl}")
 	private String nexuDownloadUrl;
 
+	@Value("${nexuInfoUrl}")
+	private String nexuInfoUrl;
+
 	@Value("${default.digest.algo}")
 	private String defaultDigestAlgo;
 
@@ -100,6 +103,7 @@ public class SignatureJAdESController {
 
 		model.addAttribute("signatureJAdESForm", signatureJAdESForm);
 		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
+		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return SIGNATURE_JAdES;
 	}
 
@@ -120,6 +124,7 @@ public class SignatureJAdESController {
 		model.addAttribute("digestAlgorithm", signatureJAdESForm.getDigestAlgorithm());
 		model.addAttribute("rootUrl", "sign-with-jades");
 		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
+		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		model.addAttribute("nexuUrl", nexuUrl);
 		return SIGNATURE_PROCESS;
 	}
