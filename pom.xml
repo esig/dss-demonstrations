@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.3.RC1</version>
+	<version>6.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -211,7 +211,7 @@
 		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
 		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
 		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>6.3.RC1</tag>
+		<tag>6.2</tag>
 	</scm>
 
 	<dependencyManagement>
