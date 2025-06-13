@@ -555,6 +555,15 @@
 	</div>
 </th:block>
 
+<div class="form-group row" th:fragment="field-cryptographic-suite">
+	<label class="col-sm-3 col-form-label" for="cryptographicSuite" th:text="#{label.cryptographic.suite}"></label>
+	<div class="col-sm-6">
+		<input type="file" class="form-control-file" name="cryptographicSuite" />
+		<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+		   data-placement="top" th:title="#{label.cryptographic.suite.tooltip}"></i>
+	</div>
+</div>
+
 <div class="position-relative form-group row" th:fragment="field-sign-pdf">
 	<div class="col-sm-8">
 		<input type="file" class="drag-file cursor-pointer" name="documentToSign" id="documentToSign" accept="application/pdf" />

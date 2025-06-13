@@ -4,13 +4,13 @@ import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.enumerations.ValidationLevel;
-import eu.europa.esig.dss.policy.EtsiValidationPolicy;
-import eu.europa.esig.dss.policy.ValidationPolicyFacade;
+import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.executor.ProcessExecutor;
 import eu.europa.esig.dss.validation.executor.certificate.CertificateProcessExecutor;
 import eu.europa.esig.dss.validation.executor.certificate.DefaultCertificateProcessExecutor;
 import eu.europa.esig.dss.validation.executor.signature.DefaultSignatureProcessExecutor;
+import eu.europa.esig.dss.validation.policy.ValidationPolicyLoader;
 import eu.europa.esig.dss.validation.reports.AbstractReports;
 import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.model.ReplayDiagForm;
@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -46,8 +47,9 @@ public class ReplayDiagController extends AbstractValidationController {
 	
 	private static final String REPLAY_TILE = "replay-diagnostic-data";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
-	
-	private static final String[] ALLOWED_FIELDS = { "diagnosticFile", "resetDate", "validationLevel", "defaultPolicy", "policyFile" };
+
+	private static final String[] ALLOWED_FIELDS = { "diagnosticFile", "resetDate", "validationLevel",
+			"defaultPolicy", "policyFile", "cryptographicSuite" };
 
 	@Autowired
 	private Resource defaultPolicy;
@@ -105,23 +107,36 @@ public class ReplayDiagController extends AbstractValidationController {
 		Date validationDate = (replayDiagForm.isResetDate()) ? new Date() : dd.getValidationDate();
 		dd.setValidationDate(validationDate);
 		executor.setCurrentTime(validationDate);
-		
+
 		// Set policy
-		if (!replayDiagForm.isDefaultPolicy() && ((replayDiagForm.getPolicyFile() != null) && !replayDiagForm.getPolicyFile().isEmpty())) {
-			try (InputStream policyIs = replayDiagForm.getPolicyFile().getInputStream()) {
-				executor.setValidationPolicy(new EtsiValidationPolicy(ValidationPolicyFacade.newFacade().unmarshall(policyIs)));
+		ValidationPolicyLoader validationPolicyLoader;
+		MultipartFile policyFile = replayDiagForm.getPolicyFile();
+		if (!replayDiagForm.isDefaultPolicy() && policyFile != null && !policyFile.isEmpty()) {
+			try (InputStream policyIs = policyFile.getInputStream()) {
+				validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(policyIs);
 			} catch (Exception e) {
-				throw new InternalServerException(String.format("Error while loading the provided validation policy: %s", e.getMessage()), e);
+				throw new DSSException(String.format("Error while loading the provided validation policy: %s", e.getMessage()), e);
 			}
 		} else if (defaultPolicy != null) {
 			try (InputStream is = defaultPolicy.getInputStream()) {
-				executor.setValidationPolicy(ValidationPolicyFacade.newFacade().getValidationPolicy(is));
+				validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(is);
 			} catch (Exception e) {
-				throw new InternalServerException(String.format("Error while loading the default validation policy: %s", e.getMessage()), e);
+				throw new DSSException(String.format("Error while loading the default validation policy: %s", e.getMessage()), e);
 			}
 		} else {
 			throw new IllegalStateException("Validation policy is not correctly initialized!");
 		}
+
+		MultipartFile cryptographicSuiteFile = replayDiagForm.getCryptographicSuite();
+		if (cryptographicSuiteFile != null && !cryptographicSuiteFile.isEmpty()) {
+			try (InputStream is = cryptographicSuiteFile.getInputStream()) {
+				validationPolicyLoader = validationPolicyLoader.withCryptographicSuite(is);
+			} catch (Exception e) {
+				throw new DSSException(String.format("Error while loading the cryptographic suite: %s", e.getMessage()), e);
+			}
+		}
+
+		executor.setValidationPolicy(validationPolicyLoader.create());
 		
 		// If applicable, set certificate id
 		if (executor instanceof CertificateProcessExecutor) {

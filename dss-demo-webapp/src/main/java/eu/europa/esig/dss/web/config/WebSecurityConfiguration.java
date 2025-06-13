@@ -22,7 +22,7 @@ import org.springframework.security.web.header.writers.DelegatingRequestMatcherH
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -79,23 +79,23 @@ public class WebSecurityConfiguration {
 	private RequestMatcher[] getAntMatchers() {
 		RequestMatcher[] requestMatchers = new RequestMatcher[API_URLS.length];
 		for (int i = 0; i < API_URLS.length; i++) {
-			requestMatchers[i] = new AntPathRequestMatcher(API_URLS[i]);
+			requestMatchers[i] = PathPatternRequestMatcher.withDefaults().matcher(API_URLS[i]);
 		}
 		return requestMatchers;
 	}
 
 	@Bean
 	public HeaderWriter javadocHeaderWriter() {
-		final AntPathRequestMatcher javadocAntPathRequestMatcher = new AntPathRequestMatcher("/apidocs/**");
+		final PathPatternRequestMatcher javadocPathRequestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/apidocs/**");
 		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
-		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);
+		return new DelegatingRequestMatcherHeaderWriter(javadocPathRequestMatcher, hw);
 	}
 
 	@Bean
 	public HeaderWriter svgHeaderWriter() {
-		final AntPathRequestMatcher javadocAntPathRequestMatcher = new AntPathRequestMatcher("/validation/diag-data.svg");
+		final PathPatternRequestMatcher javadocPathRequestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/validation/diag-data.svg");
 		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
-		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);
+		return new DelegatingRequestMatcherHeaderWriter(javadocPathRequestMatcher, hw);
 	}
 	
 	@Bean

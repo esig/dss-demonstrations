@@ -179,7 +179,7 @@ public class SigningService {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
     public ToBeSigned getDataToCounterSign(CounterSignatureForm form) {
-        LOG.info("Start getDataToSign with one document");
+        LOG.info("Start getDataToCounterSign");
 
         try {
 	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
@@ -190,7 +190,7 @@ public class SigningService {
 	
 	        ToBeSigned toBeSigned = service.getDataToBeCounterSigned(signatureDocument, parameters);
 	
-	        LOG.info("End getDataToSign with one document");
+	        LOG.info("End getDataToCounterSign");
 	        return toBeSigned;
 		} catch (Exception e) {
 			throw new SignatureOperationException(e.getMessage(), e);
@@ -476,7 +476,7 @@ public class SigningService {
 	
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public DSSDocument counterSignSignature(CounterSignatureForm form) {
-        LOG.info("Start signDigest with one digest");
+        LOG.info("Start counterSignSignature");
 
         try {
 	        DSSDocument signatureDocument = WebAppUtils.toDSSDocument(form.getDocumentToCounterSign());
@@ -489,7 +489,7 @@ public class SigningService {
 	        SignatureValue signatureValue = new SignatureValue(sigAlgorithm, form.getSignatureValue());
 	        DSSDocument signedDocument = service.counterSignSignature(signatureDocument, parameters, signatureValue);
 	
-	        LOG.info("End signDocument with one document");
+	        LOG.info("End counterSignSignature");
 	        return signedDocument;
 		} catch (Exception e) {
 			throw new SignatureOperationException(e.getMessage(), e);

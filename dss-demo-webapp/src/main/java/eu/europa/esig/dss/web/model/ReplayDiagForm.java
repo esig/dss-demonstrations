@@ -19,6 +19,9 @@ public class ReplayDiagForm {
 	@AssertMultipartFile
 	private MultipartFile policyFile;
 
+	@AssertMultipartFile
+	private MultipartFile cryptographicSuite;
+
 	public MultipartFile getDiagnosticFile() {
 		return diagnosticFile;
 	}
@@ -57,6 +60,14 @@ public class ReplayDiagForm {
 
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
+	}
+
+	public MultipartFile getCryptographicSuite() {
+		return cryptographicSuite;
+	}
+
+	public void setCryptographicSuite(MultipartFile cryptographicSuite) {
+		this.cryptographicSuite = cryptographicSuite;
 	}
 	
 	@AssertTrue(message = "{error.diagnostic.file.mandatory}")

@@ -3,17 +3,17 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>6.2</version>
+		<version>6.3.RC1</version>
 	</parent>
 	<artifactId>dss-standalone-app-package</artifactId>
 	<name>DSS standalone application packager</name>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.2%2B7/OpenJDK23U-jre_x64_windows_hotspot_23.0.2_7.zip</jre.download.link>
-		<jre.root.folder>jdk-23.0.2+7-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.1%2B9/OpenJDK24U-jre_x64_windows_hotspot_24.0.1_9.zip</jre.download.link>
+		<jre.root.folder>jdk-24.0.1+9-jre</jre.root.folder>
 		
-		<fx.sdk.download.link>https://download.java.net/java/GA/javafx23.0.2/512f2f157741485abda37a0a95f69984//3/openjfx-23.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-23.0.2</fx.root.folder>
+		<fx.sdk.download.link>https://download.java.net/java/GA/javafx24.0.1/338f581b4f2442da8df48a4a4285e047/4/openjfx-24.0.1_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-24.0.1</fx.root.folder>
 	</properties>
 
 	<dependencies>
@@ -135,7 +135,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.5.0</version>
+						<version>3.5.1</version>
 						<executions>
 							<execution>
 								<id>package-jar</id>
