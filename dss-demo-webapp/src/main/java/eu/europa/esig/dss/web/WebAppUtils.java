@@ -74,7 +74,7 @@ public final class WebAppUtils {
 					DSSDocument dssDocument;
 					MultipartFile completeFile = originalDocument.getCompleteFile();
 					if (completeFile != null) {
-						dssDocument = WebAppUtils.toDSSDocument(completeFile);
+						dssDocument = toDSSDocument(completeFile);
 						inMemorySize += completeFile.getSize();
 						if (inMemorySize > MultipartResolverProvider.getInstance().getMaxInMemorySize()) {
 							throw new MaxUploadSizeExceededException(MultipartResolverProvider.getInstance().getMaxInMemorySize());
@@ -107,7 +107,12 @@ public final class WebAppUtils {
     public static CertificateToken toCertificateToken(MultipartFile certificateFile) {
         try {
             if (certificateFile != null && !certificateFile.isEmpty()) {
-                return DSSUtils.loadCertificate(certificateFile.getBytes());
+				byte[] certificateBytes = certificateFile.getBytes();
+				String certificateBytesString = new String(certificateBytes);
+				if (!isPem(certificateBytes) && Utils.isBase64Encoded(certificateBytesString)) {
+					return DSSUtils.loadCertificateFromBase64EncodedString(certificateBytesString);
+				}
+                return DSSUtils.loadCertificate(certificateBytes);
             }
         } catch (DSSException | IOException e) {
             LOG.warn("Cannot convert file to X509 Certificate", e);
@@ -115,13 +120,18 @@ public final class WebAppUtils {
         }
         return null;
     }
+
+	// TODO : to remove after https://ec.europa.eu/digital-building-blocks/tracker/browse/DSS-3647 is resolved
+	private static boolean isPem(byte[] string) {
+		return Utils.startsWith(string, "-----".getBytes());
+	}
     
     public static CertificateSource toCertificateSource(List<MultipartFile> certificateFiles) {
         CertificateSource certSource = null;
         if (Utils.isCollectionNotEmpty(certificateFiles)) {
             certSource = new CommonCertificateSource();
             for (MultipartFile file : certificateFiles) {
-                CertificateToken certificateChainItem = WebAppUtils.toCertificateToken(file);
+                CertificateToken certificateChainItem = toCertificateToken(file);
                 if (certificateChainItem != null) {
                     certSource.addCertificate(certificateChainItem);
                 }
