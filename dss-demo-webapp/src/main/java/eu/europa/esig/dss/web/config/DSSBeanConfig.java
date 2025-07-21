@@ -87,6 +87,12 @@ public class DSSBeanConfig {
 	@Value("${default.validation.policy}")
 	private String defaultValidationPolicy;
 
+	@Value("${default.cryptographic.suite.xml:}")
+	private String defaultCryptographicSuiteXml;
+
+	@Value("${default.cryptographic.suite.json:}")
+	private String defaultCryptographicSuiteJson;
+
 	@Value("${default.certificate.validation.policy}")
 	private String defaultCertificateValidationPolicy;
 
@@ -605,6 +611,22 @@ public class DSSBeanConfig {
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader());
 		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
 		return offlineFileLoader;
+	}
+
+	@Bean
+	public ClassPathResource cryptographicSuiteXml() {
+		if (Utils.isStringNotEmpty(defaultCryptographicSuiteXml)) {
+			return new ClassPathResource(defaultCryptographicSuiteXml);
+		}
+		return null;
+	}
+
+	@Bean
+	public ClassPathResource cryptographicSuiteJson() {
+		if (Utils.isStringNotEmpty(defaultCryptographicSuiteJson)) {
+			return new ClassPathResource(defaultCryptographicSuiteJson);
+		}
+		return null;
 	}
 
 	@Bean

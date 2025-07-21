@@ -65,6 +65,7 @@ public class ReplayDiagController extends AbstractValidationController {
 		replayForm.setValidationLevel(ValidationLevel.ARCHIVAL_DATA);
 		replayForm.setDefaultPolicy(true);
 		model.addAttribute("replayDiagForm", replayForm);
+		setCryptographicSuiteSamples(model);
 		return REPLAY_TILE;
 	}
 	
