@@ -3,8 +3,8 @@ package eu.europa.esig.dss.web.controller;
 import eu.europa.esig.dss.diagnostic.AbstractTokenProxy;
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
-import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.spi.validation.CertificateVerifier;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.reports.AbstractReports;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.validation.reports.Reports;
@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.core.io.Resource;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -46,11 +47,20 @@ public abstract class AbstractValidationController {
 	protected static final String ALL_REVOCATION_DATA_ATTRIBUTE = "allRevocationData";
 	protected static final String ALL_TIMESTAMPS_ATTRIBUTE = "allTimestamps";
 
+	protected static final String XML_CRYPTOGRAPHIC_SUITE_ATTRIBUTE = "cryptographicSuiteXml";
+	protected static final String JSON_CRYPTOGRAPHIC_SUITE_ATTRIBUTE = "cryptographicSuiteJson";
+
 	@Autowired
 	protected CertificateVerifier certificateVerifier;
 
 	@Autowired
 	protected XSLTService xsltService;
+
+	@Autowired(required = false)
+	private Resource cryptographicSuiteXml;
+
+	@Autowired(required = false)
+	private Resource cryptographicSuiteJson;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -60,7 +70,7 @@ public abstract class AbstractValidationController {
 		webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
 	}
 
-	public void setAttributesModels(Model model, AbstractReports reports) {
+	protected void setAttributesModels(Model model, AbstractReports reports) {
 		String xmlSimpleReport = reports.getXmlSimpleReport();
 		if (reports instanceof CertificateReports) {
 			model.addAttribute(XML_SIMPLE_REPORT_ATTRIBUTE, Utils.EMPTY_STRING);
@@ -96,6 +106,11 @@ public abstract class AbstractValidationController {
 
 		// Get Timestamps for which binaries are available
 		model.addAttribute(ALL_TIMESTAMPS_ATTRIBUTE, buildTokenDtos(diagnosticData.getTimestampList()));
+	}
+
+	protected void setCryptographicSuiteSamples(Model model) {
+		model.addAttribute(XML_CRYPTOGRAPHIC_SUITE_ATTRIBUTE, cryptographicSuiteXml);
+		model.addAttribute(JSON_CRYPTOGRAPHIC_SUITE_ATTRIBUTE, cryptographicSuiteJson);
 	}
 
 	private Set<TokenDTO> buildTokenDtos(Collection<? extends AbstractTokenProxy> abstractTokens) {

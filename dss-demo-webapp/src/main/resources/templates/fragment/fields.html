@@ -537,19 +537,23 @@
 <th:block th:fragment="field-validation-policy">
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label" th:text="#{label.validation.policy}"></label>
-		<div class="col-sm-9">
+		<div class="col-sm-5">
 			<div class="form-check form-check-inline">
 				<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="true" th:id="defaultPolicy" />
 				<label class="form-check-label" th:for="defaultPolicy" th:text="#{label.validation.default.policy.file}"></label>
 			</div>
 		</div>
-		<div class="offset-sm-3 col-sm-3">
+		<div class="col-sm-4">
+			<a href="/policy/download-default-policy" class="btn btn-outline-secondary mb-2 mr-2 pt-1 pb-1"
+			   data-toggle="tooltip" data-placement="top" th:title="#{label.validation.default.policy.file.download}"><i class="fa fa-download"></i></a>
+		</div>
+		<div class="offset-sm-3 col-sm-5">
 			<div class="form-check form-check-inline">
 				<input class="form-check-input" type="radio" th:field="*{defaultPolicy}" value="false" th:id="otherPolicy" />
 				<label class="form-check-label" th:for="otherPolicy" th:text="#{label.validation.custom.policy.file}"></label>
 			</div>
 		</div>
-		<div class="col-sm-5">
+		<div class="col-sm-4">
 			<input type="file" class="form-control-file" name="policyFile" id="policyFile" disabled="disabled" />
 		</div>
 	</div>
@@ -557,10 +561,16 @@
 
 <div class="form-group row" th:fragment="field-cryptographic-suite">
 	<label class="col-sm-3 col-form-label" for="cryptographicSuite" th:text="#{label.cryptographic.suite}"></label>
-	<div class="col-sm-6">
+	<div class="col-sm-5">
 		<input type="file" class="form-control-file" name="cryptographicSuite" />
 		<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
 		   data-placement="top" th:title="#{label.cryptographic.suite.tooltip}"></i>
+	</div>
+	<div class="col-sm-4">
+		<a href="/policy/download-cryptographic-suite-xml" class="mr-2 pt-1 pb-1 btn btn-outline-secondary" th:if="${cryptographicSuiteXml != null}"
+		   th:title="#{label.cryptographic.suite.download.xml}" data-placement="top" data-toggle="tooltip"><i class="fa fa-download"></i> <span th:text="#{label.XML}"></span></a>
+		<a href="/policy/download-cryptographic-suite-json" class="mr-2 pt-1 pb-1 btn btn-outline-secondary" th:if="${cryptographicSuiteJson != null}"
+		   th:title="#{label.cryptographic.suite.download.json}" data-placement="top" data-toggle="tooltip"><i class="fa fa-download"></i> <span th:text="#{label.JSON}"></span></a>
 	</div>
 </div>
 
