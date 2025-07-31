@@ -544,7 +544,7 @@
 			</div>
 		</div>
 		<div class="col-sm-4">
-			<a href="/policy/download-default-policy" class="btn btn-outline-secondary mb-2 mr-2 pt-1 pb-1"
+			<a th:href="@{/policy/download-default-policy}" class="btn btn-outline-secondary mb-2 mr-2 pt-1 pb-1"
 			   data-toggle="tooltip" data-placement="top" th:title="#{label.validation.default.policy.file.download}"><i class="fa fa-download"></i></a>
 		</div>
 		<div class="offset-sm-3 col-sm-5">
@@ -567,9 +567,9 @@
 		   data-placement="top" th:title="#{label.cryptographic.suite.tooltip}"></i>
 	</div>
 	<div class="col-sm-4">
-		<a href="/policy/download-cryptographic-suite-xml" class="mr-2 pt-1 pb-1 btn btn-outline-secondary" th:if="${cryptographicSuiteXml != null}"
+		<a th:href="@{/policy/download-cryptographic-suite-xml}" class="mr-2 pt-1 pb-1 btn btn-outline-secondary" th:if="${cryptographicSuiteXml != null}"
 		   th:title="#{label.cryptographic.suite.download.xml}" data-placement="top" data-toggle="tooltip"><i class="fa fa-download"></i> <span th:text="#{label.XML}"></span></a>
-		<a href="/policy/download-cryptographic-suite-json" class="mr-2 pt-1 pb-1 btn btn-outline-secondary" th:if="${cryptographicSuiteJson != null}"
+		<a th:href="@{/policy/download-cryptographic-suite-json}" class="mr-2 pt-1 pb-1 btn btn-outline-secondary" th:if="${cryptographicSuiteJson != null}"
 		   th:title="#{label.cryptographic.suite.download.json}" data-placement="top" data-toggle="tooltip"><i class="fa fa-download"></i> <span th:text="#{label.JSON}"></span></a>
 	</div>
 </div>
