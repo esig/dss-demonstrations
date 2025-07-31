@@ -17,14 +17,11 @@ import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
-import eu.europa.esig.dss.web.service.SigningService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,26 +43,13 @@ import java.util.List;
 @Controller
 @SessionAttributes(value = { "signaturePdfForm", "signedPdfDocument" })
 @RequestMapping(value = "/sign-a-pdf")
-public class SignaturePdfController {
+public class SignaturePdfController extends AbstractSignatureController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignaturePdfController.class);
 
 	private static final String SIGNATURE_PDF_PARAMETERS = "signature-pdf";
-	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "documentToSign" };
-
-	@Value("${nexuUrl}")
-	private String nexuUrl;
-
-	@Value("${nexuDownloadUrl}")
-	private String nexuDownloadUrl;
-
-	@Value("${nexuInfoUrl}")
-	private String nexuInfoUrl;
-
-	@Autowired
-	private SigningService signingService;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -83,8 +67,6 @@ public class SignaturePdfController {
 		signaturePdfForm.setSignaturePackaging(SignaturePackaging.ENVELOPED);
 
 		model.addAttribute("signaturePdfForm", signaturePdfForm);
-		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
-		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return SIGNATURE_PDF_PARAMETERS;
 	}
 
