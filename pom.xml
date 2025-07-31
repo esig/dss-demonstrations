@@ -268,6 +268,13 @@
 				<artifactId>fop-core</artifactId>
 				<version>${fop-core.version}</version>
 			</dependency>
+
+			<!-- Temporary bump while spring-boot 3.5.x uses a commons-lang3 version 3.17.0 with a vulnerability -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.18.0</version>
+			</dependency>
 			
 			<dependency>
 				<groupId>org.apache.cxf</groupId>
