@@ -444,13 +444,6 @@
             <properties>
                 <packaging.type>war</packaging.type>
             </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <!-- Build a JAR file -->
