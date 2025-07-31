@@ -21,14 +21,11 @@ import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
-import eu.europa.esig.dss.web.service.SigningService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,30 +47,14 @@ import java.util.List;
 @Controller
 @SessionAttributes(value = { "signatureDocumentForm", "signedDocument" })
 @RequestMapping(value = "/sign-a-document")
-public class SignatureController {
+public class SignatureController extends AbstractSignatureController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
 
 	private static final String SIGNATURE_PARAMETERS = "signature";
-	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "documentToSign", "containerType", "signatureForm", "signaturePackaging",
 			"signatureLevel", "digestAlgorithm", "signWithExpiredCertificate", "addContentTimestamp" };
-
-	@Value("${nexuUrl}")
-	private String nexuUrl;
-
-	@Value("${nexuDownloadUrl}")
-	private String nexuDownloadUrl;
-
-	@Value("${nexuInfoUrl}")
-	private String nexuInfoUrl;
-	
-    @Value("${default.digest.algo}")
-    private String defaultDigestAlgo;
-
-	@Autowired
-	private SigningService signingService;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -95,8 +76,6 @@ public class SignatureController {
 		SignatureDocumentForm signatureDocumentForm = new SignatureDocumentForm();
 		signatureDocumentForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("signatureDocumentForm", signatureDocumentForm);
-		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
-		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return SIGNATURE_PARAMETERS;
 	}
 
@@ -199,11 +178,6 @@ public class SignatureController {
 		DigestAlgorithm[] algos = new DigestAlgorithm[] { DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384,
 				DigestAlgorithm.SHA512 };
 		return algos;
-	}
-
-	@ModelAttribute("isMockUsed")
-	public boolean isMockUsed() {
-		return signingService.isMockTSPSourceUsed();
 	}
 
 }
