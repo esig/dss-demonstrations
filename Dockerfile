@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-21 as build
+FROM maven:3.9.11-eclipse-temurin-21 as build
 
 RUN useradd -m demouser -d /home/demouser
 
@@ -14,7 +14,7 @@ RUN mvn package -pl dss-standalone-app,dss-standalone-app-package,dss-demo-webap
 
 USER demouser
 
-FROM tomcat:11.0.7-jdk21-temurin
+FROM tomcat:11.0.9-jdk21-temurin
 
 COPY --from=build /home/demouser/dss-demonstrations/dss-demo-webapp/target/dss-demo-webapp-*.war /usr/local/tomcat/webapps/ROOT.war
 
