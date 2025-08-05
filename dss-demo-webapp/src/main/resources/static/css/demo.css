@@ -22,6 +22,7 @@
 .form-control-file {
     display: inline-block;
     width: auto;
+	max-width: 90%;
     overflow: hidden;
 }
 

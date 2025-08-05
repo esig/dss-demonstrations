@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>6.3.RC1</version>
+		<version>6.3</version>
 	</parent>
 
 	<name>DSS Package: OOTB Web-Application</name>
@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jre_x64_windows_hotspot_21.0.7_6.zip</jre.download.link>
-		<jre.root.folder>jdk-21.0.7+6-jre</jre.root.folder>
-		<tomcat.version>11.0.7</tomcat.version>
+		<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.8%2B9/OpenJDK21U-jre_x64_windows_hotspot_21.0.8_9.zip</jre.download.link>
+		<jre.root.folder>jdk-21.0.8+9-jre</jre.root.folder>
+		<tomcat.version>11.0.9</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -113,8 +113,8 @@
 		<profile>
 			<id>java24</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.1%2B9/OpenJDK24U-jre_x64_windows_hotspot_24.0.1_9.zip</jre.download.link>
-				<jre.root.folder>jdk-24.0.1+9-jre</jre.root.folder>
+				<jre.download.link>https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.2%2B12/OpenJDK24U-jre_x64_windows_hotspot_24.0.2_12.zip</jre.download.link>
+				<jre.root.folder>jdk-24.0.2+12-jre</jre.root.folder>
 			</properties>
 		</profile>
 	</profiles>

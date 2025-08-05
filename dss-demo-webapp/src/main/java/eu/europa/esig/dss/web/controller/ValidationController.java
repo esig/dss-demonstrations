@@ -109,6 +109,7 @@ public class ValidationController extends AbstractValidationController {
 		validationForm.setValidationLevel(ValidationLevel.ARCHIVAL_DATA);
 		validationForm.setDefaultPolicy(true);
 		model.addAttribute("validationForm", validationForm);
+		setCryptographicSuiteSamples(model);
 		return VALIDATION_TILE;
 	}
 

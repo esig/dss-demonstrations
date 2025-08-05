@@ -46,9 +46,9 @@ public class WebSecurityConfiguration {
 	@Value("${web.strict.transport.security:}")
 	private String strictTransportSecurity;
 	
-	/** API urls (REST/SOAP webServices) */
+	/** API urls (REST/SOAP webServices and server-sign) */
 	private static final String[] API_URLS = new String[] {
-			"/services/rest/**", "/services/soap/**"
+			"/services/rest/**", "/services/soap/**", "/server-sign/**"
 	};
 
 	@Bean

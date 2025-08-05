@@ -44,16 +44,8 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		
 	}
 }).fail(function() {
-	// no response, NexU not installed or not started
-	$("#submit-button").html("Install NexU");
-	$("#submit-button").on("click", function() {
-		console.log("Install NexU");
-		window.location = "${nexuDownloadUrl}";
-		return false;
-	});
-	
-    $("#warning-text").html("NexU not detected or not started !");
     $("#nexu_missing_alert").slideDown();
+    $("#submit-button").prop('disabled', false);
 });
 
 function loadScript(onSuccess) {

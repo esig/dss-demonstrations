@@ -24,14 +24,12 @@ import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
-import eu.europa.esig.dss.web.service.SigningService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,30 +54,14 @@ import java.util.List;
 @Controller
 @SessionAttributes(value = { "counterSignatureForm", "signedDocument" })
 @RequestMapping(value = "/counter-sign")
-public class CounterSignatureController {
+public class CounterSignatureController extends AbstractSignatureController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CounterSignatureController.class);
 
 	private static final String COUNTER_SIGN = "counter-signature";
-	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "counterSignatureForm", "documentToCounterSign", "signatureIdToCounterSign", 
 			"signatureForm", "signatureLevel", "digestAlgorithm", "signWithExpiredCertificate" };
-
-	@Value("${nexuUrl}")
-	private String nexuUrl;
-
-	@Value("${nexuDownloadUrl}")
-	private String nexuDownloadUrl;
-
-	@Value("${nexuInfoUrl}")
-	private String nexuInfoUrl;
-
-	@Value("${default.digest.algo}")
-	private String defaultDigestAlgo;
-
-	@Autowired
-	private SigningService signingService;
 
 	@Autowired
 	protected CertificateVerifier certificateVerifier;
@@ -102,8 +84,6 @@ public class CounterSignatureController {
 		CounterSignatureForm counterSignatureForm = new CounterSignatureForm();
 		counterSignatureForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("counterSignatureForm", counterSignatureForm);
-		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
-		model.addAttribute("nexuInfoUrl", nexuInfoUrl);
 		return COUNTER_SIGN;
 	}
 
