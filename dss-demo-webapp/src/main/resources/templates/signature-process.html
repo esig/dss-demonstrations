@@ -12,11 +12,13 @@
             </div>
 		</div>
 		<div layout:fragment="scripts">
+			<link id="server-sign-source" rel="prefetch" th:href="@{/server-sign}" />
+			<link id="server-sign-js-source" rel="prefetch" th:href="@{/scripts/serverSign.js}" />
 			<script type="text/javascript" th:inline="javascript">
 			/*<![CDATA[*/
 
 				var nexuUrl = /*[[@{${nexuUrl}+'/nexu.js'}]]*/ '';
-				var fallbackUrl = /*[[@{/scripts/serverSign.js}]]*/ '';
+				var fallbackUrl = $('#server-sign-js-source').attr('href');
 
 				function urlExists(url, callback) {
 					var xhr = new XMLHttpRequest();
@@ -36,7 +38,8 @@
 					script.type = 'text/javascript';
 					script.src = success ? nexuUrl : fallbackUrl;
 					if (!success) {
-						script.setAttribute('data-server-sign-url', /*[[@{/server-sign}]]*/);
+						var serverSignUrl = $('#server-sign-source').attr('href');
+						script.setAttribute('data-server-sign-url', serverSignUrl);
 					}
 
 					script.onload = function () {
