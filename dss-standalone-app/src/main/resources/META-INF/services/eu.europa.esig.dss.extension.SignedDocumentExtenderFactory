@@ -1,0 +1,6 @@
+eu.europa.esig.dss.xades.extension.XAdESDocumentExtenderFactory
+eu.europa.esig.dss.cades.extension.CAdESDocumentExtenderFactory
+eu.europa.esig.dss.jades.extension.JAdESDocumentExtenderFactory
+eu.europa.esig.dss.pades.extension.PAdESDocumentExtenderFactory
+eu.europa.esig.dss.asic.xades.extension.ASiCWithXAdESDocumentExtenderFactory
+eu.europa.esig.dss.asic.cades.extension.ASiCWithCAdESDocumentExtenderFactory

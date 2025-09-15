@@ -28,31 +28,8 @@
     </HBox>
 
     <HBox styleClass="hbox-style">
-        <Label styleClass="label-style" text="Container Type"/>
-        <fx:define>
-            <ToggleGroup fx:id="toggleAsicContainerType"/>
-        </fx:define>
-        <RadioButton mnemonicParsing="false" text="None" toggleGroup="$toggleAsicContainerType"/>
-        <RadioButton fx:id="asicsRadio" mnemonicParsing="false" text="ASiC-S"
-                     toggleGroup="$toggleAsicContainerType"/>
-        <RadioButton fx:id="asiceRadio" mnemonicParsing="false" text="ASiC-E"
-                     toggleGroup="$toggleAsicContainerType"/>
-    </HBox>
-
-    <HBox styleClass="hbox-style">
-        <Label styleClass="label-style" text="Signature format"/>
-        <fx:define>
-            <ToggleGroup fx:id="toogleSigFormat"/>
-        </fx:define>
-        <RadioButton fx:id="xadesRadio" mnemonicParsing="false" text="XAdES" toggleGroup="$toogleSigFormat"/>
-        <RadioButton fx:id="cadesRadio" mnemonicParsing="false" text="CAdES" toggleGroup="$toogleSigFormat"/>
-        <RadioButton fx:id="padesRadio" mnemonicParsing="false" text="PAdES" toggleGroup="$toogleSigFormat"/>
-        <RadioButton fx:id="jadesRadio" mnemonicParsing="false" text="JAdES" toggleGroup="$toogleSigFormat"/>
-    </HBox>
-
-    <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text="Level"/>
-        <ComboBox fx:id="comboLevel" disable="true" prefWidth="200.0"/>
+        <ComboBox fx:id="comboProfile" disable="true" prefWidth="200.0"/>
     </HBox>
 
     <Label fx:id="warningMockTSALabel" styleClass="warningLabel"

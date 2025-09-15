@@ -1,8 +1,5 @@
 package eu.europa.esig.dss.standalone.task;
 
-import eu.europa.esig.dss.enumerations.JWSSerializationType;
-import eu.europa.esig.dss.enumerations.SigDMechanism;
-import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
@@ -39,7 +36,7 @@ public class ExtensionTask extends Task<DSSDocument> {
             RemoteDocument toExtendDocument = RemoteDocumentConverter.toRemoteDocument(fileToExtend);
 
             RemoteSignatureParameters parameters = buildParameters();
-            RemoteDocument extendedDocument = service.extendDocument(toExtendDocument, parameters);
+            RemoteDocument extendedDocument = service.extendDocument(toExtendDocument, model.getSignatureProfile(), parameters);
             return RemoteDocumentConverter.toDSSDocument(extendedDocument);
 
         } catch (Exception e) {
@@ -50,15 +47,9 @@ public class ExtensionTask extends Task<DSSDocument> {
 
     private RemoteSignatureParameters buildParameters() {
         RemoteSignatureParameters parameters = new RemoteSignatureParameters();
-        parameters.setAsicContainerType(model.getAsicContainerType());
-        parameters.setSignatureLevel(model.getSignatureLevel());
         if (Utils.isCollectionNotEmpty(model.getOriginalDocuments())) {
             List<DSSDocument> fileDocuments = model.getOriginalDocuments().stream().map(FileDocument::new).collect(Collectors.toList());
             parameters.setDetachedContents(RemoteDocumentConverter.toRemoteDocuments(fileDocuments));
-        }
-        if (SignatureForm.JAdES.equals(model.getSignatureForm())) {
-            parameters.setJwsSerializationType(JWSSerializationType.JSON_SERIALIZATION); // allow extension
-            parameters.setSigDMechanism(SigDMechanism.OBJECT_ID_BY_URI_HASH); // to be used by default
         }
         return parameters;
     }
