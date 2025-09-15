@@ -10,6 +10,7 @@ import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
 import eu.europa.esig.dss.enumerations.TextWrapping;
@@ -171,6 +172,42 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	}
 
 	@Test
+	public void testSigningAndExtensionWithProfile() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signDocument);
+
+			assertNotNull(signedDocument);
+
+			RemoteDocument extendedDocument = restClient.extendDocument(new ExtendDocumentDTO(signedDocument, SignatureProfile.BASELINE_T));
+
+			assertNotNull(extendedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
+			// iMD.save("target/test.xml");
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
 	public void testSigningAndExtensionDigestDocument() throws Exception {
 		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
 				new PasswordProtection("password".toCharArray()))) {
@@ -203,6 +240,47 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 			parameters.setDetachedContents(Arrays.asList(toSignDocument));
 
 			RemoteDocument extendedDocument = restClient.extendDocument(new ExtendDocumentDTO(signedDocument, parameters));
+
+			assertNotNull(extendedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
+			// iMD.save("target/test-digest.xml");
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	public void testSigningAndExtensionDigestDocumentWithProfile() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.DETACHED);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.digest(DigestAlgorithm.SHA256, fileToSign), DigestAlgorithm.SHA256,
+					fileToSign.getName());
+
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signDocument);
+
+			assertNotNull(signedDocument);
+
+			parameters = new RemoteSignatureParameters();
+			parameters.setDetachedContents(Arrays.asList(toSignDocument));
+
+			RemoteDocument extendedDocument = restClient.extendDocument(new ExtendDocumentDTO(signedDocument, SignatureProfile.BASELINE_T, parameters));
 
 			assertNotNull(extendedDocument);
 
@@ -247,6 +325,46 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_T);
 
 			RemoteDocument extendedDocument = restMultiDocsClient.extendDocument(new ExtendDocumentDTO(signedDocument, parameters));
+
+			assertNotNull(extendedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(extendedDocument.getBytes());
+			// iMD.save("target/test.asice");
+			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	public void testSigningAndExtensionMultiDocumentsWithProfile() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setAsicContainerType(ASiCContainerType.ASiC_E);
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			List<RemoteDocument> toSignDocuments = new ArrayList<>();
+			toSignDocuments.add(toSignDocument);
+			toSignDocuments.add(toSignDoc2);
+			ToBeSignedDTO dataToSign = restMultiDocsClient.getDataToSign(new DataToSignMultipleDocumentsDTO(toSignDocuments, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignMultipleDocumentDTO signDocument = new SignMultipleDocumentDTO(toSignDocuments, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restMultiDocsClient.signDocument(signDocument);
+
+			assertNotNull(signedDocument);
+
+			RemoteDocument extendedDocument = restMultiDocsClient.extendDocument(new ExtendDocumentDTO(signedDocument, SignatureProfile.BASELINE_T));
 
 			assertNotNull(extendedDocument);
 

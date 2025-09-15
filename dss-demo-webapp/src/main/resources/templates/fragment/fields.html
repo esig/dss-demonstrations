@@ -206,6 +206,19 @@
     </div>
 </div>
 
+<div class="form-group row" th:fragment="field-signature-profile">
+	<label class="col-sm-3 col-form-label" for="signatureProfile" th:text="#{label.signature.level}"></label>
+	<div class="col-sm-5">
+		<select th:field="*{signatureProfile}" class="custom-select">
+			<option th:each="profile : ${signatureProfiles}" th:value="${profile}"
+					th:text="${#strings.replace(profile,'_','-')}" />
+		</select>
+	</div>
+	<div class="col-xs-3 col-md-offset-1">
+		<p th:if="${#fields.hasErrors('signatureProfile')}" th:errors="*{signatureProfile}" class="text-danger">Error</p>
+	</div>
+</div>
+
 <div class="form-group row" th:fragment="field-digest-algo">
     <label class="col-sm-3 col-form-label" for="digestAlgorithm" th:text="#{label.digest.algorithm}"></label>
     <div class="col-sm-5">

@@ -17,6 +17,8 @@ import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
+import eu.europa.esig.dss.extension.SignedDocumentExtender;
 import eu.europa.esig.dss.jades.JAdESSignatureParameters;
 import eu.europa.esig.dss.jades.JAdESTimestampParameters;
 import eu.europa.esig.dss.jades.signature.JAdESCounterSignatureParameters;
@@ -37,6 +39,7 @@ import eu.europa.esig.dss.signature.CounterSignatureService;
 import eu.europa.esig.dss.signature.DocumentSignatureService;
 import eu.europa.esig.dss.signature.MultipleDocumentsSignatureService;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.extension.DocumentExtender;
 import eu.europa.esig.dss.spi.validation.CertificateVerifier;
 import eu.europa.esig.dss.spi.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.spi.x509.tsp.KeyEntityTSPSource;
@@ -82,26 +85,21 @@ public class SigningService {
 		return tspSource instanceof KeyEntityTSPSource;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DSSDocument extend(ExtensionForm extensionForm) {
 		LOG.info("Start extend signature");
 
-		ASiCContainerType containerType = extensionForm.getContainerType();
-		SignatureForm signatureForm = extensionForm.getSignatureForm();
+		SignatureProfile signatureProfile = extensionForm.getSignatureProfile();
 
 		DSSDocument signedDocument = WebAppUtils.toDSSDocument(extensionForm.getSignedFile());
 		List<DSSDocument> originalDocuments = WebAppUtils.toDSSDocuments(extensionForm.getOriginalFiles());
 
-		DocumentSignatureService service = getSignatureService(containerType, signatureForm);
+		DocumentExtender documentExtender = SignedDocumentExtender.fromDocument(signedDocument);
 
-		AbstractSignatureParameters parameters = getSignatureParameters(containerType, signatureForm);
-		parameters.setSignatureLevel(extensionForm.getSignatureLevel());
+		CertificateVerifier cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
+		documentExtender.setCertificateVerifier(cv);
+		documentExtender.setTspSource(tspSource);
 
-		if (Utils.isCollectionNotEmpty(originalDocuments)) {
-			parameters.setDetachedContents(originalDocuments);
-		}
-
-		DSSDocument extendDocument = service.extendDocument(signedDocument, parameters);
+		DSSDocument extendDocument = documentExtender.extendDocument(signatureProfile, originalDocuments);
 		LOG.info("End extend signature");
 		return extendDocument;
 	}

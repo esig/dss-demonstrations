@@ -1,9 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
-import eu.europa.esig.dss.enumerations.SignatureForm;
-import eu.europa.esig.dss.enumerations.SignatureLevel;
-import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.editor.ASiCContainerTypePropertyEditor;
@@ -35,8 +33,8 @@ public class ExtensionController {
 	private static final Logger LOG = LoggerFactory.getLogger(ExtensionController.class);
 
 	private static final String EXTENSION_TILE = "extension";
-	
-	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles", "containerType", "signatureForm", "signatureLevel" };
+
+	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles", "signatureProfile" };
 
 	@Autowired
 	private SigningService signingService;
@@ -44,9 +42,7 @@ public class ExtensionController {
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
 		webDataBinder.registerCustomEditor(ASiCContainerType.class, new ASiCContainerTypePropertyEditor());
-		webDataBinder.registerCustomEditor(SignatureForm.class, new EnumPropertyEditor(SignatureForm.class));
-		webDataBinder.registerCustomEditor(SignaturePackaging.class, new EnumPropertyEditor(SignaturePackaging.class));
-		webDataBinder.registerCustomEditor(SignatureLevel.class, new EnumPropertyEditor(SignatureLevel.class));
+		webDataBinder.registerCustomEditor(SignatureProfile.class, new EnumPropertyEditor(SignatureProfile.class));
 	}
 	
 	@InitBinder
@@ -86,19 +82,9 @@ public class ExtensionController {
 		return null;
 	}
 
-	@ModelAttribute("asicContainerTypes")
-	public ASiCContainerType[] getASiCContainerTypes() {
-		return ASiCContainerType.values();
-	}
-
-	@ModelAttribute("signatureForms")
-	public SignatureForm[] getSignatureForms() {
-		return new SignatureForm[] { SignatureForm.XAdES, SignatureForm.CAdES, SignatureForm.PAdES, SignatureForm.JAdES };
-	}
-
-	@ModelAttribute("signaturePackagings")
-	public SignaturePackaging[] getSignaturePackagings() {
-		return SignaturePackaging.values();
+	@ModelAttribute("signatureProfiles")
+	public SignatureProfile[] getSignatureProfiles() {
+		return new SignatureProfile[] { SignatureProfile.BASELINE_T, SignatureProfile.BASELINE_LT, SignatureProfile.BASELINE_LTA };
 	}
 
 	@ModelAttribute("isMockUsed")

@@ -1,8 +1,6 @@
 package eu.europa.esig.dss.web.model;
 
-import eu.europa.esig.dss.enumerations.ASiCContainerType;
-import eu.europa.esig.dss.enumerations.SignatureForm;
-import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
 import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
@@ -18,13 +16,8 @@ public class ExtensionForm {
 	@AssertMultipartFile
 	private List<MultipartFile> originalFiles;
 
-	private ASiCContainerType containerType;
-
-	@NotNull(message = "{error.signature.form.mandatory}")
-	private SignatureForm signatureForm;
-
 	@NotNull(message = "{error.signature.level.mandatory}")
-	private SignatureLevel signatureLevel;
+	private SignatureProfile signatureProfile;
 
 	public MultipartFile getSignedFile() {
 		return signedFile;
@@ -42,28 +35,12 @@ public class ExtensionForm {
 		this.originalFiles = originalFiles;
 	}
 
-	public ASiCContainerType getContainerType() {
-		return containerType;
+	public SignatureProfile getSignatureProfile() {
+		return signatureProfile;
 	}
 
-	public void setContainerType(ASiCContainerType containerType) {
-		this.containerType = containerType;
-	}
-
-	public SignatureForm getSignatureForm() {
-		return signatureForm;
-	}
-
-	public void setSignatureForm(SignatureForm signatureForm) {
-		this.signatureForm = signatureForm;
-	}
-
-	public SignatureLevel getSignatureLevel() {
-		return signatureLevel;
-	}
-
-	public void setSignatureLevel(SignatureLevel signatureLevel) {
-		this.signatureLevel = signatureLevel;
+	public void setSignatureProfile(SignatureProfile signatureProfile) {
+		this.signatureProfile = signatureProfile;
 	}
 
 	@AssertTrue(message = "{error.signed.file.mandatory}")
