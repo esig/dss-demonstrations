@@ -1,0 +1,47 @@
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+applicationSuite: Digital Identity and Trust
+categories:
+  - e-signature
+description:
+  en:
+    documentation: |-
+      https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/doc/dss-documentation.html#_available_demonstrations
+    features:
+      - Web application;
+      - Standalone application;
+      - REST samples generation;
+      - eSig Validation Test Cases.
+    genericName: DSS Demonstrations
+    longDescription: |
+      With the framework, the following demonstrations are provided: 
+      - DSS online demo web application; 
+      - Ready to use demo web application build;
+      - JavaFX Standalone Application;
+      - eSignature validation test cases.
+    shortDescription: DSS Demonstrations is the demonstration repository for project DSS.
+developmentStatus: stable
+legal:
+  license: LGPL-2.1
+  mainCopyrightOwner: European Commission
+localisation:
+  availableLanguages:
+    - en
+  localisationReady: false
+maintenance:
+  contacts:
+    - name: David Naramski
+    - name: Pierrick Vandenbroucke
+    - name: Aleksandr Beliakov
+  type: internal
+name: DSS Demonstrations
+platforms:
+  - windows
+  - linux
+releaseDate: '2025-08-05'
+softwareType: standalone/other
+url: 'https://code.europa.eu/dit/dss-demonstrations.git'
+softwareVersion: '6.3'
