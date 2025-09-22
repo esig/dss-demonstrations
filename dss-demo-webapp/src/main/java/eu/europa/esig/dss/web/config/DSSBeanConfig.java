@@ -125,6 +125,9 @@ public class DSSBeanConfig {
 	@Value("${tl.loader.lotl.tl.versions}")
 	private List<Integer> lotlTLVersions;
 
+	@Value("${tl.loader.cache.folder:}")
+	private String tlCacheFolder;
+
 	@Value("${tl.loader.ades.enabled}")
 	private boolean adesLotlEnabled;
 
@@ -185,6 +188,15 @@ public class DSSBeanConfig {
 	@Value("${cache.ocsp.max.next.update:0}")
 	private long ocspMaxNextUpdate;
 
+	@Value("${cache.data.loader.folder:}")
+	private String cacheDataLoaderFolder;
+
+	@Value("${cache.crl.folder:}")
+	private String crlCacheFolder;
+
+	@Value("${cache.ocsp.folder:}")
+	private String ocspCacheFolder;
+
 	@Value("${dataloader.connection.timeout}")
 	private int connectionTimeout;
 
@@ -239,8 +251,24 @@ public class DSSBeanConfig {
 		FileCacheDataLoader fileCacheDataLoader = new FileCacheDataLoader();
 		fileCacheDataLoader.setDataLoader(dataLoader());
 		// Per default uses "java.io.tmpdir" property
-		// fileCacheDataLoader.setFileCacheDirectory(new File("/tmp"));
+		fileCacheDataLoader.setFileCacheDirectory(cacheDataLoaderDirectory());
 		return fileCacheDataLoader;
+	}
+
+	@Bean
+	public File cacheDataLoaderDirectory() {
+		File cacheFolder;
+		if (Utils.isStringNotEmpty(cacheDataLoaderFolder)) {
+			cacheFolder = new File(cacheDataLoaderFolder);
+		} else {
+			// create temp folder
+			cacheFolder = new File(System.getProperty("java.io.tmpdir"));
+		}
+		if (cacheFolder.mkdirs()) {
+			LOG.debug("Cache folder created : {}", cacheFolder.getAbsolutePath());
+		}
+		LOG.info("Cache folder : {}", cacheFolder.getAbsolutePath());
+		return cacheFolder;
 	}
 
 	@Bean
@@ -274,9 +302,25 @@ public class DSSBeanConfig {
 			return jdbcCacheCRLSource;
 		}
 		FileCacheCRLSource fileCacheCRLSource = new FileCacheCRLSource(onlineCRLSource());
+		fileCacheCRLSource.setFileCacheDirectory(crlCacheDirectory());
 		fileCacheCRLSource.setDefaultNextUpdateDelay(crlDefaultNextUpdate);
 		fileCacheCRLSource.setMaxNextUpdateDelay(crlMaxNextUpdate);
 		return fileCacheCRLSource;
+	}
+
+	public File crlCacheDirectory() {
+		File crlCache;
+		if (Utils.isStringNotEmpty(crlCacheFolder)) {
+			crlCache = new File(crlCacheFolder);
+		} else {
+			// create temp folder
+			crlCache = new File(System.getProperty("java.io.tmpdir"), "dss-revocation");
+		}
+		if (crlCache.mkdirs()) {
+			LOG.debug("CRL Cache folder created : {}", crlCache.getAbsolutePath());
+		}
+		LOG.info("CRL Cache folder : {}", crlCache.getAbsolutePath());
+		return crlCache;
 	}
 
 	@Bean
@@ -295,9 +339,25 @@ public class DSSBeanConfig {
 			return jdbcCacheOCSPSource;
 		}
 		FileCacheOCSPSource fileCacheOCSPSource = new FileCacheOCSPSource(onlineOCSPSource());
+		fileCacheOCSPSource.setFileCacheDirectory(ocspCacheDirectory());
 		fileCacheOCSPSource.setDefaultNextUpdateDelay(ocspDefaultNextUpdate);
 		fileCacheOCSPSource.setMaxNextUpdateDelay(ocspMaxNextUpdate);
 		return fileCacheOCSPSource;
+	}
+
+	public File ocspCacheDirectory() {
+		File ocspCache;
+		if (Utils.isStringNotEmpty(ocspCacheFolder)) {
+			ocspCache = new File(ocspCacheFolder);
+		} else {
+			// create temp folder
+			ocspCache = new File(System.getProperty("java.io.tmpdir"), "dss-revocation");
+		}
+		if (ocspCache.mkdirs()) {
+			LOG.debug("OCSP Cache folder created : {}", ocspCache.getAbsolutePath());
+		}
+		LOG.info("OCSP Cache folder : {}", ocspCache.getAbsolutePath());
+		return ocspCache;
 	}
 
 	@Bean
@@ -630,11 +690,17 @@ public class DSSBeanConfig {
 
 	@Bean
 	public File tlCacheDirectory() {
-		File rootFolder = new File(System.getProperty("java.io.tmpdir"));
-		File tslCache = new File(rootFolder, "dss-tsl-loader");
-		if (tslCache.mkdirs()) {
-			LOG.info("TL Cache folder : {}", tslCache.getAbsolutePath());
+		File tslCache;
+		if (Utils.isStringNotEmpty(tlCacheFolder)) {
+			tslCache = new File(tlCacheFolder);
+		} else {
+			// create temp folder
+			tslCache = new File(System.getProperty("java.io.tmpdir"), "dss-tsl-loader");
 		}
+		if (tslCache.mkdirs()) {
+			LOG.debug("TL Cache folder created : {}", tslCache.getAbsolutePath());
+		}
+		LOG.info("TL Cache folder : {}", tslCache.getAbsolutePath());
 		return tslCache;
 	}
 	
