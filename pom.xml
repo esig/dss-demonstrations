@@ -45,7 +45,7 @@
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.17</slf4j.version>
-		<logback-classic.version>1.5.18</logback-classic.version>
+		<logback-classic.version>1.5.19</logback-classic.version>
 
 		<cxf.version>4.1.2</cxf.version>
 		<swagger-ui.version>5.27.0</swagger-ui.version>
