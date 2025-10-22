@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.eu.oj.certificates.page}">
+	<body>		
+		<div layout:fragment="content">
+			<div class="card">
+				<div class="card-header">
+					<span class="badge badge-secondary pull-right">
+						<span th:text="${#lists.size(keystoreCertificates)}"></span>&nbsp;
+						<span th:text="#{label.eu.oj.certificates.page}"></span>
+					</span>
+    				<span th:text="#{label.trusted.certificates.from.OJ}"></span>
+				</div>
+				<div class="card-body" th:if="${keystoreCertificates != null}">
+					<div class="eu-official-journal">
+						<p><span th:text="#{label.keystore.synchronized.with}"></span>&nbsp;<a th:href="${currentOjUrl}" th:text="#{label.eu.oj.page}" target="_blank"></a></p>
+						<p th:if="${actualOjUrl == null}" class="text-danger" th:text="#{label.eu.oj.unable.retrieve}"></p>
+						<p th:if="${actualOjUrl != null && actualOjUrl != currentOjUrl}" class="text-danger">
+							<span th:text="#{label.eu.oj.keystore.outdated}"></span>&nbsp;
+							<a th:href="${actualOjUrl}" target="_blank" th:title="#{label.eu.oj.page}">link</a>
+						</p>
+					</div>
+					<div class="certificates">
+						<th:block th:each="certificateDTO, i : ${keystoreCertificates}">
+							<div th:replace="~{fragment/certificate :: certificateDTO(certificateDTO=${certificateDTO})}"></div>
+							<hr th:if="${! i.last}" />
+						</th:block>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>

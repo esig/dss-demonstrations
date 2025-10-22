@@ -31,6 +31,11 @@
     </HBox>
 
     <HBox styleClass="hbox-style">
+        <Label styleClass="label-style" text="Cryptographic suite"/>
+        <Button fx:id="cryptographicSuiteSelectButton" mnemonicParsing="false" text="Select cryptographic suitey..."/>
+    </HBox>
+
+    <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text="Signing Certificate"/>
         <Button fx:id="signingCertificateSelectButton" mnemonicParsing="false" text="Select signing certificate..."/>
     </HBox>

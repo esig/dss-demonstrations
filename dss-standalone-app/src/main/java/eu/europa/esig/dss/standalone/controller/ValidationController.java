@@ -51,6 +51,9 @@ public class ValidationController extends AbstractController {
     public Button validationPolicySelectButton;
 
     @FXML
+    public Button cryptographicSuiteSelectButton;
+
+    @FXML
     public HBox validationBox;
 
     @FXML
@@ -110,6 +113,17 @@ public class ValidationController extends AbstractController {
             }
         });
         validationPolicySelectButton.textProperty().bindBidirectional(model.fileValidationPolicyProperty(), new FileToStringConverter());
+
+        cryptographicSuiteSelectButton.setOnAction(new EventHandler<>() {
+            @Override
+            public void handle(ActionEvent event) {
+                DSSFileChooser fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
+                        "Cryptographic suite file", "Validation policy (*.xml)", "*.xml");
+                File cryptographicSuite = fileChooser.showOpenDialog(stage);
+                model.setCryptographicSuite(cryptographicSuite);
+            }
+        });
+        cryptographicSuiteSelectButton.textProperty().bindBidirectional(model.fileCryptographicSuiteProperty(), new FileToStringConverter());
 
         signingCertificateSelectButton.setOnAction(new EventHandler<>() {
             @Override

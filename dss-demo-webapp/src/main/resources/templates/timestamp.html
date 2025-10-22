@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.timestamp.doc}">
+	<body>		
+		<div layout:fragment="content">
+			
+			<div th:replace="~{fragment/disclaimer-mock-tsp :: mock-tsp-warn}"></div>
+            
+            <form method="post" th:action="@{/timestamp-a-document}" th:object="${timestampForm}" enctype="multipart/form-data">
+                <div th:replace="~{fragment/fields :: field-original-files}"></div>
+
+                <div th:replace="~{fragment/fields :: field-container-type-form-timestamp}"></div>
+
+				<div th:replace="~{fragment/fields :: submit-reset}"></div>
+            </form>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage='Replay Diagnostic Data'">
+	<body>		
+		<div layout:fragment="content">
+           <form method="post" enctype="multipart/form-data" th:action="@{/replay-diagnostic-data}" th:object="${replayDiagForm}">
+
+				<div th:replace="~{fragment/fields :: field-diagnostic-data}"></div>
+				<div th:replace="~{fragment/fields :: field-reset-date}"></div>
+			    <div th:replace="~{fragment/fields :: field-validation-level}"></div>
+
+			   <div class="card mb-3">
+				   <div class="card-header cursor-pointer" data-toggle='collapse' data-target='#advancedOptions' aria-expanded='false'>
+					   <span th:text="#{label.validation.advanced.options}" th:remove="tag"></span>
+				   </div>
+				   <div id="advancedOptions" class="card-body collapse in">
+					   <div th:replace="~{fragment/fields :: field-validation-policy}"></div>
+					   <div th:replace="~{fragment/fields :: field-cryptographic-suite}"></div>
+				   </div>
+			   </div>
+				
+				<div th:replace="~{fragment/fields :: submit-reset}"></div>
+             </form>
+		</div>
+		<div layout:fragment="scripts">
+			<script type="text/javascript">
+			$('[data-toggle="tooltip"]').tooltip();
+			
+			$('input[name="defaultPolicy"]:radio').change(
+				function() {
+					$('#policyFile').attr("disabled",
+							this.value == 'true');
+				});
+			</script>
+		</div>
+	</body>
+</html>

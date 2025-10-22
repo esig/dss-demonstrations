@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head th:replace="~{fragment/head :: head}"></head>
+
+<body>
+
+	<th:block th:replace="~{fragment/logo :: logo}"></th:block>
+    
+    <th:block th:replace="~{fragment/nav_bar :: nav_bar}"></th:block>
+	
+	<th:block th:replace="~{fragment/breadcrumb :: breadcrumb}"></th:block>
+
+    <section class="container">
+	    <!-- BODY -->
+		<div class="row">
+			<div class="col-sm-3 d-print-none mb-4">
+				<th:block th:replace="~{fragment/menu :: menu}"></th:block>
+			</div>
+          
+			<!-- CONTENT -->
+			<div class="col-sm-9 dss-main">
+				<h1 class="mb-3" th:text="${currentPage}"></h1>
+				<div class="content" layout:fragment="content"></div>
+			</div>
+		</div>
+    </section>
+    
+    <th:block th:replace="~{fragment/footer :: footer}"></th:block>
+    
+	<div class="scripts" layout:fragment="scripts"></div>
+</body>
+</html>

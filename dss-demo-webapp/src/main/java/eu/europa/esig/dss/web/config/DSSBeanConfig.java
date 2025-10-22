@@ -6,6 +6,7 @@ import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.tsl.TrustServiceStatusAndInformationExtensions;
 import eu.europa.esig.dss.pades.signature.ExternalCMSService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.pades.signature.PAdESWithExternalCMSService;
@@ -21,7 +22,10 @@ import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
+import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
+import eu.europa.esig.dss.spi.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
@@ -30,15 +34,15 @@ import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
+import eu.europa.esig.dss.tsl.function.GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
+import eu.europa.esig.dss.tsl.function.TrustAnchorPeriodPredicate;
 import eu.europa.esig.dss.tsl.function.TypeOtherTSLPointer;
 import eu.europa.esig.dss.tsl.function.XMLOtherTSLPointer;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
+import eu.europa.esig.dss.tsl.sha2.Sha2FileCacheDataLoader;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CommonCertificateVerifier;
-import eu.europa.esig.dss.validation.SignaturePolicyProvider;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
@@ -73,7 +77,7 @@ import java.util.List;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, JdbcConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
+@Import({ PropertiesConfig.class, JdbcConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
 		SchedulingConfig.class })
 @ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {
@@ -82,6 +86,12 @@ public class DSSBeanConfig {
 
 	@Value("${default.validation.policy}")
 	private String defaultValidationPolicy;
+
+	@Value("${default.cryptographic.suite.xml:}")
+	private String defaultCryptographicSuiteXml;
+
+	@Value("${default.cryptographic.suite.json:}")
+	private String defaultCryptographicSuiteJson;
 
 	@Value("${default.certificate.validation.policy}")
 	private String defaultCertificateValidationPolicy;
@@ -104,6 +114,15 @@ public class DSSBeanConfig {
 	@Value("${oj.content.keystore.password}")
 	private String ksPassword;
 
+	@Value("${tl.loader.trust.all}")
+	private boolean tlTrustAllStrategy;
+
+	@Value("${tl.loader.lotl.use.sunset.date}")
+	private boolean useSunsetDate;
+
+	@Value("${tl.loader.lotl.tl.versions}")
+	private List<Integer> lotlTLVersions;
+
 	@Value("${tl.loader.ades.enabled}")
 	private boolean adesLotlEnabled;
 
@@ -121,6 +140,12 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.ades.tsl.type}")
 	private String adesTSLType;
+
+	@Value("${tl.loader.ades.tsl.status.list}")
+	private List<String> adesTSLStatusList;
+
+	@Value("${tl.loader.ades.tl.versions}")
+	private List<Integer> adesTLVersions;
 
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
@@ -167,6 +192,9 @@ public class DSSBeanConfig {
 	@Value("${dataloader.redirect.enabled}")
 	private boolean redirectEnabled;
 
+	@Value("${dataloader.use.system.properties}")
+	private boolean useSystemProperties;
+
 	@Value("${trusted.source.keystore.type:}")
 	private String trustSourceKsType;
 
@@ -175,9 +203,6 @@ public class DSSBeanConfig {
 
 	@Value("${trusted.source.keystore.password:}")
 	private String trustSourceKsPassword;
-
-	@Value("${bc.rsa.max_mr_tests:}")
-	private String bcRsaValidation;
 
 
 	// can be null
@@ -507,10 +532,20 @@ public class DSSBeanConfig {
 	@Bean
 	public DSSFileLoader onlineLoader() {
 		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
-		onlineFileLoader.setCacheExpirationTime(0);
-		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setCacheExpirationTime(-1);
+		onlineFileLoader.setDataLoader(tlDataLoader());
 		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
-		return onlineFileLoader;
+		return Sha2FileCacheDataLoader.initSha2DailyUpdateDataLoader(onlineFileLoader);
+	}
+
+	@Bean
+	public CommonsDataLoader tlDataLoader() {
+		if (tlTrustAllStrategy) {
+			LOG.info("TrustAllStrategy is enabled on TL loading.");
+			return trustAllDataLoader();
+		} else {
+			return dataLoader();
+		}
 	}
 
 	private LOTLSource[] listOfTrustedListSources() {
@@ -529,6 +564,12 @@ public class DSSBeanConfig {
 		lotlSource.setCertificateSource(ojContentKeyStore());
 		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(currentOjUrl));
 		lotlSource.setPivotSupport(true);
+		if (useSunsetDate) {
+			lotlSource.setTrustAnchorValidityPredicate(new GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate());
+		}
+		if (Utils.isCollectionNotEmpty(lotlTLVersions)) {
+			lotlSource.setTLVersions(lotlTLVersions);
+		}
 		return lotlSource;
 	}
 
@@ -543,7 +584,24 @@ public class DSSBeanConfig {
 		adesLOTL.setLotlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)));
 		adesLOTL.setTlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)).negate()); // allow all TSL Types
 
+		if (Utils.isCollectionNotEmpty(adesTSLStatusList)) {
+			adesLOTL.setTrustAnchorValidityPredicate(adesLOTLTrustAnchorValidityPrecicate());
+		}
+		if (Utils.isCollectionNotEmpty(adesTLVersions)) {
+			adesLOTL.setTLVersions(adesTLVersions);
+		}
+
 		return adesLOTL;
+	}
+
+	@Bean
+	public TrustAnchorPeriodPredicate adesLOTLTrustAnchorValidityPrecicate() {
+		return new TrustAnchorPeriodPredicate() {
+			@Override
+			public boolean test(TrustServiceStatusAndInformationExtensions trustServiceStatusAndInformationExtensions) {
+				return adesTSLStatusList.stream().anyMatch(v -> v.equals(trustServiceStatusAndInformationExtensions.getStatus()));
+			}
+		};
 	}
 
 	@Bean
@@ -553,6 +611,22 @@ public class DSSBeanConfig {
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader());
 		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
 		return offlineFileLoader;
+	}
+
+	@Bean
+	public ClassPathResource cryptographicSuiteXml() {
+		if (Utils.isStringNotEmpty(defaultCryptographicSuiteXml)) {
+			return new ClassPathResource(defaultCryptographicSuiteXml);
+		}
+		return null;
+	}
+
+	@Bean
+	public ClassPathResource cryptographicSuiteJson() {
+		if (Utils.isStringNotEmpty(defaultCryptographicSuiteJson)) {
+			return new ClassPathResource(defaultCryptographicSuiteJson);
+		}
+		return null;
 	}
 
 	@Bean
@@ -574,17 +648,11 @@ public class DSSBeanConfig {
         return sslCertificateLoader;
     }
 
-	@Bean
-	public void bcRsaValidation() {
-		if (Utils.isStringNotEmpty(bcRsaValidation)) {
-			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
-		}
-	}
-
 	private <C extends CommonsDataLoader> C configureCommonsDataLoader(C dataLoader) {
 		dataLoader.setTimeoutConnection(connectionTimeout);
 		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
 		dataLoader.setRedirectsEnabled(redirectEnabled);
+		dataLoader.setUseSystemProperties(useSystemProperties);
 		dataLoader.setProxyConfig(proxyConfig);
 		return dataLoader;
 	}

@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.13.RC1</version>
+		<version>6.3</version>
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
 	
 	<properties>
-		<javafx.version>18</javafx.version>
+		<javafx.version>17</javafx.version>
 	</properties>
 
 	<build>
@@ -114,6 +114,21 @@
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-evidence-record-xml</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-evidence-record-asn1</artifactId>
+		</dependency>
+
+		<!-- Choose your CMS implementation -->
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-cms-object</artifactId>
+		</dependency>
+		<!--        <dependency>-->
+		<!--            <groupId>eu.europa.ec.joinup.sd-dss</groupId>-->
+		<!--            <artifactId>dss-cms-stream</artifactId>-->
+		<!--        </dependency>-->
+
 		<!-- Choose your PAdES implementation -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -144,6 +159,20 @@
 			<artifactId>dss-crl-parser-stream</artifactId>
 		</dependency>
 
+		<!-- Validation policy support -->
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-policy-jaxb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-policy-crypto-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-policy-crypto-json</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop-core</artifactId>
@@ -158,7 +187,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
+					<artifactId>javax-api</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.ant</groupId>
@@ -168,12 +197,20 @@
 					<groupId>org.apache.pdfbox</groupId>
 					<artifactId>fontbox</artifactId>
 				</exclusion>
+				<exclusion> <!-- Exclude to avoid JDK vs provided dependency class conflict -->
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-simple</artifactId>
+		    <artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 		
 	</dependencies>

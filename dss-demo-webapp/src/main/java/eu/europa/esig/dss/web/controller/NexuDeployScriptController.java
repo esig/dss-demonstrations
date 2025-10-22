@@ -18,9 +18,6 @@ import java.util.Map;
 @Controller
 public class NexuDeployScriptController {
 
-	@Value("${nexuDownloadUrl}")
-	private String nexuDownloadUrl;
-
 	@Value("${nexuVersion}")
 	private String nexuVersion;
 
@@ -45,11 +42,8 @@ public class NexuDeployScriptController {
 		StringWriter outWriter = new StringWriter();
 
 		Map<String, String> model = new HashMap<>();
-
-		model.put("nexuDownloadUrl", nexuDownloadUrl);
 		model.put("nexuVersion", nexuVersion);
 		model.put("nexuUrl", nexuUrl);
-
 		template.process(model, outWriter);
 
 		HttpHeaders headers = new HttpHeaders();

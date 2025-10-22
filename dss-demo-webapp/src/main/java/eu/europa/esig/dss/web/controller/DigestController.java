@@ -18,11 +18,11 @@ import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureDigestForm;
-import eu.europa.esig.dss.web.service.SigningService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,9 +37,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
@@ -47,27 +44,14 @@ import java.util.List;
 @Controller
 @SessionAttributes(value = { "signatureDigestForm", "signedDocument" })
 @RequestMapping(value = "/sign-a-digest")
-public class DigestController {
+public class DigestController extends AbstractSignatureController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DigestController.class);
 
 	private static final String SIGN_DIGEST = "signature-digest";
-	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "signatureForm", "digestAlgorithm", "digestToSign", "documentName", "fileToCompute", 
 			"signatureLevel", "signWithExpiredCertificate", "addContentTimestamp" };
-
-	@Value("${nexuUrl}")
-	private String nexuUrl;
-
-	@Value("${nexuDownloadUrl}")
-	private String nexuDownloadUrl;
-	
-    @Value("${default.digest.algo}")
-    private String defaultDigestAlgo;
-
-	@Autowired
-	private SigningService signingService;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -87,13 +71,12 @@ public class DigestController {
 		SignatureDigestForm signatureDigestForm = new SignatureDigestForm();
         signatureDigestForm.setDigestAlgorithm(DigestAlgorithm.forName(defaultDigestAlgo, DigestAlgorithm.SHA256));
 		model.addAttribute("signatureDigestForm", signatureDigestForm);
-		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
 		return SIGN_DIGEST;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
-			@ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
+										  @ModelAttribute("signatureDigestForm") @Valid SignatureDigestForm signatureDigestForm, BindingResult result) {
 		if (result.hasErrors()) {
 			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();

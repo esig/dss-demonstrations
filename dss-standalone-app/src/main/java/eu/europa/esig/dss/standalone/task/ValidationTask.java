@@ -2,9 +2,11 @@ package eu.europa.esig.dss.standalone.task;
 
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
-import eu.europa.esig.dss.model.InMemoryDocument;
-import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.model.identifier.OriginalIdentifierProvider;
+import eu.europa.esig.dss.model.policy.ValidationPolicy;
+import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
@@ -12,19 +14,17 @@ import eu.europa.esig.dss.standalone.model.ValidationModel;
 import eu.europa.esig.dss.standalone.source.CertificateVerifierBuilder;
 import eu.europa.esig.dss.standalone.source.DataLoaderConfigLoader;
 import eu.europa.esig.dss.standalone.source.PropertyReader;
+import eu.europa.esig.dss.standalone.utils.StandaloneAppUtils;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.DocumentValidator;
-import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
-import eu.europa.esig.dss.validation.SignaturePolicyProvider;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.identifier.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.policy.ValidationPolicyLoader;
 import eu.europa.esig.dss.validation.reports.Reports;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,16 +63,8 @@ public class ValidationTask extends Task<Reports> {
 
             if (model.getSigningCertificate() != null) {
                 CommonCertificateSource signingCertificateSource = new CommonCertificateSource();
-                signingCertificateSource.addCertificate(DSSUtils.loadCertificate(model.getSigningCertificate()));
+                signingCertificateSource.addCertificate(StandaloneAppUtils.toCertificateToken(model.getSigningCertificate()));
                 documentValidator.setSigningCertificateSource(signingCertificateSource);
-            }
-
-            CertificateSource adjunctCertificateSource = new CommonCertificateSource();
-            if (Utils.isCollectionNotEmpty(model.getAdjunctCertificates())) {
-                adjunctCertificateSource = new CommonCertificateSource();
-                for (File file : model.getAdjunctCertificates()) {
-                    adjunctCertificateSource.addCertificate(DSSUtils.loadCertificate(file));
-                }
             }
 
             documentValidator.setTokenIdentifierProvider(model.isUserFriendlyIdentifiers() ?
@@ -80,23 +72,31 @@ public class ValidationTask extends Task<Reports> {
 
             documentValidator.setIncludeSemantics(model.isSemantics());
 
-            CertificateVerifier certificateVerifier = new CertificateVerifierBuilder()
-                    .setTslCertificateSource(tslCertificateSource)
-                    .setAdjunctCertificateSource(adjunctCertificateSource)
-                    .build();
+            CertificateVerifierBuilder certificateVerifierBuilder = new CertificateVerifierBuilder()
+                    .setTslCertificateSource(tslCertificateSource);
+
+            CertificateSource adjunctCertificateSource = StandaloneAppUtils.toCertificateSource(model.getAdjunctCertificates());
+            if (adjunctCertificateSource != null) {
+                certificateVerifierBuilder.setAdjunctCertificateSource(adjunctCertificateSource);
+            }
+            CertificateVerifier certificateVerifier = certificateVerifierBuilder.build();
             documentValidator.setCertificateVerifier(certificateVerifier);
 
             SignaturePolicyProvider signaturePolicyProvider = new SignaturePolicyProvider();
             signaturePolicyProvider.setDataLoader(DataLoaderConfigLoader.getDataLoader());
             documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
 
-            DSSDocument validationPolicy = null;
+            ValidationPolicyLoader validationPolicyLoader;
             if (model.getValidationPolicy() != null) {
-                validationPolicy = new FileDocument(model.getValidationPolicy());
+                validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(model.getValidationPolicy());
             } else {
-                validationPolicy = loadDefaultValidationPolicy();
+                validationPolicyLoader = fromDefaultValidationPolicy();
+            }
+            if (model.getCryptographicSuite() != null) {
+                validationPolicyLoader = validationPolicyLoader.withCryptographicSuite(model.getCryptographicSuite());
             }
 
+            ValidationPolicy validationPolicy = validationPolicyLoader.create();
             return documentValidator.validateDocument(validationPolicy);
 
         } catch (Exception e) {
@@ -105,13 +105,13 @@ public class ValidationTask extends Task<Reports> {
         }
     }
 
-    private DSSDocument loadDefaultValidationPolicy() {
+    private ValidationPolicyLoader fromDefaultValidationPolicy() {
         String policyPath = PropertyReader.getProperty("default.validation.policy");
         if (Utils.isStringEmpty(policyPath)) {
             throw new IllegalArgumentException("default.validation.policy is not defined!");
         }
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(policyPath)) {
-            return new InMemoryDocument(is);
+            return ValidationPolicyLoader.fromValidationPolicy(is);
 
         } catch (Exception e) {
             throwException("Unable to load validation policy", e);

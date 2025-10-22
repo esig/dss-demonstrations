@@ -1,17 +1,20 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.enumerations.ValidationLevel;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
+import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.Date;
 import java.util.List;
 
 public class ValidationForm {
 
+	@AssertMultipartFile
 	private MultipartFile signedFile;
 
+	@AssertMultipartFile
 	private List<OriginalFile> originalFiles;
 
 	private Date validationTime;
@@ -22,12 +25,19 @@ public class ValidationForm {
 
 	private boolean defaultPolicy;
 
+	@AssertMultipartFile
 	private MultipartFile policyFile;
+
+	@AssertMultipartFile
+	private MultipartFile cryptographicSuite;
 	
+	@AssertMultipartFile
 	private MultipartFile signingCertificate;
 
+	@AssertMultipartFile
 	private List<MultipartFile> adjunctCertificates;
 
+	@AssertMultipartFile
 	private List<MultipartFile> evidenceRecordFiles;
 	
 	private boolean includeCertificateTokens;
@@ -102,6 +112,14 @@ public class ValidationForm {
 
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
+	}
+
+	public MultipartFile getCryptographicSuite() {
+		return cryptographicSuite;
+	}
+
+	public void setCryptographicSuite(MultipartFile cryptographicSuite) {
+		this.cryptographicSuite = cryptographicSuite;
 	}
 
 	public MultipartFile getSigningCertificate() {

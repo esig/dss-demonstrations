@@ -97,7 +97,7 @@ public class RestPAdESWithExternalCMSSignatureIT extends AbstractRestIT {
             ToBeSignedDTO dataToSign = externalCmsService.getDataToSign(
                     new DataToSignExternalCmsDTO(messageDigest, cmsParameters));
             SignatureValue signatureValue = token.sign(
-                    DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+                    DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA512, dssPrivateKeyEntry);
             SignatureValueDTO signatureValueDTO = DTOConverter.toSignatureValueDTO(signatureValue);
             RemoteDocument cmsSignature = externalCmsService.signMessageDigest(
                     new SignMessageDigestExternalCmsDTO(messageDigest, cmsParameters, signatureValueDTO));

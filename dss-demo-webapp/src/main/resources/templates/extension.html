@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.extend}">
+	<body>		
+		<div layout:fragment="content">
+			<div th:replace="~{fragment/disclaimer-mock-tsp :: mock-tsp-warn}"></div>
+            
+            <form method="post" th:action="@{/extension}" th:object="${extensionForm}" enctype="multipart/form-data">
+
+                <input type="hidden" id="process" value="EXTENSION" />
+
+                <div th:replace="~{fragment/fields :: field-signed-file}"></div>
+
+                <div th:replace="~{fragment/fields :: field-original-files}"></div>
+
+                <div th:replace="~{fragment/fields :: field-container-type-form}"></div>
+
+                <div th:replace="~{fragment/fields :: field-signature-form}"></div>
+
+                <div th:replace="~{fragment/fields :: field-signature-level}"></div>
+				
+				<div th:replace="~{fragment/fields :: submit-reset}"></div>
+            </form>
+            
+		</div>
+		<div layout:fragment="scripts">
+   			<script type="text/javascript" th:src="@{/scripts/jsSignatureLevel.js}"></script>
+		</div>
+	</body>
+</html>

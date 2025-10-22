@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.13.RC1</version>
+		<version>6.3</version>
 	</parent>
 
 	<name>DSS Package: OOTB Web-Application</name>
@@ -16,9 +16,9 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x86-32_windows_hotspot_8u392b08.zip</jre.download.link>
-		<jre.root.folder>jdk8u392-b08-jre</jre.root.folder>
-		<tomcat.version>8.5.95</tomcat.version>
+		<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.8%2B9/OpenJDK21U-jre_x64_windows_hotspot_21.0.8_9.zip</jre.download.link>
+		<jre.root.folder>jdk-21.0.8+9-jre</jre.root.folder>
+		<tomcat.version>11.0.9</tomcat.version>
 		<tomcat.root.folder>apache-tomcat-${tomcat.version}</tomcat.root.folder>
 	</properties>
 
@@ -54,7 +54,7 @@
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
 				<artifactId>download-maven-plugin</artifactId>
-				<version>1.7.1</version>
+				<version>1.13.0</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -104,11 +104,17 @@
 	
 	<profiles>
 		<profile>
-			<id>java21</id>
+			<id>java17</id>
 			<properties>
-				<jre.download.link>https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jre_x64_windows_hotspot_21.0.1_12.zip</jre.download.link>
-				<jre.root.folder>jdk-21.0.1+12-jre</jre.root.folder>
-				<tomcat.version>9.0.82</tomcat.version>
+				<jre.download.link>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9.1/OpenJDK17U-jre_x64_windows_hotspot_17.0.9_9.zip</jre.download.link>
+				<jre.root.folder>jdk-17.0.9+9-jre</jre.root.folder>
+			</properties>
+		</profile>
+		<profile>
+			<id>java24</id>
+			<properties>
+				<jre.download.link>https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.2%2B12/OpenJDK24U-jre_x64_windows_hotspot_24.0.2_12.zip</jre.download.link>
+				<jre.root.folder>jdk-24.0.2+12-jre</jre.root.folder>
 			</properties>
 		</profile>
 	</profiles>

@@ -17,11 +17,11 @@ import eu.europa.esig.dss.web.model.GetDataToSignResponse;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import eu.europa.esig.dss.web.model.SignatureDocumentForm;
-import eu.europa.esig.dss.web.service.SigningService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,9 +36,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
@@ -46,23 +43,13 @@ import java.util.List;
 @Controller
 @SessionAttributes(value = { "signaturePdfForm", "signedPdfDocument" })
 @RequestMapping(value = "/sign-a-pdf")
-public class SignaturePdfController {
+public class SignaturePdfController extends AbstractSignatureController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignaturePdfController.class);
 
 	private static final String SIGNATURE_PDF_PARAMETERS = "signature-pdf";
-	private static final String SIGNATURE_PROCESS = "nexu-signature-process";
 	
 	private static final String[] ALLOWED_FIELDS = { "documentToSign" };
-
-	@Value("${nexuUrl}")
-	private String nexuUrl;
-
-	@Value("${nexuDownloadUrl}")
-	private String nexuDownloadUrl;
-
-	@Autowired
-	private SigningService signingService;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -80,13 +67,12 @@ public class SignaturePdfController {
 		signaturePdfForm.setSignaturePackaging(SignaturePackaging.ENVELOPED);
 
 		model.addAttribute("signaturePdfForm", signaturePdfForm);
-		model.addAttribute("nexuDownloadUrl", nexuDownloadUrl);
 		return SIGNATURE_PDF_PARAMETERS;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String sendSignatureParameters(Model model, HttpServletRequest response,
-			@ModelAttribute("signaturePdfForm") @Valid SignatureDocumentForm signaturePdfForm, BindingResult result) {
+										  @ModelAttribute("signaturePdfForm") @Valid SignatureDocumentForm signaturePdfForm, BindingResult result) {
 		if (result.hasErrors()) {
 			if (LOG.isDebugEnabled()) {
 				List<ObjectError> allErrors = result.getAllErrors();

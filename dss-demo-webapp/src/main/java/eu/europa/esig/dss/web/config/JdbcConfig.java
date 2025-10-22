@@ -34,17 +34,14 @@ public class JdbcConfig {
 
 	@Bean
 	public DataSource dataSource() {
-		if (Utils.isTrue(jdbcEnabled)) {
-			HikariDataSource ds = new HikariDataSource();
-			ds.setPoolName("DSS-Hikari-Pool");
-			ds.setJdbcUrl(dataSourceUrl);
-			ds.setDriverClassName(dataSourceDriverClassName);
-			ds.setUsername(username);
-			ds.setPassword(password);
-			ds.setAutoCommit(false);
-			return ds;
-		}
-		return null;
+		HikariDataSource ds = new HikariDataSource();
+		ds.setPoolName("DSS-Hikari-Pool");
+		ds.setJdbcUrl(dataSourceUrl);
+		ds.setDriverClassName(dataSourceDriverClassName);
+		ds.setUsername(username);
+		ds.setPassword(password);
+		ds.setAutoCommit(false);
+		return ds;
 	}
 
 	@Bean

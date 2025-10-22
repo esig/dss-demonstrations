@@ -59,7 +59,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testWithNoPolicyAndNoOriginalFile() throws Exception {
+	public void testWithNoPolicyAndNoOriginalFile() {
 
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
@@ -82,7 +82,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testWithNoPolicyAndOriginalFile() throws Exception {
+	public void testWithNoPolicyAndOriginalFile() {
 
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 		RemoteDocument originalFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
@@ -106,7 +106,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testWithNoPolicyAndDigestOriginalFile() throws Exception {
+	public void testWithNoPolicyAndDigestOriginalFile() {
 
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 
@@ -132,7 +132,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testWithPolicyAndOriginalFile() throws Exception {
+	public void testWithPolicyAndOriginalFile() {
 
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 		RemoteDocument originalFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
@@ -157,7 +157,61 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testWithPolicyAndNoOriginalFile() throws Exception {
+	void testWithPolicyAndCryptoSuiteAndOriginalFile(){
+
+		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+		RemoteDocument originalFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
+		RemoteDocument policy = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/constraint.xml"));
+		RemoteDocument cryptographicSuite = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/dss-crypto-suite.json"));
+
+		DataToValidateDTO dto = new DataToValidateDTO(signedFile, originalFile, policy, cryptographicSuite);
+
+		WSReportsDTO result = validationService.validateSignature(dto);
+
+		assertNotNull(result.getDiagnosticData());
+		assertNotNull(result.getDetailedReport());
+		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
+
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getIndication());
+		assertEquals(SubIndication.NO_CERTIFICATE_CHAIN_FOUND, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getSubIndication());
+
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(),
+				result.getValidationReport());
+		assertNotNull(reports);
+	}
+
+	@Test
+	void testWithCryptoSuiteAndOriginalFile(){
+		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
+		RemoteDocument originalFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sample.xml"));
+		RemoteDocument cryptographicSuite = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/dss-crypto-suite.json"));
+
+		DataToValidateDTO dto = new DataToValidateDTO();
+
+		dto.setSignedDocument(signedFile);
+		dto.setOriginalDocuments(Collections.singletonList(originalFile));
+		dto.setCryptographicSuite(cryptographicSuite);
+
+		WSReportsDTO result = validationService.validateSignature(dto);
+
+		assertNotNull(result.getDiagnosticData());
+		assertNotNull(result.getDetailedReport());
+		assertNotNull(result.getSimpleReport());
+		assertNotNull(result.getValidationReport());
+
+		assertEquals(1, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().size());
+		assertEquals(Indication.INDETERMINATE, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getIndication());
+		assertEquals(SubIndication.NO_CERTIFICATE_CHAIN_FOUND, result.getSimpleReport().getSignatureOrTimestampOrEvidenceRecord().get(0).getSubIndication());
+
+		Reports reports = new Reports(result.getDiagnosticData(), result.getDetailedReport(), result.getSimpleReport(),
+				result.getValidationReport());
+		assertNotNull(reports);
+	}
+
+	@Test
+	public void testWithPolicyAndNoOriginalFile() {
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/xades-detached.xml"));
 		RemoteDocument policy = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/constraint.xml"));
 
@@ -180,7 +234,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testGetOriginals() throws Exception {
+	public void testGetOriginals() {
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO();
@@ -198,7 +252,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testGetOriginalsWithoutId() throws Exception {
+	public void testGetOriginalsWithoutId() {
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO();
@@ -212,7 +266,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 	}
 
 	@Test
-	public void testGetOriginalsWithWrongId() throws Exception {
+	public void testGetOriginalsWithWrongId() {
 		RemoteDocument signedFile = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/XAdESLTA.xml"));
 
 		DataToValidateDTO toValidate = new DataToValidateDTO();

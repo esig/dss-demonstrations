@@ -1,13 +1,13 @@
 package eu.europa.esig.dss.web.model;
 
-import javax.validation.constraints.AssertTrue;
-
+import eu.europa.esig.dss.enumerations.ValidationLevel;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
+import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;
-
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
 
 public class ReplayDiagForm {
 
+	@AssertMultipartFile
 	private MultipartFile diagnosticFile;
 	
 	private ValidationLevel validationLevel;
@@ -16,7 +16,11 @@ public class ReplayDiagForm {
 	
 	private boolean defaultPolicy;
 
+	@AssertMultipartFile
 	private MultipartFile policyFile;
+
+	@AssertMultipartFile
+	private MultipartFile cryptographicSuite;
 
 	public MultipartFile getDiagnosticFile() {
 		return diagnosticFile;
@@ -56,6 +60,14 @@ public class ReplayDiagForm {
 
 	public void setPolicyFile(MultipartFile policyFile) {
 		this.policyFile = policyFile;
+	}
+
+	public MultipartFile getCryptographicSuite() {
+		return cryptographicSuite;
+	}
+
+	public void setCryptographicSuite(MultipartFile cryptographicSuite) {
+		this.cryptographicSuite = cryptographicSuite;
 	}
 	
 	@AssertTrue(message = "{error.diagnostic.file.mandatory}")

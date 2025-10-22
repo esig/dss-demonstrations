@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.validation.results}">
+<body>
+	<div class="p-0" layout:fragment="content">
+		<ul class="nav nav-tabs nav-justified d-print-none" id="tabsResult">
+			<li class="nav-item" th:if="${simpleReport} != null" role="presentation">
+				<a class="nav-link active" href="#simple-report" th:text="#{label.simple.report}" data-toggle="tab" role="tab" 
+						aria-controls="simple-report" aria-selected="true"></a>
+			</li>
+			<li class="nav-item" th:if="${detailedReport} != null" role="presentation">
+				<a class="nav-link" href="#detailed-report" th:text="#{label.detailed.report}" data-toggle="tab" role="tab" 
+						aria-controls="detailed-report" aria-selected="false"></a>
+			</li>
+			<li class="nav-item" th:if="${diagnosticDataXml} != null" role="presentation">
+				<a class="nav-link" href="#diagnostic-tree" th:text="#{label.diagnostic.tree}" data-toggle="tab" role="tab" 
+						aria-controls="diagnostic-tree" aria-selected="false"></a>
+			</li>
+			<li class="nav-item" th:if="${etsiValidationReport} != null" role="presentation">
+				<a class="nav-link" href="#etsi-validation-report" th:text="#{label.etsi.validation.report}" data-toggle="tab" 
+						role="tab" aria-controls="etsi-validation-report" aria-selected="false"></a>
+			</li>
+		</ul>
+
+		<div class="tab-content mt-2">
+		
+			<div th:if="${simpleReport} != null" role="tabcard" class="tab-pane fade in active show report" id="simple-report">
+				<div class="position-relative">
+					<div class="position-absolute btn-group d-print-none" role="toolbar" style="margin: 6px; z-index : 3; right : 0">
+						<button type="button" class="btn btn-light"
+							onclick="window.print();">
+							<i class="fa fa-print"></i>&nbsp;<span th:text="#{label.print}"></span>
+						</button>
+						<a class="btn btn-light"
+							th:href="@{/validation/download-simple-report}" role="button"
+							th:if="${displayDownloadPdf}">
+							<i class="fa fa-download"></i>&nbsp;<span th:text="#{label.download.pdf}"></span>
+						</a>
+					</div>
+
+					<div class="w-100" th:utext="${simpleReport}"></div>
+				</div>
+			</div>
+		
+			<div th:if="${detailedReport} != null" role="tabcard" class="tab-pane fade report" id="detailed-report">
+				<div class="position-relative">
+					<div id="detailed-report-buttons" class="btn-group ml-auto align-self-center d-print-none" role="toolbar">
+						<button type="button" class="btn btn-light switch-annotations">
+							<i class="icon fa fa-commenting-o"></i>&nbsp;
+							<span class="label-show" th:text="#{label.annotations.show}"></span>
+							<span class="label-hide d-none" th:text="#{label.annotations.hide}"></span>
+						</button>
+						<button type="button" class="btn btn-light"
+							onclick="window.print();">
+							<i class="fa fa-print"></i>&nbsp;<span th:text="#{label.print}"></span>
+						</button>
+						<a class="btn btn-light"
+							th:href="@{/validation/download-detailed-report}" role="button"
+							th:if="${displayDownloadPdf}">
+							<i class="fa fa-download"></i>&nbsp;<span th:text="#{label.download.pdf}"></span>
+						</a>
+					</div>
+
+					<div class="w-100" th:utext="${detailedReport}"></div>
+				</div>
+			</div>
+			<div th:if="${diagnosticDataXml} != null" role="tabcard" class="tab-pane fade report" id="diagnostic-tree">
+				<div class="card mb-2">
+					<div class="card-header collapsed cursor-pointer" data-toggle="collapse"
+						data-target="#downloads" aria-expanded='false'>
+						<h3 th:text="#{label.validation.download}" th:remove="tag"></h3>
+					</div>
+
+					<div class="card-body collapse show" id="downloads">
+						<div class="row">
+							<div class="col-sm-3">
+								<p th:text="#{label.report}"></p>
+							</div>
+							<div class="col-sm-9">
+								<ul class="list-unstyled">
+									<li>
+										<a th:href="@{/validation/download-diagnostic-data}">
+											<span th:text="#{label.diagnostic.data}"></span>
+											<i class="fa fa-download"></i>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="row" th:if="${allCertificates != null && allCertificates.size() > 0}">
+							<div class="col-sm-3">
+								<p th:text="#{label.certificates}"></p>
+							</div>
+							<div class="col-sm-9">
+								<ul class="list-unstyled">
+									<li th:each="cert : ${allCertificates}">
+										<a th:href="@{|/validation/download-certificate?id=${cert.getId()}|}">
+											<span th:text="${cert.getName()}"></span>
+											<i class="fa fa-download"></i>
+										</a>
+									</li>
+								</ul>								
+							</div>
+						</div>
+						<div class="row" th:if="${allRevocationData != null && allRevocationData.size() > 0}">
+							<div class="col-sm-3">
+								<p th:text="#{label.revocation-data}"></p>
+							</div>
+							<div class="col-sm-9">
+								<ul class="list-unstyled">
+									<li th:each="rd : ${allRevocationData}">
+										<span th:text="${rd.getName()}"></span>
+										<div th:replace="~{fragment/fields :: field-der-pem(${#strings.startsWith(rd.getName(), 'CRL')}, |/validation/download-revocation?id=${rd.getId()}|)}" th:remove="tag"></div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="row" th:if="${allTimestamps != null && allTimestamps.size() > 0}">
+							<div class="col-sm-3">
+								<p th:text="#{label.timestamps}"></p>
+							</div>
+							<div class="col-sm-9">
+								<ul class="list-unstyled">
+									<li th:each="tst : ${allTimestamps}">
+										<span th:text="${tst.getName()}"></span>
+										<div th:replace="~{fragment/fields :: field-der-pem(true, |/validation/download-timestamp?id=${tst.getId()}|)}" th:remove="tag"></div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="card mb-2">
+                    <div class="card-header collapsed cursor-pointer" data-toggle="collapse"
+                        data-target="#svg-card" aria-expanded='false'>
+                        <h3 th:text="#{label.validation.visualrepresentation}" th:remove="tag"></h3>
+                    </div>
+                    <div class="card-body collapse show" id="svg-card">
+						<div id="svg-content">
+							<div class="row">
+								<div class="col-sm-12 d-flex">
+									<object th:data="@{/validation/diag-data.svg}" th:text="#{label.svg.browser.error}"
+											type="image/svg+xml" width="100%" id="svg-diag-data" class="mx-auto">
+									</object>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label for="select-visualrepresentation" class="col-sm-3 col-form-label">Display :</label>
+								<div class="col-sm-9">
+									<select  class="form-control" id="select-visualrepresentation">
+										<optgroup th:label="#{label.signatures}" id="select-visualrepresentation-sigs">
+
+										</optgroup>
+										<optgroup th:label="#{label.evidence.records}" id="select-visualrepresentation-ers">
+
+										</optgroup>
+										<optgroup th:label="#{label.timestamps}" id="select-visualrepresentation-tsts">
+
+										</optgroup>
+										<optgroup th:label="#{label.certificate.chains}" id="select-visualrepresentation-chains">
+
+										</optgroup>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div id="svg-empty" class="d-none">
+							<p th:text="#{label.svg.empty}"></p>
+						</div>
+                    </div>
+                </div>
+				<pre class="prettyprint"><code class="language-xml" th:text="${diagnosticDataXml}"></code></pre>
+			</div>
+			<div th:if="${etsiValidationReport} != null" role="tabcard" class="tab-pane fade report" id="etsi-validation-report">
+				<pre class="prettyprint"><code class="language-xml" th:text="${etsiValidationReport}"></code></pre>
+			</div>
+		</div>
+	</div>
+	<div layout:fragment="scripts">
+		<script type="text/javascript" th:src="@{/scripts/jsValidationResult.js}"></script>
+		<script type="text/javascript">hljs.highlightAll();</script> <!-- highlight XML code -->
+		<script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
+			$('#tabsResult a').click(function(e) {
+				e.preventDefault();
+				$(this).tab('show');
+			});
+
+			$('[data-toggle="tooltip"]').tooltip();
+            
+            var currentCertificateId = /*[[${currentCertificate}]]*/;
+            var mySVG = document.getElementById("svg-diag-data");
+			var svgWidth = 800;
+			var svgHeight = 150;
+            var padding = 40;
+
+			mySVG.style.maxWidth = svgWidth + "px";
+
+            var representation = null;
+
+            mySVG.addEventListener("load",function() {
+            	representation = mySVG.contentDocument.initSVG(svgWidth, svgHeight, padding);
+                
+                if (currentCertificateId != null) {
+                    representation.displayCertificateChainById(currentCertificateId);
+                } else if (representation.isSignatureOrTimestampPresent()) {
+                    representation.displayFirstSignatureOrTimestamp();
+                } else {
+                	var svgContent = document.getElementById("svg-content");
+                	svgContent.classList.add("d-none");
+                	var svgEmpty = document.getElementById("svg-empty");
+                	svgEmpty.classList.remove("d-none");
+                }
+
+				var svgElement = mySVG.contentDocument.documentElement;
+				svgElement.setAttribute("viewBox", "0 0 " + svgWidth + " " + svgHeight);
+                
+                var signatureIds = mySVG.contentDocument.getSignatureIds();
+                initSignatureSelect(signatureIds);
+
+				var evidenceRecordIds = mySVG.contentDocument.getEvidenceRecordIds();
+				initEvidenceRecordSelect(evidenceRecordIds);
+
+                var timestampIds = mySVG.contentDocument.getTimestampIds();
+                initTimestampSelect(timestampIds);
+                
+                var certificateIds = mySVG.contentDocument.getCertificateIds();
+                initCertChainSelect(certificateIds);
+            });
+
+            function initSignatureSelect(signatureIds) {
+                var optgroup = document.getElementById("select-visualrepresentation-sigs");
+                if (signatureIds == null || signatureIds.length == 0) {
+                    optgroup.style.display="none";
+                } else {
+                    optgroup.style.display="";
+                    for (var elementIdx = 0;  elementIdx < signatureIds.length; elementIdx++) {
+                        var sigId = signatureIds[elementIdx];
+                        var option = document.createElement("option");
+                        option.text = sigId;
+                        option.className = "sig";
+                        optgroup.appendChild(option);
+                    }
+                }
+            }
+
+            function initTimestampSelect(timestampIds) {
+                var optgroup = document.getElementById("select-visualrepresentation-tsts");
+                if (timestampIds == null || timestampIds.length == 0) {
+                    optgroup.style.display="none";
+                } else {
+                    optgroup.style.display="";
+                    for (var elementIdx = 0;  elementIdx < timestampIds.length; elementIdx++) {
+                        var tstId = timestampIds[elementIdx];
+                        var option = document.createElement("option");
+                        option.text = tstId;
+                        option.className = "tst";
+                        optgroup.appendChild(option);
+                    }
+                }
+            }
+
+            function initEvidenceRecordSelect(evidenceRecordIds) {
+				var optgroup = document.getElementById("select-visualrepresentation-ers");
+				if (evidenceRecordIds == null || evidenceRecordIds.length == 0) {
+					optgroup.style.display="none";
+				} else {
+					optgroup.style.display="";
+					for (var elementIdx = 0;  elementIdx < evidenceRecordIds.length; elementIdx++) {
+						var erId = evidenceRecordIds[elementIdx];
+						var option = document.createElement("option");
+						option.text = erId;
+						option.className = "er";
+						optgroup.appendChild(option);
+					}
+				}
+			}
+
+            function initCertChainSelect(certificateIds) {
+                var optgroup = document.getElementById("select-visualrepresentation-chains");
+                if (certificateIds == null || certificateIds.length == 0) {
+                    optgroup.style.display="none";
+                } else {
+                    optgroup.style.display="";
+                    for (var elementIdx = 0;  elementIdx < certificateIds.length; elementIdx++) {
+                        var certificateId = certificateIds[elementIdx];
+                        var option = document.createElement("option");
+                        option.text = certificateId;
+                        option.className = "chain";
+                        optgroup.appendChild(option);
+                    }
+                }
+            }
+            
+            var selectVisual = document.getElementById("select-visualrepresentation");
+            
+            selectVisual.addEventListener("change", function() {
+                if (this.selectedOptions == null || this.selectedOptions.length != 1) {
+                    return;
+                }
+                var option = this.selectedOptions[0];
+                if ("sig" == option.className) {
+                    representation.displaySignatureById(option.value);
+				} else if ("er" == option.className) {
+					representation.displayEvidenceRecordById(option.value);
+                } else if ("tst" == option.className) {
+                    representation.displayTimestampById(option.value);
+                } else {
+                    representation.displayCertificateChainById(option.value);
+                }
+                
+            });
+
+            /*]]>*/
+		</script>
+	</div>
+</body>
+</html>

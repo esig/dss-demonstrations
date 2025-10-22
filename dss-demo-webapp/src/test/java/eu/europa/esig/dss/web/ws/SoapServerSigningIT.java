@@ -66,7 +66,6 @@ public class SoapServerSigningIT extends AbstractIT {
 
 		byte[] toBeSigned = "Hello world!".getBytes(Charset.defaultCharset());
 		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
-		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
 		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
 		SignatureValueDTO signatureValue = remoteToken.signDigest(digestDTO, alias);
 		assertNotNull(signatureValue);
@@ -113,7 +112,6 @@ public class SoapServerSigningIT extends AbstractIT {
 
 		byte[] toBeSigned = "Hello world!".getBytes(Charset.defaultCharset());
 		byte[] digest = DSSUtils.digest(DigestAlgorithm.SHA256, toBeSigned);
-		digest = DSSUtils.encodeRSADigest(DigestAlgorithm.SHA256, digest);
 		DigestDTO digestDTO = new DigestDTO(DigestAlgorithm.SHA256, digest);
 		SignatureValueDTO signatureValue = remoteToken.signDigest(digestDTO, alias);
 		assertNotNull(signatureValue);

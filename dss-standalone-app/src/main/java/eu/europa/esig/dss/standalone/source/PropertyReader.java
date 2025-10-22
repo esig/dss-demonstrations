@@ -66,6 +66,13 @@ public class PropertyReader {
         return -1;
     }
 
+    public static List<Integer> getIntegerListProperty(String propertyKey) {
+        if (getProperties().containsKey(propertyKey)) {
+            return getPropertyAsList(propertyKey).stream().map(Integer::parseInt).collect(Collectors.toList());
+        }
+        return null;
+    }
+
     public static Boolean getBooleanProperty(String propertyKey) {
         String value = getProperty(propertyKey);
         if (Utils.isStringNotEmpty(value)) {

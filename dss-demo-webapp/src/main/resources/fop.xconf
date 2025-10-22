@@ -3,10 +3,10 @@
    <renderers>
     <renderer mime="application/pdf">
      <fonts>
-       <font kerning="yes" embed-url="classpath:fonts/OpenSans-Regular.ttf">
+       <font kerning="yes" embed-url="classpath:static/fonts/OpenSans-Regular.ttf">
          <font-triplet name="sans-serif" style="normal" weight="normal"/>
        </font>
-       <font kerning="yes" embed-url="classpath:fonts/OpenSans-Bold.ttf">
+       <font kerning="yes" embed-url="classpath:static/fonts/OpenSans-Bold.ttf">
          <font-triplet name="sans-serif" style="normal" weight="bold"/>
        </font>
      </fonts>

@@ -11,21 +11,23 @@ import eu.europa.esig.dss.enumerations.MimeTypeEnum;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
 import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
+import eu.europa.esig.dss.enumerations.ValidationLevel;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.identifier.OriginalIdentifierProvider;
+import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
+import eu.europa.esig.dss.spi.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.DocumentValidator;
-import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
-import eu.europa.esig.dss.validation.SignaturePolicyProvider;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
-import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.validation.identifier.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.policy.ValidationPolicyLoader;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
@@ -33,6 +35,10 @@ import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +58,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,8 +79,8 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 
 	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationTime",
-			"validationLevel", "timezoneDifference", "defaultPolicy", "policyFile", "signingCertificate", "adjunctCertificates",
-			"evidenceRecordFiles", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
+			"validationLevel", "timezoneDifference", "defaultPolicy", "policyFile", "cryptographicSuite", "signingCertificate",
+			"adjunctCertificates", "evidenceRecordFiles", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
 			"includeUserFriendlyIdentifiers", "includeSemantics" };
 
 	@Autowired
@@ -106,6 +109,7 @@ public class ValidationController extends AbstractValidationController {
 		validationForm.setValidationLevel(ValidationLevel.ARCHIVAL_DATA);
 		validationForm.setDefaultPolicy(true);
 		model.addAttribute("validationForm", validationForm);
+		setCryptographicSuiteSamples(model);
 		return VALIDATION_TILE;
 	}
 
@@ -207,21 +211,37 @@ public class ValidationController extends AbstractValidationController {
 		Reports reports = null;
 
 		Date start = new Date();
-		DSSDocument policyFile = WebAppUtils.toDSSDocument(validationForm.getPolicyFile());
-        if (!validationForm.isDefaultPolicy() && (policyFile != null)) {
-            try (InputStream is = policyFile.openStream()) {
-                reports = documentValidator.validateDocument(is);
+		ValidationPolicyLoader validationPolicyLoader;
+		MultipartFile policyFile = validationForm.getPolicyFile();
+		if (!validationForm.isDefaultPolicy() && policyFile != null && !policyFile.isEmpty()) {
+			try (InputStream is = policyFile.getInputStream()) {
+				validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(is);
 			} catch (IOException e) {
-				LOG.error(e.getMessage(), e);
+				throw new DSSException("Unable to load validation policy!", e);
 			}
 		} else if (defaultPolicy != null) {
-            try (InputStream is = defaultPolicy.getInputStream()) {
-                reports = documentValidator.validateDocument(is);
-            } catch (IOException e) {
+			try (InputStream is = defaultPolicy.getInputStream()) {
+				validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(is);
+			} catch (IOException e) {
 				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
-            }
+			}
 		} else {
 			throw new IllegalStateException("Validation policy is not correctly initialized!");
+		}
+
+		MultipartFile cryptographicSuiteFile = validationForm.getCryptographicSuite();
+		if (cryptographicSuiteFile != null && !cryptographicSuiteFile.isEmpty()) {
+			try (InputStream is = cryptographicSuiteFile.getInputStream()) {
+				validationPolicyLoader = validationPolicyLoader.withCryptographicSuite(is);
+			} catch (IOException e) {
+				throw new DSSException("Unable to load cryptographic suite!", e);
+			}
+		}
+
+		try {
+			reports = documentValidator.validateDocument(validationPolicyLoader.create());
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
 		}
 
 		Date end = new Date();

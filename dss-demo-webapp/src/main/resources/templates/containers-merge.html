@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.merge.containers}">
+<body>
+<div layout:fragment="content">
+    <form method="post" id="merge-containers-form"
+          enctype="multipart/form-data" th:action="@{/merge-containers}"
+          th:object="${containerMergeForm}">
+
+        <div th:replace="~{fragment/fields :: field-merge-containers}"></div>
+
+        <div th:replace="~{fragment/fields :: merge-containers-submit}"></div>
+
+    </form>
+</div>
+<div layout:fragment="scripts">
+    <script type="text/javascript">
+			$('form input')
+					.change(function() {
+                            if (this.files.length == 0) {
+                                $('#filenames').text("[[#{label.merge.containers.drag.files}]]");
+                            } else {
+                                var str = "";
+                                for (let i = 0; i < this.files.length; i++) {
+                                    if (str != "") {
+                                        str += "<br/>"
+                                    }
+                                    let file = this.files.item(i);
+                                    str += file.name;
+                                }
+                                $('#filenames').html(str);
+                            }
+					});
+
+			$('form').submit(function() {
+                $.post($(this).attr('action'), $(this).serialize(), function(data) {
+                }).done(function(data) {
+                    $('#filenames').text("[[#{label.merge.containers.drag.files}]]");
+                    $('.errors').html("");
+                    $('form')[0].reset();
+                }).fail(function() {
+                    $('.errors').text("[[#{label.merge.containers.error}]]");
+                });;
+            });
+		</script>
+</div>
+</body>
+</html>
