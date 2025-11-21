@@ -179,16 +179,20 @@
             <SigningTime Level="FAIL" />
             <MessageDigestOrSignedPropertiesPresent Level="FAIL" />
             <EllipticCurveKeySize Level="WARN" />
-            <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" />
-                        <ContentHints Level="FAIL" value="*" />
-                        <CommitmentTypeIndication Level="FAIL">
-                            <Id>1.2.840.113549.1.9.16.6.1</Id>
-                            <Id>1.2.840.113549.1.9.16.6.4</Id>
-                            <Id>1.2.840.113549.1.9.16.6.5</Id>
-                            <Id>1.2.840.113549.1.9.16.6.6</Id>
-                        </CommitmentTypeIndication>
-                        <SignerLocation Level="FAIL" />
-                        <ContentTimeStamp Level="FAIL" /> -->
+<!--		<ContentType Level="FAIL">
+                <Id>1.2.840.113549.1.7.1</Id>
+            </ContentType>
+            <ContentHints Level="FAIL">
+                <Id>*</Id>
+            </ContentHints>
+            <CommitmentTypeIndication Level="FAIL">
+                <Id>1.2.840.113549.1.9.16.6.1</Id>
+                <Id>1.2.840.113549.1.9.16.6.4</Id>
+                <Id>1.2.840.113549.1.9.16.6.5</Id>
+                <Id>1.2.840.113549.1.9.16.6.6</Id>
+            </CommitmentTypeIndication>
+            <SignerLocation Level="FAIL" />
+            <ContentTimeStamp Level="FAIL" /> -->
         </SignedAttributes>
         <UnsignedAttributes>
             <!--		<CounterSignature Level="IGNORE" /> check presence -->
@@ -318,16 +322,20 @@
             <SigningTime Level="FAIL" />
             <MessageDigestOrSignedPropertiesPresent Level="FAIL" />
             <EllipticCurveKeySize Level="WARN" />
-            <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" />
-                        <ContentHints Level="FAIL" value="*" />
-                        <CommitmentTypeIndication Level="FAIL">
-                            <Id>1.2.840.113549.1.9.16.6.1</Id>
-                            <Id>1.2.840.113549.1.9.16.6.4</Id>
-                            <Id>1.2.840.113549.1.9.16.6.5</Id>
-                            <Id>1.2.840.113549.1.9.16.6.6</Id>
-                        </CommitmentTypeIndication>
-                        <SignerLocation Level="FAIL" />
-                        <ContentTimeStamp Level="FAIL" /> -->
+<!--		<ContentType Level="FAIL">
+                <Id>1.2.840.113549.1.7.1</Id>
+            </ContentType>
+            <ContentHints Level="FAIL">
+                <Id>*</Id>
+            </ContentHints>
+            <CommitmentTypeIndication Level="FAIL">
+                <Id>1.2.840.113549.1.9.16.6.1</Id>
+                <Id>1.2.840.113549.1.9.16.6.4</Id>
+                <Id>1.2.840.113549.1.9.16.6.5</Id>
+                <Id>1.2.840.113549.1.9.16.6.6</Id>
+            </CommitmentTypeIndication>
+            <SignerLocation Level="FAIL" />
+            <ContentTimeStamp Level="FAIL" /> -->
         </SignedAttributes>
     </CounterSignatureConstraints>
     <Timestamp>
