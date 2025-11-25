@@ -13,7 +13,7 @@
 					   <span th:text="#{label.validation.advanced.options}" th:remove="tag"></span>
 				   </div>
 				   <div id="advancedOptions" class="card-body collapse in">
-					   <div th:replace="~{fragment/fields :: field-validation-policy}"></div>
+					   <div th:replace="~{fragment/fields :: field-validation-policy(policyUrl='/download-default-policy')}"></div>
 					   <div th:replace="~{fragment/fields :: field-cryptographic-suite}"></div>
 				   </div>
 			   </div>

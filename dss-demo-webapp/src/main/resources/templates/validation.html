@@ -20,7 +20,7 @@
                 <div id="advancedOptions" class="card-body collapse in">
 					<div th:replace="~{fragment/fields :: field-validation-level}"></div>
 					<div th:replace="~{fragment/fields :: field-validation-time}"></div>
-					<div th:replace="~{fragment/fields :: field-validation-policy}"></div>
+					<div th:replace="~{fragment/fields :: field-validation-policy(policyUrl='/download-default-policy')}"></div>
 					<div th:replace="~{fragment/fields :: field-cryptographic-suite}"></div>
 					<div th:replace="~{fragment/fields :: field-signing-certificate}"></div>
                     <div th:replace="~{fragment/fields :: field-adjunct-certificates}"></div>
@@ -37,6 +37,7 @@
 		</form>
 	</div>
 	<div layout:fragment="scripts">
+		<script type="text/javascript" th:src="@{/scripts/jsPolicyProvider.js}"></script>
         <script type="text/javascript" th:src="@{/scripts/jsOriginalFilesProvider.js}"></script>
         <script type="text/javascript" th:src="@{/scripts/jsCryptoSupportAlert.js}"></script>
 	</div>

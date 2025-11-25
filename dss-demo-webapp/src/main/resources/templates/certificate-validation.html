@@ -24,6 +24,7 @@
 					</div>
 					<div id="advancedOptions" class="card-body collapse in">
 						<div th:replace="~{fragment/fields :: field-validation-time}"></div>
+						<div th:replace="~{fragment/fields::field-validation-policy(policyUrl='/download-certificate-default-policy')}"></div>
 						<div th:replace="~{fragment/fields :: field-certificate-tokens}"></div>
 						<div th:replace="~{fragment/fields :: field-revocation-data-tokens}"></div>
 						<div th:replace="~{fragment/fields :: field-identifiers}"></div>
@@ -34,9 +35,8 @@
 			</form>
 		</div>
 		<div layout:fragment="scripts">
+			<script type="text/javascript" th:src="@{/scripts/jsPolicyProvider.js}"></script>
 			<script type="text/javascript">
-				$('[data-toggle="tooltip"]').tooltip();
-				
 	        	$("#certificate-switcher").click(function (e) {
 	        		e.preventDefault();
 	        		var $base64form = $(".certificate-form-base64");

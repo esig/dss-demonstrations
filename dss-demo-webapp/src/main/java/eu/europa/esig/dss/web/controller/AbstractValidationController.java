@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -130,6 +131,16 @@ public abstract class AbstractValidationController {
 			LOG.error("Unable to marshall ETSI Validation Report. Reason : {}", e.getMessage(), e);
 			return Utils.EMPTY_STRING;
 		}
+	}
+
+	protected Date getValidationTime(Date validationTime, int timezoneDifference) {
+		if (validationTime != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(validationTime);
+			calendar.add(Calendar.MINUTE, timezoneDifference);
+			return calendar.getTime();
+		}
+		return null;
 	}
 
 }

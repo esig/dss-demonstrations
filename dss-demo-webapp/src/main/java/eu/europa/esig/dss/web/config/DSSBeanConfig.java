@@ -16,7 +16,6 @@ import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
-import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.ocsp.FileCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
@@ -97,6 +96,9 @@ public class DSSBeanConfig {
 
 	@Value("${default.certificate.validation.policy}")
 	private String defaultCertificateValidationPolicy;
+
+	@Value("${default.qwac.validation.policy}")
+	private String defaultQWACValidationPolicy;
 
 	@Value("${current.lotl.url}")
 	private String lotlUrl;
@@ -413,6 +415,11 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
+	public ClassPathResource defaultQwacPolicy() {
+		return new ClassPathResource(defaultQWACValidationPolicy);
+	}
+
+	@Bean
 	public CAdESService cadesService() {
 		CAdESService service = new CAdESService(certificateVerifier());
 		service.setTspSource(tspSource);
@@ -703,15 +710,6 @@ public class DSSBeanConfig {
 		LOG.info("TL Cache folder : {}", tslCache.getAbsolutePath());
 		return tslCache;
 	}
-	
-    /* QWAC Validation */
-
-    @Bean
-    public SSLCertificateLoader sslCertificateLoader() {
-        SSLCertificateLoader sslCertificateLoader = new SSLCertificateLoader();
-        sslCertificateLoader.setCommonsDataLoader(trustAllDataLoader());
-        return sslCertificateLoader;
-    }
 
 	private <C extends CommonsDataLoader> C configureCommonsDataLoader(C dataLoader) {
 		dataLoader.setTimeoutConnection(connectionTimeout);

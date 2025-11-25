@@ -4,6 +4,7 @@ import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.identifier.OriginalIdentifierProvider;
 import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
+import eu.europa.esig.dss.model.policy.ValidationPolicy;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.validation.CertificateVerifier;
@@ -11,6 +12,7 @@ import eu.europa.esig.dss.spi.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.validation.CertificateValidator;
 import eu.europa.esig.dss.validation.identifier.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.policy.ValidationPolicyLoader;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.exception.InternalServerException;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,9 +50,10 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 	private static final String VALIDATION_TILE = "certificate-validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
-	
-	private static final String[] ALLOWED_FIELDS = { "certificateForm.certificateFile", "certificateForm.certificateBase64", "certificateChainFiles",
-			"validationTime", "timezoneDifference", "includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
+
+	private static final String[] ALLOWED_FIELDS = { "certificateForm.certificateFile", "certificateForm.certificateBase64",
+			"certificateChainFiles", "validationTime", "timezoneDifference", "defaultPolicy", "policyFile",
+			"includeCertificateTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers" };
 
 	@Autowired
 	private Resource defaultCertificateValidationPolicy;
@@ -61,7 +65,9 @@ public class CertificateValidationController extends AbstractValidationControlle
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String showValidationForm(Model model, HttpServletRequest request) {
-		model.addAttribute("certValidationForm", new CertificateValidationForm());
+		CertificateValidationForm certificateValidationForm = new CertificateValidationForm();
+		certificateValidationForm.setDefaultPolicy(true);
+		model.addAttribute("certValidationForm", certificateValidationForm);
 		return VALIDATION_TILE;
 	}
 
@@ -100,17 +106,7 @@ public class CertificateValidationController extends AbstractValidationControlle
 		}
 		certificateValidator.setLocale(locale);
 
-		CertificateReports reports;
-		if (defaultCertificateValidationPolicy != null) {
-			try (InputStream is = defaultCertificateValidationPolicy.getInputStream()) {
-				reports = certificateValidator.validate(is);
-			} catch (IOException e) {
-				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
-			}
-		} else {
-			throw new IllegalStateException("Validation policy is not correctly initialized!");
-		}
-
+		CertificateReports reports = validate(certificateValidator, certValidationForm);
 		// reports.print();
 
 		model.addAttribute("currentCertificate", identifierProvider.getIdAsString(certificate));
@@ -154,7 +150,28 @@ public class CertificateValidationController extends AbstractValidationControlle
 		
 		return cv;
 	}
-	
+
+	private CertificateReports validate(CertificateValidator certificateValidator, CertificateValidationForm validationForm) {
+		ValidationPolicy validationPolicy;
+		MultipartFile policyFile = validationForm.getPolicyFile();
+		if (!validationForm.isDefaultPolicy() && policyFile != null && !policyFile.isEmpty()) {
+			try (InputStream is = policyFile.getInputStream()) {
+				validationPolicy = ValidationPolicyLoader.fromValidationPolicy(is).create();
+			} catch (IOException e) {
+				throw new DSSException("Unable to load validation policy!", e);
+			}
+		} else if (defaultCertificateValidationPolicy != null) {
+			try (InputStream is = defaultCertificateValidationPolicy.getInputStream()) {
+				validationPolicy = ValidationPolicyLoader.fromValidationPolicy(is).create();
+			} catch (IOException e) {
+				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
+		} else {
+			throw new IllegalStateException("Validation policy is not correctly initialized!");
+		}
+		return certificateValidator.validate(validationPolicy);
+	}
+
 	@ModelAttribute("displayDownloadPdf")
 	public boolean isDisplayDownloadPdf() {
 		return true;

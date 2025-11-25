@@ -1,11 +1,4 @@
-$('[data-toggle="tooltip"]').tooltip();
-
-$('input[name="defaultPolicy"]:radio').change(function() {
-	$('#policyFile').attr("disabled", this.value == 'true');
-});
-
-
-$("#validation-form").submit(function(event) {	
+$("#validation-form").submit(function(event) {
 	var originalFilesField = $('#detachedOriginalFiles');
 	var originalFiles = originalFilesField[0].files;
 	
