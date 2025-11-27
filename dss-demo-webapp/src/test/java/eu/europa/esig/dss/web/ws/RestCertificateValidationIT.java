@@ -7,6 +7,7 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.simplecertificatereport.jaxb.XmlChainItem;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateReportsDTO;
@@ -29,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,6 +73,9 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		
 		CertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
 		validateReports(reportsDTO);
+
+		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
+		assertEquals(0, validationDate.compareTo(diagnosticData.getValidationDate()));
 	}
 	
 	@Test
@@ -154,17 +159,21 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
 		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
 		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
+
+		XmlChainItem certificate = reportsDTO.getSimpleCertificateReport().getCertificate();
+		assertNotNull(certificate);
+
+		List<XmlChainItem> chain = certificate.getChain();
+		assertTrue(Utils.isCollectionNotEmpty(chain));
 
 		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
 		assertNotNull(diagnosticData);
 
 		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
+			CertificateWrapper certificateById = diagnosticData.getUsedCertificateById(chainItem.getId());
+			assertNotNull(certificateById);
+			CertificateWrapper signingCertificate = certificateById.getSigningCertificate();
+			assertTrue(signingCertificate != null || certificateById.isTrusted() && certificateById.isSelfSigned());
 		}
 		assertNotNull(diagnosticData.getValidationDate());
 

@@ -7,6 +7,7 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.simplecertificatereport.jaxb.XmlChainItem;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.reports.CertificateReports;
 import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
@@ -75,26 +76,9 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, Arrays.asList(issuerCertificate), validationDate);
 
 		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
+		validateReports(reportsDTO);
 
-		assertNotNull(reportsDTO.getDiagnosticData());
-		assertNotNull(reportsDTO.getSimpleCertificateReport());
-		assertNotNull(reportsDTO.getDetailedReport());
-
-		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
-		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
-
-		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
-		assertNotNull(diagnosticData);
-
-		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
-		}
+		XmlDiagnosticData diagnosticData = reportsDTO.getDiagnosticData();
 		assertEquals(0, validationDate.compareTo(diagnosticData.getValidationDate()));
 	}
 
@@ -107,27 +91,7 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, Arrays.asList(issuerCertificate), null);
 
 		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
-
-		assertNotNull(reportsDTO.getDiagnosticData());
-		assertNotNull(reportsDTO.getSimpleCertificateReport());
-		assertNotNull(reportsDTO.getDetailedReport());
-
-		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
-		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
-
-		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
-		assertNotNull(diagnosticData);
-
-		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
-		}
-		assertNotNull(diagnosticData.getValidationDate());
+		validateReports(reportsDTO);
 	}
 
 	@Test
@@ -136,27 +100,7 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate);
 
 		WSCertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
-
-		assertNotNull(reportsDTO.getDiagnosticData());
-		assertNotNull(reportsDTO.getSimpleCertificateReport());
-		assertNotNull(reportsDTO.getDetailedReport());
-
-		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
-		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
-		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
-
-		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
-		assertNotNull(diagnosticData);
-
-		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
-		}
-		assertNotNull(diagnosticData.getValidationDate());
+		validateReports(reportsDTO);
 	}
 
 	@Test
@@ -213,17 +157,21 @@ public class SoapCertificateValidationIT extends AbstractIT {
 		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
 		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
 		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
+
+		XmlChainItem certificate = reportsDTO.getSimpleCertificateReport().getCertificate();
+		assertNotNull(certificate);
+
+		List<XmlChainItem> chain = certificate.getChain();
+		assertTrue(Utils.isCollectionNotEmpty(chain));
 
 		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
 		assertNotNull(diagnosticData);
 
 		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
+			CertificateWrapper certificateById = diagnosticData.getUsedCertificateById(chainItem.getId());
+			assertNotNull(certificateById);
+			CertificateWrapper signingCertificate = certificateById.getSigningCertificate();
+			assertTrue(signingCertificate != null || certificateById.isTrusted() && certificateById.isSelfSigned());
 		}
 		assertNotNull(diagnosticData.getValidationDate());
 
