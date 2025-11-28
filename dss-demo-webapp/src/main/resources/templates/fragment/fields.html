@@ -210,8 +210,7 @@
 	<label class="col-sm-3 col-form-label" for="signatureProfile" th:text="#{label.signature.level}"></label>
 	<div class="col-sm-5">
 		<select th:field="*{signatureProfile}" class="custom-select">
-			<option th:each="profile : ${signatureProfiles}" th:value="${profile}"
-					th:text="${#strings.replace(profile,'_','-')}" />
+			<option th:each="profile : ${signatureProfiles}" th:value="${profile}" th:text="${profile}" />
 		</select>
 	</div>
 	<div class="col-xs-3 col-md-offset-1">

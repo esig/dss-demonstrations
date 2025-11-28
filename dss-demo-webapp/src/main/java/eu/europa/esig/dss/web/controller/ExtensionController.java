@@ -5,7 +5,7 @@ import eu.europa.esig.dss.enumerations.SignatureProfile;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.editor.ASiCContainerTypePropertyEditor;
-import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.editor.SignatureProfilePropertyEditor;
 import eu.europa.esig.dss.web.model.ExtensionForm;
 import eu.europa.esig.dss.web.service.SigningService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ public class ExtensionController {
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
 		webDataBinder.registerCustomEditor(ASiCContainerType.class, new ASiCContainerTypePropertyEditor());
-		webDataBinder.registerCustomEditor(SignatureProfile.class, new EnumPropertyEditor(SignatureProfile.class));
+		webDataBinder.registerCustomEditor(SignatureProfile.class, new SignatureProfilePropertyEditor());
 	}
 	
 	@InitBinder
