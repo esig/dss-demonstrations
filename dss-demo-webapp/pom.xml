@@ -480,6 +480,60 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>linux</id>
+            <properties>
+                <packaging.type>war</packaging.type>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-standalone-linux-complete</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+                                            <artifactId>dss-standalone-app-package</artifactId>
+                                            <classifier>linux-complete-tar</classifier>
+                                            <type>tar.gz</type>
+                                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
+                                            <destFileName>/downloads/dss-app-complete-linux.tar.gz</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-standalone-linux-minimal</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+                                            <artifactId>dss-standalone-app-package</artifactId>
+                                            <classifier>linux-minimal-tar</classifier>
+                                            <type>tar.gz</type>
+                                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
+                                            <destFileName>/downloads/dss-app-minimal-linux.tar.gz</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>

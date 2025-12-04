@@ -1,4 +1,4 @@
-FROM maven:3.9.11-eclipse-temurin-21 as build
+FROM maven:3.9.11-eclipse-temurin-21 AS build
 
 RUN useradd -m demouser -d /home/demouser
 
@@ -10,7 +10,7 @@ COPY . /home/demouser/dss-demonstrations/
 
 WORKDIR /home/demouser/dss-demonstrations
 
-RUN mvn package -pl dss-standalone-app,dss-standalone-app-package,dss-demo-webapp -P quick
+RUN mvn package -pl dss-standalone-app,dss-standalone-app-package,dss-demo-webapp -P quick,linux
 
 USER demouser
 

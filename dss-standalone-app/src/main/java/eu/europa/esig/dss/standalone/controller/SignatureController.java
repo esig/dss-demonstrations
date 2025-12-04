@@ -293,6 +293,11 @@ public class SignatureController extends AbstractController {
 		pkcs11Radio.setUserData(SignatureTokenType.PKCS11);
 		pkcs12Radio.setUserData(SignatureTokenType.PKCS12);
 		mscapiRadio.setUserData(SignatureTokenType.MSCAPI);
+
+		if (!isWindowsOS()) {
+			disableRadioButtons(mscapiRadio);
+		}
+
 		toggleSigToken.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -315,7 +320,7 @@ public class SignatureController extends AbstractController {
 				switch (model.getTokenType()) {
 					case PKCS11:
 						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
-								"Library", "PKCS11 library (*.dll)", "*.dll");
+								"Library", "PKCS11 library (*.dll, *.so)", "*.dll", "*.so");
 						break;
 					case PKCS12:
 						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
@@ -628,6 +633,11 @@ public class SignatureController extends AbstractController {
 				}
 			}
 		}
+	}
+
+	private boolean isWindowsOS() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.contains("win");
 	}
 
 }
