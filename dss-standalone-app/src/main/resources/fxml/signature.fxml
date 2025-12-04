@@ -10,7 +10,8 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+<?import javafx.scene.control.TextField?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0"
       prefWidth="1000.0"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
@@ -99,6 +100,11 @@
         <Label fx:id="labelPkcs11File" styleClass="label-style" text="PKCS #11 library"/>
         <Label fx:id="labelPkcs12File" styleClass="label-style" text="Keystore file"/>
         <Button fx:id="pkcsFileButton" mnemonicParsing="false" text="Select file..."/>
+    </HBox>
+
+    <HBox fx:id="hPkcsSlotid" styleClass="hbox-style" visible="false">
+        <Label styleClass="label-style" text="Slot Id"/>
+        <TextField fx:id="pkcsSlotId"/>
     </HBox>
 
     <HBox fx:id="hPkcsPassword" styleClass="hbox-style" visible="false">

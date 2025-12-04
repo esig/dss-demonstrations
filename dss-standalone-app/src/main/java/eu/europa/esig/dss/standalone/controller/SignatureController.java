@@ -36,6 +36,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
@@ -157,6 +159,9 @@ public class SignatureController extends AbstractController {
 	private Label labelPkcs12File;
 
 	@FXML
+	private HBox hPkcsSlotid;
+
+	@FXML
 	private HBox hPkcsPassword;
 
 	@FXML
@@ -164,6 +169,9 @@ public class SignatureController extends AbstractController {
 
 	@FXML
 	private PasswordField pkcsPassword;
+
+	@FXML
+	private TextField pkcsSlotId;
 
 	@FXML
 	public Label warningMockTSALabel;
@@ -184,6 +192,7 @@ public class SignatureController extends AbstractController {
 		
 		// Allows to collapse items
 		hPkcsFile.managedProperty().bind(hPkcsFile.visibleProperty());
+		hPkcsSlotid.managedProperty().bind(hPkcsSlotid.visibleProperty());
 		hPkcsPassword.managedProperty().bind(hPkcsPassword.visibleProperty());
 		labelPkcs11File.managedProperty().bind(labelPkcs11File.visibleProperty());
 		labelPkcs12File.managedProperty().bind(labelPkcs12File.visibleProperty());
@@ -293,6 +302,7 @@ public class SignatureController extends AbstractController {
 				}
 				model.setPkcsFile(null);
 				model.setPassword(null);
+				model.setSlotId("0");
 
 				updatePropertiesForm();
 			}
@@ -322,12 +332,21 @@ public class SignatureController extends AbstractController {
 		pkcsFileButton.textProperty().bindBidirectional(model.pkcsFileProperty(), new FileToStringConverter());
 
 		pkcsPassword.textProperty().bindBidirectional(model.passwordProperty());
+		pkcsSlotId.textProperty().bindBidirectional(model.slotIdProperty());
+
+		// allow only integers
+		pkcsSlotId.setTextFormatter(new TextFormatter<>(change -> {
+			String newText = change.getControlNewText();
+			return newText.matches("\\d*") ? change : null;
+		}));
 
 		BooleanBinding isPkcs11Or12 = model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11)
 				.or(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
 
 		hPkcsFile.visibleProperty().bind(isPkcs11Or12);
 		hPkcsPassword.visibleProperty().bind(isPkcs11Or12);
+
+		hPkcsSlotid.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11));
 
 		labelPkcs11File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11));
 		labelPkcs12File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));

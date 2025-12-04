@@ -335,7 +335,7 @@ public class SigningTask extends Task<DSSDocument> {
 	private SignatureTokenConnection getToken(SignatureModel model) throws IOException {
 		switch (model.getTokenType()) {
 		case PKCS11:
-			return new Pkcs11SignatureToken(model.getPkcsFile().getAbsolutePath(), new PasswordProtection(model.getPassword().toCharArray()));
+			return new Pkcs11SignatureToken(model.getPkcsFile().getAbsolutePath(), new PasswordProtection(model.getPassword().toCharArray()), Integer.parseInt(model.getSlotId()));
 		case PKCS12:
 			return new Pkcs12SignatureToken(model.getPkcsFile(), new PasswordProtection(model.getPassword().toCharArray()));
 		case MSCAPI:
