@@ -84,7 +84,7 @@ public class SigningTask extends Task<DSSDocument> {
 		SignatureTokenConnection token = getToken(model);
 
 		updateProgress(5, 100);
-		List<DSSPrivateKeyEntry> keys = token.getKeys();
+		List<DSSPrivateKeyEntry> keys = getKeys(token);
 
 		updateProgress(10, 100);
 
@@ -334,15 +334,28 @@ public class SigningTask extends Task<DSSDocument> {
 
 	private SignatureTokenConnection getToken(SignatureModel model) throws IOException {
 		switch (model.getTokenType()) {
-		case PKCS11:
-			return new Pkcs11SignatureToken(model.getPkcsFile().getAbsolutePath(), new PasswordProtection(model.getPassword().toCharArray()), Integer.parseInt(model.getSlotId()));
-		case PKCS12:
-			return new Pkcs12SignatureToken(model.getPkcsFile(), new PasswordProtection(model.getPassword().toCharArray()));
-		case MSCAPI:
-			return new MSCAPISignatureToken();
-		default:
-			throw new IllegalArgumentException("Unsupported token type " + model.getTokenType());
+			case PKCS11:
+				return new Pkcs11SignatureToken(model.getPkcsFile().getAbsolutePath(), new PasswordProtection(model.getPassword().toCharArray()), Integer.parseInt(model.getSlotId()));
+			case PKCS12:
+				return new Pkcs12SignatureToken(model.getPkcsFile(), new PasswordProtection(model.getPassword().toCharArray()));
+			case MSCAPI:
+				return new MSCAPISignatureToken();
+			default:
+				throw new IllegalArgumentException("Unsupported token type " + model.getTokenType());
+			}
+	}
+
+	private List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token) {
+		List<DSSPrivateKeyEntry> keys = null;
+		try {
+			keys = token.getKeys();
+		} catch (Exception e) {
+			throwException("Unable to extract keys", e);
 		}
+		if (Utils.isCollectionEmpty(keys)) {
+			throwException("No certificate found", null);
+		}
+		return keys;
 	}
 
 	private void throwException(String message, Exception e) {
