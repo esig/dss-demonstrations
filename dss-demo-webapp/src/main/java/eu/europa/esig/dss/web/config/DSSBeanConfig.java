@@ -10,6 +10,7 @@ import eu.europa.esig.dss.model.tsl.TrustServiceStatusAndInformationExtensions;
 import eu.europa.esig.dss.pades.signature.ExternalCMSService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
 import eu.europa.esig.dss.pades.signature.PAdESWithExternalCMSService;
+import eu.europa.esig.dss.service.SecureRandomNonceSource;
 import eu.europa.esig.dss.service.crl.FileCacheCRLSource;
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
@@ -211,6 +212,12 @@ public class DSSBeanConfig {
 	@Value("${dataloader.use.system.properties}")
 	private boolean useSystemProperties;
 
+	@Value("${dataloader.ocsp.nonce.enabled}")
+	private boolean ocspNonceEnabled;
+
+	@Value("${dataloader.ocsp.nonce.size:32}")
+	private int ocspNonceSize;
+
 	@Value("${trusted.source.keystore.type:}")
 	private String trustSourceKsType;
 
@@ -329,6 +336,9 @@ public class DSSBeanConfig {
 	public OnlineOCSPSource onlineOCSPSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
+		if (ocspNonceEnabled) {
+			onlineOCSPSource.setNonceSource(new SecureRandomNonceSource(ocspNonceSize));
+		}
 		return onlineOCSPSource;
 	}
 
