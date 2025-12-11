@@ -88,6 +88,7 @@
 				</KeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
 				<NoRevAvail Level="WARN" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
@@ -134,6 +135,8 @@
 				</KeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
+				<SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -233,6 +236,7 @@
 				</KeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
 				<NoRevAvail Level="WARN" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
@@ -277,6 +281,8 @@
 				</KeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
+				<SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -368,6 +374,7 @@
 				</ExtendedKeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -405,6 +412,8 @@
 				</KeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
+				<SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -471,6 +480,7 @@
 				<RevocationFreshness Level="IGNORE" Unit="DAYS" Value="0" />
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -505,6 +515,8 @@
 				</KeyUsage>
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
+				<AuthorityKeyIdentifierPresent Level="WARN" />
+				<SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="WARN">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
