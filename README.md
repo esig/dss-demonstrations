@@ -31,12 +31,23 @@ In order to build the standalone application, the following modules are required
  * dss-standalone-app;
  * dss-standalone-package.
  
-If the build is successful, you will be able to find out the following containers in the directory `/dss-standalone-app-package/target/`:
+If the build is successful, you will be able to find the following containers in the directory `/dss-standalone-app-package/target/`:
 
- * dss-standalone-app-package-minimal.zip - contains the application code. Requires JDK ad JavaFX installed on a target machine in order to run the application;
- * dss-standalone-app-package-complete.zip - contains the application code, as well as JDK and JavaFX library code. Can be run on a machine whithout pre-installed libraries.
+ * dss-standalone-app-package-*-minimal.zip - contains the application code. Requires JDK ad JavaFX installed on a target machine in order to run the application;
+ * dss-standalone-app-package-*-complete.zip - contains the application code, as well as JDK and JavaFX for Windows x64. Can be run on a machine without pre-installed libraries.
 
-In order to launch the application, you will need to extract the archive and run the file `dss-run.bat`.
+In order to launch the application for Windows, you will need to extract the archive and run the file `dss-run.bat`.
+
+Should you use Linux OS, please call the profile below for building Linux packages:
+
+`mvn clean install -P linux`
+
+This will produce two additional containers in the directory `/dss-standalone-app-package/target/`:
+
+* dss-standalone-app-package-*-linux-minimal.tar.gz - contains the application code. Requires JDK ad JavaFX installed on a target machine in order to run the application;
+* dss-standalone-app-package-*-linux-complete.tar.gz - contains the application code, as well as JDK and JavaFX for Linux. Can be run on a machine without pre-installed libraries.
+
+In order to launch the application for Linux, you will need to extract the archive and run the file `dss-run.sh`.
 
 # DSS Web Application
 

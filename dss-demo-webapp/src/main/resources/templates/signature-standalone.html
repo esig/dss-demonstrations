@@ -14,8 +14,8 @@
                 <th:block th:if="${linuxMinimalExists or linuxCompleteExists}">
                     <li>Linux:</li>
                     <ul>
-                        <li th:if="${linuxMinimalExists}"><a th:href="@{/downloads/dss-app-minimal-linux.tar.gz}" title="e-signature standalone">Minimal ZIP</a> (application + .sh file (uses system properties))</li>
-                        <li th:if="${linuxCompleteExists}"><a th:href="@{/downloads/dss-app-complete-linux.tar.gz}" title="e-signature standalone">Complete ZIP</a> (application + .sh file + <a href="https://adoptopenjdk.net/">OpenJDK</a> + <a href="https://gluonhq.com/products/javafx/">JavaFX SDK</a>)</li>
+                        <li th:if="${linuxMinimalExists}"><a th:href="@{/downloads/dss-app-minimal-linux.tar.gz}" title="e-signature standalone">Minimal TAR.GZ</a> (application + .sh file (uses system properties))</li>
+                        <li th:if="${linuxCompleteExists}"><a th:href="@{/downloads/dss-app-complete-linux.tar.gz}" title="e-signature standalone">Complete TAR.GZ</a> (application + .sh file + <a href="https://adoptopenjdk.net/">OpenJDK</a> + <a href="https://gluonhq.com/products/javafx/">JavaFX SDK</a>)</li>
                     </ul>
                 </th:block>
             </ul>
