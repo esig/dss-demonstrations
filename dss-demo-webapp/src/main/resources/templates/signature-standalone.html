@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.standalone.application}">
 	<body>		
-		<div layout:fragment="content">            
-            <p>Download the standalone application (Windows x64)</p>
-
-           	<ul>
-               	<li><a th:href="@{/downloads/dss-app-minimal-windows-x64.zip}" title="e-signature standalone">Minimal ZIP</a> (application + bat file (uses system properties))</li>
-           		<li><a th:href="@{/downloads/dss-app-complete-windows-x64.zip}" title="e-signature standalone">Complete ZIP</a> (application + bat file + <a href="https://adoptopenjdk.net/">OpenJDK</a> + <a href="https://gluonhq.com/products/javafx/">JavaFX SDK</a>)</li>
-           	</ul>
+		<div layout:fragment="content">
+            <p>Download the standalone application:</p>
+            <ul class="mt-4">
+                <th:block th:if="${windowsMinimalExists or windowsCompleteExists}">
+                    <li>Windows x64:</li>
+                    <ul>
+                        <li th:if="${windowsMinimalExists}"><a th:href="@{/downloads/dss-app-minimal-windows-x64.zip}" title="e-signature standalone">Minimal ZIP</a> (application + .bat file (uses system properties))</li>
+                        <li th:if="${windowsCompleteExists}"><a th:href="@{/downloads/dss-app-complete-windows-x64.zip}" title="e-signature standalone">Complete ZIP</a> (application + .bat file + <a href="https://adoptopenjdk.net/">OpenJDK</a> + <a href="https://gluonhq.com/products/javafx/">JavaFX SDK</a>)</li>
+                    </ul>
+                </th:block>
+                <th:block th:if="${linuxMinimalExists or linuxCompleteExists}">
+                    <li>Linux:</li>
+                    <ul>
+                        <li th:if="${linuxMinimalExists}"><a th:href="@{/downloads/dss-app-minimal-linux.tar.gz}" title="e-signature standalone">Minimal TAR.GZ</a> (application + .sh file (uses system properties))</li>
+                        <li th:if="${linuxCompleteExists}"><a th:href="@{/downloads/dss-app-complete-linux.tar.gz}" title="e-signature standalone">Complete TAR.GZ</a> (application + .sh file + <a href="https://adoptopenjdk.net/">OpenJDK</a> + <a href="https://gluonhq.com/products/javafx/">JavaFX SDK</a>)</li>
+                    </ul>
+                </th:block>
+            </ul>
 
             <div class="card">
                 <div class="card-header">More info...</div>
                 <div class="card-body collapse in">
                     <p>This demo is a standalone application which uses JavaFX.</p>
                     <p>The application connects directly to the CA's infrastructure to retrieve information such as CRL, OCSP, certificates from AIA ...</p>
-                    <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, ASiC). This application doesn't require a DSS server.</p>
+                    <p>All DSS business logic is embedded inside this application (CAdES, PAdES, XAdES, JAdES, ASiC). This application doesn't require a DSS server.</p>
                     <div class="col-sm-12">
                         <a th:href="@{/images/standalone-application.png}" class="thumbnail" target="_blank">
                             <img th:src="@{/images/standalone-application.png}" alt="Standalone application" class="img-fluid" />

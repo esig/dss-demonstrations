@@ -25,6 +25,12 @@ public class PolicyController {
     @Autowired
     private Resource defaultPolicy;
 
+    @Autowired
+    private Resource defaultCertificateValidationPolicy;
+
+    @Autowired
+    private Resource defaultQwacPolicy;
+
     @Autowired(required = false)
     private Resource cryptographicSuiteXml;
 
@@ -39,6 +45,28 @@ public class PolicyController {
             Utils.copy(is, os);
         } catch (IOException e) {
             LOG.error("An error occurred while downloading a default validation policy : {}", e.getMessage(), e);
+        }
+    }
+
+    @RequestMapping(value = "/download-certificate-default-policy")
+    public void downloadCertificatePolicy(HttpSession session, HttpServletResponse response) {
+        response.setContentType(MimeTypeEnum.XML.getMimeTypeString());
+        response.setHeader("Content-Disposition", "attachment; filename=" + defaultCertificateValidationPolicy.getFilename());
+        try (InputStream is = defaultCertificateValidationPolicy.getInputStream(); OutputStream os = response.getOutputStream()) {
+            Utils.copy(is, os);
+        } catch (IOException e) {
+            LOG.error("An error occurred while downloading a certificate validation policy : {}", e.getMessage(), e);
+        }
+    }
+
+    @RequestMapping(value = "/download-qwac-default-policy")
+    public void downloadQWACPolicy(HttpSession session, HttpServletResponse response) {
+        response.setContentType(MimeTypeEnum.XML.getMimeTypeString());
+        response.setHeader("Content-Disposition", "attachment; filename=" + defaultQwacPolicy.getFilename());
+        try (InputStream is = defaultQwacPolicy.getInputStream(); OutputStream os = response.getOutputStream()) {
+            Utils.copy(is, os);
+        } catch (IOException e) {
+            LOG.error("An error occurred while downloading a QWAC validation policy : {}", e.getMessage(), e);
         }
     }
 

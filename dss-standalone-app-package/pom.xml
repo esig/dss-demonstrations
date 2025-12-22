@@ -3,17 +3,22 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>6.3</version>
+		<version>6.4.RC1</version>
 	</parent>
 	<artifactId>dss-standalone-app-package</artifactId>
 	<name>DSS standalone application packager</name>
 	
 	<properties>
-		<jre.download.link>https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.2%2B12/OpenJDK24U-jre_x64_windows_hotspot_24.0.2_12.zip</jre.download.link>
-		<jre.root.folder>jdk-24.0.2+12-jre</jre.root.folder>
+		<!-- Windows -->
+		<jre.download.link>https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jre_x64_windows_hotspot_25.0.1_8.zip</jre.download.link>
+		<jre.root.folder>jdk-25.0.1+8-jre</jre.root.folder>
 		
-		<fx.sdk.download.link>https://download.java.net/java/GA/javafx24.0.2/c9f1897a5f324dd69bac0be076ad221c/4/openjfx-24.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-24.0.2</fx.root.folder>
+		<fx.sdk.download.link>https://download.java.net/java/GA/javafx25.0.1/c7eb12ff968046b6a549780ad550b701/3/openjfx-25.0.1_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-25.0.1</fx.root.folder>
+
+		<!-- Linux -->
+		<jre.linux.download.link>https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jre_x64_linux_hotspot_25.0.1_8.tar.gz</jre.linux.download.link>
+		<fx.sdk.linux.download.link>https://download.java.net/java/GA/javafx25.0.1/c7eb12ff968046b6a549780ad550b701/3/openjfx-25.0.1_linux-x64_bin-sdk.tar.gz</fx.sdk.linux.download.link>
 	</properties>
 
 	<dependencies>
@@ -30,6 +35,7 @@
 				<artifactId>download-maven-plugin</artifactId>
 				<version>1.13.0</version>
 				<executions>
+					<!-- Windows -->
 					<execution>
 						<id>JRE</id>
 						<phase>validate</phase>
@@ -59,7 +65,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>3.6.1</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -128,14 +134,14 @@
 
 	<profiles>
 		<profile>
-			<!--  this profile allows to generate a installer for Windows. It requires that WiX is installed on the computer (http://wixtoolset.org/)  --> 
+			<!--  this profile allows to generate an installer for Windows. It requires that WiX is installed on the computer (http://wixtoolset.org/)  -->
 			<id>wix-package</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.5.1</version>
+						<version>3.6.2</version>
 						<executions>
 							<execution>
 								<id>package-jar</id>
@@ -165,6 +171,71 @@
 										<argument>-native</argument>
 										<argument>msi</argument>
 									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- This profile allows to generate a package for Linux -->
+			<id>linux</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.googlecode.maven-download-plugin</groupId>
+						<artifactId>download-maven-plugin</artifactId>
+						<version>1.13.0</version>
+						<executions>
+							<!-- Linux -->
+							<execution>
+								<id>JRE_LINUX</id>
+								<phase>validate</phase>
+								<goals><goal>wget</goal></goals>
+								<configuration>
+									<url>${jre.linux.download.link}</url>
+									<unpack>true</unpack>
+									<outputDirectory>${project.build.directory}/java-linux</outputDirectory>
+								</configuration>
+							</execution>
+							<execution>
+								<id>FX_LINUX</id>
+								<phase>validate</phase>
+								<goals><goal>wget</goal></goals>
+								<configuration>
+									<url>${fx.sdk.linux.download.link}</url>
+									<unpack>true</unpack>
+									<outputDirectory>${project.build.directory}/fx-sdk-linux</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>linux-complete-tar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/linux-complete-assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>linux-minimal-tar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/linux-minimal-assembly.xml</descriptor>
+									</descriptors>
 								</configuration>
 							</execution>
 						</executions>

@@ -206,6 +206,18 @@
     </div>
 </div>
 
+<div class="form-group row" th:fragment="field-signature-profile">
+	<label class="col-sm-3 col-form-label" for="signatureProfile" th:text="#{label.signature.level}"></label>
+	<div class="col-sm-5">
+		<select th:field="*{signatureProfile}" class="custom-select">
+			<option th:each="profile : ${signatureProfiles}" th:value="${profile}" th:text="${profile}" />
+		</select>
+	</div>
+	<div class="col-xs-3 col-md-offset-1">
+		<p th:if="${#fields.hasErrors('signatureProfile')}" th:errors="*{signatureProfile}" class="text-danger">Error</p>
+	</div>
+</div>
+
 <div class="form-group row" th:fragment="field-digest-algo">
     <label class="col-sm-3 col-form-label" for="digestAlgorithm" th:text="#{label.digest.algorithm}"></label>
     <div class="col-sm-5">
@@ -499,6 +511,30 @@
     </div>
 </div>
 
+<div class="form-group row" th:fragment="field-tls-certificate">
+	<label class="col-sm-3 col-form-label font-weight-bold" for="tlsCertificate" th:text="#{label.qwac.tls.certificate}"></label>
+	<div class="col-sm-5">
+		<input type="file" class="form-control-file" name="tlsCertificate" accept=".cer,.der,.pem,.crt" />
+		<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+		   data-placement="top" th:title="#{label.qwac.tls.certificate.tooltip}"></i>
+	</div>
+	<div class="col-xs-4">
+		<p th:if="${#fields.hasErrors('tlsCertificate')}" th:errors="*{tlsCertificate}" class="text-danger">Error</p>
+	</div>
+</div>
+
+<div class="form-group row" th:fragment="field-tls-binding-signature">
+	<label class="col-sm-3 col-form-label font-weight-bold" for="tlsBindingSignature" th:text="#{label.qwac.tls.signature}"></label>
+	<div class="col-sm-5">
+		<input type="file" class="form-control-file" name="tlsBindingSignature" id="tlsBindingSignature" />
+		<i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
+		   data-placement="top" th:title="#{label.qwac.tls.signature.tooltip}"></i>
+	</div>
+	<div class="col-xs-4">
+		<p th:if="${#fields.hasErrors('tlsBindingSignature')}" th:errors="*{tlsBindingSignature}" class="text-danger">Error</p>
+	</div>
+</div>
+
 <div id="digestAlgoToSend" class="form-group row" th:fragment="send-digest-algo">
     <label class="col-sm-3 mb-2 col-form-label" for="digestToSend" th:text="#{label.send.detached.as}"></label>
     <div class="col-sm-5 mb-2">
@@ -534,7 +570,7 @@
 	</div>
 </th:block>
 
-<th:block th:fragment="field-validation-policy">
+<th:block th:fragment="field-validation-policy(policyUrl)">
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label" th:text="#{label.validation.policy}"></label>
 		<div class="col-sm-5">
@@ -544,7 +580,7 @@
 			</div>
 		</div>
 		<div class="col-sm-4">
-			<a th:href="@{/policy/download-default-policy}" class="btn btn-outline-secondary mb-2 mr-2 pt-1 pb-1"
+			<a th:href="@{/policy} + ${policyUrl}" class="btn btn-outline-secondary mb-2 mr-2 pt-1 pb-1"
 			   data-toggle="tooltip" data-placement="top" th:title="#{label.validation.default.policy.file.download}"><i class="fa fa-download"></i></a>
 		</div>
 		<div class="offset-sm-3 col-sm-5">

@@ -36,6 +36,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
@@ -53,10 +55,10 @@ import java.util.ResourceBundle;
 public class SignatureController extends AbstractController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
-
+	
 	private static final List<DigestAlgorithm> SUPPORTED_DIGEST_ALGORITHMS = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
 			DigestAlgorithm.SHA384, DigestAlgorithm.SHA512, DigestAlgorithm.SHA3_224, DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512);
-
+	
 	/** A list of DigestAlgorithms supported by the current chosen SignatureFormat */
 	private List<DigestAlgorithm> sigFormSupportedDigestAlgorithms;
 
@@ -104,7 +106,7 @@ public class SignatureController extends AbstractController {
 
 	@FXML
 	private HBox hSignatureOption;
-
+	
 	@FXML
 	private HBox hBoxDigestAlgos;
 
@@ -143,7 +145,7 @@ public class SignatureController extends AbstractController {
 
 	@FXML
 	private RadioButton pkcs12Radio;
-
+	
 	@FXML
 	private RadioButton mscapiRadio;
 
@@ -157,6 +159,9 @@ public class SignatureController extends AbstractController {
 	private Label labelPkcs12File;
 
 	@FXML
+	private HBox hPkcsSlotid;
+
+	@FXML
 	private HBox hPkcsPassword;
 
 	@FXML
@@ -166,6 +171,9 @@ public class SignatureController extends AbstractController {
 	private PasswordField pkcsPassword;
 
 	@FXML
+	private TextField pkcsSlotId;
+
+	@FXML
 	public Label warningMockTSALabel;
 
 	@FXML
@@ -173,7 +181,7 @@ public class SignatureController extends AbstractController {
 
 	@FXML
 	private ProgressIndicator progressSign;
-
+	
 	private ProgressIndicator progressRefreshLOTL;
 
 	private SignatureModel model;
@@ -181,9 +189,10 @@ public class SignatureController extends AbstractController {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		model = new SignatureModel();
-
+		
 		// Allows to collapse items
 		hPkcsFile.managedProperty().bind(hPkcsFile.visibleProperty());
+		hPkcsSlotid.managedProperty().bind(hPkcsSlotid.visibleProperty());
 		hPkcsPassword.managedProperty().bind(hPkcsPassword.visibleProperty());
 		labelPkcs11File.managedProperty().bind(labelPkcs11File.visibleProperty());
 		labelPkcs12File.managedProperty().bind(labelPkcs12File.visibleProperty());
@@ -229,7 +238,7 @@ public class SignatureController extends AbstractController {
 				updatePropertiesForm();
 			}
 		});
-
+		
 		envelopedRadio.setUserData(SignaturePackaging.ENVELOPED);
 		envelopingRadio.setUserData(SignaturePackaging.ENVELOPING);
 		detachedRadio.setUserData(SignaturePackaging.DETACHED);
@@ -259,14 +268,14 @@ public class SignatureController extends AbstractController {
 				updatePropertiesForm();
 			}
 		});
-
+		
 		for (DigestAlgorithm digestAlgo : SUPPORTED_DIGEST_ALGORITHMS) {
 			RadioButton rb = new RadioButton(digestAlgo.getName());
 			rb.setUserData(digestAlgo);
 			rb.setToggleGroup(toggleDigestAlgo);
 			hBoxDigestAlgos.getChildren().add(rb);
 		}
-
+		
 		toggleDigestAlgo.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -284,6 +293,11 @@ public class SignatureController extends AbstractController {
 		pkcs11Radio.setUserData(SignatureTokenType.PKCS11);
 		pkcs12Radio.setUserData(SignatureTokenType.PKCS12);
 		mscapiRadio.setUserData(SignatureTokenType.MSCAPI);
+
+		if (!isWindowsOS()) {
+			disableRadioButtons(mscapiRadio);
+		}
+
 		toggleSigToken.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -293,11 +307,12 @@ public class SignatureController extends AbstractController {
 				}
 				model.setPkcsFile(null);
 				model.setPassword(null);
+				model.setSlotId("0");
 
 				updatePropertiesForm();
 			}
 		});
-
+		
 		pkcsFileButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -305,7 +320,7 @@ public class SignatureController extends AbstractController {
 				switch (model.getTokenType()) {
 					case PKCS11:
 						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
-								"Library", "PKCS11 library (*.dll)", "*.dll");
+								"Library", "PKCS11 library (*.dll, *.so)", "*.dll", "*.so");
 						break;
 					case PKCS12:
 						fileChooser = DSSFileChooserLoader.getInstance().createFileChooser(
@@ -322,12 +337,21 @@ public class SignatureController extends AbstractController {
 		pkcsFileButton.textProperty().bindBidirectional(model.pkcsFileProperty(), new FileToStringConverter());
 
 		pkcsPassword.textProperty().bindBidirectional(model.passwordProperty());
+		pkcsSlotId.textProperty().bindBidirectional(model.slotIdProperty());
+
+		// allow only integers
+		pkcsSlotId.setTextFormatter(new TextFormatter<>(change -> {
+			String newText = change.getControlNewText();
+			return newText.matches("\\d*") ? change : null;
+		}));
 
 		BooleanBinding isPkcs11Or12 = model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11)
 				.or(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
 
 		hPkcsFile.visibleProperty().bind(isPkcs11Or12);
 		hPkcsPassword.visibleProperty().bind(isPkcs11Or12);
+
+		hPkcsSlotid.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11));
 
 		labelPkcs11File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS11));
 		labelPkcs12File.visibleProperty().bind(model.tokenTypeProperty().isEqualTo(SignatureTokenType.PKCS12));
@@ -578,7 +602,7 @@ public class SignatureController extends AbstractController {
 	private void reinitSignatureOptions() {
 		disableRadioButtons(tlSigning, xmlManifest);
 	}
-
+	
 	private void reinitDigestAlgos() {
 		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
 		if (sigFormSupportedDigestAlgorithms != null) {
@@ -594,7 +618,7 @@ public class SignatureController extends AbstractController {
 			digestAlgos.remove(DigestAlgorithm.SHA3_384);
 			digestAlgos.remove(DigestAlgorithm.SHA3_512);
 		}
-
+		
 		for (Node daButton : hBoxDigestAlgos.getChildren()) {
 			DigestAlgorithm digestAlgorithm = (DigestAlgorithm) daButton.getUserData();
 			if (digestAlgorithm == null) {
@@ -609,6 +633,11 @@ public class SignatureController extends AbstractController {
 				}
 			}
 		}
+	}
+
+	private boolean isWindowsOS() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.contains("win");
 	}
 
 }

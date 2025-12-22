@@ -1,8 +1,6 @@
 package eu.europa.esig.dss.standalone.controller;
 
-import eu.europa.esig.dss.enumerations.ASiCContainerType;
-import eu.europa.esig.dss.enumerations.SignatureForm;
-import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.standalone.fx.CollectionFilesToStringConverter;
 import eu.europa.esig.dss.standalone.fx.DSSFileChooser;
@@ -14,8 +12,6 @@ import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.ExtensionTask;
 import eu.europa.esig.dss.utils.Utils;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -27,9 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import org.slf4j.Logger;
@@ -51,31 +44,7 @@ public class ExtensionController extends AbstractController {
     public Button originalFilesSelectButton;
 
     @FXML
-    public RadioButton asicsRadio;
-
-    @FXML
-    public RadioButton asiceRadio;
-
-    @FXML
-    private ToggleGroup toggleAsicContainerType;
-
-    @FXML
-    public RadioButton xadesRadio;
-
-    @FXML
-    public RadioButton cadesRadio;
-
-    @FXML
-    public RadioButton padesRadio;
-
-    @FXML
-    public RadioButton jadesRadio;
-
-    @FXML
-    private ToggleGroup toogleSigFormat;
-
-    @FXML
-    public ComboBox<SignatureLevel> comboLevel;
+    public ComboBox<SignatureProfile> comboProfile;
 
     @FXML
     public Label warningMockTSALabel;
@@ -121,40 +90,14 @@ public class ExtensionController extends AbstractController {
         });
         originalFilesSelectButton.textProperty().bindBidirectional(model.originalDocumentsProperty(), new CollectionFilesToStringConverter());
 
-        asicsRadio.setUserData(ASiCContainerType.ASiC_S);
-        asiceRadio.setUserData(ASiCContainerType.ASiC_E);
-        toggleAsicContainerType.selectedToggleProperty().addListener(new ChangeListener<>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if (newValue != null) {
-                    ASiCContainerType newContainerType = (ASiCContainerType) newValue.getUserData();
-                    updateSignatureFormForASiC(newContainerType);
-                } else {
-                    updateSignatureFormForASiC(null);
-                }
-            }
-        });
+        comboProfile.valueProperty().bindBidirectional(model.signatureProfileProperty());
 
-        cadesRadio.setUserData(SignatureForm.CAdES);
-        xadesRadio.setUserData(SignatureForm.XAdES);
-        padesRadio.setUserData(SignatureForm.PAdES);
-        jadesRadio.setUserData(SignatureForm.JAdES);
-        toogleSigFormat.selectedToggleProperty().addListener(new ChangeListener<>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if (newValue != null) {
-                    SignatureForm newSigForm = (SignatureForm) newValue.getUserData();
-                    updateSignatureForm(newSigForm);
-                } else {
-                    updateSignatureForm(null);
-                }
-            }
-        });
-
-        comboLevel.valueProperty().bindBidirectional(model.signatureLevelProperty());
+        comboProfile.setDisable(false);
+        comboProfile.getItems().addAll(SignatureProfile.BASELINE_T, SignatureProfile.BASELINE_LT, SignatureProfile.BASELINE_LTA);
+        comboProfile.setValue(SignatureProfile.BASELINE_T);
 
         BooleanBinding disableExtendButton = model.fileToExtendProperty().isNull()
-                .or(model.signatureFormProperty().isNull()).or(model.signatureLevelProperty().isNull());
+                .or(model.signatureProfileProperty().isNull());
 
         extendButton.disableProperty().bind(disableExtendButton);
 
@@ -192,63 +135,6 @@ public class ExtensionController extends AbstractController {
         });
 
         warningMockTSALabel.setVisible(Utils.isTrue(PropertyReader.getBooleanProperty("timestamp.mock")));
-    }
-
-    protected void updateSignatureFormForASiC(ASiCContainerType newValue) {
-        model.setAsicContainerType(newValue);
-
-        reinitSignatureFormats();
-
-        if (newValue != null) { // ASiC
-            cadesRadio.setDisable(false);
-            xadesRadio.setDisable(false);
-        } else {
-            cadesRadio.setDisable(false);
-            padesRadio.setDisable(false);
-            xadesRadio.setDisable(false);
-            jadesRadio.setDisable(false);
-        }
-    }
-
-    private void reinitSignatureFormats() {
-        cadesRadio.setDisable(true);
-        padesRadio.setDisable(true);
-        xadesRadio.setDisable(true);
-        jadesRadio.setDisable(true);
-
-        cadesRadio.setSelected(false);
-        padesRadio.setSelected(false);
-        xadesRadio.setSelected(false);
-        jadesRadio.setSelected(false);
-    }
-
-    private void updateSignatureForm(SignatureForm signatureForm) {
-        model.setSignatureForm(signatureForm);
-
-        comboLevel.setDisable(false);
-        comboLevel.getItems().removeAll(comboLevel.getItems());
-
-        if (signatureForm != null) {
-            switch (signatureForm) {
-                case CAdES:
-                    comboLevel.getItems().addAll(SignatureLevel.CAdES_BASELINE_T, SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
-                    comboLevel.setValue(SignatureLevel.CAdES_BASELINE_T);
-                    break;
-                case PAdES:
-                    comboLevel.getItems().addAll(SignatureLevel.PAdES_BASELINE_T, SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
-                    comboLevel.setValue(SignatureLevel.PAdES_BASELINE_T);
-                    break;
-                case XAdES:
-                    comboLevel.getItems().addAll(SignatureLevel.XAdES_BASELINE_T, SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-                    comboLevel.setValue(SignatureLevel.XAdES_BASELINE_T);
-                    break;
-                case JAdES:
-                    comboLevel.getItems().addAll(SignatureLevel.JAdES_BASELINE_T, SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
-                    comboLevel.setValue(SignatureLevel.JAdES_BASELINE_T);
-                default:
-                    break;
-            }
-        }
     }
 
 }

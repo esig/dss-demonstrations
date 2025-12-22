@@ -5,6 +5,7 @@ import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
 import eu.europa.esig.dss.enumerations.TimestampContainerForm;
@@ -129,11 +130,18 @@ public class RestDocumentationApp {
 
 			DataToSignOneDocumentDTO dataToSign = new DataToSignOneDocumentDTO();
 
+			Date signingTime = new Date();
+
 			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
 			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
 			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
 			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getEncoded()));
+
+			RemoteBLevelParameters remoteBLevelParameters = new RemoteBLevelParameters();
+			remoteBLevelParameters.setSigningDate(signingTime);
+			parameters.setBLevelParams(remoteBLevelParameters);
+
 			dataToSign.setParameters(parameters);
 
 			RemoteDocument toSignDocument = new RemoteDocument();
@@ -169,9 +177,11 @@ public class RestDocumentationApp {
 			assertNotNull(signedDocument.getBytes());
 
 			ExtendDocumentDTO extendOneDoc = new ExtendDocumentDTO();
-			parameters = new RemoteSignatureParameters();
-			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_T);
-			extendOneDoc.setParameters(parameters);
+			RemoteSignatureParameters extensionParameters = new RemoteSignatureParameters();
+			extensionParameters.setBLevelParams(remoteBLevelParameters);
+			extendOneDoc.setParameters(extensionParameters);
+
+			extendOneDoc.setSignatureProfile(SignatureProfile.BASELINE_T);
 			extendOneDoc.setToExtendDocument(signedDocument);
 
 			// extend signed document

@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.standalone.controller;
 
+import eu.europa.esig.dss.spi.DSSSecurityProvider;
 import eu.europa.esig.dss.standalone.source.PropertyReader;
 import eu.europa.esig.dss.standalone.source.TLValidationJobExecutor;
 import eu.europa.esig.dss.standalone.task.RefreshLOTLTask;
@@ -14,11 +15,16 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController extends AbstractController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MainController.class);
 
     public static final String NUMBER_OF_TRUSTED_CERTIFICATES = "Number of Trusted Certificates : ";
 
@@ -77,6 +83,17 @@ public class MainController extends AbstractController {
         String xmlsecManifestMaxRefsCount = PropertyReader.getProperty("xmlsec.manifest.max.references");
         if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
             System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
+        }
+
+        String securityProvider = PropertyReader.getProperty("security.provider");
+        if (Utils.isStringNotEmpty(securityProvider)) {
+            LOG.info("Security provider set : {}", securityProvider);
+            DSSSecurityProvider.setSecurityProvider(securityProvider);
+        }
+        List<String> alternativeSecurityProviders = PropertyReader.getPropertyAsList("alternative.security.providers");
+        if (Utils.isCollectionNotEmpty(alternativeSecurityProviders)) {
+            LOG.info("Alternative security providers added : {}", alternativeSecurityProviders);
+            DSSSecurityProvider.setAlternativeSecurityProviders(alternativeSecurityProviders.toArray(new String[0]));
         }
     }
 

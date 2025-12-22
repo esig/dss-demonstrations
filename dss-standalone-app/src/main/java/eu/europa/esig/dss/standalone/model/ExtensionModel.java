@@ -1,8 +1,6 @@
 package eu.europa.esig.dss.standalone.model;
 
-import eu.europa.esig.dss.enumerations.ASiCContainerType;
-import eu.europa.esig.dss.enumerations.SignatureForm;
-import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.enumerations.SignatureProfile;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -15,11 +13,7 @@ public class ExtensionModel {
 
     private ObjectProperty<Collection<File>> originalDocuments = new SimpleObjectProperty<>();
 
-    private ObjectProperty<ASiCContainerType> asicContainerType = new SimpleObjectProperty<>();
-
-    private ObjectProperty<SignatureForm> signatureForm = new SimpleObjectProperty<>();
-
-    private ObjectProperty<SignatureLevel> signatureLevel = new SimpleObjectProperty<>();
+    private ObjectProperty<SignatureProfile> signatureProfile = new SimpleObjectProperty<>();
 
     public File getFileToExtend() {
         return fileToExtend.get();
@@ -45,39 +39,16 @@ public class ExtensionModel {
         this.originalDocuments.set(originalDocuments);
     }
 
-    public ASiCContainerType getAsicContainerType() {
-        return asicContainerType.get();
+    public SignatureProfile getSignatureProfile() {
+        return signatureProfile.get();
     }
 
-    public ObjectProperty<ASiCContainerType> asicContainerTypeProperty() {
-        return asicContainerType;
+    public ObjectProperty<SignatureProfile> signatureProfileProperty() {
+        return signatureProfile;
     }
 
-    public void setAsicContainerType(ASiCContainerType asicContainerType) {
-        this.asicContainerType.set(asicContainerType);
+    public void setSignatureProfile(SignatureProfile signatureProfile) {
+        this.signatureProfile.set(signatureProfile);
     }
 
-    public SignatureForm getSignatureForm() {
-        return signatureForm.get();
-    }
-
-    public ObjectProperty<SignatureForm> signatureFormProperty() {
-        return signatureForm;
-    }
-
-    public void setSignatureForm(SignatureForm signatureForm) {
-        this.signatureForm.set(signatureForm);
-    }
-
-    public SignatureLevel getSignatureLevel() {
-        return signatureLevel.get();
-    }
-
-    public ObjectProperty<SignatureLevel> signatureLevelProperty() {
-        return signatureLevel;
-    }
-
-    public void setSignatureLevel(SignatureLevel signatureLevel) {
-        this.signatureLevel.set(signatureLevel);
-    }
 }

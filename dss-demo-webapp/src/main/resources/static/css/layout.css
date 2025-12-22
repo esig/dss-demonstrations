@@ -27,6 +27,10 @@ body {
 	border-color : #5986bd;
 }
 
+.text-primary {
+    color: #5986bd!important;
+}
+
 .list-group-item.active {
 	background-color: #f8f9fa!important; /* bg-light color */
 	color :#5986bd;

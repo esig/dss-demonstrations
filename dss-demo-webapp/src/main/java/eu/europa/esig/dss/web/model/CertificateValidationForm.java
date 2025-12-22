@@ -17,6 +17,10 @@ public class CertificateValidationForm {
 
 	@AssertMultipartFile
 	private List<MultipartFile> certificateChainFiles;
+
+	private boolean defaultPolicy;
+
+	private MultipartFile policyFile;
 	
 	private boolean includeCertificateTokens;
 	
@@ -54,6 +58,22 @@ public class CertificateValidationForm {
 
 	public void setCertificateChainFiles(List<MultipartFile> certificateChainFiles) {
 		this.certificateChainFiles = certificateChainFiles;
+	}
+
+	public boolean isDefaultPolicy() {
+		return defaultPolicy;
+	}
+
+	public void setDefaultPolicy(boolean defaultPolicy) {
+		this.defaultPolicy = defaultPolicy;
+	}
+
+	public MultipartFile getPolicyFile() {
+		return policyFile;
+	}
+
+	public void setPolicyFile(MultipartFile policyFile) {
+		this.policyFile = policyFile;
 	}
 	
 	public boolean isIncludeCertificateTokens() {

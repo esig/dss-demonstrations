@@ -29,6 +29,7 @@ public class SignatureModel {
 
 	private ObjectProperty<File> pkcsFile = new SimpleObjectProperty<>();
 	private StringProperty password = new SimpleStringProperty();
+	private StringProperty slotId = new SimpleStringProperty();
 
 	public Collection<File> getFilesToSign() {
 		return filesToSign.get();
@@ -136,6 +137,18 @@ public class SignatureModel {
 
 	public StringProperty passwordProperty() {
 		return password;
+	}
+
+	public String getSlotId() {
+		return slotId.get();
+	}
+
+	public void setSlotId(String slotId) {
+		this.slotId.set(slotId);
+	}
+
+	public StringProperty slotIdProperty() {
+		return slotId;
 	}
 
 	public File getPkcsFile() {
