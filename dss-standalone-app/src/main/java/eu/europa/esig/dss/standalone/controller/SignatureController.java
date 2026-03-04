@@ -26,7 +26,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -42,6 +41,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +49,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -56,8 +57,12 @@ public class SignatureController extends AbstractController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SignatureController.class);
 	
-	private static final List<DigestAlgorithm> SUPPORTED_DIGEST_ALGORITHMS = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
-			DigestAlgorithm.SHA384, DigestAlgorithm.SHA512, DigestAlgorithm.SHA3_224, DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512);
+	private static final List<DigestAlgorithm> SUPPORTED_DIGEST_ALGORITHMS = Arrays.asList(
+			DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512,
+			DigestAlgorithm.SHA3_224, DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512
+	);
+
+	private static final DigestAlgorithm DEFAULT_DIGEST_ALGORITHM = DigestAlgorithm.SHA256;
 	
 	/** A list of DigestAlgorithms supported by the current chosen SignatureFormat */
 	private List<DigestAlgorithm> sigFormSupportedDigestAlgorithms;
@@ -108,7 +113,7 @@ public class SignatureController extends AbstractController {
 	private HBox hSignatureOption;
 	
 	@FXML
-	private HBox hBoxDigestAlgos;
+	private ComboBox<DigestAlgorithm> comboDigestAlgos;
 
 	@FXML
 	private RadioButton envelopedRadio;
@@ -268,25 +273,20 @@ public class SignatureController extends AbstractController {
 				updatePropertiesForm();
 			}
 		});
-		
-		for (DigestAlgorithm digestAlgo : SUPPORTED_DIGEST_ALGORITHMS) {
-			RadioButton rb = new RadioButton(digestAlgo.getName());
-			rb.setUserData(digestAlgo);
-			rb.setToggleGroup(toggleDigestAlgo);
-			hBoxDigestAlgos.getChildren().add(rb);
-		}
-		
-		toggleDigestAlgo.selectedToggleProperty().addListener(new ChangeListener<>() {
+
+		comboDigestAlgos.valueProperty().bindBidirectional(model.digestAlgorithmProperty());
+		comboDigestAlgos.setConverter(new StringConverter<>() {
 			@Override
-			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-				if (newValue != null) {
-					DigestAlgorithm digestAlgorithm = (DigestAlgorithm) newValue.getUserData();
-					model.setDigestAlgorithm(digestAlgorithm);
-				} else {
-					model.setDigestAlgorithm(null);
-				}
+			public String toString(DigestAlgorithm algo) {
+				return algo != null ? algo.getName() : null;
+			}
+			@Override
+			public DigestAlgorithm fromString(String string) {
+				return string != null ? DigestAlgorithm.forName(string) : null;
 			}
 		});
+
+		updateDigestAlgorithms(SUPPORTED_DIGEST_ALGORITHMS);
 
 		comboLevel.valueProperty().bindBidirectional(model.signatureLevelProperty());
 
@@ -419,8 +419,6 @@ public class SignatureController extends AbstractController {
 		updateSignatureFormAndPackaging();
 		updateSignatureLevelAndDigestAlgo();
 		updateSignatureOption();
-
-		reinitDigestAlgos();
 	}
 
 	private void updateSignatureFormAndPackaging() {
@@ -497,57 +495,65 @@ public class SignatureController extends AbstractController {
 	}
 
 	private void updateSignatureLevelAndDigestAlgo() {
-		sigFormSupportedDigestAlgorithms = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
-
 		SignatureForm signatureForm = model.getSignatureForm();
 		if (signatureForm != null) {
+			List<SignatureLevel> signatureLevels = null;
+			List<DigestAlgorithm> digestAlgorithms = SUPPORTED_DIGEST_ALGORITHMS;
+
 			switch (signatureForm) {
 				case XAdES:
 					if (model.getSignatureOption() != null) {
 						switch (model.getSignatureOption()) {
 							case TL_SIGNING:
-								updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B);
-								sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256,
-										DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+								signatureLevels = Collections.singletonList(SignatureLevel.XAdES_BASELINE_B);
+								digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 								break;
 							case XML_MANIFEST_SIGNING:
-								updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
+								signatureLevels = Arrays.asList(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
 										SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-								sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256,
-										DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
+								digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 								break;
 							default:
 								break;
 						}
 					} else {
-						updateSignatureLevels(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
+						signatureLevels = Arrays.asList(SignatureLevel.XAdES_BASELINE_B, SignatureLevel.XAdES_BASELINE_T,
 								SignatureLevel.XAdES_BASELINE_LT, SignatureLevel.XAdES_BASELINE_LTA);
-						sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
+						digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA224, DigestAlgorithm.SHA256,
 								DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 					}
 					break;
 
 				case CAdES:
-					updateSignatureLevels(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
+					signatureLevels = Arrays.asList(SignatureLevel.CAdES_BASELINE_B, SignatureLevel.CAdES_BASELINE_T,
 							SignatureLevel.CAdES_BASELINE_LT, SignatureLevel.CAdES_BASELINE_LTA);
 					break;
 
 				case PAdES:
-					updateSignatureLevels(SignatureLevel.PAdES_BASELINE_B, SignatureLevel.PAdES_BASELINE_T,
+					signatureLevels = Arrays.asList(SignatureLevel.PAdES_BASELINE_B, SignatureLevel.PAdES_BASELINE_T,
 							SignatureLevel.PAdES_BASELINE_LT, SignatureLevel.PAdES_BASELINE_LTA);
 					break;
 
 				case JAdES:
-					sigFormSupportedDigestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
-
-					updateSignatureLevels(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
+					signatureLevels = Arrays.asList(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
 							SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
+					digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 					break;
 
 				default:
-					updateSignatureLevels();
+					signatureLevels = Collections.emptyList();;
 					break;
 			}
+
+
+			if (SignatureTokenType.MSCAPI.equals(model.getTokenType())) {
+				digestAlgorithms = new ArrayList<>(comboDigestAlgos.getItems());
+				digestAlgorithms.removeAll(Arrays.asList(DigestAlgorithm.SHA224, DigestAlgorithm.SHA3_224,
+						DigestAlgorithm.SHA3_256, DigestAlgorithm.SHA3_384, DigestAlgorithm.SHA3_512));
+			}
+
+			updateSignatureLevels(signatureLevels);
+			updateDigestAlgorithms(digestAlgorithms);
 		}
 	}
 
@@ -586,12 +592,29 @@ public class SignatureController extends AbstractController {
 		}
 	}
 
-	private void updateSignatureLevels(SignatureLevel... signatureLevels) {
+	private void updateDigestAlgorithms(List<DigestAlgorithm> digestAlgorithms) {
+		DigestAlgorithm selectedDigestAlgorithm = comboDigestAlgos.getValue();
+		if (Utils.isCollectionNotEmpty(digestAlgorithms)) {
+			// this ensures that internal value ids are updated, otherwise it may lead to unexpected behavior
+			comboDigestAlgos.getSelectionModel().clearSelection();
+			comboDigestAlgos.getItems().setAll(digestAlgorithms);
+			if (digestAlgorithms.contains(selectedDigestAlgorithm)) {
+				comboDigestAlgos.getSelectionModel().select(selectedDigestAlgorithm);
+			} else if (digestAlgorithms.contains(DEFAULT_DIGEST_ALGORITHM)) {
+				comboDigestAlgos.getSelectionModel().select(DEFAULT_DIGEST_ALGORITHM);
+			} else {
+				comboDigestAlgos.getSelectionModel().select(digestAlgorithms.iterator().next());
+			}
+			comboDigestAlgos.setVisibleRowCount(digestAlgorithms.size());
+		}
+	}
+
+	private void updateSignatureLevels(List<SignatureLevel> signatureLevels) {
 		comboLevel.setDisable(false);
 		comboLevel.getItems().removeAll(comboLevel.getItems());
-		if (Utils.isArrayNotEmpty(signatureLevels)) {
+		if (Utils.isCollectionNotEmpty(signatureLevels)) {
 			comboLevel.getItems().addAll(signatureLevels);
-			comboLevel.setValue(signatureLevels[0]);
+			comboLevel.setValue(signatureLevels.iterator().next());
 		}
 	}
 
@@ -601,38 +624,6 @@ public class SignatureController extends AbstractController {
 
 	private void reinitSignatureOptions() {
 		disableRadioButtons(tlSigning, xmlManifest);
-	}
-	
-	private void reinitDigestAlgos() {
-		ArrayList<DigestAlgorithm> digestAlgos = new ArrayList<>(SUPPORTED_DIGEST_ALGORITHMS);
-		if (sigFormSupportedDigestAlgorithms != null) {
-			digestAlgos.retainAll(sigFormSupportedDigestAlgorithms);
-		}
-		if (sigTokenTypeSupportedDigestAlgorithms != null) {
-			digestAlgos.retainAll(sigTokenTypeSupportedDigestAlgorithms);
-		}
-		if (SignatureTokenType.MSCAPI.equals(model.getTokenType())) {
-			digestAlgos.remove(DigestAlgorithm.SHA224);
-			digestAlgos.remove(DigestAlgorithm.SHA3_224);
-			digestAlgos.remove(DigestAlgorithm.SHA3_256);
-			digestAlgos.remove(DigestAlgorithm.SHA3_384);
-			digestAlgos.remove(DigestAlgorithm.SHA3_512);
-		}
-		
-		for (Node daButton : hBoxDigestAlgos.getChildren()) {
-			DigestAlgorithm digestAlgorithm = (DigestAlgorithm) daButton.getUserData();
-			if (digestAlgorithm == null) {
-				// nothing chosen case
-			} else if (digestAlgos.contains(digestAlgorithm)) {
-				daButton.setDisable(false);
-			} else {
-				daButton.setDisable(true);
-				Toggle selectedToggle = toggleDigestAlgo.getSelectedToggle();
-				if (selectedToggle != null && digestAlgorithm.equals(selectedToggle.getUserData())) {
-					selectedToggle.setSelected(false);
-				}
-			}
-		}
 	}
 
 	private boolean isWindowsOS() {
