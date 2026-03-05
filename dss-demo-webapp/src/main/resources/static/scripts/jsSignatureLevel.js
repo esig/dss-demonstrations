@@ -73,6 +73,9 @@ function updateSignatureLevel(signatureForm) {
     $('#selectSignatureLevel').empty();
 
     var process = $('#process').val();
+    if ($('#nexu_ready_alert').is(':hidden')) {
+        process += "_SERVER_SIGN";
+    }
 
     $.ajax({
         type : "GET",
@@ -118,6 +121,35 @@ $('input[name="signatureForm"]:radio').change(
         getDigestAlgorithms(this.value);
 
     });
+
+function watchVisibility($el, callback) {
+    if ($el.length === 0) return;
+
+    let lastState = $el.is(':visible');
+
+    const observer = new MutationObserver(function () {
+        const currentState = $el.is(':visible');
+
+        if (currentState !== lastState) {
+            lastState = currentState;
+            callback.call($el[0], currentState);
+        }
+    });
+
+    observer.observe($el[0], {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+    });
+
+    return observer;
+}
+
+watchVisibility($('#nexu_ready_alert'), function (visible) {
+    var checkedSignatureForm = $('input[name="signatureForm"]:checked');
+    if (checkedSignatureForm.length) {
+        updateSignatureLevel(checkedSignatureForm.val());
+    }
+});
 
 $(document).ready(function() {
     var checkedContainerType = $('input[name="containerType"]:checked');

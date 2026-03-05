@@ -22,6 +22,7 @@ import eu.europa.esig.dss.web.model.CounterSignatureForm;
 import eu.europa.esig.dss.web.model.CounterSignatureHelperResponse;
 import eu.europa.esig.dss.web.model.DataToSignParams;
 import eu.europa.esig.dss.web.model.GetDataToSignResponse;
+import eu.europa.esig.dss.web.model.ProcessEnum;
 import eu.europa.esig.dss.web.model.SignDocumentResponse;
 import eu.europa.esig.dss.web.model.SignResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +66,9 @@ public class CounterSignatureController extends AbstractSignatureController {
 
 	@Autowired
 	protected CertificateVerifier certificateVerifier;
+
+	@Autowired
+	protected DataController dataController;
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
@@ -164,7 +168,8 @@ public class CounterSignatureController extends AbstractSignatureController {
 
 	@RequestMapping(value = "/signatureIds", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
 	@ResponseBody
-	public CounterSignatureHelperResponse getSignatureIds(@RequestParam("documentToCounterSign") MultipartFile documentToCounterSign) {
+	public CounterSignatureHelperResponse getSignatureIds(@RequestParam("documentToCounterSign") MultipartFile documentToCounterSign,
+														  @RequestParam("process") ProcessEnum process) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Extraction of signatures...");
 		}
@@ -180,7 +185,7 @@ public class CounterSignatureController extends AbstractSignatureController {
 				counterSignatureResponse.setSignatureIds(getSignatureIds(signatures));
 				SignatureForm signatureForm = getSignatureForm(signatures);
 				counterSignatureResponse.setSignatureForm(signatureForm);
-				counterSignatureResponse.setSignatureLevels(getSignatureLevels(signatureForm));
+				counterSignatureResponse.setSignatureLevels(getSignatureLevels(signatureForm, process));
 				
 				return counterSignatureResponse;
 			}
@@ -218,29 +223,8 @@ public class CounterSignatureController extends AbstractSignatureController {
 		return advancedSignature.getSignatureForm();
 	}
 	
-	private List<SignatureLevel> getSignatureLevels(SignatureForm signatureForm) {
-		List<SignatureLevel> levels = new ArrayList<>();
-		switch (signatureForm) {
-			case CAdES:
-				levels.add(SignatureLevel.CAdES_BASELINE_B);
-				// TODO : add a support of T+ levels
-				break;
-			case XAdES:
-				levels.add(SignatureLevel.XAdES_BASELINE_B);
-				levels.add(SignatureLevel.XAdES_BASELINE_T);
-				levels.add(SignatureLevel.XAdES_BASELINE_LT);
-				levels.add(SignatureLevel.XAdES_BASELINE_LTA);
-				break;
-			case JAdES:
-				levels.add(SignatureLevel.JAdES_BASELINE_B);
-				levels.add(SignatureLevel.JAdES_BASELINE_T);
-				levels.add(SignatureLevel.JAdES_BASELINE_LT);
-				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
-				break;
-			default:
-				throw new DSSException(String.format("Counter signature is not supported with %s!", signatureForm));
-		}
-		return levels;
+	private List<SignatureLevel> getSignatureLevels(SignatureForm signatureForm, ProcessEnum process) {
+		return dataController.getAllowedLevelsByForm(signatureForm, process);
 	}
 
 	@ModelAttribute("digestAlgos")

@@ -6,6 +6,7 @@ import eu.europa.esig.dss.enumerations.SignatureForm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.web.model.ProcessEnum;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -23,6 +24,9 @@ import java.util.List;
 public class DataController {
 
 	private static final String[] ALLOWED_FIELDS = { "form", "process" };
+
+	@Value("${dss.server.signing.keystore.self.signed}")
+	private boolean serverSignSelfSigned;
 	
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
@@ -35,24 +39,24 @@ public class DataController {
 		List<SignaturePackaging> packagings = new ArrayList<>();
 		if (signatureForm != null) {
 			switch (signatureForm) {
-			case CAdES:
-				packagings.add(SignaturePackaging.ENVELOPING);
-				packagings.add(SignaturePackaging.DETACHED);
-				break;
-			case PAdES:
-				packagings.add(SignaturePackaging.ENVELOPED);
-				break;
-			case XAdES:
-				packagings.add(SignaturePackaging.ENVELOPED);
-				packagings.add(SignaturePackaging.ENVELOPING);
-				packagings.add(SignaturePackaging.DETACHED);
-				packagings.add(SignaturePackaging.INTERNALLY_DETACHED);
-				break;
-			case JAdES:
-				packagings.add(SignaturePackaging.ENVELOPING);
-				packagings.add(SignaturePackaging.DETACHED);
-			default:
-				break;
+				case CAdES:
+					packagings.add(SignaturePackaging.ENVELOPING);
+					packagings.add(SignaturePackaging.DETACHED);
+					break;
+				case PAdES:
+					packagings.add(SignaturePackaging.ENVELOPED);
+					break;
+				case XAdES:
+					packagings.add(SignaturePackaging.ENVELOPED);
+					packagings.add(SignaturePackaging.ENVELOPING);
+					packagings.add(SignaturePackaging.DETACHED);
+					packagings.add(SignaturePackaging.INTERNALLY_DETACHED);
+					break;
+				case JAdES:
+					packagings.add(SignaturePackaging.ENVELOPING);
+					packagings.add(SignaturePackaging.DETACHED);
+				default:
+					break;
 			}
 		}
 		return packagings;
@@ -64,44 +68,56 @@ public class DataController {
 		List<SignatureLevel> levels = new ArrayList<>();
 		if (signatureForm != null) {
 			switch (signatureForm) {
-			case CAdES:                
-				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
-					levels.add(SignatureLevel.CAdES_BASELINE_B);
-				}
-				levels.add(SignatureLevel.CAdES_BASELINE_T);
-				levels.add(SignatureLevel.CAdES_BASELINE_LT);
-				levels.add(SignatureLevel.CAdES_BASELINE_LTA);
-				break;
-			case PAdES:
-				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
-					levels.add(SignatureLevel.PAdES_BASELINE_B);
-				}
-				levels.add(SignatureLevel.PAdES_BASELINE_T);
-				levels.add(SignatureLevel.PAdES_BASELINE_LT);
-				levels.add(SignatureLevel.PAdES_BASELINE_LTA);
-				break;
-			case XAdES:
-				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
-					levels.add(SignatureLevel.XAdES_BASELINE_B);
-				}
-				levels.add(SignatureLevel.XAdES_BASELINE_T);
-				levels.add(SignatureLevel.XAdES_BASELINE_LT);
-				if (!ProcessEnum.DIGEST_SIGN.equals(process)) {
-					levels.add(SignatureLevel.XAdES_BASELINE_LTA);
-				}
-				break;
-			case JAdES:
-				if (ProcessEnum.SIGNATURE.equals(process) || ProcessEnum.DIGEST_SIGN.equals(process)) {
-					levels.add(SignatureLevel.JAdES_BASELINE_B);
-				}
-				levels.add(SignatureLevel.JAdES_BASELINE_T);
-				levels.add(SignatureLevel.JAdES_BASELINE_LT);
-				if (!ProcessEnum.DIGEST_SIGN.equals(process)) {
-					levels.add(SignatureLevel.JAdES_BASELINE_LTA);
-				}
-				break;
-			default:
-				break;
+				case CAdES:
+					if (process.isSign()) {
+						levels.add(SignatureLevel.CAdES_BASELINE_B);
+					}
+					if (ProcessEnum.COUNTER_SIGN == process || ProcessEnum.COUNTER_SIGN_SERVER_SIGN == process) {
+						// TODO : extended CAdES counter-signatures are not supported (yet)
+						break;
+					}
+					levels.add(SignatureLevel.CAdES_BASELINE_T);
+					if (!serverSignSelfSigned || !process.isServerSign()) {
+						levels.add(SignatureLevel.CAdES_BASELINE_LT);
+						levels.add(SignatureLevel.CAdES_BASELINE_LTA);
+					}
+					break;
+				case PAdES:
+					if (process.isSign()) {
+						levels.add(SignatureLevel.PAdES_BASELINE_B);
+					}
+					levels.add(SignatureLevel.PAdES_BASELINE_T);
+					if (!serverSignSelfSigned || !process.isServerSign()) {
+						levels.add(SignatureLevel.PAdES_BASELINE_LT);
+						levels.add(SignatureLevel.PAdES_BASELINE_LTA);
+					}
+					break;
+				case XAdES:
+					if (process.isSign()) {
+						levels.add(SignatureLevel.XAdES_BASELINE_B);
+					}
+					levels.add(SignatureLevel.XAdES_BASELINE_T);
+					if (!serverSignSelfSigned || !process.isServerSign()) {
+						levels.add(SignatureLevel.XAdES_BASELINE_LT);
+						if (!ProcessEnum.DIGEST_SIGN.equals(process)) {
+							levels.add(SignatureLevel.XAdES_BASELINE_LTA);
+						}
+					}
+					break;
+				case JAdES:
+					if (process.isSign()) {
+						levels.add(SignatureLevel.JAdES_BASELINE_B);
+					}
+					levels.add(SignatureLevel.JAdES_BASELINE_T);
+					if (!serverSignSelfSigned || !process.isServerSign()) {
+						levels.add(SignatureLevel.JAdES_BASELINE_LT);
+						if (!ProcessEnum.DIGEST_SIGN.equals(process)) {
+							levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+						}
+					}
+					break;
+				default:
+					break;
 			}
 		}
 		return levels;
@@ -119,7 +135,8 @@ public class DataController {
 
 	@RequestMapping(value = "/levelsBySerialization", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<SignatureLevel> getAllowedLevelsByJWSSerialization(@RequestParam("serializationType") JWSSerializationType jwsSerializationType) {
+	public List<SignatureLevel> getAllowedLevelsByJWSSerialization(@RequestParam("serializationType") JWSSerializationType jwsSerializationType,
+																   @RequestParam("process") ProcessEnum process) {
 		List<SignatureLevel> levels = new ArrayList<>();
 		if (jwsSerializationType != null) {
 			switch (jwsSerializationType) {
@@ -130,8 +147,10 @@ public class DataController {
 			case FLATTENED_JSON_SERIALIZATION:
 				levels.add(SignatureLevel.JAdES_BASELINE_B);
 				levels.add(SignatureLevel.JAdES_BASELINE_T);
-				levels.add(SignatureLevel.JAdES_BASELINE_LT);
-				levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				if (!serverSignSelfSigned || !process.isServerSign()) {
+					levels.add(SignatureLevel.JAdES_BASELINE_LT);
+					levels.add(SignatureLevel.JAdES_BASELINE_LTA);
+				}
 				break;
 			default:
 				break;
