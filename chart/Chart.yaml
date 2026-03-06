@@ -1,0 +1,5 @@
+apiVersion: v2
+name: dss-demo-webapp
+version: 0.1.0
+appVersion: latest
+description: A Helm chart for DSS Demo Webapp (digital signature services)

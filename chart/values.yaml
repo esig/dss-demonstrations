@@ -1,0 +1,31 @@
+replicas: 1
+
+image:
+  repository: registry.aity.tech/alfatrust/dss-demo-webapp
+  tag: latest
+
+service:
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  class: nginx
+  host: dss.alfasign.works
+  prefix: /
+
+certmanager:
+  enabled: true
+  cluster_issuer: letsencrypt-prod
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  failureThreshold: 3
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 90
+  periodSeconds: 30
+  failureThreshold: 3
