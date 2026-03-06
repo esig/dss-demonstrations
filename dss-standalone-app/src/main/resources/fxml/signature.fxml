@@ -7,13 +7,14 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextField?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0"
-      prefWidth="1000.0"
-      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="eu.europa.esig.dss.standalone.controller.SignatureController">
 
     <padding>
@@ -79,11 +80,9 @@
         <ComboBox fx:id="comboLevel" disable="true" prefWidth="200.0"/>
     </HBox>
 
-    <HBox fx:id="hBoxDigestAlgos" styleClass="hbox-style">
+    <HBox styleClass="hbox-style">
         <Label styleClass="label-style" text="Digest algorithm"/>
-        <fx:define>
-            <ToggleGroup fx:id="toggleDigestAlgo"/>
-        </fx:define>
+        <ComboBox fx:id="comboDigestAlgos" prefWidth="200.0"/>
     </HBox>
 
     <HBox styleClass="hbox-style">

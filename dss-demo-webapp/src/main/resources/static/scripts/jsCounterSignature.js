@@ -19,6 +19,12 @@ $('input[type=file][name=documentToCounterSign]').change(function() {
 	var files = $('#documentToCounterSign')[0].files;	
 	formData.append('documentToCounterSign', files[0], files[0].name)
 
+    var process = $('#process').val();
+    if ($('#nexu_ready_alert').is(':hidden')) {
+        process += "_SERVER_SIGN";
+    }
+	formData.append('process', process)
+
 	$.ajax({
         url : "counter-sign/signatureIds",
         type: 'POST',

@@ -18,9 +18,14 @@ $('#selectSignatureLevel').change(
 function loadSignatureLevels(serializationType) {
 	$('#selectSignatureLevel').empty();
 
+    var process = $('#process').val();
+    if ($('#nexu_ready_alert').is(':hidden')) {
+        process += "_SERVER_SIGN";
+    }
+
     $.ajax({
         type : "GET",
-        url : "data/levelsBySerialization?serializationType=" + serializationType,
+        url : "data/levelsBySerialization?serializationType=" + serializationType + "&process=" + process,
         dataType : "json",
         error : function(msg) {
             alert("Error !: " + msg);

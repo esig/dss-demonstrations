@@ -3,22 +3,22 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>6.4.RC1</version>
+		<version>6.4</version>
 	</parent>
 	<artifactId>dss-standalone-app-package</artifactId>
 	<name>DSS standalone application packager</name>
 	
 	<properties>
 		<!-- Windows -->
-		<jre.download.link>https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jre_x64_windows_hotspot_25.0.1_8.zip</jre.download.link>
-		<jre.root.folder>jdk-25.0.1+8-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2%2B10/OpenJDK25U-jre_x64_windows_hotspot_25.0.2_10.zip</jre.download.link>
+		<jre.root.folder>jdk-25.0.2+10-jre</jre.root.folder>
 		
-		<fx.sdk.download.link>https://download.java.net/java/GA/javafx25.0.1/c7eb12ff968046b6a549780ad550b701/3/openjfx-25.0.1_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-25.0.1</fx.root.folder>
+		<fx.sdk.download.link>https://download.java.net/java/GA/javafx25.0.2/1ccc8ce474414c94ade008f8833286e8/4/openjfx-25.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-25.0.2</fx.root.folder>
 
 		<!-- Linux -->
-		<jre.linux.download.link>https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jre_x64_linux_hotspot_25.0.1_8.tar.gz</jre.linux.download.link>
-		<fx.sdk.linux.download.link>https://download.java.net/java/GA/javafx25.0.1/c7eb12ff968046b6a549780ad550b701/3/openjfx-25.0.1_linux-x64_bin-sdk.tar.gz</fx.sdk.linux.download.link>
+		<jre.linux.download.link>https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2%2B10/OpenJDK25U-jre_x64_linux_hotspot_25.0.2_10.tar.gz</jre.linux.download.link>
+		<fx.sdk.linux.download.link>https://download.java.net/java/GA/javafx25.0.2/1ccc8ce474414c94ade008f8833286e8/4/openjfx-25.0.2_linux-x64_bin-sdk.tar.gz</fx.sdk.linux.download.link>
 	</properties>
 
 	<dependencies>
@@ -141,7 +141,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.6.2</version>
+						<version>3.6.3</version>
 						<executions>
 							<execution>
 								<id>package-jar</id>

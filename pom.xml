@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.4.RC1</version>
+	<version>6.4</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -41,15 +41,15 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>6.4.RC1</dss.framework.version>
+		<dss.framework.version>6.4</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.17</slf4j.version>
-		<logback-classic.version>1.5.22</logback-classic.version>
+		<logback-classic.version>1.5.32</logback-classic.version>
 
-		<cxf.version>4.1.4</cxf.version>
-		<swagger-ui.version>5.30.3</swagger-ui.version>
-		<jackson-jakarta-rs-json-provider.version>3.0.3</jackson-jakarta-rs-json-provider.version>
+		<cxf.version>4.2.0</cxf.version>
+		<swagger-ui.version>5.32.0</swagger-ui.version>
+		<jackson-jakarta-rs-json-provider.version>3.1.0</jackson-jakarta-rs-json-provider.version>
 		<jakarta.xml.bind-api.version>3.0.1</jakarta.xml.bind-api.version>
 		<commons-io.version>2.21.0</commons-io.version>
 		<hikaricp.version>7.0.2</hikaricp.version>
@@ -58,7 +58,7 @@
 		<fop-core.version>2.11</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 		
-		<junit.version>6.0.1</junit.version>
+		<junit.version>6.0.3</junit.version>
 	</properties>
 
 	<licenses>
@@ -130,7 +130,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.14.1</version>
+					<version>3.15.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -201,7 +201,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.5.4</version>
+					<version>3.5.5</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -211,7 +211,7 @@
 		<url>https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</url>
 		<connection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</connection>
 		<developerConnection>scm:git:https://ec.europa.eu/digital-building-blocks/code/scm/esig/dss-demos.git</developerConnection>
-		<tag>6.4.RC1</tag>
+		<tag>6.4</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -249,7 +249,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<type>pom</type>
-				<version>3.5.8</version>
+				<version>3.5.11</version>
 				<scope>import</scope>
 			</dependency>
 
@@ -274,6 +274,12 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>3.20.0</version>
+			</dependency>
+			<!-- Temporary bump while spring-boot 3.5.x uses a log4j-api version 2.24.3 with a vulnerability -->
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>2.25.3</version>
 			</dependency>
 			
 			<dependency>
@@ -441,7 +447,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>12.1.9</version>
+						<version>12.2.0</version>
 						<executions>
 							<execution>
 								<goals>
