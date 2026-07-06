@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.tsl}">
+	<head>
+		<title th:text="#{label.tsl}"></title>
+	</head>
+	<body>		
+		<div layout:fragment="content">
+			<p th:if="${loteInfo == null}">No data found for this list</p>
+			
+			<div th:if="${loteInfo != null}" th:with="status=${loteInfo.validationCacheInfo == null or loteInfo.validationCacheInfo.invalid or not loteInfo.downloadCacheInfo.resultExist} ? 'danger' :
+					(${(loteInfo.parsingCacheInfo != null and loteInfo.parsingCacheInfo.nextUpdateDate != null and loteInfo.parsingCacheInfo.nextUpdateDate <= #dates.createNow()) 
+					or (loteInfo.validationCacheInfo != null and loteInfo.validationCacheInfo.indeterminate)} ? 'warning' : 'success')" 
+					th:class="${'card border-' + status}">
+			
+				<div th:class="${'card-header clearfix bg-' + status}">
+					<span th:class="${'badge pull-right badge-' + status}" th:if="${loteInfo.parsingCacheInfo != null and loteInfo.parsingCacheInfo.trustedEntities != null}"
+							th:text="${#lists.size(loteInfo.parsingCacheInfo.trustedEntities)}" title="Number of Trusted Entities"></span>
+					<th:block th:with="country = ${loteInfo.parsingCacheInfo != null and loteInfo.parsingCacheInfo.isResultExist()} ? ${loteInfo.parsingCacheInfo.territory} :
+							(${loteInfo.otherTSLPointer != null} ? ${loteInfo.otherTSLPointer.schemeTerritory} : 'no_country')">
+						<span th:class="${'small_flag flag_' + country}" th:title="${country != 'no_country'} ? ${country} : '?'"></span>
+						<span th:if="${country != 'no_country'}" th:text="#{${'label.country.code.'+country}}" class="tl-card-country-name"></span>
+						<a class="text-white" th:if="${loteInfo.parsingCacheInfo.type != null}" th:text="'(' + (${loteInfo.parsingCacheInfo.type.label != null ? loteInfo.parsingCacheInfo.type.label : loteInfo.parsingCacheInfo.type.uri}) + ')'"
+						   th:href="${loteInfo.parsingCacheInfo.type.uri}" target="_blank"></a>
+					</th:block>
+					<h3 th:if="${loteInfo.parsingCacheInfo == null}" class="card-title" th:text="Country Not Found"></h3>
+				</div>
+				<div class="card-body">
+					<div class="dl-horizontal">
+						<!-- TL-Info body -->
+						<div th:replace="~{fragment/lote-info :: lote-info-body-content(url=${loteInfo.url},
+								downloadResult=${loteInfo.downloadCacheInfo}, 
+								parsingResult=${loteInfo.parsingCacheInfo}, 
+								validationResult=${loteInfo.validationCacheInfo}, 
+								potentialSigners=${loteInfo.validationCacheInfo.potentialSigners})}"></div>
+					</div>
+					<div th:if="${loteInfo.parsingCacheInfo != null and not #lists.isEmpty(loteInfo.parsingCacheInfo.trustedEntities)}">
+						<br>
+						<th:block th:each="trustedEntity,te : ${loteInfo.parsingCacheInfo.trustedEntities}">
+							<div th:replace="~{fragment/lote-info :: lote-te(trustedEntity=${trustedEntity}, te=${te})}"></div>
+						</th:block>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

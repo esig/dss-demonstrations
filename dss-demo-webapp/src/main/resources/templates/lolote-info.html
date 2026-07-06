@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.summary.lolote.complete}">
+	<head>
+		<title th:text="#{label.summary.lolote.complete}"></title>
+	</head>
+	<body>
+		<div layout:fragment="content">
+			<p th:if="${loloteInfo == null}">No info found for this LoLoTE</p>
+			
+			<div th:if="${loloteInfo != null}">
+	
+				<div class="lolote" th:with="downloadResult=${loloteInfo.downloadCacheInfo}, parsingResult=${loloteInfo.parsingCacheInfo}, validationResult=${loloteInfo.validationCacheInfo}">
+					<h2>
+						<th:block th:with="country = ${loloteInfo.parsingCacheInfo != null and loloteInfo.parsingCacheInfo.isResultExist()} ? ${loloteInfo.parsingCacheInfo.territory} :
+							(${loloteInfo.listPointer != null} ? ${loloteInfo.listPointer.schemeTerritory} : 'no_country')">
+							<a th:href="@{/tl-info/lolote/} + ${loloteInfo.getDSSId().asXmlId()}">
+								<span th:class="${'lolote-flag small_flag mt-2 flag_' + country}" th:title="${country != 'no_country'} ? ${country} : '?'"></span>
+							</a>
+						</th:block>
+						<span th:text="#{label.summary.lolote}"></span>
+						<a class="h4" th:if="${parsingResult.type != null}" th:text="'(' + (${parsingResult.type.label != null ? parsingResult.type.label : parsingResult.type.uri}) + ')'" th:href="${parsingResult.type.uri}" target="_blank"></a>
+						<a class="h6" th:href="${loloteInfo.url}" th:text="${loloteInfo.url}?:'-'" target="_blank"></a>
+					</h2>
+					
+					<!-- LoLoTE Info -->
+					<div th:replace="~{fragment/lotl-info-fragments :: lotl-info-summary(downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult})}"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service()
-public class TEValidationJob {
+public class TELoaderJob {
 
     @Value("${cron.lote.loader.enable}")
     private boolean enable;
@@ -18,7 +18,9 @@ public class TEValidationJob {
 
     @PostConstruct
     public void init() {
-        loloteJob.offlineRefresh();
+        if (enable) {
+            loloteJob.offlineRefresh();
+        }
     }
 
     @Scheduled(initialDelayString = "${cron.lote.loader.initial.delay}", fixedDelayString = "${cron.lote.loader.update.delay}")
