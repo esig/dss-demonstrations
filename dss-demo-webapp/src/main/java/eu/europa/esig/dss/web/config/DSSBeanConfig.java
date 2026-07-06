@@ -169,6 +169,9 @@ public class DSSBeanConfig {
 	@Value("${tl.loader.ades.tl.versions}")
 	private List<Integer> adesTLVersions;
 
+	@Value("${cron.lote.loader.enable}")
+	private boolean loteEnabled;
+
 	@Value("${lote.loader.loloteUrl}")
 	private String loteUrl;
 
@@ -768,9 +771,9 @@ public class DSSBeanConfig {
 	public LoTEValidationJob loloteJob() {
 		LoTEValidationJob job = new LoTEValidationJob();
 		job.setTrustedEntitiesCertificateSource(trustedEntitiesListSource());
-
-		job.setLoLoTESources(loloteSource());
-
+		if (loteEnabled) {
+			job.setLoLoTESources(loloteSource());
+		}
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
 		return job;
@@ -781,7 +784,6 @@ public class DSSBeanConfig {
 		return new TrustedEntitiesCertificateSource();
 	}
 
-	@Bean
 	public LoLoTESource loloteSource() {
 		LoLoTESource listSource = new LoLoTESource();
 		listSource.setUrl(loteUrl);
@@ -791,14 +793,16 @@ public class DSSBeanConfig {
 		return listSource;
 	}
 
-	@Bean
 	public KeyStoreCertificateSource loteTrustedKeyStore() {
-		try {
-			return new KeyStoreCertificateSource(new ClassPathResource(loteKeyStoreFilename).getFile(),
-					loteKeyStoreType, loteKeyStorePassword.toCharArray());
-		} catch (IOException e) {
-			throw new DSSException("Unable to load the file " + loteKeyStoreFilename, e);
+		if (loteEnabled) {
+			try {
+				return new KeyStoreCertificateSource(new ClassPathResource(loteKeyStoreFilename).getFile(),
+						loteKeyStoreType, loteKeyStorePassword.toCharArray());
+			} catch (IOException e) {
+				throw new DSSException("Unable to load the file " + loteKeyStoreFilename, e);
+			}
 		}
+		return null;
 	}
 
 	@Bean

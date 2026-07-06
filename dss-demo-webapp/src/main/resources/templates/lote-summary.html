@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.lote.summary}">
+	<head>
+		<title th:text="#{label.tsls.summary}"></title>
+	</head>
+	<body>
+		<div layout:fragment="content">
+
+			<p th:if="${summary == null}" th:text="#{label.summary.lote.info.empty}"></p>
+		
+			<th:block th:if="${summary != null}">
+				<div class="lolote" th:each="lolote,iterLoLoTE : ${summary.getLoLoTEInfos()}" th:with="downloadResult=${lolote.downloadCacheInfo},
+							parsingResult=${lolote.parsingCacheInfo},
+							validationResult=${lolote.validationCacheInfo},
+					 		listPointer=${lolote.listPointer}">
+									
+					<!-- LoLoTE -->
+					<h2>
+						<th:block th:with="country=${parsingResult != null and parsingResult.isResultExist()}?${parsingResult.territory}:
+								(${listPointer != null}?${listPointer.schemeTerritory}:'no_country')">
+							<a th:href="@{/lote-info/lolote/} + ${lolote.getDSSId().asXmlId()}">
+								<span th:class="${'lolote-flag small_flag mt-2 flag_' + country}" th:title="${country != 'no_country'} ? ${country} : '?'"></span>
+							</a>
+						</th:block>
+						<span th:text="#{label.summary.lolote.number(${iterLoLoTE.count})}"></span>
+						<a class="h4" th:if="${parsingResult.type != null}" th:text="'(' + (${parsingResult.type.label != null ? parsingResult.type.label : parsingResult.type.uri}) + ')'" th:href="${parsingResult.type.uri}" target="_blank"></a>
+						<a class="h6" th:href="${lolote.url}" th:text="${lolote.url}?:'-'" target="_blank"></a>
+					</h2>
+					
+					<!-- LoLoTE Info -->
+					<div th:replace="~{fragment/lotl-info-fragments :: lotl-info-summary(downloadResult=${downloadResult}, parsingResult=${parsingResult}, validationResult=${validationResult})}"></div>
+					
+					<!-- LoTE summary -->
+					<div class="table-container row" th:if="${not #lists.isEmpty(lolote.getChildrenInfos())}">
+						<h4 th:text="#{label.summary.lote.info.header}"></h4>
+						<table class="tl-summary summary-table table accordion">
+							<thead th:replace="~{fragment/lote-info :: lote-info-header()}"></thead>
+							
+							<tbody th:each="lote,iterTL : ${lolote.getChildrenInfos()}" th:with="loteId=${lote.getDSSId().asXmlId()},
+									country=${lote.parsingCacheInfo != null and lote.parsingCacheInfo.isResultExist()}?${lote.parsingCacheInfo.territory}:
+											(${lote.listPointer != null}?${lote.listPointer.schemeTerritory}:'no_country'),
+									downloadResult=${lote.downloadCacheInfo},
+									parsingResult=${lote.parsingCacheInfo},
+									validationResult=${lote.validationCacheInfo}">
+									
+									<!-- TL-Info preview -->
+									<tr th:replace="~{fragment/lote-info :: lote-info-preview(loteId=${loteId}, country=${country}, downloadResult=${downloadResult},
+											parsingResult=${parsingResult}, validationResult=${validationResult})}"></tr>
+											
+									<!-- TL-Info body -->
+									<tr th:replace="~{fragment/lote-info :: lote-info-body(loteId=${loteId}, url=${lote.url}, downloadResult=${downloadResult},
+											parsingResult=${parsingResult}, validationResult=${validationResult})}"></tr>
+							</tbody>
+							
+						</table>
+					</div>
+				</div>
+				
+				<!-- Other LoTEs -->
+				<div class="table-container row" th:if="${not #lists.isEmpty(summary.otherLoTEInfos)}">
+					<h2 th:text=#{label.summary.lote.info.other.header}></h2>
+					<table class="tl-summary summary-table table accordion">
+						<thead th:replace="~{fragment/lote-info :: lote-info-header()}"></thead>
+						
+						<tbody th:each="lote,iterTL : ${summary.otherLoTEInfos}" th:with="loteId=${lote.getDSSId().asXmlId()},
+								country=${lote.parsingCacheInfo != null and lote.parsingCacheInfo.isResultExist()}?${lote.parsingCacheInfo.territory}:
+										(${lote.listPointer != null}?${lote.listPointer.schemeTerritory}:'no_country'),
+								downloadResult=${lote.downloadCacheInfo},
+								parsingResult=${lote.parsingCacheInfo},
+								validationResult=${lote.validationCacheInfo}">
+								
+								<!-- TL-Info preview -->
+								<tr th:replace="~{fragment/lote-info :: lote-info-preview(loteId=${loteId}, country=${country}, downloadResult=${downloadResult},
+										parsingResult=${parsingResult}, validationResult=${validationResult})}"></tr>
+										
+								<!-- TL-Info body -->
+								<tr th:replace="~{fragment/lote-info :: lote-info-body(loteId=${loteId}, url=${lote.url}, downloadResult=${downloadResult},
+										parsingResult=${parsingResult}, validationResult=${validationResult})}"></tr>
+						</tbody>
+						
+					</table>
+				</div>
+			</th:block>
+		</div>
+	
+		<div layout:fragment="scripts">
+		    <script type="text/javascript" th:inline="javascript">
+			    $('tr > td > a > span').on('click', function(e) { 
+			        if(jQuery.inArray( "small_flag", e.target.classList ) != -1){
+			            e.stopPropagation(); 
+			        }
+			    });
+		    </script>
+		</div>
+	</body>
+</html>

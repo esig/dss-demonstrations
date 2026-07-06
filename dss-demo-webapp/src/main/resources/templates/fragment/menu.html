@@ -38,6 +38,13 @@
         </div>
     </div>
 
+    <div class="card mt-3" th:if="${@environment.getProperty('cron.lote.loader.enable')}">
+        <div class="card-header bg-primary">Lists of Trusted Entities</div>
+        <div class="list-group list-group-flush">
+            <a th:with="label=#{label.lote.summary}" th:href="@{/lote-info}" th:text="${label}" class="list-group-item" th:classappend="${currentPage == label} ? 'active'"></a>
+        </div>
+    </div>
+
     <div class="card mt-3">
         <div class="card-header bg-primary">Documentation</div>
         <div class="list-group list-group-flush">
