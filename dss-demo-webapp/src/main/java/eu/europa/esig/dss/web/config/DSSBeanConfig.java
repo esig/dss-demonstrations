@@ -9,6 +9,8 @@ import eu.europa.esig.dss.eaa.jwt.creation.SDJWTEAAService;
 import eu.europa.esig.dss.eaa.mdoc.creation.MdocEAAService;
 import eu.europa.esig.dss.eaa.revocation.source.OnlineEAARevocationSource;
 import eu.europa.esig.dss.jades.signature.JAdESService;
+import eu.europa.esig.dss.lote.job.LoTEValidationJob;
+import eu.europa.esig.dss.lote.source.LoLoTESource;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.tsl.TrustServiceStatusAndInformationExtensions;
 import eu.europa.esig.dss.pades.signature.ExternalCMSService;
@@ -29,6 +31,7 @@ import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
 import eu.europa.esig.dss.spi.eaa.status.EAARevocationSource;
+import eu.europa.esig.dss.spi.lote.TrustedEntitiesCertificateSource;
 import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.validation.CertificateVerifier;
@@ -165,6 +168,21 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.ades.tl.versions}")
 	private List<Integer> adesTLVersions;
+
+	@Value("${lote.loader.loloteUrl}")
+	private String loteUrl;
+
+	@Value("${lote.loader.keystore.type}")
+	private String loteKeyStoreType;
+
+	@Value("${lote.loader.keystore.filename}")
+	private String loteKeyStoreFilename;
+
+	@Value("${lote.loader.keystore.password}")
+	private String loteKeyStorePassword;
+
+	@Value("${lote.loader.lote.list.types}")
+	private List<String> loteListTypes;
 
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
@@ -424,7 +442,7 @@ public class DSSBeanConfig {
 		certificateVerifier.setCrlSource(cachedCRLSource());
 		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setAIASource(cachedAIASource());
-		certificateVerifier.setTrustedCertSources(trustedListSource(), trustedCertificateSource());
+		certificateVerifier.setTrustedCertSources(trustedListSource(), trustedEntitiesListSource(), trustedCertificateSource());
 
 		// Default configs
 		certificateVerifier.setAlertOnMissingRevocationData(new ExceptionOnStatusAlert());
@@ -727,7 +745,7 @@ public class DSSBeanConfig {
 		adesLOTL.setTlPredicate(new XMLOtherTSLPointer().and(new TypeOtherTSLPointer(adesTSLType)).negate()); // allow all TSL Types
 
 		if (Utils.isCollectionNotEmpty(adesTSLStatusList)) {
-			adesLOTL.setTrustAnchorValidityPredicate(adesLOTLTrustAnchorValidityPrecicate());
+			adesLOTL.setTrustAnchorValidityPredicate(adesLOTLTrustAnchorValidityPredicate());
 		}
 		if (Utils.isCollectionNotEmpty(adesTLVersions)) {
 			adesLOTL.setTLVersions(adesTLVersions);
@@ -737,13 +755,50 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public TrustAnchorPeriodPredicate adesLOTLTrustAnchorValidityPrecicate() {
+	public TrustAnchorPeriodPredicate adesLOTLTrustAnchorValidityPredicate() {
 		return new TrustAnchorPeriodPredicate() {
 			@Override
 			public boolean test(TrustServiceStatusAndInformationExtensions trustServiceStatusAndInformationExtensions) {
 				return adesTSLStatusList.stream().anyMatch(v -> v.equals(trustServiceStatusAndInformationExtensions.getStatus()));
 			}
 		};
+	}
+
+	@Bean
+	public LoTEValidationJob loloteJob() {
+		LoTEValidationJob job = new LoTEValidationJob();
+		job.setTrustedEntitiesCertificateSource(trustedEntitiesListSource());
+
+		job.setLoLoTESources(loloteSource());
+
+		job.setOfflineDataLoader(offlineLoader());
+		job.setOnlineDataLoader(onlineLoader());
+		return job;
+	}
+
+	@Bean(name = "trusted-entities-certificate-source")
+	public TrustedEntitiesCertificateSource trustedEntitiesListSource() {
+		return new TrustedEntitiesCertificateSource();
+	}
+
+	@Bean
+	public LoLoTESource loloteSource() {
+		LoLoTESource listSource = new LoLoTESource();
+		listSource.setUrl(loteUrl);
+		listSource.setCertificateSource(loteTrustedKeyStore());
+		listSource.setLotePredicate(otherListPointer ->
+				loteListTypes != null && loteListTypes.contains(otherListPointer.getType()));
+		return listSource;
+	}
+
+	@Bean
+	public KeyStoreCertificateSource loteTrustedKeyStore() {
+		try {
+			return new KeyStoreCertificateSource(new ClassPathResource(loteKeyStoreFilename).getFile(),
+					loteKeyStoreType, loteKeyStorePassword.toCharArray());
+		} catch (IOException e) {
+			throw new DSSException("Unable to load the file " + loteKeyStoreFilename, e);
+		}
 	}
 
 	@Bean
