@@ -65,9 +65,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-tsl-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-lote-validation-json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-lote-validation-xml</artifactId>
         </dependency>
 
         <!-- Choose your implementation -->
@@ -586,4 +595,3 @@
     </profiles>
 
 </project>
-
