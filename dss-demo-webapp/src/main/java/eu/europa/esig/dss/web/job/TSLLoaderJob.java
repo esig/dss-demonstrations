@@ -27,6 +27,9 @@ public class TSLLoaderJob {
 	@Value("${bc.allow.wrong.oid.enc:}")
 	private String bcAllowWrongOidEncoding;
 
+	@Value("${bc.asn1.max_cons_depth:}")
+	private String bcAsn1MaxConsDepth;
+
 	@Value("${xmlsec.manifest.max.references:}")
 	private String xmlsecManifestMaxRefsCount;
 
@@ -42,12 +45,19 @@ public class TSLLoaderJob {
 	@PostConstruct
 	public void init() {
 		if (Utils.isStringNotEmpty(bcRsaValidation)) {
+			LOG.info("Set org.bouncycastle.rsa.max_mr_tests : {}", bcRsaValidation);
 			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
 		}
 		if (Utils.isStringNotEmpty(bcAllowWrongOidEncoding)) {
+			LOG.info("Set org.bouncycastle.asn1.allow_wrong_oid_enc : {}", bcAllowWrongOidEncoding);
 			System.setProperty("org.bouncycastle.asn1.allow_wrong_oid_enc", bcAllowWrongOidEncoding);
 		}
+		if (Utils.isStringNotEmpty(bcAsn1MaxConsDepth)) {
+			LOG.info("Set org.bouncycastle.asn1.max_cons_depth : {}", bcAsn1MaxConsDepth);
+			System.setProperty("org.bouncycastle.asn1.max_cons_depth", bcAsn1MaxConsDepth);
+		}
 		if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
+			LOG.info("Set org.apache.xml.security.maxReferences : {}", xmlsecManifestMaxRefsCount);
 			System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
 		}
 		if (Utils.isStringNotEmpty(securityProvider)) {

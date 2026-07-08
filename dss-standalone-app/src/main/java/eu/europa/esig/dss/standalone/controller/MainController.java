@@ -73,15 +73,23 @@ public class MainController extends AbstractController {
 
         String bcRsaValidation = PropertyReader.getProperty("bc.rsa.max_mr_tests");
         if (Utils.isStringNotEmpty(bcRsaValidation)) {
+            LOG.info("Set org.bouncycastle.rsa.max_mr_tests : {}", bcRsaValidation);
             System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
         }
         String bcAllowWrongOidEncoding = PropertyReader.getProperty("bc.allow.wrong.oid.enc");
         if (Utils.isStringNotEmpty(bcAllowWrongOidEncoding)) {
+            LOG.info("Set org.bouncycastle.asn1.allow_wrong_oid_enc : {}", bcAllowWrongOidEncoding);
             System.setProperty("org.bouncycastle.asn1.allow_wrong_oid_enc", bcAllowWrongOidEncoding);
+        }
+        String bcAsn1MaxConsDepth = PropertyReader.getProperty("bc.asn1.max_cons_depth");
+        if (Utils.isStringNotEmpty(bcAsn1MaxConsDepth)) {
+            LOG.info("Set org.bouncycastle.asn1.max_cons_depth : {}", bcAsn1MaxConsDepth);
+            System.setProperty("org.bouncycastle.asn1.max_cons_depth", bcAsn1MaxConsDepth);
         }
 
         String xmlsecManifestMaxRefsCount = PropertyReader.getProperty("xmlsec.manifest.max.references");
         if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
+            LOG.info("Set org.apache.xml.security.maxReferences : {}", xmlsecManifestMaxRefsCount);
             System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
         }
 
