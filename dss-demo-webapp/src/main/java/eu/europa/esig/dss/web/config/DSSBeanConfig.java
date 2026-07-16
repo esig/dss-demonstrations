@@ -5,7 +5,7 @@ import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
 import eu.europa.esig.dss.cades.signature.CAdESService;
 import eu.europa.esig.dss.cbades.signature.CBAdESService;
-import eu.europa.esig.dss.eaa.jwt.creation.SDJWTEAAService;
+import eu.europa.esig.dss.eaa.sd.jwt.creation.SDJWTEAAService;
 import eu.europa.esig.dss.eaa.mdoc.creation.MdocEAAService;
 import eu.europa.esig.dss.eaa.revocation.source.OnlineEAARevocationSource;
 import eu.europa.esig.dss.jades.signature.JAdESService;

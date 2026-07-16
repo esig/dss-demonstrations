@@ -218,7 +218,7 @@
 
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
-            <artifactId>dss-eaa-jwt</artifactId>
+            <artifactId>dss-eaa-sd-jwt</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
