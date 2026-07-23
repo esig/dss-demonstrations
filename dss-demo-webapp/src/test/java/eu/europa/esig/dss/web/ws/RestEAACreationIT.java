@@ -104,7 +104,6 @@ public class RestEAACreationIT extends AbstractRestIT {
             payloadParameters.setExpirationDate(expirationTime);
 
             payloadParameters.setIssuer("EAA provider");
-            payloadParameters.setSubject("good-ecdsa-user");
 
             RemotePublicKey publicKey = new RemotePublicKey();
             publicKey.setPublicKey(ecdsaKey.getCertificate().getPublicKey().getEncoded());
@@ -123,6 +122,7 @@ public class RestEAACreationIT extends AbstractRestIT {
             payloadParameters.setSelectivelyDisclosable(selectivelyDisclosable);
 
             RemoteEAAClaimParameters nonSelectivelyDisclosable = new RemoteEAAClaimParameters();
+            nonSelectivelyDisclosable.setSubject("good-ecdsa-user");
             nonSelectivelyDisclosable.setIssuingAuthority("TEST Authority");
             nonSelectivelyDisclosable.setIssuingCountry("LU");
             nonSelectivelyDisclosable.setIssuingAuthorityRegistrationIdentifier("VATLU-123456");
