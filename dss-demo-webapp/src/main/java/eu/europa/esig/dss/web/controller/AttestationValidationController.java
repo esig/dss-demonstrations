@@ -1,14 +1,14 @@
 package eu.europa.esig.dss.web.controller;
 
+import eu.europa.esig.dss.attestation.common.validation.DefaultAttestationDocumentValidator;
+import eu.europa.esig.dss.attestation.mdoc.validation.AbstractMdocDocumentValidator;
+import eu.europa.esig.dss.attestation.mdoc.validation.MdocValidationParameters;
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
 import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
 import eu.europa.esig.dss.diagnostic.RevocationWrapper;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
-import eu.europa.esig.dss.eaa.common.validation.DefaultEAAPresentationValidator;
-import eu.europa.esig.dss.eaa.mdoc.validation.AbstractMdocEAAPresentationValidator;
-import eu.europa.esig.dss.eaa.mdoc.validation.MdocValidationParameters;
 import eu.europa.esig.dss.enumerations.MimeTypeEnum;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
@@ -19,7 +19,7 @@ import eu.europa.esig.dss.model.identifier.OriginalIdentifierProvider;
 import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.spi.eaa.status.EAARevocationSource;
+import eu.europa.esig.dss.spi.attestation.revocation.AttestationRevocationSource;
 import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
 import eu.europa.esig.dss.spi.validation.CertificateVerifier;
 import eu.europa.esig.dss.spi.validation.CertificateVerifierBuilder;
@@ -34,7 +34,7 @@ import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
 import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
-import eu.europa.esig.dss.web.model.EAAValidationForm;
+import eu.europa.esig.dss.web.model.AttestationValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,15 +71,15 @@ import java.util.List;
 import java.util.Locale;
 
 @Controller
-@RequestMapping(value = "/eaa-validation")
-public class EAAValidationController extends AbstractValidationController {
+@RequestMapping(value = "/attestation-validation")
+public class AttestationValidationController extends AbstractValidationController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(EAAValidationController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AttestationValidationController.class);
 
-	private static final String VALIDATION_TILE = "eaa-validation";
+	private static final String VALIDATION_TILE = "attestation-validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 
-	private static final String[] ALLOWED_FIELDS = { "eaaFile", "sessionTranscript", "validationTime",
+	private static final String[] ALLOWED_FIELDS = { "attestationFile", "sessionTranscript", "validationTime",
 			"timezoneDifference", "defaultPolicy", "policyFile", "cryptographicSuite", "signingCertificate",
 			"adjunctCertificates", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
 			"includeUserFriendlyIdentifiers", "includeSemantics" };
@@ -91,10 +91,10 @@ public class EAAValidationController extends AbstractValidationController {
     private SignaturePolicyProvider signaturePolicyProvider;
 
     @Autowired
-    private EAARevocationSource eaaRevocationSource;
+    private AttestationRevocationSource attestationRevocationSource;
 
     @Autowired
-    private Resource defaultEAAPolicy;
+    private Resource defaultAttestationPolicy;
 
     @Override
     @InitBinder
@@ -110,15 +110,15 @@ public class EAAValidationController extends AbstractValidationController {
 
     @GetMapping
 	public String showValidationForm(Model model, HttpServletRequest request) {
-		EAAValidationForm validationForm = new EAAValidationForm();
+		AttestationValidationForm validationForm = new AttestationValidationForm();
 		validationForm.setDefaultPolicy(true);
-		model.addAttribute("eaaValidationForm", validationForm);
+		model.addAttribute("attestationValidationForm", validationForm);
 		setCryptographicSuiteSamples(model);
 		return VALIDATION_TILE;
 	}
 
     @PostMapping
-	public String validate(@ModelAttribute("eaaValidationForm") @Valid EAAValidationForm validationForm, BindingResult result,
+	public String validate(@ModelAttribute("attestationValidationForm") @Valid AttestationValidationForm validationForm, BindingResult result,
                            Model model, HttpServletRequest request) {
 		if (result.hasErrors()) {
             if (LOG.isDebugEnabled()) {
@@ -130,30 +130,30 @@ public class EAAValidationController extends AbstractValidationController {
             return VALIDATION_TILE;
         }
 
-        LOG.trace("Start EAA validation");
+        LOG.info("Start Attestation validation");
 
-        DefaultEAAPresentationValidator eaaPresentationValidator = DefaultEAAPresentationValidator
-				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getEaaFile()));
-        eaaPresentationValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
-        eaaPresentationValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
+        DefaultAttestationDocumentValidator attestationPresentationValidator = DefaultAttestationDocumentValidator
+				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getAttestationFile()));
+        attestationPresentationValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
+        attestationPresentationValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens(), false));
-        eaaPresentationValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
-        eaaPresentationValidator.setSignaturePolicyProvider(signaturePolicyProvider);
-        eaaPresentationValidator.setValidationTime(getValidationTime(validationForm.getValidationTime(), validationForm.getTimezoneDifference()));
-        eaaPresentationValidator.setEAARevocationSource(eaaRevocationSource);
+        attestationPresentationValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
+        attestationPresentationValidator.setSignaturePolicyProvider(signaturePolicyProvider);
+        attestationPresentationValidator.setValidationTime(getValidationTime(validationForm.getValidationTime(), validationForm.getTimezoneDifference()));
+        attestationPresentationValidator.setAttestationRevocationSource(attestationRevocationSource);
 
-        if ((eaaPresentationValidator instanceof AbstractMdocEAAPresentationValidator mdocEAAPresentationValidator)
+        if ((attestationPresentationValidator instanceof AbstractMdocDocumentValidator mdocValidator)
                 && (validationForm.getSessionTranscript() != null)) {
             MdocValidationParameters mdocValidationParameters = new MdocValidationParameters();
             mdocValidationParameters.setSessionTranscript(WebAppUtils.toDSSDocument(validationForm.getSessionTranscript()));
-            mdocEAAPresentationValidator.setEAAValidationParameters(mdocValidationParameters);
+            mdocValidator.setAttestationValidationParameters(mdocValidationParameters);
         }
 
 		TokenIdentifierProvider identifierProvider = validationForm.isIncludeUserFriendlyIdentifiers() ?
 				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
-        eaaPresentationValidator.setTokenIdentifierProvider(identifierProvider);
+        attestationPresentationValidator.setTokenIdentifierProvider(identifierProvider);
 
-		setSigningCertificate(eaaPresentationValidator, validationForm);
+		setSigningCertificate(attestationPresentationValidator, validationForm);
 
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);
@@ -161,17 +161,17 @@ public class EAAValidationController extends AbstractValidationController {
 			locale = Locale.getDefault();
 			LOG.warn("The request locale is null! Use the default one : {}", locale);
 		}
-        eaaPresentationValidator.setLocale(locale);
+        attestationPresentationValidator.setLocale(locale);
 
-		Reports reports = validate(eaaPresentationValidator, validationForm);
+		Reports reports = validate(attestationPresentationValidator, validationForm);
 		setAttributesModels(model, reports);
 
-        LOG.info("End EAA validation");
+        LOG.info("End Attestation validation");
 
 		return VALIDATION_RESULT_TILE;
 	}
 
-	private void setSigningCertificate(DocumentValidator documentValidator, EAAValidationForm validationForm) {
+	private void setSigningCertificate(DocumentValidator documentValidator, AttestationValidationForm validationForm) {
 		CertificateToken signingCertificate = WebAppUtils.toCertificateToken(validationForm.getSigningCertificate());
 		if (signingCertificate != null) {
 			CertificateSource signingCertificateSource = new CommonCertificateSource();
@@ -180,7 +180,7 @@ public class EAAValidationController extends AbstractValidationController {
 		}
 	}
 
-	private CertificateVerifier getCertificateVerifier(EAAValidationForm certValidationForm) {
+	private CertificateVerifier getCertificateVerifier(AttestationValidationForm certValidationForm) {
 		CertificateSource adjunctCertSource = WebAppUtils.toCertificateSource(certValidationForm.getAdjunctCertificates());
 
 		CertificateVerifier cv;
@@ -195,7 +195,7 @@ public class EAAValidationController extends AbstractValidationController {
 		return cv;
 	}
 
-	private Reports validate(DocumentValidator documentValidator, EAAValidationForm validationForm) {
+	private Reports validate(DocumentValidator documentValidator, AttestationValidationForm validationForm) {
 		Reports reports = null;
 
         Date start = new Date();
@@ -207,8 +207,8 @@ public class EAAValidationController extends AbstractValidationController {
             } catch (IOException e) {
                 throw new DSSException("Unable to load validation policy!", e);
             }
-        } else if (defaultEAAPolicy != null) {
-            try (InputStream is = defaultEAAPolicy.getInputStream()) {
+        } else if (defaultAttestationPolicy != null) {
+            try (InputStream is = defaultAttestationPolicy.getInputStream()) {
                 validationPolicyLoader = ValidationPolicyLoader.fromValidationPolicy(is);
             } catch (IOException e) {
                 throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);

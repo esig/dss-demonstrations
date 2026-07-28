@@ -1,17 +1,16 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
+import jakarta.validation.constraints.AssertTrue;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import eu.europa.esig.dss.web.validation.AssertMultipartFile;
-import jakarta.validation.constraints.AssertTrue;
-
-public class EAAValidationForm {
+public class AttestationValidationForm {
 
 	@AssertMultipartFile
-	private MultipartFile eaaFile;
+	private MultipartFile attestationFile;
 
     @AssertMultipartFile
     private MultipartFile sessionTranscript;
@@ -44,12 +43,12 @@ public class EAAValidationForm {
 
 	private boolean includeUserFriendlyIdentifiers = true;
 
-    public MultipartFile getEaaFile() {
-        return eaaFile;
+    public MultipartFile getAttestationFile() {
+        return attestationFile;
     }
 
-    public void setEaaFile(final MultipartFile eaaFile) {
-        this.eaaFile = eaaFile;
+    public void setAttestationFile(final MultipartFile attestationFile) {
+        this.attestationFile = attestationFile;
     }
 
     public MultipartFile getSessionTranscript() {
@@ -156,9 +155,9 @@ public class EAAValidationForm {
 		this.includeUserFriendlyIdentifiers = includeUserFriendlyIdentifiers;
 	}
 
-    @AssertTrue(message = "{error.eaa.file.mandatory}")
-    public boolean isEaaFormValid() {
-        return (eaaFile != null) && (!eaaFile.isEmpty());
+    @AssertTrue(message = "{error.attestation.file.mandatory}")
+    public boolean isAttestationFormValid() {
+        return (attestationFile != null) && (!attestationFile.isEmpty());
     }
 
 }

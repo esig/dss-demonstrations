@@ -50,12 +50,12 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-eaa-creation-rest-client</artifactId>
+			<artifactId>dss-attestation-creation-rest-client</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-eaa-validation-rest-client</artifactId>
+			<artifactId>dss-attestation-validation-rest-client</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
