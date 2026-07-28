@@ -1,8 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
+import eu.europa.esig.dss.enumerations.AttestationProfile;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.EAAType;
 import eu.europa.esig.dss.enumerations.SignatureAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
@@ -28,22 +28,22 @@ import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.CreateKeyBindingSignatureDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.DataToSignEAADTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.DataToSignForKeyBindingSignatureDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.DisclosuresDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.IssuePresentationDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.SignEAADTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.ClaimDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.ClaimValueDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.DisclosureDTO;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.RemoteEAAClaimParameters;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.RemoteEAAPayloadParameters;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.RemoteEAAPresentationParameters;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.RemoteEAAStatusList;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.RemoteKeyBindingParameters;
-import eu.europa.esig.dss.ws.eaa.creation.dto.parameters.RemotePublicKey;
-import eu.europa.esig.dss.ws.eaa.validation.dto.EAAToValidateDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.CreateKeyBindingSignatureDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.DataToSignAttestationDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.DataToSignForKeyBindingSignatureDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.DisclosuresDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.IssuePresentationDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.SignAttestationDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.ClaimDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.ClaimValueDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.DisclosureDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationClaimParameters;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationPayloadParameters;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationPresentationParameters;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteTokenStatusList;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteKeyBindingParameters;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemotePublicKey;
+import eu.europa.esig.dss.ws.attestation.validation.dto.AttestationToValidateDTO;
 import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
@@ -836,7 +836,7 @@ public class RestDocumentationApp {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void eaaAndEaaPresentation() throws Exception {
+	public void attestationAndPresentation() throws Exception {
 		try (Pkcs12SignatureToken rsaToken = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
 				new KeyStore.PasswordProtection("password".toCharArray()));
 			 Pkcs12SignatureToken ecdsaToken = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_ecdsa.p12"),
@@ -854,7 +854,7 @@ public class RestDocumentationApp {
 			signatureParameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(rsaKey.getCertificate()));
 			signatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-			RemoteEAAPayloadParameters payloadParameters = new RemoteEAAPayloadParameters(EAAType.SD_JWT_VC);
+			RemoteAttestationPayloadParameters payloadParameters = new RemoteAttestationPayloadParameters(AttestationProfile.SD_JWT_VC);
 
 			payloadParameters.setNotBeforeDate(signingTime);
 			Calendar calendar = Calendar.getInstance();
@@ -868,19 +868,19 @@ public class RestDocumentationApp {
 			publicKey.setPublicKey(ecdsaKey.getCertificate().getPublicKey().getEncoded());
 			payloadParameters.setDeviceKey(publicKey);
 
-			payloadParameters.setVerifiableCredentialsType("urn:eudi:eaa:1");
+			payloadParameters.setVerifiableCredentialsType("urn:eudi:attestation:1");
 			DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA256, DSSUtils.digest(DigestAlgorithm.SHA256, "vct".getBytes()));
 			payloadParameters.setVerifiableCredentialsTypeIntegrity(digest);
 
-			payloadParameters.setStatusList(new RemoteEAAStatusList(1, "https://pki.nowina.lu/eaa/status_list"));
-			payloadParameters.setCategory("urn:etsi:esi:eaa:eu:qualified");
+			payloadParameters.setStatusList(new RemoteTokenStatusList(1, "https://pki.nowina.lu/eaa/status_list"));
+			payloadParameters.setCategory("urn:etsi:esi:attestation:eu:qualified");
 
-			RemoteEAAClaimParameters selectivelyDisclosable = new RemoteEAAClaimParameters();
+			RemoteAttestationClaimParameters selectivelyDisclosable = new RemoteAttestationClaimParameters();
 			selectivelyDisclosable.setGivenName("John");
 			selectivelyDisclosable.setFamilyName("Doe");
 			payloadParameters.setSelectivelyDisclosable(selectivelyDisclosable);
 
-			RemoteEAAClaimParameters nonSelectivelyDisclosable = new RemoteEAAClaimParameters();
+			RemoteAttestationClaimParameters nonSelectivelyDisclosable = new RemoteAttestationClaimParameters();
 			nonSelectivelyDisclosable.setSubject("good-ecdsa-user");
 			nonSelectivelyDisclosable.setIssuingAuthority("TEST Authority");
 			nonSelectivelyDisclosable.setIssuingCountry("LU");
@@ -909,11 +909,11 @@ public class RestDocumentationApp {
 
 			payloadParameters.getSelectivelyDisclosable().setOtherClaims(Collections.singletonList(pets));
 
-			DataToSignEAADTO dataToSignEAADTO = new DataToSignEAADTO(payloadParameters, signatureParameters);
+			DataToSignAttestationDTO dataToSignAttestationDTO = new DataToSignAttestationDTO(payloadParameters, signatureParameters);
 
 			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
-					.accept(ContentType.JSON).body(dataToSignEAADTO, ObjectMapperType.JACKSON_2)
-					.post("/services/rest/eaa-creation/getDataToSign");
+					.accept(ContentType.JSON).body(dataToSignAttestationDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/attestation-creation/getDataToSign");
 
 			ToBeSignedDTO toBeSignedDTO = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
 			assertNotNull(toBeSignedDTO);
@@ -921,20 +921,20 @@ public class RestDocumentationApp {
 
 			SignatureValue signatureValue = rsaToken.sign(DTOConverter.toToBeSigned(toBeSignedDTO), DigestAlgorithm.SHA256, rsaKey);
 
-			SignEAADTO signEAADTO = new SignEAADTO(payloadParameters, signatureParameters,
+			SignAttestationDTO signAttestationDTO = new SignAttestationDTO(payloadParameters, signatureParameters,
 					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
-			Response responseSignEAA = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
-					.accept(ContentType.JSON).body(signEAADTO, ObjectMapperType.JACKSON_2)
-					.post("/services/rest/eaa-creation/signEAA");
+			Response responseSignAttestation = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(signAttestationDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/attestation-creation/signAttestation");
 
-			RemoteDocument signedEAA = responseSignEAA.andReturn().as(RemoteDocument.class);
-			assertNotNull(signedEAA);
-			assertTrue(Utils.isArrayNotEmpty(signedEAA.getBytes()));
+			RemoteDocument signedAttestation = responseSignAttestation.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedAttestation);
+			assertTrue(Utils.isArrayNotEmpty(signedAttestation.getBytes()));
 
 			DisclosuresDTO disclosuresDTO = new DisclosuresDTO(payloadParameters);
 			Response responseGetDisclosures = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.accept(ContentType.JSON).body(disclosuresDTO, ObjectMapperType.JACKSON_2)
-					.post("/services/rest/eaa-creation/getDisclosures");
+					.post("/services/rest/attestation-creation/getDisclosures");
 			List<DisclosureDTO> disclosures = (List<DisclosureDTO>) responseGetDisclosures.andReturn().as(List.class);
 			assertTrue(Utils.isCollectionNotEmpty(disclosures));
 
@@ -943,16 +943,16 @@ public class RestDocumentationApp {
 			keyBindingSignatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 			RemoteKeyBindingParameters keyBindingParameters = new RemoteKeyBindingParameters();
-			keyBindingParameters.setEaaType(EAAType.SD_JWT_VC);
+			keyBindingParameters.setAttestationProfile(AttestationProfile.SD_JWT_VC);
 			keyBindingParameters.setNonce("123456");
 			keyBindingParameters.setAudience("audience");
 
 			DataToSignForKeyBindingSignatureDTO dataToSignForKeyBindingSignatureDTO =
-					new DataToSignForKeyBindingSignatureDTO(signedEAA, disclosures, keyBindingParameters, keyBindingSignatureParameters);
+					new DataToSignForKeyBindingSignatureDTO(signedAttestation, disclosures, keyBindingParameters, keyBindingSignatureParameters);
 
 			Response responseGetDataToSignForKeyBindingSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.accept(ContentType.JSON).body(dataToSignForKeyBindingSignatureDTO, ObjectMapperType.JACKSON_2)
-					.post("/services/rest/eaa-creation/getDataToSignForKeyBindingSignature");
+					.post("/services/rest/attestation-creation/getDataToSignForKeyBindingSignature");
 
 			toBeSignedDTO = responseGetDataToSignForKeyBindingSignature.andReturn().as(ToBeSignedDTO.class);
 			assertNotNull(toBeSignedDTO);
@@ -960,41 +960,41 @@ public class RestDocumentationApp {
 
 			signatureValue = ecdsaToken.sign(DTOConverter.toToBeSigned(toBeSignedDTO), DigestAlgorithm.SHA256, ecdsaKey);
 
-			CreateKeyBindingSignatureDTO createKeyBindingSignatureDTO = new CreateKeyBindingSignatureDTO(signedEAA, disclosures, keyBindingParameters,
+			CreateKeyBindingSignatureDTO createKeyBindingSignatureDTO = new CreateKeyBindingSignatureDTO(signedAttestation, disclosures, keyBindingParameters,
 					keyBindingSignatureParameters, new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
 			Response responseCreateKeyBindingSignature = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.accept(ContentType.JSON).body(createKeyBindingSignatureDTO, ObjectMapperType.JACKSON_2)
-					.post("/services/rest/eaa-creation/createKeyBindingSignature");
+					.post("/services/rest/attestation-creation/createKeyBindingSignature");
 
 			RemoteDocument keyBindingSignature = responseCreateKeyBindingSignature.andReturn().as(RemoteDocument.class);
 			assertNotNull(keyBindingSignature);
 			assertTrue(Utils.isArrayNotEmpty(keyBindingSignature.getBytes()));
 
-			IssuePresentationDTO issuePresentationDTO = new IssuePresentationDTO(signedEAA, disclosures, keyBindingSignature,
-					new RemoteEAAPresentationParameters(EAAType.SD_JWT_VC));
+			IssuePresentationDTO issuePresentationDTO = new IssuePresentationDTO(signedAttestation, disclosures, keyBindingSignature,
+					new RemoteAttestationPresentationParameters(AttestationProfile.SD_JWT_VC));
 			Response responseIssuePresentation = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
 					.accept(ContentType.JSON).body(issuePresentationDTO, ObjectMapperType.JACKSON_2)
-					.post("/services/rest/eaa-creation/issuePresentation");
+					.post("/services/rest/attestation-creation/issuePresentation");
 
-			RemoteDocument eaaPresentation = responseIssuePresentation.andReturn().as(RemoteDocument.class);
-			assertNotNull(eaaPresentation);
-			assertTrue(Utils.isArrayNotEmpty(eaaPresentation.getBytes()));
+			RemoteDocument attestationPresentation = responseIssuePresentation.andReturn().as(RemoteDocument.class);
+			assertNotNull(attestationPresentation);
+			assertTrue(Utils.isArrayNotEmpty(attestationPresentation.getBytes()));
 		}
 	}
 
 	@Test
-	public void eaaValidation() throws Exception {
+	public void attestationValidation() throws Exception {
 
-		EAAToValidateDTO eaaToValidateDTO = new EAAToValidateDTO();
+		AttestationToValidateDTO attestationToValidateDTO = new AttestationToValidateDTO();
 
-		File eaaFile = new File("src/test/resources/sdjwt.json");
-		RemoteDocument eaaPresentationDoc = new RemoteDocument();
-		eaaPresentationDoc.setBytes(toByteArray(eaaFile));
-		eaaPresentationDoc.setName(eaaFile.getName());
-		eaaToValidateDTO.setEaaPresentation(eaaPresentationDoc);
+		File attestationFile = new File("src/test/resources/sdjwt.json");
+		RemoteDocument attestationPresentationDoc = new RemoteDocument();
+		attestationPresentationDoc.setBytes(toByteArray(attestationFile));
+		attestationPresentationDoc.setName(attestationFile.getName());
+		attestationToValidateDTO.setAttestationPresentation(attestationPresentationDoc);
 
-		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(eaaToValidateDTO, ObjectMapperType.JACKSON_2)
-				.post("/services/rest/eaa-validation/validateEAA").then().assertThat().statusCode(equalTo(200));
+		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(attestationToValidateDTO, ObjectMapperType.JACKSON_2)
+				.post("/services/rest/attestation-validation/validateAttestation").then().assertThat().statusCode(equalTo(200));
 	}
 
 	private byte[] toByteArray(File file) throws IOException {

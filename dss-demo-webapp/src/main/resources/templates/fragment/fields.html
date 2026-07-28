@@ -425,15 +425,15 @@
 	</div>
 </div>
 
-<div class="certificate-form-file form-group row" th:fragment="field-eaa-file">
-    <label class="col-sm-3 col-form-label" for="eaaFile" th:text="#{label.eaa.file}"></label>
+<div class="certificate-form-file form-group row" th:fragment="field-attestation-file">
+    <label class="col-sm-3 col-form-label" for="attestationFile" th:text="#{label.attestation.file}"></label>
     <div class="col-sm-6">
-        <input type="file" class="form-control-file" id="eaaFile" name="eaaFile" accept=".json,.cbor" />
+        <input type="file" class="form-control-file" id="attestationFile" name="attestationFile" accept=".json,.cbor" />
         <i class="fa fa-info-circle text-info ml-2" data-toggle="tooltip"
-           data-placement="top" th:title="#{label.eaa.file.tooltip}"></i>
+           data-placement="top" th:title="#{label.attestation.file.tooltip}"></i>
     </div>
     <div class="col-sm-9 offset-sm-3 align-self-center">
-        <p th:if="${#fields.hasErrors('eaaFormValid')}" th:errors="*{eaaFormValid}" class="text-danger">Error</p>
+        <p th:if="${#fields.hasErrors('attestationFormValid')}" th:errors="*{attestationFormValid}" class="text-danger">Error</p>
     </div>
 </div>
 

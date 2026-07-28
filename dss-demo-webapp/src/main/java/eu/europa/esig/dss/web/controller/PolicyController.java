@@ -32,7 +32,7 @@ public class PolicyController {
     private Resource defaultQwacPolicy;
 
     @Autowired
-    private Resource defaultEAAPolicy;
+    private Resource defaultAttestationPolicy;
 
     @Autowired(required = false)
     private Resource cryptographicSuiteXml;
@@ -73,14 +73,14 @@ public class PolicyController {
         }
     }
 
-    @RequestMapping(value = "/download-eaa-default-policy")
-    public void downloadEAAPolicy(HttpSession session, HttpServletResponse response) {
+    @RequestMapping(value = "/download-attestation-default-policy")
+    public void downloadAttestationPolicy(HttpSession session, HttpServletResponse response) {
         response.setContentType(MimeTypeEnum.XML.getMimeTypeString());
-        response.setHeader("Content-Disposition", "attachment; filename=" + defaultEAAPolicy.getFilename());
-        try (InputStream is = defaultEAAPolicy.getInputStream(); OutputStream os = response.getOutputStream()) {
+        response.setHeader("Content-Disposition", "attachment; filename=" + defaultAttestationPolicy.getFilename());
+        try (InputStream is = defaultAttestationPolicy.getInputStream(); OutputStream os = response.getOutputStream()) {
             Utils.copy(is, os);
         } catch (IOException e) {
-            LOG.error("An error occurred while downloading a EAA validation policy : {}", e.getMessage(), e);
+            LOG.error("An error occurred while downloading a default attestation validation policy : {}", e.getMessage(), e);
         }
     }
 

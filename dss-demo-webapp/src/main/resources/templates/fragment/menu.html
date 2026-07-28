@@ -23,7 +23,7 @@
             <a th:with="label=#{label.validate}" th:href="@{/validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
             <a th:with="label=#{label.cert.validate}" th:href="@{/certificate-validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
             <a th:with="label=#{label.qwac.validate}" th:href="@{/qwac-validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
-            <a th:with="label=#{label.eaa.validate}" th:href="@{/eaa-validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.attestation.validate}" th:href="@{/attestation-validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
             <a th:with="label=#{label.replay.diag}" th:href="@{/replay-diagnostic-data}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
             <a th:with="label=#{label.merge.containers}" th:href="@{/merge-containers}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
         </div>

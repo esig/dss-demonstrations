@@ -1,16 +1,16 @@
 package eu.europa.esig.dss.web.ws;
 
+import eu.europa.esig.dss.diagnostic.AttestationWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
-import eu.europa.esig.dss.diagnostic.EAAWrapper;
 import eu.europa.esig.dss.diagnostic.SignatureWrapper;
-import eu.europa.esig.dss.enumerations.EAAType;
+import eu.europa.esig.dss.enumerations.AttestationProfile;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.config.CXFConfig;
+import eu.europa.esig.dss.ws.attestation.validation.dto.AttestationToValidateDTO;
+import eu.europa.esig.dss.ws.attestation.validation.rest.client.RestAttestationValidationService;
 import eu.europa.esig.dss.ws.converter.RemoteDocumentConverter;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
-import eu.europa.esig.dss.ws.eaa.validation.dto.EAAToValidateDTO;
-import eu.europa.esig.dss.ws.eaa.validation.rest.client.RestEAAValidationService;
 import eu.europa.esig.dss.ws.validation.dto.WSReportsDTO;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -25,16 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RestEAAValidationIT extends AbstractRestIT {
+public class RestAttestationValidationIT extends AbstractRestIT {
 
-    private RestEAAValidationService validationService;
+    private RestAttestationValidationService validationService;
 
     @BeforeEach
     public void init() {
         JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 
-        factory.setAddress(getBaseCxf() + CXFConfig.REST_EAA_VALIDATION);
-        factory.setServiceClass(RestEAAValidationService.class);
+        factory.setAddress(getBaseCxf() + CXFConfig.REST_ATTESTATION_VALIDATION);
+        factory.setServiceClass(RestAttestationValidationService.class);
         factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
 
         LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
@@ -45,14 +45,14 @@ public class RestEAAValidationIT extends AbstractRestIT {
         factory.getOutInterceptors().add(loggingOutInterceptor);
         factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
-        validationService = factory.create(RestEAAValidationService.class);
+        validationService = factory.create(RestAttestationValidationService.class);
     }
 
     @Test
     public void test() {
-        RemoteDocument eaaPresentation = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sd-jwt-eaa.json"));
-        EAAToValidateDTO dto = new EAAToValidateDTO(eaaPresentation);
-        WSReportsDTO result = validationService.validateEAA(dto);
+        RemoteDocument attestationPresentation = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sd-jwt-attestation.json"));
+        AttestationToValidateDTO dto = new AttestationToValidateDTO(attestationPresentation);
+        WSReportsDTO result = validationService.validateAttestation(dto);
 
         assertNotNull(result.getDiagnosticData());
         assertNotNull(result.getDetailedReport());
@@ -67,13 +67,13 @@ public class RestEAAValidationIT extends AbstractRestIT {
         assertNotNull(reports.getSimpleReport());
 
         DiagnosticData diagnosticData = reports.getDiagnosticData();
-        EAAWrapper eaa = diagnosticData.getEAAById(diagnosticData.getFirstEAAId());
-        assertNotNull(eaa);
-        assertEquals(EAAType.SD_JWT_VC, eaa.getEAAType());
+        AttestationWrapper attestation = diagnosticData.getAttestationById(diagnosticData.getFirstAttestationId());
+        assertNotNull(attestation);
+        assertEquals(AttestationProfile.SD_JWT_VC, attestation.getAttestationProfile());
 
-        List<SignatureWrapper> eaaSignatures = eaa.getEAASignatures();
-        assertEquals(1, eaaSignatures.size());
-        SignatureWrapper signature = eaaSignatures.get(0);
+        List<SignatureWrapper> attestationSignatures = attestation.getAttestationSignatures();
+        assertEquals(1, attestationSignatures.size());
+        SignatureWrapper signature = attestationSignatures.get(0);
         assertTrue(signature.isBLevelTechnicallyValid());
     }
 
