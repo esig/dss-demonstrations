@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.web.ws;
 
 import eu.europa.esig.dss.attestation.mdoc.MdocConstants;
-import eu.europa.esig.dss.enumerations.AttestationProfile;
+import eu.europa.esig.dss.enumerations.AttestationForm;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.SignatureValue;
@@ -14,20 +14,25 @@ import eu.europa.esig.dss.ws.attestation.creation.dto.CreateKeyBindingSignatureD
 import eu.europa.esig.dss.ws.attestation.creation.dto.DataToSignAttestationDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.DataToSignForKeyBindingSignatureDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.DisclosuresDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.IssueAttestationDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.IssuePresentationDTO;
+import eu.europa.esig.dss.ws.attestation.creation.dto.ParseAttestationDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.SignAttestationDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.ClaimDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.ClaimValueDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.DisclosureDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.DrivingPrivilegeDTO;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationClaimParameters;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationDocument;
+import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationParsingParameters;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationPayloadParameters;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteAttestationPresentationParameters;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteIdentifierList;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteKeyBindingParameters;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemotePublicKey;
 import eu.europa.esig.dss.ws.attestation.creation.dto.parameters.RemoteTokenStatusList;
-import eu.europa.esig.dss.ws.attestation.creation.rest.client.RestAttestationCreationService;
+import eu.europa.esig.dss.ws.attestation.creation.rest.client.RestAttestationPresentationService;
+import eu.europa.esig.dss.ws.attestation.creation.rest.client.RestAttestationSDCreationService;
 import eu.europa.esig.dss.ws.converter.DTOConverter;
 import eu.europa.esig.dss.ws.converter.RemoteCertificateConverter;
 import eu.europa.esig.dss.ws.dto.DigestDTO;
@@ -55,14 +60,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RestAttestationCreationIT extends AbstractRestIT {
 
-    private RestAttestationCreationService attestationService;
+    private RestAttestationSDCreationService attestationService;
+    private RestAttestationPresentationService presentationService;
 
     @BeforeEach
     public void init() {
         JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
 
         factory.setAddress(getBaseCxf() + CXFConfig.REST_ATTESTATION_CREATION);
-        factory.setServiceClass(RestAttestationCreationService.class);
+        factory.setServiceClass(RestAttestationSDCreationService.class);
         factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
 
         LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
@@ -73,7 +79,23 @@ public class RestAttestationCreationIT extends AbstractRestIT {
         factory.getOutInterceptors().add(loggingOutInterceptor);
         factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
-        attestationService = factory.create(RestAttestationCreationService.class);
+        attestationService = factory.create(RestAttestationSDCreationService.class);
+
+        factory = new JAXRSClientFactoryBean();
+
+        factory.setAddress(getBaseCxf() + CXFConfig.REST_ATTESTATION_PRESENTATION);
+        factory.setServiceClass(RestAttestationPresentationService.class);
+        factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
+
+        loggingInInterceptor = new LoggingInInterceptor();
+        factory.getInInterceptors().add(loggingInInterceptor);
+        factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+        loggingOutInterceptor = new LoggingOutInterceptor();
+        factory.getOutInterceptors().add(loggingOutInterceptor);
+        factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+        presentationService = factory.create(RestAttestationPresentationService.class);
     }
 
     @Test
@@ -95,7 +117,7 @@ public class RestAttestationCreationIT extends AbstractRestIT {
             signatureParameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(rsaKey.getCertificate()));
             signatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-            RemoteAttestationPayloadParameters payloadParameters = new RemoteAttestationPayloadParameters(AttestationProfile.SD_JWT_VC);
+            RemoteAttestationPayloadParameters payloadParameters = new RemoteAttestationPayloadParameters(AttestationForm.SD_JWT);
 
             payloadParameters.setNotBeforeDate(signingTime);
             Calendar calendar = Calendar.getInstance();
@@ -109,12 +131,12 @@ public class RestAttestationCreationIT extends AbstractRestIT {
             publicKey.setPublicKey(ecdsaKey.getCertificate().getPublicKey().getEncoded());
             payloadParameters.setDeviceKey(publicKey);
 
-            payloadParameters.setVerifiableCredentialsType("urn:eudi:attestation:1");
+            payloadParameters.setVerifiableCredentialsType("urn:eudi:eaa:1");
             DigestDTO digest = new DigestDTO(DigestAlgorithm.SHA256, DSSUtils.digest(DigestAlgorithm.SHA256, "vct".getBytes()));
             payloadParameters.setVerifiableCredentialsTypeIntegrity(digest);
 
             payloadParameters.setStatusList(new RemoteTokenStatusList(1, "https://pki.nowina.lu/eaa/status_list"));
-            payloadParameters.setCategory("urn:etsi:esi:attestation:eu:qualified");
+            payloadParameters.setCategory("urn:etsi:esi:eaa:eu:qualified");
 
             RemoteAttestationClaimParameters selectivelyDisclosable = new RemoteAttestationClaimParameters();
             selectivelyDisclosable.setGivenName("John");
@@ -162,32 +184,40 @@ public class RestAttestationCreationIT extends AbstractRestIT {
             assertNotNull(signedAttestation);
 
             DisclosuresDTO disclosuresDTO = new DisclosuresDTO(payloadParameters);
-            List<DisclosureDTO> disclosures = attestationService.getDisclosures(disclosuresDTO);
+            List<DisclosureDTO> disclosures = attestationService.generateDisclosures(disclosuresDTO);
             assertTrue(Utils.isCollectionNotEmpty(disclosures));
+
+            IssueAttestationDTO issueAttestationDTO = new IssueAttestationDTO(signedAttestation, AttestationForm.SD_JWT, disclosures);
+            RemoteDocument issuedAttestation = attestationService.issueAttestation(issueAttestationDTO);
+
+            ParseAttestationDTO parseAttestationDTO = new ParseAttestationDTO(issuedAttestation, new RemoteAttestationParsingParameters(AttestationForm.SD_JWT));
+            RemoteAttestationDocument parsedAttestation = presentationService.parseAttestation(parseAttestationDTO);
+            signedAttestation = parsedAttestation.getSignedAttestation();
+            disclosures = parsedAttestation.getDisclosures();
 
             RemoteSignatureParameters keyBindingSignatureParameters = new RemoteSignatureParameters();
             keyBindingSignatureParameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(ecdsaKey.getCertificate()));
             keyBindingSignatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
             RemoteKeyBindingParameters keyBindingParameters = new RemoteKeyBindingParameters();
-            keyBindingParameters.setAttestationProfile(AttestationProfile.SD_JWT_VC);
+            keyBindingParameters.setAttestationForm(AttestationForm.SD_JWT);
             keyBindingParameters.setNonce("123456");
             keyBindingParameters.setAudience("audience");
 
             DataToSignForKeyBindingSignatureDTO dataToSignForKeyBindingSignatureDTO =
                     new DataToSignForKeyBindingSignatureDTO(signedAttestation, disclosures, keyBindingParameters, keyBindingSignatureParameters);
-            dataToSign = attestationService.getDataToSignForKeyBindingSignature(dataToSignForKeyBindingSignatureDTO);
+            dataToSign = presentationService.getDataToSignForKeyBindingSignature(dataToSignForKeyBindingSignatureDTO);
             assertNotNull(dataToSign);
             signatureValue = ecdsaToken.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, ecdsaKey);
 
             CreateKeyBindingSignatureDTO createKeyBindingSignatureDTO = new CreateKeyBindingSignatureDTO(signedAttestation, disclosures, keyBindingParameters,
                     keyBindingSignatureParameters, new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
-            RemoteDocument keyBindingSignature = attestationService.createKeyBindingSignature(createKeyBindingSignatureDTO);
+            RemoteDocument keyBindingSignature = presentationService.createKeyBindingSignature(createKeyBindingSignatureDTO);
             assertNotNull(keyBindingSignature);
 
             IssuePresentationDTO issuePresentationDTO = new IssuePresentationDTO(signedAttestation, disclosures, keyBindingSignature,
-                    new RemoteAttestationPresentationParameters(AttestationProfile.SD_JWT_VC));
-            RemoteDocument attestationPresentation = attestationService.issuePresentation(issuePresentationDTO);
+                    new RemoteAttestationPresentationParameters(AttestationForm.SD_JWT));
+            RemoteDocument attestationPresentation = presentationService.issuePresentation(issuePresentationDTO);
 
             InMemoryDocument iMD = new InMemoryDocument(attestationPresentation.getBytes());
             assertNotNull(iMD);
@@ -208,7 +238,7 @@ public class RestAttestationCreationIT extends AbstractRestIT {
             signatureParameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(privateKey.getCertificate()));
             signatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-            RemoteAttestationPayloadParameters payloadParameters = new RemoteAttestationPayloadParameters(AttestationProfile.ISO_IEC_MDOC);
+            RemoteAttestationPayloadParameters payloadParameters = new RemoteAttestationPayloadParameters(AttestationForm.MDOC);
 
             payloadParameters.setDocType(MdocConstants.ISO18013_5_MDL_DOC_TYPE);
             RemotePublicKey publicKey = new RemotePublicKey();
@@ -264,38 +294,43 @@ public class RestAttestationCreationIT extends AbstractRestIT {
             assertNotNull(signedAttestation);
 
             DisclosuresDTO disclosuresDTO = new DisclosuresDTO(payloadParameters);
-            List<DisclosureDTO> disclosures = attestationService.getDisclosures(disclosuresDTO);
+            List<DisclosureDTO> disclosures = attestationService.generateDisclosures(disclosuresDTO);
             assertTrue(Utils.isCollectionNotEmpty(disclosures));
+
+            IssueAttestationDTO issueAttestationDTO = new IssueAttestationDTO(signedAttestation, AttestationForm.MDOC, disclosures);
+            RemoteDocument issuedAttestation = attestationService.issueAttestation(issueAttestationDTO);
+
+            ParseAttestationDTO parseAttestationDTO = new ParseAttestationDTO(issuedAttestation, new RemoteAttestationParsingParameters(AttestationForm.MDOC));
+            RemoteAttestationDocument parsedAttestation = presentationService.parseAttestation(parseAttestationDTO);
+            signedAttestation = parsedAttestation.getSignedAttestation();
+            disclosures = parsedAttestation.getDisclosures();
 
             RemoteSignatureParameters keyBindingSignatureParameters = new RemoteSignatureParameters();
             keyBindingSignatureParameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(privateKey.getCertificate()));
             keyBindingSignatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
             RemoteKeyBindingParameters keyBindingParameters = new RemoteKeyBindingParameters();
-            keyBindingParameters.setAttestationProfile(AttestationProfile.ISO_IEC_MDOC);
+            keyBindingParameters.setAttestationForm(AttestationForm.MDOC);
             keyBindingParameters.setSessionTranscript(new RemoteDocument(Utils.fromHex("80")));
             keyBindingParameters.setDocType(MdocConstants.ISO18013_5_MDL_DOC_TYPE);
 
             DataToSignForKeyBindingSignatureDTO dataToSignForKeyBindingSignatureDTO =
                     new DataToSignForKeyBindingSignatureDTO(signedAttestation, disclosures, keyBindingParameters, keyBindingSignatureParameters);
-            dataToSign = attestationService.getDataToSignForKeyBindingSignature(dataToSignForKeyBindingSignatureDTO);
+            dataToSign = presentationService.getDataToSignForKeyBindingSignature(dataToSignForKeyBindingSignatureDTO);
             assertNotNull(dataToSign);
             signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, privateKey);
 
             CreateKeyBindingSignatureDTO createKeyBindingSignatureDTO = new CreateKeyBindingSignatureDTO(signedAttestation, disclosures, keyBindingParameters,
                     keyBindingSignatureParameters, new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
-            RemoteDocument keyBindingSignature = attestationService.createKeyBindingSignature(createKeyBindingSignatureDTO);
+            RemoteDocument keyBindingSignature = presentationService.createKeyBindingSignature(createKeyBindingSignatureDTO);
             assertNotNull(keyBindingSignature);
 
             IssuePresentationDTO issuePresentationDTO = new IssuePresentationDTO(signedAttestation, disclosures, keyBindingSignature,
-                    new RemoteAttestationPresentationParameters(AttestationProfile.ISO_IEC_MDOC));
-            RemoteDocument attestationPresentation = attestationService.issuePresentation(issuePresentationDTO);
+                    new RemoteAttestationPresentationParameters(AttestationForm.MDOC));
+            RemoteDocument attestationPresentation = presentationService.issuePresentation(issuePresentationDTO);
 
             InMemoryDocument iMD = new InMemoryDocument(attestationPresentation.getBytes());
             assertNotNull(iMD);
-
-            new InMemoryDocument(Utils.fromHex("80")).save("target/sessionTranscript.cbor");
-            iMD.save("target/imd.cbor");
         }
     }
 

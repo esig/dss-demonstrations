@@ -53,8 +53,10 @@ import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.sha2.Sha2FileCacheDataLoader;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationCreationService;
-import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationCreationServiceImpl;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationPresentationServiceImpl;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationPresentationService;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationSDCreationService;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationSDCreationServiceImpl;
 import eu.europa.esig.dss.ws.attestation.validation.common.RemoteAttestationValidationService;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
@@ -642,11 +644,19 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public RemoteAttestationCreationService attestationCreationService() {
-		RemoteAttestationCreationServiceImpl attestationCreationService = new RemoteAttestationCreationServiceImpl();
+	public RemoteAttestationSDCreationService attestationCreationService() {
+		RemoteAttestationSDCreationServiceImpl attestationCreationService = new RemoteAttestationSDCreationServiceImpl();
 		attestationCreationService.setSdjwtService(sdjwtService());
 		attestationCreationService.setMdocService(mdocService());
 		return attestationCreationService;
+	}
+
+	@Bean
+	public RemoteAttestationPresentationService attestationPresentationService() {
+		RemoteAttestationPresentationServiceImpl attestationPresentationService = new RemoteAttestationPresentationServiceImpl();
+		attestationPresentationService.setSdjwtService(sdjwtService());
+		attestationPresentationService.setMdocService(mdocService());
+		return attestationPresentationService;
 	}
 
 	@Bean

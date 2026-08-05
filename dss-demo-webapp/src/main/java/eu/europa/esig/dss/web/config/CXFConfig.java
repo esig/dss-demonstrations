@@ -7,20 +7,25 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import eu.europa.esig.dss.web.exception.ExceptionRestMapper;
-import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
-import eu.europa.esig.dss.ws.cert.validation.rest.RestCertificateValidationServiceImpl;
-import eu.europa.esig.dss.ws.cert.validation.rest.client.RestCertificateValidationService;
-import eu.europa.esig.dss.ws.cert.validation.soap.SoapCertificateValidationServiceImpl;
-import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationCreationService;
-import eu.europa.esig.dss.ws.attestation.creation.rest.RestAttestationCreationServiceImpl;
-import eu.europa.esig.dss.ws.attestation.creation.rest.client.RestAttestationCreationService;
-import eu.europa.esig.dss.ws.attestation.creation.soap.SoapAttestationCreationServiceImpl;
-import eu.europa.esig.dss.ws.attestation.creation.soap.client.SoapAttestationCreationService;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationPresentationService;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationSDCreationService;
+import eu.europa.esig.dss.ws.attestation.creation.rest.RestAttestationPresentationServiceImpl;
+import eu.europa.esig.dss.ws.attestation.creation.rest.RestAttestationSDCreationServiceImpl;
+import eu.europa.esig.dss.ws.attestation.creation.rest.client.RestAttestationPresentationService;
+import eu.europa.esig.dss.ws.attestation.creation.rest.client.RestAttestationSDCreationService;
+import eu.europa.esig.dss.ws.attestation.creation.soap.SoapAttestationPresentationServiceImpl;
+import eu.europa.esig.dss.ws.attestation.creation.soap.SoapAttestationSDCreationServiceImpl;
+import eu.europa.esig.dss.ws.attestation.creation.soap.client.SoapAttestationPresentationService;
+import eu.europa.esig.dss.ws.attestation.creation.soap.client.SoapAttestationSDCreationService;
 import eu.europa.esig.dss.ws.attestation.validation.common.RemoteAttestationValidationService;
 import eu.europa.esig.dss.ws.attestation.validation.rest.RestAttestationValidationServiceImpl;
 import eu.europa.esig.dss.ws.attestation.validation.rest.client.RestAttestationValidationService;
 import eu.europa.esig.dss.ws.attestation.validation.soap.SoapAttestationValidationServiceImpl;
 import eu.europa.esig.dss.ws.attestation.validation.soap.client.SoapAttestationValidationService;
+import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
+import eu.europa.esig.dss.ws.cert.validation.rest.RestCertificateValidationServiceImpl;
+import eu.europa.esig.dss.ws.cert.validation.rest.client.RestCertificateValidationService;
+import eu.europa.esig.dss.ws.cert.validation.soap.SoapCertificateValidationServiceImpl;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.rest.RestSignatureTokenConnectionImpl;
 import eu.europa.esig.dss.ws.server.signing.rest.client.RestSignatureTokenConnection;
@@ -100,6 +105,7 @@ public class CXFConfig {
 	public static final String SOAP_SERVER_SIGNING = "/soap/server-signing";
 	public static final String SOAP_TIMESTAMP_SERVICE = "/soap/timestamp-service";
 	public static final String SOAP_ATTESTATION_CREATION = "/soap/attestation-creation";
+	public static final String SOAP_ATTESTATION_PRESENTATION = "/soap/attestation-presentation";
 	public static final String SOAP_ATTESTATION_VALIDATION = "/soap/attestation-validation";
 
 	public static final String REST_SIGNATURE_ONE_DOCUMENT = "/rest/signature/one-document";
@@ -112,6 +118,7 @@ public class CXFConfig {
 	public static final String REST_SERVER_SIGNING = "/rest/server-signing";
 	public static final String REST_TIMESTAMP_SERVICE = "/rest/timestamp-service";
 	public static final String REST_ATTESTATION_CREATION = "/rest/attestation-creation";
+	public static final String REST_ATTESTATION_PRESENTATION = "/rest/attestation-presentation";
 	public static final String REST_ATTESTATION_VALIDATION = "/rest/attestation-validation";
 
 	@Value("${cxf.debug:false}")
@@ -154,7 +161,10 @@ public class CXFConfig {
 	private RemoteTimestampService timestampService;
 
 	@Autowired
-	private RemoteAttestationCreationService attestationCreationService;
+	private RemoteAttestationSDCreationService attestationCreationService;
+
+	@Autowired
+	private RemoteAttestationPresentationService attestationPresentationService;
 
 	@Autowired
 	private RemoteAttestationValidationService attestationValidationService;
@@ -246,10 +256,17 @@ public class CXFConfig {
 	}
 
 	@Bean
-	public SoapAttestationCreationService soapAttestationCreationService() {
-		SoapAttestationCreationServiceImpl soapAttestationCreationService = new SoapAttestationCreationServiceImpl();
+	public SoapAttestationSDCreationService soapAttestationCreationService() {
+		SoapAttestationSDCreationServiceImpl soapAttestationCreationService = new SoapAttestationSDCreationServiceImpl();
 		soapAttestationCreationService.setService(attestationCreationService);
 		return soapAttestationCreationService;
+	}
+
+	@Bean
+	public SoapAttestationPresentationService soapAttestationPresentationService() {
+		SoapAttestationPresentationServiceImpl soapAttestationPresentationService = new SoapAttestationPresentationServiceImpl();
+		soapAttestationPresentationService.setService(attestationPresentationService);
+		return soapAttestationPresentationService;
 	}
 
 	@Bean
@@ -345,6 +362,14 @@ public class CXFConfig {
 	}
 
 	@Bean
+	public Endpoint createSoapRemoteAttestationPresentationEndpoint() {
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapAttestationPresentationService());
+		endpoint.publish(SOAP_ATTESTATION_PRESENTATION);
+		enableMTOM(endpoint);
+		return endpoint;
+	}
+
+	@Bean
 	public Endpoint createSoapRemoteAttestationValidationEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(cxf, soapAttestationValidationService());
 		endpoint.publish(SOAP_ATTESTATION_VALIDATION);
@@ -429,10 +454,17 @@ public class CXFConfig {
 	}
 
 	@Bean
-	public RestAttestationCreationService restAttestationCreationService() {
-		RestAttestationCreationServiceImpl restAttestationCreationService = new RestAttestationCreationServiceImpl();
+	public RestAttestationSDCreationService restAttestationCreationService() {
+		RestAttestationSDCreationServiceImpl restAttestationCreationService = new RestAttestationSDCreationServiceImpl();
 		restAttestationCreationService.setService(attestationCreationService);
 		return restAttestationCreationService;
+	}
+
+	@Bean
+	public RestAttestationPresentationService restAttestationPresentationService() {
+		RestAttestationPresentationServiceImpl restAttestationPresentationService = new RestAttestationPresentationServiceImpl();
+		restAttestationPresentationService.setService(attestationPresentationService);
+		return restAttestationPresentationService;
 	}
 
 	@Bean
@@ -548,7 +580,18 @@ public class CXFConfig {
 		sfb.setAddress(REST_ATTESTATION_CREATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(createFeatures(RestAttestationCreationService.class.getName()));
+		sfb.setFeatures(createFeatures(RestAttestationSDCreationService.class.getName()));
+		return sfb.create();
+	}
+
+	@Bean
+	public Server createAttestationPresentationRestService() {
+		JAXRSServerFactoryBean sfb = new JAXRSServerFactoryBean();
+		sfb.setServiceBean(restAttestationPresentationService());
+		sfb.setAddress(REST_ATTESTATION_PRESENTATION);
+		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(createFeatures(RestAttestationPresentationService.class.getName()));
 		return sfb.create();
 	}
 

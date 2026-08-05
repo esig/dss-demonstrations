@@ -54,7 +54,7 @@ public class SoapAttestationValidationIT extends AbstractIT {
 
     @Test
     public void testWithNoPolicyAndNoOriginalFile() {
-        RemoteDocument attestationPresentation = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sd-jwt-attestation.json"));
+        RemoteDocument attestationPresentation = RemoteDocumentConverter.toRemoteDocument(new FileDocument("src/test/resources/sd-jwt-eaa.json"));
         AttestationToValidateDTO dto = new AttestationToValidateDTO(attestationPresentation);
         WSReportsDTO result = validationService.validateAttestation(dto);
 
