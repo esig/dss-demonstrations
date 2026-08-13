@@ -1,8 +1,10 @@
 package eu.europa.esig.dss.standalone.task;
 
+import eu.europa.esig.dss.cbades.cbor.CBORUtils;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
 import eu.europa.esig.dss.enumerations.SigDMechanism;
 import eu.europa.esig.dss.enumerations.SignatureForm;
+import eu.europa.esig.dss.jades.DSSJsonUtils;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.FileDocument;
 import eu.europa.esig.dss.model.SignatureValue;
@@ -13,6 +15,7 @@ import eu.europa.esig.dss.standalone.enumeration.SignatureOption;
 import eu.europa.esig.dss.standalone.exception.ApplicationException;
 import eu.europa.esig.dss.standalone.model.SignatureModel;
 import eu.europa.esig.dss.standalone.service.RemoteDocumentSignatureServiceBuilder;
+import eu.europa.esig.dss.standalone.service.RemoteListOfTrustedEntitiesSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.service.RemoteMultipleDocumentSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.service.RemoteTrustedListSignatureServiceBuilder;
 import eu.europa.esig.dss.standalone.source.PropertyReader;
@@ -28,9 +31,11 @@ import eu.europa.esig.dss.ws.dto.RemoteCertificate;
 import eu.europa.esig.dss.ws.dto.RemoteDocument;
 import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.common.RemoteListOfTrustedEntitiesSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteListOfTrustedEntitiesSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.xades.DSSXMLUtils;
@@ -60,6 +65,7 @@ public class SigningTask extends Task<DSSDocument> {
 	private final RemoteDocumentSignatureService documentsSignatureService;
 
 	private final RemoteTrustedListSignatureService trustedListSignatureService;
+	private final RemoteListOfTrustedEntitiesSignatureService loteSignatureService;
 
 	private final RemoteMultipleDocumentsSignatureService multipleDocumentsSignatureService;
 
@@ -72,6 +78,9 @@ public class SigningTask extends Task<DSSDocument> {
 
 		RemoteTrustedListSignatureServiceBuilder trustedListServiceBuilder = new RemoteTrustedListSignatureServiceBuilder();
 		this.trustedListSignatureService = trustedListServiceBuilder.build();
+
+		RemoteListOfTrustedEntitiesSignatureServiceBuilder loteServiceBuilder = new RemoteListOfTrustedEntitiesSignatureServiceBuilder();
+		this.loteSignatureService = loteServiceBuilder.build();
 
 		RemoteMultipleDocumentSignatureServiceBuilder multipleDocumentSignatureServiceBuilder = new RemoteMultipleDocumentSignatureServiceBuilder();
 		multipleDocumentSignatureServiceBuilder.setTslCertificateSource(tslCertificateSource);
@@ -108,6 +117,15 @@ public class SigningTask extends Task<DSSDocument> {
 			ToBeSigned toBeSigned = getDataToSignTrustedList(toSignDocument, parameters);
 			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
 			signedDocument = signTrustedList(toSignDocument, parameters, signatureValue);
+
+		} else if (isLoTESigning() || isVICALSigning()) {
+			DSSDocument documentToSign = fileDocuments.iterator().next();
+			RemoteListOfTrustedEntitiesSignatureParameters parameters = buildLoTEParameters(signer, documentToSign);
+
+			RemoteDocument toSignDocument = toSignDocuments.iterator().next();
+			ToBeSigned toBeSigned = getDataToSignListOfTrustedEntities(toSignDocument, parameters);
+			SignatureValueDTO signatureValue = sign(token, signer, toBeSigned);
+			signedDocument = signListOfTrustedEntities(toSignDocument, parameters, signatureValue);
 
 		} else {
 			RemoteSignatureParameters parameters = buildParameters(signer);
@@ -178,9 +196,59 @@ public class SigningTask extends Task<DSSDocument> {
 		return parameters;
 	}
 
+	private RemoteListOfTrustedEntitiesSignatureParameters buildLoTEParameters(DSSPrivateKeyEntry signer, DSSDocument documentToSign) {
+		updateProgress(20, 100);
+
+		assertLoTEConfigurationValid(documentToSign, model.getSignatureForm());
+
+		RemoteListOfTrustedEntitiesSignatureParameters parameters = new RemoteListOfTrustedEntitiesSignatureParameters();
+		RemoteBLevelParameters bLevelParams = new RemoteBLevelParameters();
+		bLevelParams.setSigningDate(new Date());
+		parameters.setBLevelParameters(bLevelParams);
+
+		parameters.setSigningCertificate(new RemoteCertificate(signer.getCertificate().getEncoded()));
+		parameters.setDigestAlgorithm(model.getDigestAlgorithm());
+		parameters.setReferenceDigestAlgorithm(model.getDigestAlgorithm());
+
+		return parameters;
+	}
+
+	private void assertLoTEConfigurationValid(DSSDocument documentToSign, SignatureForm signatureForm) {
+		switch (signatureForm) {
+            case XAdES:
+				if (!DomUtils.startsWithXmlPreamble(documentToSign)) {
+					throwException("The provided file is not an XML!", null);
+				}
+				break;
+            case JAdES:
+				if (!DSSJsonUtils.isJsonDocument(documentToSign)) {
+					throwException("The provided file is not a JSON!", null);
+				}
+				break;
+            case CBAdES:
+				if (!CBORUtils.isCbor(documentToSign)) {
+					throwException("The provided file is not a CBOR!", null);
+				}
+				break;
+            default:
+				throw new UnsupportedOperationException(String.format(
+						"The signature form '%s' is not supported for LoTE signature!", signatureForm));
+		}
+	}
+
 	private boolean isTLSigning() {
 		SignatureOption signatureOption = model.getSignatureOption();
 		return SignatureOption.TL_SIGNING.equals(signatureOption);
+	}
+
+	private boolean isLoTESigning() {
+		SignatureOption signatureOption = model.getSignatureOption();
+		return SignatureOption.LOTE_SIGNING.equals(signatureOption);
+	}
+
+	private boolean isVICALSigning() {
+		SignatureOption signatureOption = model.getSignatureOption();
+		return SignatureOption.VICAL_SIGNING.equals(signatureOption);
 	}
 
 	private String getTLVersion(DSSDocument documentToSign) {
@@ -257,6 +325,17 @@ public class SigningTask extends Task<DSSDocument> {
 		return toBeSigned;
 	}
 
+	private ToBeSigned getDataToSignListOfTrustedEntities(RemoteDocument toSignDocument, RemoteListOfTrustedEntitiesSignatureParameters parameters) {
+		updateProgress(25, 100);
+		ToBeSigned toBeSigned = null;
+		try {
+			toBeSigned = DTOConverter.toToBeSigned(loteSignatureService.getDataToSign(toSignDocument, parameters));
+		} catch (Exception e) {
+			throwException("Unable to compute the digest to sign", e);
+		}
+		return toBeSigned;
+	}
+
 	private ToBeSigned getDataToSign(List<RemoteDocument> toSignDocuments, RemoteSignatureParameters parameters) {
 		updateProgress(25, 100);
 		ToBeSigned toBeSigned = null;
@@ -312,6 +391,19 @@ public class SigningTask extends Task<DSSDocument> {
 		try {
 			signDocument = RemoteDocumentConverter.toDSSDocument(
 					trustedListSignatureService.signDocument(toSignDocument, parameters, signatureValue));
+		} catch (Exception e) {
+			throwException("Unable to sign the document", e);
+		}
+		return signDocument;
+	}
+
+	private DSSDocument signListOfTrustedEntities(RemoteDocument toSignDocument, RemoteListOfTrustedEntitiesSignatureParameters parameters,
+												  SignatureValueDTO signatureValue) {
+		updateProgress(75, 100);
+		DSSDocument signDocument = null;
+		try {
+			signDocument = RemoteDocumentConverter.toDSSDocument(
+					loteSignatureService.signDocument(toSignDocument, parameters, signatureValue));
 		} catch (Exception e) {
 			throwException("Unable to sign the document", e);
 		}

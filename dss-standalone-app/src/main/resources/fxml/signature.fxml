@@ -74,6 +74,10 @@
                      toggleGroup="$toggleSignatureOption"/>
         <RadioButton fx:id="xmlManifest" disable="true" mnemonicParsing="false" text="XML Manifest"
                      toggleGroup="$toggleSignatureOption"/>
+        <RadioButton fx:id="loteSigning" disable="true" mnemonicParsing="false" text="LoTE"
+                     toggleGroup="$toggleSignatureOption"/>
+        <RadioButton fx:id="vicalSigning" disable="true" mnemonicParsing="false" text="VICAL"
+                     toggleGroup="$toggleSignatureOption"/>
     </HBox>
 
     <HBox styleClass="hbox-style">

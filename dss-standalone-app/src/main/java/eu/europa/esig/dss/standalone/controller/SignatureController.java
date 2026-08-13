@@ -63,12 +63,6 @@ public class SignatureController extends AbstractController {
 	);
 
 	private static final DigestAlgorithm DEFAULT_DIGEST_ALGORITHM = DigestAlgorithm.SHA256;
-	
-	/** A list of DigestAlgorithms supported by the current chosen SignatureFormat */
-	private List<DigestAlgorithm> sigFormSupportedDigestAlgorithms;
-
-	/** A list of DigestAlgorithms supported by the current chosen SignatureTokenType */
-	private List<DigestAlgorithm> sigTokenTypeSupportedDigestAlgorithms;
 
 	@FXML
 	private Button fileSelectButton;
@@ -135,6 +129,12 @@ public class SignatureController extends AbstractController {
 
 	@FXML
 	private RadioButton xmlManifest;
+
+	@FXML
+	private RadioButton loteSigning;
+
+	@FXML
+	private RadioButton vicalSigning;
 
 	@FXML
 	private ComboBox<SignatureLevel> comboLevel;
@@ -266,6 +266,9 @@ public class SignatureController extends AbstractController {
 
 		tlSigning.setUserData(SignatureOption.TL_SIGNING);
 		xmlManifest.setUserData(SignatureOption.XML_MANIFEST_SIGNING);
+		loteSigning.setUserData(SignatureOption.LOTE_SIGNING);
+		vicalSigning.setUserData(SignatureOption.VICAL_SIGNING);
+
 		toggleSignatureOption.selectedToggleProperty().addListener(new ChangeListener<>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -430,12 +433,12 @@ public class SignatureController extends AbstractController {
 			activateRadioButtons(xadesRadio, cadesRadio);
 			disableRadioButtons(padesRadio, jadesRadio, cbadesRadio);
 			disableRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
-			disableRadioButtons(tlSigning, xmlManifest);
+			disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
 
 		} else if (Utils.collectionSize(model.getFilesToSign()) > 1) {
 			activateRadioButtons(xadesRadio, jadesRadio, cbadesRadio);
 			disableRadioButtons(cadesRadio, padesRadio);
-			disableRadioButtons(tlSigning, xmlManifest);
+			disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
 			if (model.getSignatureForm() != null) {
 				switch (model.getSignatureForm()) {
 					case XAdES:
@@ -462,6 +465,7 @@ public class SignatureController extends AbstractController {
 						if (model.getSignaturePackaging() == null && model.getSignatureOption() != null) {
 							switch (model.getSignatureOption()) {
 								case TL_SIGNING:
+                                case LOTE_SIGNING:
 									envelopedRadio.setSelected(true);
 									break;
 								case XML_MANIFEST_SIGNING:
@@ -473,21 +477,34 @@ public class SignatureController extends AbstractController {
 						} else {
 							activateRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
 						}
-						activateRadioButtons(tlSigning, xmlManifest);
+						activateRadioButtons(tlSigning, xmlManifest, loteSigning);
 						break;
 
-					case CAdES:
 					case JAdES:
+						activateRadioButtons(envelopingRadio, detachedRadio);
+						disableRadioButtons(envelopedRadio, internallyDetachedRadio);
+						loteSigning.setDisable(false);
+						disableRadioButtons(tlSigning, xmlManifest, vicalSigning);
+						if (model.getSignaturePackaging() == null && model.getSignatureOption() == SignatureOption.LOTE_SIGNING) {
+							envelopingRadio.setSelected(true);
+						}
+						break;
+
 					case CBAdES:
 						activateRadioButtons(envelopingRadio, detachedRadio);
 						disableRadioButtons(envelopedRadio, internallyDetachedRadio);
-						disableRadioButtons(tlSigning, xmlManifest);
+						vicalSigning.setDisable(false);
+						disableRadioButtons(tlSigning, xmlManifest, loteSigning);
+						if (model.getSignaturePackaging() == null && model.getSignatureOption() == SignatureOption.VICAL_SIGNING) {
+							envelopingRadio.setSelected(true);
+						}
 						break;
 
+					case CAdES:
 					case PAdES:
 						activateRadioButtons(envelopedRadio);
 						disableRadioButtons(envelopingRadio, detachedRadio, internallyDetachedRadio);
-						disableRadioButtons(tlSigning, xmlManifest);
+						disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
 						break;
 
 					default:
@@ -511,6 +528,7 @@ public class SignatureController extends AbstractController {
 					if (model.getSignatureOption() != null) {
 						switch (model.getSignatureOption()) {
 							case TL_SIGNING:
+                            case LOTE_SIGNING:
 								signatureLevels = Collections.singletonList(SignatureLevel.XAdES_BASELINE_B);
 								digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 								break;
@@ -541,19 +559,27 @@ public class SignatureController extends AbstractController {
 					break;
 
 				case JAdES:
-					signatureLevels = Arrays.asList(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
-							SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
+					if (model.getSignatureOption() != SignatureOption.LOTE_SIGNING) {
+						signatureLevels = Collections.singletonList(SignatureLevel.JAdES_BASELINE_B);
+					} else {
+						signatureLevels = Arrays.asList(SignatureLevel.JAdES_BASELINE_B, SignatureLevel.JAdES_BASELINE_T,
+								SignatureLevel.JAdES_BASELINE_LT, SignatureLevel.JAdES_BASELINE_LTA);
+					}
 					digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 					break;
 
 				case CBAdES:
-					signatureLevels = Arrays.asList(SignatureLevel.CB_AdES_BASELINE_B, SignatureLevel.CB_AdES_BASELINE_T,
-							SignatureLevel.CB_AdES_BASELINE_LT, SignatureLevel.CB_AdES_BASELINE_LTA);
+					if (model.getSignatureOption() != SignatureOption.VICAL_SIGNING) {
+						signatureLevels = Collections.singletonList(SignatureLevel.CB_AdES_BASELINE_B);
+					} else {
+						signatureLevels = Arrays.asList(SignatureLevel.CB_AdES_BASELINE_B, SignatureLevel.CB_AdES_BASELINE_T,
+								SignatureLevel.CB_AdES_BASELINE_LT, SignatureLevel.CB_AdES_BASELINE_LTA);
+					}
 					digestAlgorithms = Arrays.asList(DigestAlgorithm.SHA256, DigestAlgorithm.SHA384, DigestAlgorithm.SHA512);
 					break;
 
 				default:
-					signatureLevels = Collections.emptyList();;
+					signatureLevels = Collections.emptyList();
 					break;
 			}
 
@@ -570,19 +596,41 @@ public class SignatureController extends AbstractController {
 	}
 
 	private void updateSignatureOption() {
-		if (SignatureForm.XAdES.equals(model.getSignatureForm()) && model.getSignaturePackaging() != null
-				&& Utils.collectionSize(model.getFilesToSign()) < 2) {
-			switch (model.getSignaturePackaging()) {
-				case ENVELOPED:
-					tlSigning.setDisable(false);
-					disableRadioButtons(xmlManifest);
+		if (model.getSignaturePackaging() != null && Utils.collectionSize(model.getFilesToSign()) < 2) {
+			switch (model.getSignatureForm()) {
+                case XAdES:
+					switch (model.getSignaturePackaging()) {
+						case ENVELOPED:
+							tlSigning.setDisable(false);
+							loteSigning.setDisable(false);
+							disableRadioButtons(xmlManifest, vicalSigning);
+							break;
+						case ENVELOPING:
+							xmlManifest.setDisable(false);
+							disableRadioButtons(tlSigning, loteSigning, vicalSigning);
+							break;
+						default:
+							disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
+							break;
+					}
 					break;
-				case ENVELOPING:
-					xmlManifest.setDisable(false);
-					disableRadioButtons(tlSigning);
+                case JAdES:
+                    if (model.getSignaturePackaging() == SignaturePackaging.ENVELOPING) {
+						loteSigning.setDisable(false);
+						disableRadioButtons(tlSigning, xmlManifest, vicalSigning);
+                    } else {
+						disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
+					}
 					break;
-				default:
-					disableRadioButtons(tlSigning, xmlManifest);
+				case CBAdES:
+					if (model.getSignaturePackaging() == SignaturePackaging.ENVELOPING) {
+						vicalSigning.setDisable(false);
+						disableRadioButtons(tlSigning, xmlManifest, loteSigning);
+					} else {
+						disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
+					}
+					break;
+                default:
 					break;
 			}
 		}
@@ -635,7 +683,7 @@ public class SignatureController extends AbstractController {
 	}
 
 	private void reinitSignatureOptions() {
-		disableRadioButtons(tlSigning, xmlManifest);
+		disableRadioButtons(tlSigning, xmlManifest, loteSigning, vicalSigning);
 	}
 
 	private boolean isWindowsOS() {

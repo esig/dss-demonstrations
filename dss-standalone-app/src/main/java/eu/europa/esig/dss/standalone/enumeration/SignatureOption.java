@@ -4,6 +4,10 @@ public enum SignatureOption {
 
     TL_SIGNING,
 
-    XML_MANIFEST_SIGNING;
+    XML_MANIFEST_SIGNING,
+
+    LOTE_SIGNING,
+
+    VICAL_SIGNING;
 
 }
