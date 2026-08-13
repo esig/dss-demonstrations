@@ -52,12 +52,14 @@ import eu.europa.esig.dss.ws.server.signing.dto.RemoteKeyEntry;
 import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignExternalCmsDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignListOfTrustedEntitiesDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.PDFExternalMessageDigestDTO;
 import eu.europa.esig.dss.ws.signature.dto.PDFExternalSignDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignListOfTrustedEntitiesDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMessageDigestExternalCmsDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
@@ -65,6 +67,7 @@ import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteListOfTrustedEntitiesSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
@@ -1033,6 +1036,57 @@ public class RestDocumentationApp {
 
 		given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON).body(attestationToValidateDTO, ObjectMapperType.JACKSON_2)
 				.post("/services/rest/attestation-validation/validateAttestation").then().assertThat().statusCode(equalTo(200));
+	}
+
+	@Test
+	public void loteSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/lote-no-sig.json"));
+			documentToSign.setName("lote.json");
+			RemoteDocument loteToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+
+			RemoteListOfTrustedEntitiesSignatureParameters loteSignatureParameters = new RemoteListOfTrustedEntitiesSignatureParameters();
+			loteSignatureParameters.setSigningCertificate(signingCertificate);
+
+			Date signingTime = DSSUtils.getUtcDate(2026, 9, 1);
+			RemoteBLevelParameters bLevelParameters = new RemoteBLevelParameters();
+			bLevelParameters.setSigningDate(signingTime);
+			loteSignatureParameters.setBLevelParameters(bLevelParameters);
+
+			// get data to be signed
+			DataToSignListOfTrustedEntitiesDTO dataToBeSignedDTO = new DataToSignListOfTrustedEntitiesDTO(loteToSign, loteSignatureParameters);
+			Response responseGetDataToSign = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).body(dataToBeSignedDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/list-of-trusted-entities/getDataToSign");
+			responseGetDataToSign.then().assertThat().statusCode(equalTo(200));
+			ToBeSignedDTO dataToBeSigned = responseGetDataToSign.andReturn().as(ToBeSignedDTO.class);
+			assertNotNull(dataToBeSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
+					DigestAlgorithm.SHA512, dssPrivateKeyEntry);
+
+			SignListOfTrustedEntitiesDTO signLoTEDTO = new SignListOfTrustedEntitiesDTO(loteToSign, loteSignatureParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+
+			Response responseSignDocument = given(this.spec).accept(ContentType.JSON).contentType(ContentType.JSON)
+					.accept(ContentType.JSON).accept(ContentType.JSON)
+					.body(signLoTEDTO, ObjectMapperType.JACKSON_2)
+					.post("/services/rest/signature/list-of-trusted-entities/signDocument");
+			responseSignDocument.then().assertThat().statusCode(equalTo(200));
+
+			RemoteDocument signedDocument = responseSignDocument.andReturn().as(RemoteDocument.class);
+			assertNotNull(signedDocument);
+			assertNotNull(signedDocument.getBytes());
+		}
 	}
 
 	private byte[] toByteArray(File file) throws IOException {

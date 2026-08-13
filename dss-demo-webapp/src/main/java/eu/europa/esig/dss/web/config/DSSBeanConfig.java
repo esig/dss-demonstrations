@@ -53,8 +53,8 @@ import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.sha2.Sha2FileCacheDataLoader;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationPresentationServiceImpl;
 import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationPresentationService;
+import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationPresentationServiceImpl;
 import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationSDCreationService;
 import eu.europa.esig.dss.ws.attestation.creation.common.RemoteAttestationSDCreationServiceImpl;
 import eu.europa.esig.dss.ws.attestation.validation.common.RemoteAttestationValidationService;
@@ -64,6 +64,7 @@ import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectio
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSService;
 import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSServiceImpl;
+import eu.europa.esig.dss.ws.signature.common.RemoteListOfTrustedEntitiesSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSService;
 import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSServiceImpl;
@@ -273,7 +274,7 @@ public class DSSBeanConfig {
 	
 	@Bean
     public CommonsDataLoader trustAllDataLoader() {
-		CommonsDataLoader trustAllDataLoader = configureCommonsDataLoader(new CommonsDataLoader());
+		CommonsDataLoader trustAllDataLoader = new CommonsDataLoader();
 		trustAllDataLoader.setTrustStrategy(TrustAllStrategy.INSTANCE);
 		return trustAllDataLoader;
     }
@@ -447,7 +448,11 @@ public class DSSBeanConfig {
 		certificateVerifier.setCrlSource(cachedCRLSource());
 		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setAIASource(cachedAIASource());
-		certificateVerifier.setTrustedCertSources(trustedListSource(), trustedEntitiesListSource(), trustedCertificateSource());
+
+		certificateVerifier.setTrustedCertSources(trustedListSource(), trustedCertificateSource());
+		if (loteEnabled) {
+			certificateVerifier.addTrustedCertSources(trustedEntitiesListSource());
+		}
 
 		// Default configs
 		certificateVerifier.setAlertOnMissingRevocationData(new ExceptionOnStatusAlert());
@@ -563,6 +568,15 @@ public class DSSBeanConfig {
 	public RemoteTrustedListSignatureServiceImpl remoteTrustedListSignatureService() {
 		RemoteTrustedListSignatureServiceImpl service = new RemoteTrustedListSignatureServiceImpl();
 		service.setXadesService(xadesService());
+		return service;
+	}
+
+	@Bean
+	public RemoteListOfTrustedEntitiesSignatureServiceImpl remoteListOfTrustedEntitiesSignatureService() {
+		RemoteListOfTrustedEntitiesSignatureServiceImpl service = new RemoteListOfTrustedEntitiesSignatureServiceImpl();
+		service.setXadesService(xadesService());
+		service.setJadesService(jadesService());
+		service.setCbadesService(cbadesService());
 		return service;
 	}
 
@@ -695,6 +709,7 @@ public class DSSBeanConfig {
 		TLValidationJob job = new TLValidationJob();
 		job.setTrustedListCertificateSource(trustedListSource());
 		job.setListOfTrustedListSources(listOfTrustedListSources());
+		job.setSynchronizationStrategy(new ExpirationAndSignatureCheckStrategyFixed());
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
 		return job;

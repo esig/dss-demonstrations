@@ -31,14 +31,17 @@ import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignListOfTrustedEntitiesDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignListOfTrustedEntitiesDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteListOfTrustedEntitiesSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
@@ -46,6 +49,7 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.soap.client.SoapListOfTrustedEntitiesSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapTrustedListSignatureService;
 import jakarta.xml.ws.WebServiceException;
@@ -77,6 +81,7 @@ public class SoapSignatureServiceIT extends AbstractIT {
 	private SoapDocumentSignatureService soapClient;
 	private SoapMultipleDocumentsSignatureService soapMultiDocsClient;
 	private SoapTrustedListSignatureService soapTLSigningClient;
+	private SoapListOfTrustedEntitiesSignatureService soapLoTESigningClient;
 
 	@BeforeEach
 	public void init() {
@@ -140,6 +145,25 @@ public class SoapSignatureServiceIT extends AbstractIT {
 		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
 		soapTLSigningClient = factory.create(SoapTrustedListSignatureService.class);
+
+		dataBinding = new JAXBDataBinding();
+		dataBinding.getConfiguredXmlAdapters().add(new DateAdapter());
+
+		factory = new JaxWsProxyFactoryBean();
+		factory.setServiceClass(SoapListOfTrustedEntitiesSignatureService.class);
+		factory.setProperties(props);
+		factory.setDataBinding(dataBinding);
+		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_SIGNATURE_LOTE);
+
+		loggingInInterceptor = new LoggingInInterceptor();
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		loggingOutInterceptor = new LoggingOutInterceptor();
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		soapLoTESigningClient = factory.create(SoapListOfTrustedEntitiesSignatureService.class);
 	}
 
 	@Test
@@ -876,6 +900,37 @@ public class SoapSignatureServiceIT extends AbstractIT {
 			assertNotNull(signedDocument);
 			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
 			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	public void testLoteSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/lote-no-sig.json"));
+			RemoteDocument loteToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+
+			RemoteListOfTrustedEntitiesSignatureParameters loteSignatureParameters = new RemoteListOfTrustedEntitiesSignatureParameters();
+			loteSignatureParameters.setSigningCertificate(signingCertificate);
+
+			DataToSignListOfTrustedEntitiesDTO dataToBeSignedDTO = new DataToSignListOfTrustedEntitiesDTO(loteToSign, loteSignatureParameters);
+			ToBeSignedDTO dataToBeSigned = soapLoTESigningClient.getDataToSign(dataToBeSignedDTO);
+			assertNotNull(dataToBeSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			SignListOfTrustedEntitiesDTO signLoTEDTO = new SignListOfTrustedEntitiesDTO(loteToSign, loteSignatureParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedLoTE = soapLoTESigningClient.signDocument(signLoTEDTO);
+			assertNotNull(signedLoTE);
 		}
 	}
 

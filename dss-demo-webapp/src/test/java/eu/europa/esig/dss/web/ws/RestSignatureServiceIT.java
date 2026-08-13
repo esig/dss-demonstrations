@@ -39,16 +39,19 @@ import eu.europa.esig.dss.ws.dto.SignatureValueDTO;
 import eu.europa.esig.dss.ws.dto.ToBeSignedDTO;
 import eu.europa.esig.dss.ws.signature.dto.CounterSignSignatureDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToBeCounterSignedDTO;
+import eu.europa.esig.dss.ws.signature.dto.DataToSignListOfTrustedEntitiesDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignMultipleDocumentsDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.DataToSignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.ExtendDocumentDTO;
+import eu.europa.esig.dss.ws.signature.dto.SignListOfTrustedEntitiesDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.SignTrustedListDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampMultipleDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.TimestampOneDocumentDTO;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteBLevelParameters;
+import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteListOfTrustedEntitiesSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureFieldParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureImageTextParameters;
@@ -56,6 +59,7 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTrustedListSignatureParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestListOfTrustedEntitiesSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestTrustedListSignatureService;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -85,6 +89,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	private RestDocumentSignatureService restClient;
 	private RestMultipleDocumentSignatureService restMultiDocsClient;
 	private RestTrustedListSignatureService restTLSigningClient;
+	private RestListOfTrustedEntitiesSignatureService restLoTESigningClient;
 
 	@BeforeEach
 	public void init() {
@@ -131,6 +136,20 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
 
 		restTLSigningClient = factory.create(RestTrustedListSignatureService.class);
+
+		factory = new JAXRSClientFactoryBean();
+
+		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_LOTE);
+		factory.setServiceClass(RestListOfTrustedEntitiesSignatureService.class);
+		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+
+		factory.getInInterceptors().add(loggingInInterceptor);
+		factory.getInFaultInterceptors().add(loggingInInterceptor);
+
+		factory.getOutInterceptors().add(loggingOutInterceptor);
+		factory.getOutFaultInterceptors().add(loggingOutInterceptor);
+
+		restLoTESigningClient = factory.create(RestListOfTrustedEntitiesSignatureService.class);
 	}
 
 	@Test
@@ -973,6 +992,37 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 			assertNotNull(signedDocument);
 			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
 			assertNotNull(iMD);
+		}
+	}
+
+	@Test
+	public void testLoteSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
+				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			DSSDocument documentToSign = new FileDocument(new File("src/test/resources/lote-no-sig.json"));
+			RemoteDocument loteToSign = RemoteDocumentConverter.toRemoteDocument(documentToSign);
+
+			RemoteCertificate signingCertificate = new RemoteCertificate(
+					dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded());
+
+			RemoteListOfTrustedEntitiesSignatureParameters loteSignatureParameters = new RemoteListOfTrustedEntitiesSignatureParameters();
+			loteSignatureParameters.setSigningCertificate(signingCertificate);
+
+			DataToSignListOfTrustedEntitiesDTO dataToBeSignedDTO = new DataToSignListOfTrustedEntitiesDTO(loteToSign, loteSignatureParameters);
+			ToBeSignedDTO dataToBeSigned = restLoTESigningClient.getDataToSign(dataToBeSignedDTO);
+			assertNotNull(dataToBeSigned);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToBeSigned),
+					DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+
+			SignListOfTrustedEntitiesDTO signLoTEDTO = new SignListOfTrustedEntitiesDTO(loteToSign, loteSignatureParameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedLoTE = restLoTESigningClient.signDocument(signLoTEDTO);
+			assertNotNull(signedLoTE);
 		}
 	}
 

@@ -33,27 +33,32 @@ import eu.europa.esig.dss.ws.server.signing.soap.SoapSignatureTokenConnectionImp
 import eu.europa.esig.dss.ws.server.signing.soap.client.SoapSignatureTokenConnection;
 import eu.europa.esig.dss.ws.signature.common.RemoteDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteExternalCMSService;
+import eu.europa.esig.dss.ws.signature.common.RemoteListOfTrustedEntitiesSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.ws.signature.common.RemotePAdESWithExternalCMSService;
 import eu.europa.esig.dss.ws.signature.common.RemoteTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.RestDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestExternalCMSServiceImpl;
+import eu.europa.esig.dss.ws.signature.rest.RestListOfTrustedEntitiesSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestMultipleDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestPAdESWithExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.RestTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestExternalCMSService;
+import eu.europa.esig.dss.ws.signature.rest.client.RestListOfTrustedEntitiesSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestPAdESWithExternalCMSService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestTrustedListSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.SoapDocumentSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapExternalCMSServiceImpl;
+import eu.europa.esig.dss.ws.signature.soap.SoapListOfTrustedEntitiesSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapMultipleDocumentsSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapPAdESWithExternalCMSServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.SoapTrustedListSignatureServiceImpl;
 import eu.europa.esig.dss.ws.signature.soap.client.DateAdapter;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapExternalCMSService;
+import eu.europa.esig.dss.ws.signature.soap.client.SoapListOfTrustedEntitiesSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapMultipleDocumentsSignatureService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapPAdESWithExternalCMSService;
 import eu.europa.esig.dss.ws.signature.soap.client.SoapTrustedListSignatureService;
@@ -98,6 +103,7 @@ public class CXFConfig {
 	public static final String SOAP_SIGNATURE_ONE_DOCUMENT = "/soap/signature/one-document";
 	public static final String SOAP_SIGNATURE_MULTIPLE_DOCUMENTS = "/soap/signature/multiple-documents";
 	public static final String SOAP_SIGNATURE_TRUSTED_LIST = "/soap/signature/trusted-list";
+	public static final String SOAP_SIGNATURE_LOTE = "/soap/signature/list-of-trusted-entities";
 	public static final String SOAP_SIGNATURE_PAdES_WITH_EXTERNAL_CMS = "/soap/signature/pades-external-cms";
 	public static final String SOAP_SIGNATURE_EXTERNAL_CMS = "/soap/signature/external-cms";
 	public static final String SOAP_VALIDATION = "/soap/validation";
@@ -111,6 +117,7 @@ public class CXFConfig {
 	public static final String REST_SIGNATURE_ONE_DOCUMENT = "/rest/signature/one-document";
 	public static final String REST_SIGNATURE_MULTIPLE_DOCUMENTS = "/rest/signature/multiple-documents";
 	public static final String REST_SIGNATURE_TRUSTED_LIST = "/rest/signature/trusted-list";
+	public static final String REST_SIGNATURE_LOTE = "/rest/signature/list-of-trusted-entities";
 	public static final String REST_SIGNATURE_PAdES_WITH_EXTERNAL_CMS = "/rest/signature/pades-external-cms";
 	public static final String REST_SIGNATURE_EXTERNAL_CMS = "/rest/signature/external-cms";
 	public static final String REST_VALIDATION = "/rest/validation";
@@ -141,6 +148,9 @@ public class CXFConfig {
 
 	@Autowired
 	private RemoteTrustedListSignatureService remoteTrustedListSignatureService;
+
+	@Autowired
+	private RemoteListOfTrustedEntitiesSignatureService remoteListOfTrustedEntitiesSignatureService;
 
 	@Autowired
 	private RemotePAdESWithExternalCMSService remotePadesWithExternalCmsService;
@@ -210,6 +220,13 @@ public class CXFConfig {
 	public SoapTrustedListSignatureService soapTrustedListSignatureService() {
 		SoapTrustedListSignatureServiceImpl service = new SoapTrustedListSignatureServiceImpl();
 		service.setService(remoteTrustedListSignatureService);
+		return service;
+	}
+
+	@Bean
+	public SoapListOfTrustedEntitiesSignatureService soapListOfTrustedEntitiesSignatureService() {
+		SoapListOfTrustedEntitiesSignatureServiceImpl service = new SoapListOfTrustedEntitiesSignatureServiceImpl();
+		service.setService(remoteListOfTrustedEntitiesSignatureService);
 		return service;
 	}
 
@@ -298,6 +315,15 @@ public class CXFConfig {
 	public Endpoint createSoapTrustedListSignatureEndpoint() {
 		EndpointImpl endpoint = new EndpointImpl(cxf, soapTrustedListSignatureService());
 		endpoint.publish(SOAP_SIGNATURE_TRUSTED_LIST);
+		addXmlAdapterDate(endpoint);
+		enableMTOM(endpoint);
+		return endpoint;
+	}
+
+	@Bean
+	public Endpoint createSoapListOfTrustedEntititesSignatureEndpoint() {
+		EndpointImpl endpoint = new EndpointImpl(cxf, soapListOfTrustedEntitiesSignatureService());
+		endpoint.publish(SOAP_SIGNATURE_LOTE);
 		addXmlAdapterDate(endpoint);
 		enableMTOM(endpoint);
 		return endpoint;
@@ -408,6 +434,13 @@ public class CXFConfig {
 	public RestTrustedListSignatureService restTrustedListSignatureService() {
 		RestTrustedListSignatureServiceImpl service = new RestTrustedListSignatureServiceImpl();
 		service.setService(remoteTrustedListSignatureService);
+		return service;
+	}
+
+	@Bean
+	public RestListOfTrustedEntitiesSignatureService restListOfTrustedEntitiesSignatureService() {
+		RestListOfTrustedEntitiesSignatureServiceImpl service = new RestListOfTrustedEntitiesSignatureServiceImpl();
+		service.setService(remoteListOfTrustedEntitiesSignatureService);
 		return service;
 	}
 
@@ -548,6 +581,17 @@ public class CXFConfig {
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
 		sfb.setFeatures(createFeatures(RestTrustedListSignatureService.class.getName()));
+		return sfb.create();
+	}
+
+	@Bean
+	public Server createListOfTrustedEntitiesRestService() {
+		JAXRSServerFactoryBean sfb = new JAXRSServerFactoryBean();
+		sfb.setServiceBean(restListOfTrustedEntitiesSignatureService());
+		sfb.setAddress(REST_SIGNATURE_LOTE);
+		sfb.setProvider(jacksonJsonProvider());
+		sfb.setProvider(exceptionRestMapper());
+		sfb.setFeatures(createFeatures(RestListOfTrustedEntitiesSignatureService.class.getName()));
 		return sfb.create();
 	}
 
