@@ -478,6 +478,7 @@ public class SignatureController extends AbstractController {
 							activateRadioButtons(envelopingRadio, envelopedRadio, detachedRadio, internallyDetachedRadio);
 						}
 						activateRadioButtons(tlSigning, xmlManifest, loteSigning);
+						disableRadioButtons(vicalSigning);
 						break;
 
 					case JAdES:
