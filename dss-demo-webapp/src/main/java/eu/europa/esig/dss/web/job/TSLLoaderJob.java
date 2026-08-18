@@ -4,6 +4,7 @@ import eu.europa.esig.dss.spi.DSSSecurityProvider;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.utils.Utils;
 import jakarta.annotation.PostConstruct;
+import org.bouncycastle.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class TSLLoaderJob {
 	@Value("${bc.asn1.max_cons_depth:}")
 	private String bcAsn1MaxConsDepth;
 
+	@Value("${bc.pkcs1.strict_digestinfo:}")
+	private String bcStrictDigestInfo;
+
 	@Value("${xmlsec.manifest.max.references:}")
 	private String xmlsecManifestMaxRefsCount;
 
@@ -53,8 +57,12 @@ public class TSLLoaderJob {
 			System.setProperty("org.bouncycastle.asn1.allow_wrong_oid_enc", bcAllowWrongOidEncoding);
 		}
 		if (Utils.isStringNotEmpty(bcAsn1MaxConsDepth)) {
-			LOG.info("Set org.bouncycastle.asn1.max_cons_depth : {}", bcAsn1MaxConsDepth);
-			System.setProperty("org.bouncycastle.asn1.max_cons_depth", bcAsn1MaxConsDepth);
+			LOG.info("Set {} : {}", Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
+			System.setProperty(Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
+		}
+		if (Utils.isStringNotEmpty(bcStrictDigestInfo)) {
+			LOG.info("Set {} : {}", Properties.PKCS1_STRICT_DIGESTINFO, bcStrictDigestInfo);
+			System.setProperty(Properties.PKCS1_STRICT_DIGESTINFO, bcStrictDigestInfo);
 		}
 		if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
 			LOG.info("Set org.apache.xml.security.maxReferences : {}", xmlsecManifestMaxRefsCount);

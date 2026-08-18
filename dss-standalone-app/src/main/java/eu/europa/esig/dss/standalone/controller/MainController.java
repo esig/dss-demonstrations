@@ -15,6 +15,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.bouncycastle.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,8 +84,13 @@ public class MainController extends AbstractController {
         }
         String bcAsn1MaxConsDepth = PropertyReader.getProperty("bc.asn1.max_cons_depth");
         if (Utils.isStringNotEmpty(bcAsn1MaxConsDepth)) {
-            LOG.info("Set org.bouncycastle.asn1.max_cons_depth : {}", bcAsn1MaxConsDepth);
-            System.setProperty("org.bouncycastle.asn1.max_cons_depth", bcAsn1MaxConsDepth);
+            LOG.info("Set {} : {}", Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
+            System.setProperty(Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
+        }
+        String bcPkcs1StrictDigestInfo = PropertyReader.getProperty("bc.pkcs1.strict_digestinfo");
+        if (Utils.isStringNotEmpty(bcPkcs1StrictDigestInfo)) {
+            LOG.info("Set {} : {}", Properties.PKCS1_STRICT_DIGESTINFO, bcPkcs1StrictDigestInfo);
+            System.setProperty(Properties.PKCS1_STRICT_DIGESTINFO, bcPkcs1StrictDigestInfo);
         }
 
         String xmlsecManifestMaxRefsCount = PropertyReader.getProperty("xmlsec.manifest.max.references");
