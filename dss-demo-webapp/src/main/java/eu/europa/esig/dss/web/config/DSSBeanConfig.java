@@ -709,7 +709,6 @@ public class DSSBeanConfig {
 		TLValidationJob job = new TLValidationJob();
 		job.setTrustedListCertificateSource(trustedListSource());
 		job.setListOfTrustedListSources(listOfTrustedListSources());
-		job.setSynchronizationStrategy(new ExpirationAndSignatureCheckStrategyFixed());
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
 		return job;
