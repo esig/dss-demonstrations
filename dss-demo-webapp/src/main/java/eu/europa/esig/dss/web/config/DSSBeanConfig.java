@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.config;
 
+import eu.europa.esig.dss.alert.Alert;
 import eu.europa.esig.dss.alert.ExceptionOnStatusAlert;
 import eu.europa.esig.dss.asic.cades.signature.ASiCWithCAdESService;
 import eu.europa.esig.dss.asic.xades.signature.ASiCWithXAdESService;
@@ -12,6 +13,8 @@ import eu.europa.esig.dss.jades.signature.JAdESService;
 import eu.europa.esig.dss.lote.job.LoTEValidationJob;
 import eu.europa.esig.dss.lote.source.LoLoTESource;
 import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.tsl.LOTLInfo;
+import eu.europa.esig.dss.model.tsl.TLInfo;
 import eu.europa.esig.dss.model.tsl.TrustServiceStatusAndInformationExtensions;
 import eu.europa.esig.dss.pades.signature.ExternalCMSService;
 import eu.europa.esig.dss.pades.signature.PAdESService;
@@ -44,6 +47,18 @@ import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
+import eu.europa.esig.dss.tsl.alerts.LOTLAlert;
+import eu.europa.esig.dss.tsl.alerts.TLAlert;
+import eu.europa.esig.dss.tsl.alerts.detections.LOTLLocationChangeDetection;
+import eu.europa.esig.dss.tsl.alerts.detections.OJUrlChangeDetection;
+import eu.europa.esig.dss.tsl.alerts.detections.TLExpirationDetection;
+import eu.europa.esig.dss.tsl.alerts.detections.TLSignatureErrorDetection;
+import eu.europa.esig.dss.tsl.alerts.detections.TSLSequenceNumberErrorDetection;
+import eu.europa.esig.dss.tsl.alerts.handlers.log.LogLOTLLocationChangeAlertHandler;
+import eu.europa.esig.dss.tsl.alerts.handlers.log.LogOJUrlChangeAlertHandler;
+import eu.europa.esig.dss.tsl.alerts.handlers.log.LogTLExpirationAlertHandler;
+import eu.europa.esig.dss.tsl.alerts.handlers.log.LogTLSignatureErrorAlertHandler;
+import eu.europa.esig.dss.tsl.alerts.handlers.log.LogTSLSequenceNumberErrorAlertHandler;
 import eu.europa.esig.dss.tsl.function.GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.function.TrustAnchorPeriodPredicate;
@@ -171,6 +186,21 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.ades.tl.versions}")
 	private List<Integer> adesTLVersions;
+
+	@Value("${tl.loader.alert.tl.signature.enable}")
+	private boolean tlAlertSignatureEnabled;
+
+	@Value("${tl.loader.alert.tl.expiration.enable}")
+	private boolean tlAlertExpirationEnabled;
+
+	@Value("${tl.loader.alert.tl.sequence.number.enable}")
+	private boolean tlAlertSequenceNumberEnabled;
+
+	@Value("${tl.loader.alert.lotl.url.enable}")
+	private boolean lotlAlertLocationEnabled;
+
+	@Value("${tl.loader.alert.lotl.oj.url.enable}")
+	private boolean lotlAlertOJUrlEnabled;
 
 	@Value("${cron.lote.loader.enable}")
 	private boolean loteEnabled;
@@ -704,14 +734,76 @@ public class DSSBeanConfig {
 		}
 	}
 	
-	@Bean 
+	@Bean
 	public TLValidationJob job() {
 		TLValidationJob job = new TLValidationJob();
 		job.setTrustedListCertificateSource(trustedListSource());
-		job.setListOfTrustedListSources(listOfTrustedListSources());
+		LOTLSource europeanLOTL = europeanLOTL();
+		if (adesLotlEnabled) {
+			job.setListOfTrustedListSources(europeanLOTL, adesLOTL());
+		} else {
+			job.setListOfTrustedListSources(europeanLOTL);
+		}
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
+		job.setTLAlerts(tlAlerts());
+		job.setLOTLAlerts(lotlAlerts(europeanLOTL));
 		return job;
+	}
+
+	private List<Alert<TLInfo>> tlAlerts() {
+		List<Alert<TLInfo>> tlAlerts = new ArrayList<>();
+		if (tlAlertSignatureEnabled) {
+			tlAlerts.add(tlSigningAlert());
+		}
+		if (tlAlertExpirationEnabled) {
+			tlAlerts.add(tlExpirationAlert());
+		}
+		if (tlAlertSequenceNumberEnabled) {
+			tlAlerts.add(tslSequenceNumberAlert());
+		}
+		return tlAlerts;
+	}
+
+	private TLAlert tlSigningAlert() {
+		TLSignatureErrorDetection signingDetection = new TLSignatureErrorDetection();
+		LogTLSignatureErrorAlertHandler handler = new LogTLSignatureErrorAlertHandler();
+		return new TLAlert(signingDetection, handler);
+	}
+
+	private TLAlert tlExpirationAlert() {
+		TLExpirationDetection expirationDetection = new TLExpirationDetection();
+		LogTLExpirationAlertHandler handler = new LogTLExpirationAlertHandler();
+		return new TLAlert(expirationDetection, handler);
+	}
+
+	private TLAlert tslSequenceNumberAlert() {
+		TSLSequenceNumberErrorDetection tslSequenceNumberDetection = new TSLSequenceNumberErrorDetection();
+		LogTSLSequenceNumberErrorAlertHandler handler = new LogTSLSequenceNumberErrorAlertHandler();
+		return new TLAlert(tslSequenceNumberDetection, handler);
+	}
+
+	private List<Alert<LOTLInfo>> lotlAlerts(LOTLSource lotl) {
+		List<Alert<LOTLInfo>> lotlAlerts = new ArrayList<>();
+		if (lotlAlertLocationEnabled) {
+			lotlAlerts.add(lotlLocationAlert(lotl));
+		}
+		if (lotlAlertOJUrlEnabled) {
+			lotlAlerts.add(ojUrlAlert(lotl));
+		}
+		return lotlAlerts;
+	}
+
+	private LOTLAlert ojUrlAlert(LOTLSource source) {
+		OJUrlChangeDetection ojUrlDetection = new OJUrlChangeDetection(source);
+		LogOJUrlChangeAlertHandler handler = new LogOJUrlChangeAlertHandler();
+		return new LOTLAlert(ojUrlDetection, handler);
+	}
+
+	private LOTLAlert lotlLocationAlert(LOTLSource source) {
+		LOTLLocationChangeDetection lotlLocationDetection = new LOTLLocationChangeDetection(source);
+		LogLOTLLocationChangeAlertHandler handler = new LogLOTLLocationChangeAlertHandler();
+		return new LOTLAlert(lotlLocationDetection, handler);
 	}
 
 	@Bean
@@ -731,15 +823,6 @@ public class DSSBeanConfig {
 		} else {
 			return dataLoader();
 		}
-	}
-
-	private LOTLSource[] listOfTrustedListSources() {
-		List<LOTLSource> lotlSourceList = new ArrayList<>();
-		lotlSourceList.add(europeanLOTL());
-		if (adesLotlEnabled) {
-			lotlSourceList.add(adesLOTL());
-		}
-		return lotlSourceList.toArray(new LOTLSource[0]);
 	}
 
 	@Bean(name = "european-lotl-source")
