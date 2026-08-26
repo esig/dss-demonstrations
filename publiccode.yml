@@ -34,14 +34,14 @@ localisation:
 maintenance:
   contacts:
     - name: David Naramski
-    - name: Pierrick Vandenbroucke
     - name: Aleksandr Beliakov
+    - name: Axel Abinet
   type: internal
 name: DSS Demonstrations
 platforms:
   - windows
   - linux
-releaseDate: '2026-03-06'
+releaseDate: '2026-08-27'
 softwareType: standalone/other
 url: 'https://code.europa.eu/dit/dss-demonstrations.git'
-softwareVersion: '6.4'
+softwareVersion: '6.5'
