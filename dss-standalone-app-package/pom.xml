@@ -7,18 +7,18 @@
 	</parent>
 	<artifactId>dss-standalone-app-package</artifactId>
 	<name>DSS standalone application packager</name>
-	
+
 	<properties>
 		<!-- Windows -->
-		<jre.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.1%2B8/OpenJDK26U-jre_x64_windows_hotspot_26.0.1_8.zip</jre.download.link>
-		<jre.root.folder>jdk-26.0.1+8-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.2%2B10/OpenJDK26U-jre_x64_windows_hotspot_26.0.2_10.zip</jre.download.link>
+        <jre.root.folder>jdk-26.0.2+10-jre</jre.root.folder>
 
-		<fx.sdk.download.link>https://download.java.net/java/GA/javafx26.0.1/8e81b911af59415286d745a64d36b878/4/openjfx-26.0.1_windows-x64_bin-sdk.zip</fx.sdk.download.link>
-		<fx.root.folder>javafx-sdk-26.0.1</fx.root.folder>
+		<fx.sdk.download.link>https://download2.gluonhq.com/openjfx/26.0.2/openjfx-26.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
+		<fx.root.folder>javafx-sdk-26.0.2</fx.root.folder>
 
 		<!-- Linux -->
-		<jre.linux.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.1%2B8/OpenJDK26U-jre_x64_linux_hotspot_26.0.1_8.tar.gz</jre.linux.download.link>
-		<fx.sdk.linux.download.link>https://download.java.net/java/GA/javafx26.0.1/8e81b911af59415286d745a64d36b878/4/openjfx-26.0.1_linux-x64_bin-sdk.tar.gz</fx.sdk.linux.download.link>
+		<jre.linux.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.2%2B10/OpenJDK26U-jdk_x64_linux_hotspot_26.0.2_10.tar.gz</jre.linux.download.link>
+		<fx.sdk.linux.download.link>https://download2.gluonhq.com/openjfx/26.0.2/openjfx-26.0.2_linux-x64_bin-sdk.zip</fx.sdk.linux.download.link>
 	</properties>
 
 	<dependencies>
