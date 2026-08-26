@@ -14,7 +14,7 @@ RUN mvn package -pl dss-standalone-app,dss-standalone-app-package,dss-demo-webap
 
 USER demouser
 
-FROM tomcat:11.0.23-jdk25-temurin
+FROM tomcat:11.0.25-jdk25-temurin
 
 COPY --from=build /home/demouser/dss-demonstrations/dss-demo-webapp/target/dss-demo-webapp-*.war /usr/local/tomcat/webapps/ROOT.war
 
