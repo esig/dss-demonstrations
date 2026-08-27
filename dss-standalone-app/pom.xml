@@ -7,9 +7,9 @@
 	</parent>
 	<artifactId>dss-standalone-app</artifactId>
 	<name>DSS Standalone application</name>
-	
+
 	<properties>
-		<javafx.version>17</javafx.version>
+		<javafx.version>17.0.20</javafx.version>
 	</properties>
 
 	<build>
