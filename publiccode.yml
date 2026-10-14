@@ -41,7 +41,7 @@ name: DSS Demonstrations
 platforms:
   - windows
   - linux
-releaseDate: '2026-08-28'
+releaseDate: '2026-10-14'
 softwareType: standalone/other
 url: 'https://code.europa.eu/dit/dss-demonstrations.git'
-softwareVersion: '6.5'
+softwareVersion: '6.5.1'
