@@ -31,6 +31,9 @@ public class TSLLoaderJob {
 	@Value("${bc.asn1.max_cons_depth:}")
 	private String bcAsn1MaxConsDepth;
 
+	@Value("${bc.asn1.allow_zoneless_utctime:}")
+	private String bcAllowZonelessUtctime;
+
 	@Value("${bc.pkcs1.strict_digestinfo:}")
 	private String bcStrictDigestInfo;
 
@@ -59,6 +62,10 @@ public class TSLLoaderJob {
 		if (Utils.isStringNotEmpty(bcAsn1MaxConsDepth)) {
 			LOG.info("Set {} : {}", Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
 			System.setProperty(Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
+		}
+		if (Utils.isStringNotEmpty(bcAllowZonelessUtctime)) {
+			LOG.info("Set {} : {}", Properties.ASN1_ALLOW_ZONELESS_UTCTIME, bcAllowZonelessUtctime);
+			System.setProperty(Properties.ASN1_ALLOW_ZONELESS_UTCTIME, bcAllowZonelessUtctime);
 		}
 		if (Utils.isStringNotEmpty(bcStrictDigestInfo)) {
 			LOG.info("Set {} : {}", Properties.PKCS1_STRICT_DIGESTINFO, bcStrictDigestInfo);

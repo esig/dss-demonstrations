@@ -87,6 +87,11 @@ public class MainController extends AbstractController {
             LOG.info("Set {} : {}", Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
             System.setProperty(Properties.ASN1_MAX_CONS_DEPTH, bcAsn1MaxConsDepth);
         }
+        String bcAllowZonelessUtctime = PropertyReader.getProperty("bc.asn1.allow_zoneless_utctime");
+        if (Utils.isStringNotEmpty(bcAllowZonelessUtctime)) {
+            LOG.info("Set {} : {}", Properties.ASN1_ALLOW_ZONELESS_UTCTIME, bcAllowZonelessUtctime);
+            System.setProperty(Properties.ASN1_ALLOW_ZONELESS_UTCTIME, bcAllowZonelessUtctime);
+        }
         String bcPkcs1StrictDigestInfo = PropertyReader.getProperty("bc.pkcs1.strict_digestinfo");
         if (Utils.isStringNotEmpty(bcPkcs1StrictDigestInfo)) {
             LOG.info("Set {} : {}", Properties.PKCS1_STRICT_DIGESTINFO, bcPkcs1StrictDigestInfo);
