@@ -46,14 +46,6 @@
             <artifactId>swagger-ui</artifactId>
         </dependency>
 
-        <!-- Downgrading groovy version, see the following issue for more details : https://github.com/spring-projects/spring-boot/issues/49277 -->
-        <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <version>5.0.3</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- DSS Core dependencies -->
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -520,7 +512,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>3.5.6</version>
+                        <version>3.6.0</version>
                         <executions>
                             <execution>
                                 <goals>

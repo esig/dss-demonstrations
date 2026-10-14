@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
-			<version>4.0.32</version>
+			<version>4.0.33</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
