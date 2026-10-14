@@ -43,6 +43,7 @@ public class SoapDocumentValidationIT extends AbstractIT {
 		Map<String, Object> props = new HashMap<>();
 		props.put("mtom-enabled", Boolean.TRUE);
 //		props.put("jaxb.additionalContextClasses", getExtraClasses());
+		props.put("attachment-max-count", 100); // increase limit for the #testValidateSignatureWithDetachedEvidenceRecord test
 		factory.setProperties(props);
 
 		factory.setAddress(getBaseCxf() + CXFConfig.SOAP_VALIDATION);
