@@ -10,14 +10,14 @@
 
 	<properties>
 		<!-- Windows -->
-		<jre.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.2%2B10/OpenJDK26U-jre_x64_windows_hotspot_26.0.2_10.zip</jre.download.link>
-        <jre.root.folder>jdk-26.0.2+10-jre</jre.root.folder>
+		<jre.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.2.1%2B1/OpenJDK26U-jre_x64_windows_hotspot_26.0.2.1_1.zip</jre.download.link>
+        <jre.root.folder>jdk-26.0.2.1+1-jre</jre.root.folder>
 
 		<fx.sdk.download.link>https://download.java.net/java/GA/javafx26.0.2/9693849436684107a5d005509c8d97a4/3/openjfx-26.0.2_windows-x64_bin-sdk.zip</fx.sdk.download.link>
 		<fx.root.folder>javafx-sdk-26.0.2</fx.root.folder>
 
 		<!-- Linux -->
-		<jre.linux.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.2%2B10/OpenJDK26U-jre_x64_linux_hotspot_26.0.2_10.tar.gz</jre.linux.download.link>
+		<jre.linux.download.link>https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.2.1%2B1/OpenJDK26U-jre_x64_linux_hotspot_26.0.2.1_1.tar.gz</jre.linux.download.link>
 		<fx.sdk.linux.download.link>https://download.java.net/java/GA/javafx26.0.2/9693849436684107a5d005509c8d97a4/3/openjfx-26.0.2_linux-x64_bin-sdk.tar.gz</fx.sdk.linux.download.link>
 	</properties>
 
